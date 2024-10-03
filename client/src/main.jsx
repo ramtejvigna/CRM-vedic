@@ -15,12 +15,14 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-tailwind/react";
 import "./index.css";
-
+import {ToastContainer} from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
           <App />
+          <ToastContainer/>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>

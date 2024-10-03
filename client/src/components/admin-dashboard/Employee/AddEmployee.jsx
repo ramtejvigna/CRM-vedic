@@ -6,18 +6,21 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { Input } from '@material-tailwind/react';
 import { TextField, InputLabel, Typography } from '@mui/material';
-import {Link, Navigate} from 'react-router-dom';
+import {Link, Navigate, redirect} from 'react-router-dom';
+import {toast} from "react-toastify"
 import { useNavigate } from 'react-router-dom';
+import { ADD_EMPLOYEE_ROUTE } from '../../../utils/constants';
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
 const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'financial']
 const AddEmployee = () => {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
     const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         personalInfo: {
-            fullName: '',
-            dob: '',
+            username: '',
+            name: '',
             phone: '',
             email: '',
             city: '',
@@ -62,16 +65,17 @@ const AddEmployee = () => {
         const formErrors = {};
 
 
-        // if (activeStep === 0) {
-        //     if (!form.fullName) formErrors.fullName = 'Full Name is required';
-        //     if (!form.email) formErrors.email = 'Email is required';
-        //     if (!form.dob) formErrors.dob = 'Date of Birth is required';
-        //     if (!form.address) formErrors.address = 'Address is required';
-        //     if (!form.phone) formErrors.phone = 'Phone number is required';
-        //     if (!form.state) formErrors.state = 'State is required';
-        //     if (!form.pincode) formErrors.pincode = 'Pincode is required';
-        //     if (!form.country) formErrors.country = 'Country is required';
-        // }
+        if (activeStep === 0) {
+            if (!form.username) formErrors.fullName = 'Full Name is required';
+            if (!form.email) formErrors.email = 'Email is required';
+            if (!form.name) formErrors.dob = 'Date of Birth is required';
+            if (!form.address) formErrors.address = 'Address is required';
+            if (!form.city) formErrors.city = 'city is required';
+            if (!form.phone) formErrors.phone = 'Phone number is required';
+            if (!form.state) formErrors.state = 'State is required';
+            if (!form.pincode) formErrors.pincode = 'Pincode is required';
+            if (!form.country) formErrors.country = 'Country is required';
+        }
 
         // if (activeStep === 1) {
         //     if (!form.aadhar) formErrors.aadhar = 'Aadhar Card is required';
@@ -117,10 +121,33 @@ const AddEmployee = () => {
 
 
 
-    const handleSubmit = () => {
 
-        console.log('Form submitted successfully:', formData);
-        alert('Employee added successfully!');
+    const handleSubmit = async  (e) => {
+        e.preventDefault();
+        try {
+            setIsLoading(true);
+            const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
+                method : "POST",
+                headers : {
+                    "Content-Type" : "application/json"
+                },
+                body : JSON.stringify({
+                    ...formData[formKeys[0]]
+                }),
+            })
+
+            if(!res.ok) {
+                throw new Error("NetWork issue");
+            }
+
+            const data = await res.json();
+            setIsLoading(false);
+            
+            toast.success("employee created");
+        } catch (error) {
+            alert(error);
+        }
+
     };
 
 
@@ -133,22 +160,22 @@ const AddEmployee = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
                                 className="flex-1"
-                                label="Full Name"
-                                name="fullName"
-                                value={formData.personalInfo.fullName}
+                                label="username"
+                                name="username"
+                                value={formData.personalInfo.username}
                                 onChange={handleChange}
-                                error={!!errors.fullName}
-                                helperText={errors.fullName}
+                                error={!!errors.username}
+                                helperText={errors.username}
                                 InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
                             />
                             <TextField
                                 className="flex-1"
-                                type="date"
-                                name="dob"
-                                value={formData.personalInfo.dob}
+                                label = "name"
+                                name="name"
+                                value={formData.personalInfo.name}
                                 onChange={handleChange}
-                                error={!!errors.dob}
-                                helperText={errors.dob}
+                                error={!!errors.name}
+                                helperText={errors.name}
                                 InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
                             />
                         </div>
@@ -176,16 +203,29 @@ const AddEmployee = () => {
                         </div>
     
                         <h3 className="text-lg font-semibold text-gray-700">Address</h3>
-                        <TextField
-                            label="Address"
-                            name="address"
-                            value={formData.personalInfo.address}
-                            onChange={handleChange}
-                            error={!!errors.address}
-                            helperText={errors.address}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <TextField
+                                label="Address"
+                                name="address"
+                                value={formData.personalInfo.address}
+                                onChange={handleChange}
+                                error={!!errors.address}
+                                helperText={errors.address}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                            />
+                            <TextField
+                                label="City"
+                                name="city"
+                                value={formData.personalInfo.city}
+                                onChange={handleChange}
+                                error={!!errors.city}
+                                helperText={errors.city}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                            />
+
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <TextField
                                 label="State"
@@ -393,7 +433,11 @@ const AddEmployee = () => {
         }
     };
     
-    return (
+    return isLoading ?  (
+         <div className='h-full flex items-center justify-center'>
+            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full"/>
+         </div>
+    ) : (
         <div className="h-full p-5 ">
             <Box className="flex flex-col  h-full p-5 ">
                 <Stepper activeStep={activeStep} className="p-10 w-full">
