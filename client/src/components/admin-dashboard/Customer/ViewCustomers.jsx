@@ -22,15 +22,15 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 
 const customerData = [
   { sino: 1, name: 'Manoj', whatsapp: '7799101777', gender: 'Male', employee: 'Employee1 Ram', status: 'In progress', pdfs: '1' },
-  { sino: 2, name: 'Srikar', whatsapp: '7556575877', gender: 'Male', employee: 'Employee2 Mounika', status: 'Pending', pdfs: '0' },
-  { sino: 3, name: 'Priya', whatsapp: '7799201788', gender: 'Female', employee: 'Employee3 Riya', status: 'In progress', pdfs: '2' },
-  { sino: 4, name: 'Nisha', whatsapp: '7799101788', gender: 'Female', employee: 'Employee4 Riya', status: 'Pending', pdfs: '1' },
-  { sino: 5, name: 'Ajay', whatsapp: '7799101778', gender: 'Male', employee: 'Employee5 Ram', status: 'In progress', pdfs: '1' },
-  { sino: 6, name: 'Ravi', whatsapp: '7799101779', gender: 'Male', employee: 'Employee6 Mounika', status: 'In progress', pdfs: '2' },
-  { sino: 7, name: 'Sita', whatsapp: '7799101780', gender: 'Female', employee: 'Employee7 Riya', status: 'Pending', pdfs: '0' },
-  { sino: 8, name: 'Gita', whatsapp: '7799101781', gender: 'Female', employee: 'Employee8 Riya', status: 'In progress', pdfs: '1' },
-  { sino: 9, name: 'Sunil', whatsapp: '7799101782', gender: 'Male', employee: 'Employee9 Ram', status: 'Pending', pdfs: '2' },
-  { sino: 10, name: 'Neha', whatsapp: '7799101783', gender: 'Female', employee: 'Employee10 Mounika', status: 'In progress', pdfs: '0' },
+  { sino: 2, name: 'Srikar', whatsapp: '7556575877', gender: 'Male', employee: 'Employee2 Mounika', status: 'Pending', pdfs: '0' },
+  { sino: 3, name: 'Priya', whatsapp: '7799201788', gender: 'Female', employee: 'Employee3 Riya', status: 'In progress', pdfs: '2' },
+  { sino: 4, name: 'Nisha', whatsapp: '7799101788', gender: 'Female', employee: 'Employee4 Riya', status: 'Pending', pdfs: '1' },
+  { sino: 5, name: 'Ajay', whatsapp: '7799101778', gender: 'Male', employee: 'Employee5 Ram', status: 'In progress', pdfs: '1' },
+  { sino: 6, name: 'Ravi', whatsapp: '7799101779', gender: 'Male', employee: 'Employee6 Mounika', status: 'In progress', pdfs: '2' },
+  { sino: 7, name: 'Sita', whatsapp: '7799101780', gender: 'Female', employee: 'Employee7 Riya', status: 'Pending', pdfs: '0' },
+  { sino: 8, name: 'Gita', whatsapp: '7799101781', gender: 'Female', employee: 'Employee8 Riya', status: 'In progress', pdfs: '1' },
+  { sino: 9, name: 'Sunil', whatsapp: '7799101782', gender: 'Male', employee: 'Employee9 Ram', status: 'Pending', pdfs: '2' },
+  { sino: 10, name: 'Neha', whatsapp: '7799101783', gender: 'Female', employee: 'Employee10 Mounika', status: 'In progress', pdfs: '0' },
 ];
 
 const getStatusContainer = (status) => (
@@ -81,17 +81,17 @@ const CustomerDetails = () => {
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   return (
-    <Box sx={{ position: 'relative', padding: '20px', paddingBottom: '80px' }}>
+    <Box sx={{ position: 'relative', padding: '20px', paddingBottom: '80px'}}>
       <Box
         sx={{
           backgroundColor: '#1E90FF',
           color: '#fff',
-          padding: '15px',
-          borderRadius: '8px',
+          padding: '1.25rem',
+          borderRadius: '20px',
           width: '1100px',
           height: '75px',
           position: 'absolute',
-          top: '30px',
+          top: '20px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 2,
@@ -100,7 +100,7 @@ const CustomerDetails = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+        <Typography className='text-xl' component="div" sx={{ fontWeight: 'bold' }}>
           Customer Details
         </Typography>
         <Button
@@ -108,66 +108,71 @@ const CustomerDetails = () => {
           color="primary"
           startIcon={<FilterListIcon />}
           onClick={() => setShowFilters(!showFilters)}
+          sx={{
+            backgroundColor: '#000',
+            borderRadius: '10px',
+            
+          }}
         >
           Filter
         </Button>
       </Box>
 
       {showFilters && (
-  <Box
-    sx={{
-      position: 'absolute',
-      right: '20px',
-      top: '120px',
-      zIndex: 3,
-      backgroundColor: 'white',
-      padding: '16px',
-      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-    }}
-  >
-    <FormControl fullWidth sx={{ mb: 2 }}>
-      <InputLabel id="gender-label">Gender</InputLabel>
-      <Select
-        labelId="gender-label"
-        value={filteredGender}
-        onChange={handleGenderChange}
-        sx={{
-          border: 'none', // Remove the border
-          '& fieldset': {
-            border: 'none', // Remove the outline around the Select
-          },
-        }}
-      >
-        <MenuItem value="All">All</MenuItem>
-        <MenuItem value="Male">Male</MenuItem>
-        <MenuItem value="Female">Female</MenuItem>
-      </Select>
-    </FormControl>
-    <FormControl fullWidth>
-      <InputLabel id="status-label">Status</InputLabel>
-      <Select
-        labelId="status-label"
-        value={filteredStatus}
-        onChange={handleStatusChange}
-        sx={{
-          border: 'none', // Remove the border
-          '& fieldset': {
-            border: 'none', // Remove the outline around the Select
-          },
-        }}
-      >
-        <MenuItem value="All">All</MenuItem>
-        <MenuItem value="In progress">In progress</MenuItem>
-        <MenuItem value="Pending">Pending</MenuItem>
-      </Select>
-    </FormControl>
-  </Box>
-)}
+        <Box
+          sx={{
+            position: 'absolute',
+            right: '20px',
+            top: '120px',
+            zIndex: 3,
+            backgroundColor: 'white',
+            padding: '16px',
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="gender-label">Gender</InputLabel>
+            <Select
+              labelId="gender-label"
+              value={filteredGender}
+              onChange={handleGenderChange}
+              sx={{
+                border: 'none', // Remove the border
+                '& fieldset': {
+                  border: 'none', // Remove the outline around the Select
+                },
+              }}
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel id="status-label">Status</InputLabel>
+            <Select
+              labelId="status-label"
+              value={filteredStatus}
+              onChange={handleStatusChange}
+              sx={{
+                border: 'none', // Remove the border
+                '& fieldset': {
+                  border: 'none', // Remove the outline around the Select
+                },
+              }}
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="In progress">In progress</MenuItem>
+              <MenuItem value="Pending">Pending</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      )}
 
 
 
       <Box sx={{ marginTop: '30px', paddingBottom: '80px' }}>
-        <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px' }}>
+        <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px', padding: '10px', borderRadius: '20px'  }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
