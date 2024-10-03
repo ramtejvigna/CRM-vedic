@@ -62,42 +62,42 @@ const AddEmployee = () => {
         const formErrors = {};
 
 
-        if (activeStep === 0) {
-            if (!form.fullName) formErrors.fullName = 'Full Name is required';
-            if (!form.email) formErrors.email = 'Email is required';
-            if (!form.dob) formErrors.dob = 'Date of Birth is required';
-            if (!form.address) formErrors.address = 'Address is required';
-            if (!form.phone) formErrors.phone = 'Phone number is required';
-            if (!form.state) formErrors.state = 'State is required';
-            if (!form.pincode) formErrors.pincode = 'Pincode is required';
-            if (!form.country) formErrors.country = 'Country is required';
-        }
+        // if (activeStep === 0) {
+        //     if (!form.fullName) formErrors.fullName = 'Full Name is required';
+        //     if (!form.email) formErrors.email = 'Email is required';
+        //     if (!form.dob) formErrors.dob = 'Date of Birth is required';
+        //     if (!form.address) formErrors.address = 'Address is required';
+        //     if (!form.phone) formErrors.phone = 'Phone number is required';
+        //     if (!form.state) formErrors.state = 'State is required';
+        //     if (!form.pincode) formErrors.pincode = 'Pincode is required';
+        //     if (!form.country) formErrors.country = 'Country is required';
+        // }
 
-        if (activeStep === 1) {
-            if (!form.aadhar) formErrors.aadhar = 'Aadhar Card is required';
-            if (!form.pan) formErrors.pan = 'PAN Card is required';
-            if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-            if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
-        }
+        // if (activeStep === 1) {
+        //     if (!form.aadhar) formErrors.aadhar = 'Aadhar Card is required';
+        //     if (!form.pan) formErrors.pan = 'PAN Card is required';
+        //     if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
+        //     if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
+        // }
 
 
-        if (activeStep === 2) {
-            if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
-            if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
-        }
+        // if (activeStep === 2) {
+        //     if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
+        //     if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
+        // }
 
-        if (activeStep === 3) {
-            if (!form.company) formErrors.company = 'Company Name is required';
-            if (!form.position) formErrors.position = 'Position is required';
-            if (!form.experience) formErrors.experience = 'Years of Experience is required';
-        }
+        // if (activeStep === 3) {
+        //     if (!form.company) formErrors.company = 'Company Name is required';
+        //     if (!form.position) formErrors.position = 'Position is required';
+        //     if (!form.experience) formErrors.experience = 'Years of Experience is required';
+        // }
 
-        if (activeStep === 4) {
-            if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
-            if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
-            if (!form.cvv) formErrors.cvv = 'CVV is required';
-        }
+        // if (activeStep === 4) {
+        //     if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
+        //     if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
+        //     if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
+        //     if (!form.cvv) formErrors.cvv = 'CVV is required';
+        // }
 
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
