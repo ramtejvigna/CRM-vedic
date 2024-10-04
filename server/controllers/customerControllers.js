@@ -71,3 +71,50 @@ export const getCustomers = async (req, res) => {
         res.status(500).json({ error: "Error fetching customers" });
     }
 };
+
+export const getCustomersBasedOnRequests = async (req, res) => {
+    try {
+        const newRequests = await Customer.find({ paymentStatus: false });
+        const inProgress = await Customer.find({ paymentStatus: true, pdfGenerated: { $lt: 1 } });
+        const completed = await Customer.find({ paymentStatus: true, pdfGenerated: { $gte: 1 } });
+
+        console.log({ newRequests: newRequests, inProgress: inProgress, completed: completed });
+
+        res.status(200).json({
+            newRequests,
+            inProgress,
+            completed,
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching customers', error: err });
+    }
+}
+
+export const getCustomerData = async (req, res) => {
+    const { id } = req.params;
+    const { paymentStatus, pdfGenerated, feedback } = req.body;
+
+    try {
+        const customer = await Customer.findById(id);
+
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
+
+        if (paymentStatus !== undefined) {
+            customer.paymentStatus = paymentStatus;
+        }
+        if (pdfGenerated !== undefined) {
+            customer.pdfGenerated = pdfGenerated;
+        }
+        if (feedback) {
+            // Assuming there’s a feedback field you want to store
+            customer.feedback = feedback;
+        }
+
+        await customer.save();
+        res.status(200).json({ message: 'Customer updated successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating customer', error: err });
+    }
+}
