@@ -15,7 +15,7 @@ import {
   getNotifications,
   markAsRead,
 } from '../controllers/NotificationController.js';
-
+import { auth } from '../middleware/auth.js';
 const router = express.Router();
 
 // Admin task routes
@@ -26,7 +26,7 @@ router.delete('/tasks/:id', deleteTask);
 router.post('/tasks/:id/comment', addComment);
 
 // Employee routes
-router.get('/employee/tasks/:employeeId', getEmployeeTasks);
+router.get('/employee/tasks', auth, getEmployeeTasks);
 router.put('/employee/tasks/:id/status', updateTaskStatus);
 router.get('/employees', getEmployees);
 
