@@ -5,14 +5,9 @@ import Sidenav from "../Sidebar";
 import { useStore } from "../../store";
 import Home from "./Home";
 import AddEmployee from "./Employee/AddEmployee";
-<<<<<<< HEAD
 import TaskManagement from "./TaskManagement";
 
 import EditEmployee from "./Employee/EditEmployee";
-=======
-import EditEmployee from "./Employee/EditEmployee";
-import TaskManagement from "./TaskManagement";
->>>>>>> abf57aa7a344784689bd4fb223785a56cfcb61f7
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
 
