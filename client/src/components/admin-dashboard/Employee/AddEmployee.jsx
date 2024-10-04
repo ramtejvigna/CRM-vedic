@@ -4,14 +4,18 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { Input } from '@material-tailwind/react';
-import { TextField, InputLabel, Typography } from '@mui/material';
-import {Link, Navigate, redirect} from 'react-router-dom';
-import {toast} from "react-toastify"
+import { TextField, InputLabel } from '@mui/material';
+import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
+
+
 import { ADD_EMPLOYEE_ROUTE } from '../../../utils/constants';
+
+
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
 const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'financial']
+
+
 const AddEmployee = () => {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
@@ -24,7 +28,7 @@ const AddEmployee = () => {
             phone: '',
             email: '',
             city: '',
-            address : '' ,
+            address: '',
             state: '',
             country: '',
             pincode: '',
@@ -122,28 +126,29 @@ const AddEmployee = () => {
 
 
 
-    const handleSubmit = async  (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             setIsLoading(true);
             const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
-                method : "POST",
-                headers : {
-                    "Content-Type" : "application/json"
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
                 },
-                body : JSON.stringify({
+                body: JSON.stringify({
                     ...formData[formKeys[0]]
                 }),
             })
 
-            if(!res.ok) {
+            if (!res.ok) {
                 throw new Error("NetWork issue");
             }
 
             const data = await res.json();
             setIsLoading(false);
-            
+
             toast.success("employee created");
+            navigate('/admin-dashboard/employees')
         } catch (error) {
             alert(error);
         }
@@ -170,7 +175,7 @@ const AddEmployee = () => {
                             />
                             <TextField
                                 className="flex-1"
-                                label = "name"
+                                label="name"
                                 name="name"
                                 value={formData.personalInfo.name}
                                 onChange={handleChange}
@@ -179,7 +184,7 @@ const AddEmployee = () => {
                                 InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
                             />
                         </div>
-    
+
                         <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -201,7 +206,7 @@ const AddEmployee = () => {
                                 className="rounded-md shadow-sm bg-gray-50"
                             />
                         </div>
-    
+
                         <h3 className="text-lg font-semibold text-gray-700">Address</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -257,7 +262,7 @@ const AddEmployee = () => {
                         </div>
                     </div>
                 );
-    
+
             case 1:
                 return (
                     <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
@@ -280,7 +285,7 @@ const AddEmployee = () => {
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
                         />
-    
+
                         <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
@@ -294,7 +299,7 @@ const AddEmployee = () => {
                                 </label>
                             </div>
                         </div>
-    
+
                         <TextField
                             label="Social Security Number"
                             name="ssn"
@@ -305,7 +310,7 @@ const AddEmployee = () => {
                         />
                     </div>
                 );
-    
+
             case 2:
                 return (
                     <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
@@ -323,7 +328,7 @@ const AddEmployee = () => {
                                 </label>
                             </div>
                         </div>
-    
+
                         <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
@@ -339,7 +344,7 @@ const AddEmployee = () => {
                         </div>
                     </div>
                 );
-    
+
             case 3:
                 return (
                     <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
@@ -386,13 +391,13 @@ const AddEmployee = () => {
                         />
                     </div>
                 );
-    
+
             case 4:
                 return (
                     <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
                         <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
                         <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
-                        
+
                         <TextField
                             label="Cardholder Name"
                             name="cardholderName"
@@ -427,16 +432,16 @@ const AddEmployee = () => {
                         </div>
                     </div>
                 );
-    
+
             default:
                 return null;
         }
     };
-    
-    return isLoading ?  (
-         <div className='h-full flex items-center justify-center'>
-            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full"/>
-         </div>
+
+    return isLoading ? (
+        <div className='h-full flex items-center justify-center'>
+            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+        </div>
     ) : (
         <div className="h-full p-5 ">
             <Box className="flex flex-col  h-full p-5 ">
