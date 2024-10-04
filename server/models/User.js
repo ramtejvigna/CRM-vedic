@@ -36,7 +36,7 @@ const employeeSchema = new mongoose.Schema({
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
-    startDate: { type: String, required: true },
+    startDate: { type: String },
     endDate: { type: String },
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,

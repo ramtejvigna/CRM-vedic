@@ -31,7 +31,7 @@ router.put('/employee/tasks/:id/status', updateTaskStatus);
 router.get('/employees', getEmployees);
 
 // Notifications routes
-router.get('/notifications/:employeeId', getNotifications);
-router.put('/notifications/:id/read', markAsRead);
+// router.get('/notifications/:employeeId', getNotifications);
+// router.put('/notifications/:id/read', markAsRead);
 
 export default router;

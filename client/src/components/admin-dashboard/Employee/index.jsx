@@ -49,7 +49,7 @@ export default function Employee() {
                 <div className='absolute p-5 top-24 bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between shadow-lg w-[160vh]'>
                     <h1>Employee Table</h1>
                     <ul>
-                        <li onClick={handleAddEmployeeClick} className='underline cursor-pointer'>Add Employees</li>
+                        <li onClick={handleAddEmployeeClick} className='p-2 bg-blue-900 cursor-pointer rounded-lg shadow-xl'>Add Employee</li>
                     </ul>
                 </div>
                 <TableContainer sx={{ marginTop: '30px' }}>
@@ -59,7 +59,7 @@ export default function Employee() {
                                 <TableCell>Employee Name</TableCell>
                                 <TableCell>Status</TableCell>
                                 <TableCell>Employed</TableCell>
-                                <TableCell>Action</TableCell>
+                                <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -92,9 +92,12 @@ export default function Employee() {
                                     <TableCell>{row.employedDate}</TableCell>
 
                                     {/* Edit Action */}
-                                    <TableCell>
-                                        <Button variant="outlined" size="small" color="primary">
+                                    <TableCell className='space-x-1'>
+                                        <Button onClick={() => navigate(`edit-employee/${row}`)} variant="outlined" size="small" color="primary">
                                             Edit
+                                        </Button>
+                                        <Button variant="outlined" size="small" color="primary">
+                                            view
                                         </Button>
                                     </TableCell>
                                 </TableRow>

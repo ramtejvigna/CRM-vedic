@@ -7,6 +7,7 @@ import Home from "./Home";
 import AddEmployee from "./Employee/AddEmployee";
 import TaskManagement from "./TaskManagement";
 
+import EditEmployee from "./Employee/EditEmployee";
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
 
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
               )
             })}
             <Route path="employees/add-employee" element={<AddEmployee />} />
+            <Route path="employees/edit-employee/:user" element={<EditEmployee/>}/>
             {/* Default route to redirect to the home */}
             <Route path='/tasks' element={<TaskManagement/>}/>
             <Route path="/" element={<Navigate to="/home" />} />

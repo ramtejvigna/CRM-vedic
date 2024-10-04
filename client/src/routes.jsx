@@ -8,41 +8,42 @@ import { GiExpense } from "react-icons/gi";
 import { AiOutlineFileDone } from "react-icons/ai";
 import { TbMoneybag } from "react-icons/tb";
 
-// componets
+// Components
 import Home from "./components/admin-dashboard/Home";
-import { element } from "prop-types";
 import Employee from "./components/admin-dashboard/Employee";
+import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
+
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
-const Component = ({name}) => {
+const Component = ({ name }) => {
   return (
     <>
       {name}
     </>
-  )
+  );
 };
 
 const icon = {
-  className:"text-xl"
-}
+  className: "text-xl",
+};
 
 export const routes = [
   {
     name: "dashboard",
     path: "home",
-    icon: <MdSpaceDashboard className="text-xl"/>,
+    icon: <MdSpaceDashboard className="text-xl" />,
     element: <Home />,
   },
   {
     name: "employees",
-    icon: <AiOutlineFileDone {...icon} />, 
+    icon: <AiOutlineFileDone {...icon} />,
     path: "employees",
-    element: <Employee />
+    element: <Employee />,
   },
   {
     name: "customers",
     path: "customers",
-    icon: <VscFileSubmodule {...icon} />, 
-    element: <Component  name={"customers"}/>,
+    icon: <VscFileSubmodule {...icon} />,
+    element: <ViewCustomers />,
   },
   {
     name: "task management",
@@ -84,11 +85,11 @@ export const routes = [
     name: 'customization',
     path: "customize",
     icon: <BiSolidCustomize {...icon} />,
-    element: <Home />
+    element: <Home />,
   },
   {
     name: "settings",
-    path: "settings", 
-  element: <Component name={"settings"} />,
+    path: "settings",
+    element: <Component name={"settings"} />,
   },
 ];

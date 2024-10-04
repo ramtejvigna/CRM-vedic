@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { getAllEmployees, addEmployee } from '../controllers/employeeController.js';
+import { getAllEmployees, addEmployee } from '../controllers/EmployeeController.js';
 import { isAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
