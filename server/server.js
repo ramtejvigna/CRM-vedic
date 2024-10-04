@@ -9,6 +9,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import authRoutes from "./routes/authRoutes.js"
 import taskRoutes from './routes/TaskRoutes.js'
+import customerRoutes from './routes/customerRoutes.js'
+
 const app = express();
 const server = http.createServer(app);
 
@@ -19,6 +21,7 @@ app.use(bodyParser.json());
 app.use('/api/employees',EmployeeRouter);
 app.use('/api',taskRoutes)
 app.use('/', authRoutes);
+app.use('/customers', customerRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, connectToMongoDB() , ()=> console.log(`Server running on port ${PORT}`));

@@ -1,8 +1,5 @@
 import { Employee } from "../models/User.js";
 
-// @desc Adding employee
-// @route POST /api/employee/add-employee
-// @access public
 export const addEmployee = async (req ,res) => {
     try {
         const {username , name , phone , email , city , address , state , country , pincode} = req.body;
