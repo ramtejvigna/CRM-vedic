@@ -12,6 +12,7 @@ import { TbMoneybag } from "react-icons/tb";
 import Home from "./components/admin-dashboard/Home";
 import { element } from "prop-types";
 import Employee from "./components/admin-dashboard/Employee";
+import TaskManagement from "./components/admin-dashboard/TaskManagement";
 const Component = ({name}) => {
   return (
     <>
@@ -47,7 +48,7 @@ export const routes = [
     name: "task management",
     path: "tasks",
     icon: <MdOutlineTaskAlt {...icon} />,
-    element: <Home />,
+    element: <TaskManagement />,
   },
   {
     name: "baby database",

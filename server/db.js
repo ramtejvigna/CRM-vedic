@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-const url = process.env.MONGO_URL;
+const url = 'mongodb+srv://ramtejsriram4:n4jIJogBZGjt8ZVQ@cluster0.bsbxq.mongodb.net/VEDIC?retryWrites=true&w=majority&appName=Cluster0';
 const connectToMongoDB = async () => {
     try {
-        const conn = await mongoose.connect(url, {});
-
+        const conn = await mongoose.connect(url);
+    
         console.log('Connected to MongoDB');
 
         return { conn };
