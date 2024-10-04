@@ -13,7 +13,8 @@ import Home from "./components/admin-dashboard/Home";
 import Employee from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
 
-const Component = ({ name }) => {
+import TaskManagement from "./components/admin-dashboard/TaskManagement";
+const Component = ({name}) => {
   return (
     <>
       {name}
@@ -48,7 +49,7 @@ export const routes = [
     name: "task management",
     path: "tasks",
     icon: <MdOutlineTaskAlt {...icon} />,
-    element: <Home />,
+    element: <TaskManagement />,
   },
   {
     name: "baby database",
