@@ -18,8 +18,9 @@ app.use(cors());
 
 app.use(express.json());
 app.use(bodyParser.json());
-app.use('/api/employees',EmployeeRouter);app.use('/api',taskRoutes)
-app.use('/api/', authRoutes);
+app.use('/api/employees',EmployeeRouter);
+app.use('/api',taskRoutes)
+app.use('/', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/notifications', notificationRoutes);
 
