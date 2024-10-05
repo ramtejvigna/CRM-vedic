@@ -29,7 +29,7 @@ export const addEmployee = async (req ,res) => {
 };
 
 // @desc Getting all employees
-// @route GET /api/employee/get-employee
+// @route GET /api/employee/get-employees
 // @access public
 export const getEmployees = async (req ,res) => {
     try {
@@ -38,5 +38,24 @@ export const getEmployees = async (req ,res) => {
         return res.status(200).json({employees});
     } catch (error) {
         return res.status(500).send("Internal server error");
+    }
+}
+
+// @desc Get Employee By id
+// @route GET /api/employee/get-employee
+// @access public
+export const getEmployee = async (req , res) => {
+    try {
+        const { id } = req.query;
+
+        const employee = await Employee.findById({_id : id});
+
+        if(!employee)  {
+            return res.status(400).send(`Employee not found with id : ${id}`)
+        }
+
+        return res.status(200).json({employee});
+    } catch (error) {
+        return res.status(400).send("Internal server error");
     }
 }

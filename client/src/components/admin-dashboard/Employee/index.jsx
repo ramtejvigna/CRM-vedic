@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, Button, Typography, tableCellClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import {toast} from "react-toastify"
+import { GET_ALL_EMPLOYEES } from '../../../utils/constants';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -36,75 +37,115 @@ const rows = [
     createData('Miriam Eric', 'miriam@creative-tim.com', 'Programator', 'Developer', 'Offline', '14/09/20', '/path-to-avatar/miriam.png'),
 ];
 
+
+
+
 export default function Employee() {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false)
+    const [employees , setEmployees] = useState([])
+    useEffect(() => {
+        const getEmployees = async () => {
+            try {
+                setIsLoading(true);
+                const res = await fetch(`${GET_ALL_EMPLOYEES}`);
+
+                if(!res.ok) {
+                    toast.error("Error !");
+                }
+
+                const data = await res.json();
+                setEmployees(data.employees);
+                setIsLoading(false);
+            } catch (error) {
+                toast.error("Error !");
+            }
+        }
+        
+        getEmployees();
+      return () => {
+        
+      }
+    }, []);
+    
 
     const handleAddEmployeeClick = () => {
         navigate("add-employee");
     };
 
     return (
-        <div className='py-10'>
-            <div className='bg-white p-5 rounded-xl shadow-lg'>
-                <div className='absolute p-5 top-24 bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between shadow-lg w-[160vh]'>
+        <div className='py-10 h-full overflow-scroll'>
+            <div className='bg-white p-5 rounded-xl shadow-lg h-full'>
+                <div className=' p-5 top-24 bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between shadow-lg w-[160vh]'>
                     <h1>Employee Table</h1>
                     <ul>
                         <li onClick={handleAddEmployeeClick} className='p-2 bg-blue-900 cursor-pointer rounded-lg shadow-xl'>Add Employee</li>
                     </ul>
                 </div>
-                <TableContainer sx={{ marginTop: '30px' }}>
-                    <Table sx={{ minWidth: 700 }} aria-label="employee table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Employee Name</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Employed</TableCell>
-                                <TableCell>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((row) => (
-                                <TableRow key={row.name}>
-                                    {/* Avatar and Name */}
-                                    <TableCell component="th" scope="row">
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            <Avatar alt={row.name} src={row.avatar} />
-                                            <div style={{ marginLeft: 10 }}>
-                                                <Typography variant="body1" fontWeight="bold">{row.name}</Typography>
-                                                <Typography variant="body2" color="textSecondary">{row.email}</Typography>
-                                            </div>
-                                        </div>
-                                    </TableCell>
 
-                                    {/* Status */}
-                                    <TableCell>
-                                        <span style={{
-                                            padding: '4px 8px',
-                                            borderRadius: '12px',
-                                            color: '#fff',
-                                            backgroundColor: row.status === 'Online' ? '#4caf50' : '#757575'
-                                        }}>
-                                            {row.status.toUpperCase()}
-                                        </span>
-                                    </TableCell>
-
-                                    {/* Employed Date */}
-                                    <TableCell>{row.employedDate}</TableCell>
-
-                                    {/* Edit Action */}
-                                    <TableCell className='space-x-1'>
-                                        <Button onClick={() => navigate(`edit-employee/${row}`)} variant="outlined" size="small" color="primary">
-                                            Edit
-                                        </Button>
-                                        <Button variant="outlined" size="small" color="primary">
-                                            view
-                                        </Button>
-                                    </TableCell>
+                {   isLoading ? (
+                        <div className='h-full flex items-center justify-center'>
+                            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+                        </div>
+                ) : (
+                    <TableContainer sx={{ marginTop: '30px' }}>
+                        <Table sx={{ minWidth: 700 }} aria-label="employee table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Employee Name</TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell>Employed</TableCell>
+                                    <TableCell>Actions</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            </TableHead>
+                            <TableBody>
+                                {employees.map((employee) => (
+                                    <TableRow key={employee._id}>
+                                        {/* Avatar and Name */}
+                                        <TableCell component="th" scope="row">
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Avatar>
+
+                                                </Avatar>
+                                                <div style={{ marginLeft: 10 }}>
+                                                    <Typography variant="body1" fontWeight="bold">{employee.name}</Typography>
+                                                    <Typography variant="body2" color="textSecondary">{employee.email}</Typography>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+
+                                        {/* Status */}
+                                        <TableCell>
+                                            <span style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                backgroundColor: '#4caf50'
+                                            }}>
+                                                {"Online"}
+                                            </span>
+                                        </TableCell>
+
+                                        {/* Employed Phone */}
+                                        <TableCell>{employee.phone}</TableCell>
+
+                                        {/* Edit Action */}
+                                        <TableCell className='space-x-1'>
+                                            <Button onClick={() => navigate(`edit-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
+                                                Edit
+                                            </Button>
+                                            <Button variant="outlined" size="small" color="primary">
+                                                view
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )
+
+                }
             </div>
         </div>
     );
