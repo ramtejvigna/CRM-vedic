@@ -33,6 +33,7 @@ const employeeSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
+    password : {type : String , required : true},
     address: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },
@@ -40,7 +41,8 @@ const employeeSchema = new mongoose.Schema({
     startDate: { type: String },
     endDate: { type: String },
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
-    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }]  // Added this field for referencing tasks assigned by the employee
+    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
+    isAdmin: { type: Boolean, default: false }
 });
 
 export const Employee = mongoose.model('Employee', employeeSchema);

@@ -111,7 +111,7 @@ export const addComment = async (req, res) => {
     }
 
     // Push the new comment
-    task.comments.push({ text, createdBy: 'Avinasha' });
+    task.comments.push({ text, createdBy });
     await task.save();
 
     res.json(task);
