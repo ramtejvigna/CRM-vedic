@@ -17,6 +17,7 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Switch,
 } from "@mui/material";
 import { Edit, Delete, Add, Close, Comment } from "@mui/icons-material";
 import axios from "axios";
@@ -36,7 +37,7 @@ const TaskManagement = () => {
     status: "Pending",
   });
   const [newComment, setNewComment] = useState("");
-  const { isDarkMode } = useStore();
+  const { isDarkMode, toggleDarkMode } = useStore();
 
   useEffect(() => {
     fetchTasks();
@@ -46,7 +47,6 @@ const TaskManagement = () => {
   const fetchTasks = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/tasks");
-      console.log(response.data);
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -56,7 +56,6 @@ const TaskManagement = () => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
-
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -160,13 +159,15 @@ const TaskManagement = () => {
         isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       }`}
     >
+     
       <Button
         variant="contained"
         color="primary"
         startIcon={<Add />}
         onClick={() => handleOpenModal()}
         className="mb-4"
-        sx={{m:3}}
+        sx={{m:2}}
+
       >
         Assign New Task
       </Button>
@@ -225,7 +226,8 @@ const TaskManagement = () => {
             isDarkMode ? "bg-gray-800" : "bg-white"
           } p-6 rounded-md`}
         >
-          <Typography variant="h6" className="m-4"   sx={{my:4}}>
+          <Typography variant="h6" className="mb-4"             sx={{mb:2}}
+          >
             {selectedTask ? "Edit Task" : "Assign New Task"}
           </Typography>
           <form onSubmit={handleSubmit}>
@@ -233,10 +235,11 @@ const TaskManagement = () => {
               name="title"
               label="Task Title"
               fullWidth
-              sx={{mb:2}}
               value={newTask.title}
               onChange={handleInputChange}
-              className="mb-8 mt-2"
+              className="mb-4"
+              sx={{mb:2}}
+
             />
             <TextField
               name="description"
@@ -246,8 +249,12 @@ const TaskManagement = () => {
               rows={4}
               value={newTask.description}
               onChange={handleInputChange}
-              sx={{mb:2}}            />
-            <FormControl fullWidth className="mb-4 mt-4"   sx={{mb:2}}>
+              className="mb-4"
+              sx={{mb:2}}
+
+            />
+            <FormControl fullWidth className="mb-4"             sx={{mb:2}}
+            >
               <InputLabel>Assign To</InputLabel>
               <Select
                 name="assignedTo"
@@ -268,9 +275,12 @@ const TaskManagement = () => {
               fullWidth
               value={newTask.endTime}
               onChange={handleInputChange}
-              sx={{mb:4}}              InputLabelProps={{
+              InputLabelProps={{
                 shrink: true,
               }}
+              className="mb-4"
+              sx={{mb:2}}
+
             />
             <Button type="submit" variant="contained" color="primary" fullWidth>
               {selectedTask ? "Update Task" : "Assign Task"}
@@ -285,16 +295,24 @@ const TaskManagement = () => {
             isDarkMode ? "bg-gray-800" : "bg-white"
           } p-6 rounded-md`}
         >
-          <Typography variant="h6" className="mb-4"   sx={{mb:2}}>
+          <Typography variant="h6" className="mb-4"             sx={{mb:2}}
+          >
             Task Details
           </Typography>
-          <Typography className="mb-4" sx={{mb:2}}>{selectedTask?.description}</Typography>
-          <Typography variant="h6">Comments</Typography>
+          <Typography className="mb-4">{selectedTask?.description}</Typography>
+          <Typography variant="h6" className="mb-2"             sx={{mb:2}}
+          >
+            Comments
+          </Typography>
           {selectedTask &&
             selectedTask.comments.map((comment) => (
-              <Typography sx={{my:2}} key={comment._id}>
-                {comment.text} - {comment.createdBy}
-              </Typography>
+              <Box key={comment._id} className="mb-2"             sx={{mb:2}}
+>
+                <Typography variant="body2">{comment.text}</Typography>
+                <Typography variant="caption" color="textSecondary">
+                  by {comment.createdBy}
+                </Typography>
+              </Box>
             ))}
 
           <TextField
@@ -303,6 +321,7 @@ const TaskManagement = () => {
             value={newComment}
             onChange={handleCommentChange}
             className="mb-4"
+            sx={{mb:2}}
           />
           <Button
             variant="contained"

@@ -104,7 +104,7 @@ export const addComment = async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
-
+    console.log(createdBy)
     task.comments.push({ text, createdBy });
     await task.save();
 
@@ -115,8 +115,8 @@ export const addComment = async (req, res) => {
 };
 
 export const getEmployeeTasks = async (req, res) => {
-  const { employeeId } = req.params;
-
+  const  employeeId  = req.user;
+  console.log(req.user)
   try {
     const tasks = await Task.find({ assignedTo: employeeId }).sort({ startTime: -1 });
     res.json(tasks);
@@ -124,6 +124,33 @@ export const getEmployeeTasks = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const addEmployee = async (req, res) => {
+  const { username, password, email, name } = req.body;
+  const newEmployee = new Employee({ username, password, email, name });
+  await newEmployee.save();
+  res.status(201).json({ message: 'Employee added successfully', employee: newEmployee });
+};
+
+
+export const getAllEmployees = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const totalEmployees = await Employee.countDocuments({ isAdmin: false });
+  const employees = await Employee.find({ isAdmin: false })
+    .select('-password')
+    .skip(skip)
+    .limit(limit);
+
+  res.json({
+    employees,
+    currentPage: page,
+    totalPages: Math.ceil(totalEmployees / limit),
+    totalEmployees
+  });
+};
+
 
 export const getEmployees = async (req, res) => {
   try {

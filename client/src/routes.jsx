@@ -14,7 +14,7 @@ import Employee from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
 
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
-const Component = ({name}) => {
+const Component = ({ name }) => {
   return (
     <>
       {name}

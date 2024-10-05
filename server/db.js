@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
-const url = process.env.MONGO_URL;
+const url = 'mongodb+srv://ramtejsriram4:n4jIJogBZGjt8ZVQ@cluster0.bsbxq.mongodb.net/VEDIC?retryWrites=true&w=majority&appName=Cluster0';
 
 const connectToMongoDB = async () => {
     try {

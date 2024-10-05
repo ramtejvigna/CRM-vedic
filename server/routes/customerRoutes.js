@@ -3,9 +3,9 @@ import { addCustomerWithAssignment, getCustomerData, getCustomers, getCustomersB
 
 const router = express.Router();
 
-router.post('/addCustomerWithAssignment', addCustomerWithAssignment);  
-router.get('/getCustomers', getCustomers);
-router.get('/getCustomersRequests', getCustomersBasedOnRequests);
+router.post('/addCustomerWithAssignment', addCustomerWithAssignment); 
+router.get('/getCustomers', getCustomers); 
+router.get('/employees/:employeeId/customers', getCustomersBasedOnRequests);
 router.put('/:id', getCustomerData);
 
 export default router

@@ -61,7 +61,6 @@ export const addCustomerWithAssignment = async (req, res) => {
     }
 };
 
-
 export const getCustomers = async (req, res) => {
     try {
         const customers = await Customer.find();
@@ -74,19 +73,29 @@ export const getCustomers = async (req, res) => {
 
 export const getCustomersBasedOnRequests = async (req, res) => {
     try {
-        const newRequests = await Customer.find({ paymentStatus: false });
-        const inProgress = await Customer.find({ paymentStatus: true, pdfGenerated: { $lt: 1 } });
-        const completed = await Customer.find({ paymentStatus: true, pdfGenerated: { $gte: 1 } });
+        const employeeId = req.params.employeeId;
 
-        console.log({ newRequests: newRequests, inProgress: inProgress, completed: completed });
+        // Find the employee by ID and populate the customers field
+        const employee = await Employee.findById(employeeId).populate('customers');
 
+        if (!employee) {
+            return res.status(404).json({ error: "Employee not found" });
+        }
+
+        // Categorize customers based on payment status and PDF generation
+        const customers = employee.customers;
+        const newRequests = customers.filter(customer => !customer.paymentStatus);
+        const inProgress = customers.filter(customer => customer.paymentStatus && customer.pdfGenerated < 1);
+        const completed = customers.filter(customer => customer.paymentStatus && customer.pdfGenerated >= 1);
+
+        // Return the categorized customers
         res.status(200).json({
             newRequests,
             inProgress,
             completed,
         });
-    } catch (err) {
-        res.status(500).json({ message: 'Error fetching customers', error: err });
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching customers for employee" });
     }
 }
 
