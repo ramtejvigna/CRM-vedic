@@ -196,6 +196,56 @@ const CustomerDetails = () => {
           </Box>
         </TableContainer>
       </Box>
+      {showFilters && (
+        <Box
+          sx={{
+            position: 'absolute',
+            right: '20px',
+            top: '120px',
+            zIndex: 3,
+            backgroundColor: 'white',
+            padding: '16px',
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="gender-label">Gender</InputLabel>
+            <Select
+              labelId="gender-label"
+              value={filteredGender}
+              onChange={handleGenderChange}
+              sx={{
+                border: 'none',
+                '& fieldset': {
+                  border: 'none',
+                },
+              }}
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel id="status-label">Status</InputLabel>
+            <Select
+              labelId="status-label"
+              value={filteredStatus}
+              onChange={handleStatusChange}
+              sx={{
+                border: 'none',
+                '& fieldset': {
+                  border: 'none',
+                },
+              }}
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="In progress">In progress</MenuItem>
+              <MenuItem value="Pending">Pending</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      )}
     </Box>
   );
 };
