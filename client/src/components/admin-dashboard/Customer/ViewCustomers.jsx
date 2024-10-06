@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Table,
@@ -44,7 +46,7 @@ const CustomerDetails = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
-
+  const navigate = useNavigate();
   // Fetch data from the backend
   useEffect(() => {
     axios.get('http://localhost:3000/customers/getCustomers')
@@ -63,7 +65,9 @@ const CustomerDetails = () => {
   const handleStatusChange = (event) => {
     setFilteredStatus(event.target.value);
   };
-
+  const handleViewCustomer = (customer) => {
+    navigate('../customers/customerDetails', { state: { customer } });
+  };
   
   const filteredData = customerData.filter((row) => {
     const genderMatch = filteredGender === 'All' || row.gender === filteredGender;
@@ -82,7 +86,7 @@ const CustomerDetails = () => {
             backgroundColor: '#1E90FF',
             color: '#fff',
             padding: '15px',
-            borderRadius: '8px',
+            borderRadius: '10px',
             width: '1080px',
             height: '75px',
             position: 'absolute',
@@ -115,6 +119,7 @@ const CustomerDetails = () => {
             display: 'flex',
             flexDirection: 'column',
             marginTop: '30px',
+            borderRadius: '10px',
             height: '600px',
           }}
         >
@@ -145,7 +150,12 @@ const CustomerDetails = () => {
                   <TableCell align="center">{getStatusContainer(row.paymentStatus)}</TableCell>
                   <TableCell align="center">{row.pdfGenerated}</TableCell>
                   <TableCell align="center">
-                  <Button variant="contained" color="primary" size="small">
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      size="small"  
+                      onClick={() => handleViewCustomer(row)}
+                    >
                       View
                     </Button>
                   </TableCell>

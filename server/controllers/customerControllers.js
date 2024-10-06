@@ -118,3 +118,22 @@ export const getCustomerData = async (req, res) => {
         res.status(500).json({ message: 'Error updating customer', error: err });
     }
 }
+export const customerDetails = async (req, res) => {
+    const customerId = req.params.id; // Get the customer ID from the URL parameters
+
+    try {
+        const customer = await Customer.findById(customerId)
+            .populate('assignedEmployee') // Populate the assigned employee details if needed
+            .exec();
+
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found.' });
+        }
+
+        // Return the customer details as a response
+        res.json(customer);
+    } catch (error) {
+        console.error('Error fetching customer data:', error);
+        res.status(500).json({ error: 'An error occurred while fetching customer data.' });
+    }
+};
