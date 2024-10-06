@@ -20,6 +20,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const getStatusContainer = (status) => (
   <Box
@@ -47,6 +48,8 @@ const CustomerDetails = () => {
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
   const [customers, setCustomers] = useState([]);
+
+  const navigate = useNavigate();
 
   const handleGenderChange = (event) => {
     setFilteredGender(event.target.value);
@@ -172,7 +175,7 @@ const CustomerDetails = () => {
 
       <Box sx={{ marginTop: '30px', paddingBottom: '80px' }}>
         <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px', padding: '10px', borderRadius: '20px' }}>
-          <Table stickyHeader sx={{ marginTop: '70px'}}>
+          <Table stickyHeader sx={{ marginTop: '70px' }}>
             <TableHead>
               <TableRow>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>S:no</TableCell>
@@ -194,9 +197,15 @@ const CustomerDetails = () => {
                   <TableCell align="center">{row.preferredStartingLetter}</TableCell>
                   <TableCell align="center">{row.preferredGod}</TableCell>
                   <TableCell align="center">
-                    <Button variant="contained" color="primary" size="small">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => navigate(`${row.username}`)}  // Wrap it inside an arrow function
+                    >
                       View
                     </Button>
+
                   </TableCell>
                 </TableRow>
               ))}
