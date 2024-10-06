@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, Button, Typography, tableCellClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import {toast} from "react-toastify"
+import { toast } from "react-toastify"
 import { AiOutlineUserAdd } from "react-icons/ai"
 import { GET_ALL_EMPLOYEES } from '../../../utils/constants';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -25,21 +25,16 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 
-
-
-
-
-
 export default function Employee() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false)
-    const [employees , setEmployees] = useState([]);
+    const [employees, setEmployees] = useState([]);
     const recordsPerPage = 5;
     const [currentPage, setCurrentPage] = useState(1);
     const lastIndex = currentPage * recordsPerPage;
-    const firstIndex =  lastIndex - recordsPerPage;
-    const records = employees.slice(firstIndex , lastIndex);
-    const npages = Math.ceil( employees.length / recordsPerPage);
+    const firstIndex = lastIndex - recordsPerPage;
+    const records = employees.slice(firstIndex, lastIndex);
+    const npages = Math.ceil(employees.length / recordsPerPage);
     const numbers = [...Array(npages + 1).keys()].slice(1);
 
     useEffect(() => {
@@ -48,7 +43,7 @@ export default function Employee() {
                 setIsLoading(true);
                 const res = await fetch(`${GET_ALL_EMPLOYEES}`);
 
-                if(!res.ok) {
+                if (!res.ok) {
                     toast.error("Error !");
                 }
 
@@ -59,27 +54,27 @@ export default function Employee() {
                 toast.error("Error !");
             }
         }
-        
+
         getEmployees();
-      return () => {
-        
-      }
+        return () => {
+
+        }
     }, []);
-    
+
 
     const handleAddEmployeeClick = () => {
         navigate("add-employee");
     };
 
     const handlePrev = () => {
-        if(currentPage !== 1) {
+        if (currentPage !== 1) {
             setCurrentPage(currentPage - 1);
         }
     }
 
     const handleNext = () => {
-        if(currentPage !== npages) {
-            setCurrentPage(currentPage  + 1);
+        if (currentPage !== npages) {
+            setCurrentPage(currentPage + 1);
         }
     }
 
@@ -88,21 +83,21 @@ export default function Employee() {
     }
 
     return (
-        <div className='py-10 h-full w-full '>
-            <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl shadow-lg h-full relative'>   
-                <div className='absolute top-[-2%] left-[50%] translate-x-[-50%] w-full  xl:w-[70%] p-5  bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between items-center shadow-lg'>
+        <div className='py-10 h-full'>
+            <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl shadow-lg h-full relative'>
+                <div className='absolute top-[-6%] left-[50%] translate-x-[-50%] xl:w-[95%] p-5  bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between items-center shadow-lg'>
                     <h1 className='uppercase '>Employee Table</h1>
                     <ul>
-                        <li onClick={handleAddEmployeeClick} className='p-2 flex items-center gap-2 tracking-wider uppercase bg-blue-900 cursor-pointer rounded-lg shadow-xl'> <AiOutlineUserAdd/> Add Employee</li>
+                        <li onClick={handleAddEmployeeClick} className='p-2 flex items-center gap-2 tracking-wider uppercase bg-blue-900 cursor-pointer rounded-lg shadow-xl'> <AiOutlineUserAdd /> Add Employee</li>
                     </ul>
                 </div>
 
-                {   isLoading ? (
-                        <div className='h-full flex items-center justify-center'>
-                            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
-                        </div>
+                {isLoading ? (
+                    <div className='h-full flex items-center justify-center'>
+                        <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+                    </div>
                 ) : (
-                    <TableContainer className='overflow-scroll flex-1' sx={{ marginTop: '30px' }}>
+                    <TableContainer className='flex-1' sx={{ marginTop: '30px' }}>
                         <Table sx={{ minWidth: 700 }} aria-label="employee table">
                             <TableHead>
                                 <TableRow>
@@ -161,18 +156,18 @@ export default function Employee() {
                 }
 
                 {/* page nation */}
-                <ul className='flex p-5'>
-                    <li onClick={handlePrev}  className={`${currentPage == 1 ? "border border-blue-500 text-blue-500 disabled cursor-default" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-[1.2em] px-5 tracking-wider `}>
+                <ul className='flex items-center p-5 gap-5'>
+                    <li onClick={handlePrev} className={`${currentPage == 1 ? "hidden" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-base px-5 rounded-xl`}>
                         <a href="#"> Prev </a>
                     </li>
-                    <li className='flex-1 flex overflow-x-scroll scrollbar-hide px-3 gap-1'>
+                    <li className='flex-1 flex overflow-x-scroll scrollbar-hide gap-1'>
                         {
-                            numbers.map((n , i) => (
-                                <a onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white scale-y-105" : "border-blue-500 border text-blue-500"}   p-3 px-5`}  href="#">{n}</a>
+                            numbers.map((n, i) => (
+                                <a onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white" : "border-blue-500 border text-blue-500"} text-sm  rounded-full p-2 px-4`} href="#">{n}</a>
                             ))
                         }
                     </li>
-                    <li onClick={handleNext} className={`${currentPage == npages ? "border border-blue-500 text-blue-500 disabled cursor-default" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-[1.2em] px-5 tracking-wider `}>
+                    <li onClick={handleNext} className={`${currentPage == npages ? "hidden" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-base px-5 rounded-xl `}>
                         <a href="#"> Next </a>
                     </li>
                 </ul>
