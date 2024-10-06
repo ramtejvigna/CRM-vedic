@@ -9,7 +9,7 @@ import { Input } from '@material-tailwind/react';
 import { TextField, InputLabel, Typography } from '@mui/material';
 import {Link, Navigate} from 'react-router-dom';
 import { useNavigate , useParams } from 'react-router-dom';
-import { GET_EMPLOYEE_BY_ID } from '../../../utils/constants';
+import { GET_EMPLOYEE_BY_ID, UPDATE_EMPLOYEE } from '../../../utils/constants';
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
 const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'financial']
 const EditEmployee = () => {
@@ -17,6 +17,7 @@ const EditEmployee = () => {
     const {id} = useParams();
     const [activeStep, setActiveStep] = useState(0);
     const [errors, setErrors] = useState({});
+    const [isLoading , setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         personalInfo: {
             username: '',
@@ -38,6 +39,7 @@ const EditEmployee = () => {
     useEffect(() =>{ 
         const getEmployee = async () => {
             try {
+                setIsLoading(true);
                 const res = await fetch(`${GET_EMPLOYEE_BY_ID}?id=${id}`);
 
                 if(!res.ok) {
@@ -45,6 +47,7 @@ const EditEmployee = () => {
                 }
 
                 const data = await res.json();
+                setIsLoading(false);
                 setFormData((prev) => prev =  {...prev , ["personalInfo"] : data.employee});
             } catch (error) {
                 toast.error(error.message);
@@ -142,11 +145,35 @@ const EditEmployee = () => {
 
 
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        try {
+            setIsLoading(true);
+          const res = await fetch(`${UPDATE_EMPLOYEE}`, {
+            method: "PUT",
+            headers: {
+              'Content-Type': "application/json",
+            },
+            body: JSON.stringify({
+              id, ...formData[formKeys[0]], 
+            }),
+          });
+      
 
-        console.log('Form submitted successfully:', formData);
-        alert('Employee added successfully!');
-    };
+          if (!res.ok) {
+            const errorData = await res.json(); 
+            toast.error(errorData.message || "An error occurred");
+            return;
+          }
+      
+          const data = await res.json(); 
+          setIsLoading(false);
+          toast.success(data.message || "Employee updated successfully");
+          navigate('/admin-dashboard/employees');
+        } catch (error) {
+          toast.error(`Error: ${error.message}`);
+        }
+      };
+      
 
 
     const renderForm = () => {
@@ -431,10 +458,14 @@ const EditEmployee = () => {
         }
     };
     
-    return (
+    return isLoading ? (
+        <div className='h-full flex items-center justify-center'>
+            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+        </div>
+    ) :  (
         <div className="h-full p-5 ">
-            <Box className="flex flex-col  h-full p-5 ">
-                <Stepper activeStep={activeStep} className="p-10 w-full">
+            <Box className="flex flex-col gap-5   h-full p-5 ">
+                <Stepper activeStep={activeStep} className="p-7 w-full">
                     {steps.map((label, index) => (
                         <Step className='' key={label}>
                             <StepLabel><span className="hidden xl:block  text-center  tracking-wider">{label}</span></StepLabel>
@@ -457,7 +488,7 @@ const EditEmployee = () => {
                     {activeStep === steps.length - 1 ? (
                         <Button
                             sx={{ border: "1px solid blue", backgroundColor: "green", color: "white", padding: "6px 15px", fontWeight: "700" }}
-                            onClick={handleSubmit}
+                            onClick={ () => handleSubmit()}
                         >
                             Finish
                         </Button>

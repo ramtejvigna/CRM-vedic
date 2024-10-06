@@ -1,32 +1,41 @@
 import { Employee } from "../models/User.js";
 
-export const addEmployee = async (req ,res) => {
+// @desc ADDING  employee
+// @route POST /api/employee/add-employee
+// @access public
+export const addEmployee = async (req, res) => {
     try {
-        const {username , name , phone , email , city , address , state , country , pincode} = req.body;
-        
-        const isExist = await Employee.findOne({email }) ;
-
-        if(isExist) {
-            return res.status(400).send("employee already exists")
-        }
-
-        const newEmployee = await Employee.create({
-            username ,
-            name ,
-            phone ,
-            email ,
-            city ,
-            address ,
-            state ,
-            country ,
-            pincode ,
-        });
-
-        return res.status(200).json({message : "employee added" , employee : newEmployee})
-    }catch(err) {
-        res.status(500).send("Internal server error");
+      const { username, name, phone, email, city, address, state, country, pincode } = req.body;
+  
+      if (!username || !email) {
+        return res.status(400).json({ message: 'Username and email are required' });
+      }
+  
+      const isExist = await Employee.findOne({ email });
+  
+      if (isExist) {
+        return res.status(400).json({ message: 'Employee already exists' });
+      }
+  
+      const newEmployee = await Employee.create({
+        username,
+        name,
+        phone,
+        email,
+        city,
+        address,
+        state,
+        country,
+        pincode,
+      });
+  
+      return res.status(200).json({ message: 'Employee added', employee: newEmployee });
+    } catch (err) {
+      console.error('Error adding employee:', err.message); // Log the error
+      res.status(500).json({ message: 'Internal server error', error: err.message });
     }
-};
+  };
+  
 
 // @desc Getting all employees
 // @route GET /api/employee/get-employees
@@ -57,5 +66,30 @@ export const getEmployee = async (req , res) => {
         return res.status(200).json({employee});
     } catch (error) {
         return res.status(400).send("Internal server error");
+    }
+}
+
+// @desc updating employee
+// @route PUT api/employees/update-employee
+// @access public
+export const updateEmployee  = async (req , res) => {
+    try {
+        const { id ,  username, name, phone, email, city, address, state, country, pincode } = req.body;
+  
+        if (!username || !email) {
+          return res.status(400).json({ message: 'Username and email are required' });
+        }
+        
+    
+        const updatedEmployee = await Employee.findByIdAndUpdate(id ,{username, name, phone, email, city, address, state, country, pincode } , {new : true , runValidators :true} );
+
+        if(!updateEmployee) {
+            return res.status(400).json({message : "Employee with provided id not exits"});
+        }
+
+        return res.status(200).json({messsage : "Employee details updated" , employee : updateEmployee});
+    } catch (error) {
+        console.error('Error updating employee:', error.message);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }

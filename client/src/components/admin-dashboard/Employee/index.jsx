@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, Button, Typography, tableCellClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {toast} from "react-toastify"
+import { AiOutlineUserAdd } from "react-icons/ai"
 import { GET_ALL_EMPLOYEES } from '../../../utils/constants';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -23,19 +24,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-function createData(name, email, functionTitle, functionSub, status, employedDate, avatar) {
-    return { name, email, functionTitle, functionSub, status, employedDate, avatar };
-}
 
-// Example employee data
-const rows = [
-    createData('John Michael', 'john@creative-tim.com', 'Manager', 'Organization', 'Online', '23/04/18', '/path-to-avatar/john.png'),
-    createData('Alexa Liras', 'alexa@creative-tim.com', 'Programator', 'Developer', 'Offline', '11/01/19', '/path-to-avatar/alexa.png'),
-    createData('Laurent Perrier', 'laurent@creative-tim.com', 'Executive', 'Projects', 'Online', '19/09/17', '/path-to-avatar/laurent.png'),
-    createData('Michael Levi', 'michael@creative-tim.com', 'Programator', 'Developer', 'Online', '24/12/08', '/path-to-avatar/michael.png'),
-    createData('Richard Gran', 'richard@creative-tim.com', 'Manager', 'Executive', 'Offline', '04/10/21', '/path-to-avatar/richard.png'),
-    createData('Miriam Eric', 'miriam@creative-tim.com', 'Programator', 'Developer', 'Offline', '14/09/20', '/path-to-avatar/miriam.png'),
-];
+
 
 
 
@@ -43,7 +33,15 @@ const rows = [
 export default function Employee() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false)
-    const [employees , setEmployees] = useState([])
+    const [employees , setEmployees] = useState([]);
+    const recordsPerPage = 5;
+    const [currentPage, setCurrentPage] = useState(1);
+    const lastIndex = currentPage * recordsPerPage;
+    const firstIndex =  lastIndex - recordsPerPage;
+    const records = employees.slice(firstIndex , lastIndex);
+    const npages = Math.ceil( employees.length / recordsPerPage);
+    const numbers = [...Array(npages + 1).keys()].slice(1);
+
     useEffect(() => {
         const getEmployees = async () => {
             try {
@@ -73,13 +71,29 @@ export default function Employee() {
         navigate("add-employee");
     };
 
+    const handlePrev = () => {
+        if(currentPage !== 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    }
+
+    const handleNext = () => {
+        if(currentPage !== npages) {
+            setCurrentPage(currentPage  + 1);
+        }
+    }
+
+    const handleChangeCPage = (id) => {
+        setCurrentPage(id);
+    }
+
     return (
-        <div className='py-10 h-full overflow-scroll'>
-            <div className='bg-white p-5 rounded-xl shadow-lg h-full'>
-                <div className=' p-5 top-24 bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between shadow-lg w-[160vh]'>
-                    <h1>Employee Table</h1>
+        <div className='py-10 h-full w-full '>
+            <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl shadow-lg h-full relative'>   
+                <div className='absolute top-[-2%] left-[50%] translate-x-[-50%] w-full  xl:w-[70%] p-5  bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between items-center shadow-lg'>
+                    <h1 className='uppercase '>Employee Table</h1>
                     <ul>
-                        <li onClick={handleAddEmployeeClick} className='p-2 bg-blue-900 cursor-pointer rounded-lg shadow-xl'>Add Employee</li>
+                        <li onClick={handleAddEmployeeClick} className='p-2 flex items-center gap-2 tracking-wider uppercase bg-blue-900 cursor-pointer rounded-lg shadow-xl'> <AiOutlineUserAdd/> Add Employee</li>
                     </ul>
                 </div>
 
@@ -88,18 +102,18 @@ export default function Employee() {
                             <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
                         </div>
                 ) : (
-                    <TableContainer sx={{ marginTop: '30px' }}>
+                    <TableContainer className='overflow-scroll flex-1' sx={{ marginTop: '30px' }}>
                         <Table sx={{ minWidth: 700 }} aria-label="employee table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Employee Name</TableCell>
                                     <TableCell>Status</TableCell>
-                                    <TableCell>Employed</TableCell>
+                                    <TableCell>phone</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {employees.map((employee) => (
+                                {records.map((employee) => (
                                     <TableRow key={employee._id}>
                                         {/* Avatar and Name */}
                                         <TableCell component="th" scope="row">
@@ -144,8 +158,24 @@ export default function Employee() {
                         </Table>
                     </TableContainer>
                 )
-
                 }
+
+                {/* page nation */}
+                <ul className='flex p-5'>
+                    <li onClick={handlePrev}  className={`${currentPage == 1 ? "border border-blue-500 text-blue-500 disabled cursor-default" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-[1.2em] px-5 tracking-wider `}>
+                        <a href="#"> Prev </a>
+                    </li>
+                    <li className='flex-1 flex overflow-x-scroll scrollbar-hide px-3 gap-1'>
+                        {
+                            numbers.map((n , i) => (
+                                <a onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white scale-y-105" : "border-blue-500 border text-blue-500"}   p-3 px-5`}  href="#">{n}</a>
+                            ))
+                        }
+                    </li>
+                    <li onClick={handleNext} className={`${currentPage == npages ? "border border-blue-500 text-blue-500 disabled cursor-default" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-[1.2em] px-5 tracking-wider `}>
+                        <a href="#"> Next </a>
+                    </li>
+                </ul>
             </div>
         </div>
     );

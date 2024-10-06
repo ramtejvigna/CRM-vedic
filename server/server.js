@@ -24,8 +24,7 @@ app.use('/api/employees',EmployeeRouter);
 app.use('/api',taskRoutes)
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
-app.use('/api/employees', employeeRoutes);
 app.use('/api/notifications', notificationRoutes);
-
+// 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, connectToMongoDB() , ()=> console.log(`Server running on port ${PORT}`));
