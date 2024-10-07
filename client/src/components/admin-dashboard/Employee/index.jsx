@@ -159,7 +159,7 @@ export default function Employee() {
                     <li className='flex-1 flex overflow-x-scroll scrollbar-hide px-3 gap-1'>
                         {
                             numbers.map((n , i) => (
-                                <a onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white scale-y-105" : "border-blue-500 border text-blue-500"}   p-3 px-5`}  href="#">{n}</a>
+                                <a key={i} onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white scale-y-105" : "border-blue-500 border text-blue-500"}   p-3 px-5`}  href="#">{n}</a>
                             ))
                         }
                     </li>

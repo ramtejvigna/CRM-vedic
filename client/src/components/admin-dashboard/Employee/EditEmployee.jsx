@@ -35,8 +35,6 @@ const EditEmployee = () => {
 
     // useEffect(() => setFormData(user)  , []);
 
-
-    console.log("Hello")
     const handleNext = () => {
         if (validateForm()) {
             setActiveStep((prev) => prev + 1);
