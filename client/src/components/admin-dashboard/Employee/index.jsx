@@ -69,53 +69,70 @@ export default function Employee() {
         navigate("add-employee");
     };
 
+    const handlePrev = () => {
+        if(currentPage !== 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNext = () => { currentPage !== npages ? setCurrentPage(currentPage  + 1)  : ''}
+
+    const handleChangeCPage = (id) => setCurrentPage(id);
     return (
-        <div className='py-10'>
-            <div className='bg-white p-5 rounded-xl shadow-lg'>
-                <div className='absolute p-5 top-24 bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between shadow-lg w-[160vh]'>
-                    <h1>Employee Table</h1>
+        <div className='py-10 h-full w-full '>
+            <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl  shadow-2xl h-full relative'>   
+                <div className='absolute top-[-5%] left-[50%] translate-x-[-50%] w-full  xl:w-[70%] p-5  bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between items-center shadow-lg'>
+                    <h1 className='uppercase font-semibold sm:text-2xl tracking-wider '>Employee Table</h1>
                     <ul>
-                        <li onClick={handleAddEmployeeClick} className='p-2 bg-blue-900 cursor-pointer rounded-lg shadow-xl'>Add Employee</li>
+                        <li onClick={handleAddEmployeeClick} className='p-2 flex items-center gap-2 tracking-wider uppercase bg-blue-900 cursor-pointer rounded-lg shadow-xl'> <AiOutlineUserAdd/> Add Employee</li>
                     </ul>
                 </div>
-                <TableContainer sx={{ marginTop: '30px' }}>
-                    <Table sx={{ minWidth: 700 }} aria-label="employee table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Employee Name</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Employed</TableCell>
-                                <TableCell>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((row) => (
-                                <TableRow key={row.name}>
-                                    {/* Avatar and Name */}
-                                    <TableCell component="th" scope="row">
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            <Avatar alt={row.name} src={row.avatar} />
-                                            <div style={{ marginLeft: 10 }}>
-                                                <Typography variant="body1" fontWeight="bold">{row.name}</Typography>
-                                                <Typography variant="body2" color="textSecondary">{row.email}</Typography>
+
+                {   isLoading ? (
+                        <div className='h-full flex items-center justify-center'>
+                            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+                        </div>
+                ) : (
+                    <TableContainer className='overflow-scroll flex-1' sx={{ marginTop: '30px' }}>
+                        <Table sx={{ minWidth: 700 }} aria-label="employee table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Employee Name</TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell>phone</TableCell>
+                                    <TableCell>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {records.map((employee) => (
+                                    <TableRow key={employee._id}>
+                                        {/* Avatar and Name */}
+                                        <TableCell component="th" scope="row">
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <Avatar>
+
+                                                </Avatar>
+                                                <div style={{ marginLeft: 10 }}>
+                                                    <Typography variant="body1" fontWeight="bold">{employee.name}</Typography>
+                                                    <Typography variant="body2" color="textSecondary">{employee.email}</Typography>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </TableCell>
+                                        </TableCell>
 
-                                    {/* Status */}
-                                    <TableCell>
-                                        <span style={{
-                                            padding: '4px 8px',
-                                            borderRadius: '12px',
-                                            color: '#fff',
-                                            backgroundColor: row.status === 'Online' ? '#4caf50' : '#757575'
-                                        }}>
-                                            {row.status.toUpperCase()}
-                                        </span>
-                                    </TableCell>
+                                        {/* Status */}
+                                        <TableCell>
+                                            <span style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                backgroundColor: '#4caf50'
+                                            }}>
+                                                {"Online"}
+                                            </span>
+                                        </TableCell>
 
-                                    {/* Employed Date */}
-                                    <TableCell>{row.employedDate}</TableCell>
+                                        {/* Employed Phone */}
+                                        <TableCell>{employee.phone}</TableCell>
 
                                         {/* Edit Action */}
                                         <TableCell className='space-x-1'>
@@ -131,20 +148,22 @@ export default function Employee() {
                             </TableBody>
                         </Table>
                     </TableContainer>
+                )
+                }
 
                 {/* page nation */}
-                <ul className='flex items-center p-5 gap-5'>
-                    <li onClick={handlePrev} className={`${currentPage == 1 ? "hidden" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-base px-5 rounded-xl`}>
+                <ul className='flex p-5'>
+                    <li onClick={handlePrev}  className={`${currentPage == 1 ? "border border-blue-500 text-blue-500 disabled cursor-default" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-[1.2em] px-5 tracking-wider `}>
                         <a href="#"> Prev </a>
                     </li>
-                    <li className='flex-1 flex overflow-x-scroll scrollbar-hide gap-1'>
+                    <li className='flex-1 flex overflow-x-scroll scrollbar-hide px-3 gap-1'>
                         {
-                            numbers.map((n, i) => (
-                                <a onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white" : "border-blue-500 border text-blue-500"} text-sm  rounded-full p-2 px-4`} href="#">{n}</a>
+                            numbers.map((n , i) => (
+                                <a onClick={() => handleChangeCPage(n)} className={`${currentPage == n ? "bg-blue-500 text-white scale-y-105" : "border-blue-500 border text-blue-500"}   p-3 px-5`}  href="#">{n}</a>
                             ))
                         }
                     </li>
-                    <li onClick={handleNext} className={`${currentPage == npages ? "hidden" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-base px-5 rounded-xl `}>
+                    <li onClick={handleNext} className={`${currentPage == npages ? "border border-blue-500 text-blue-500 disabled cursor-default" : " bg-blue-500 text-white"} link cursor-pointer p-2 text-[1.2em] px-5 tracking-wider `}>
                         <a href="#"> Next </a>
                     </li>
                 </ul>
