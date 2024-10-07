@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify"
 import { AiOutlineUserAdd } from "react-icons/ai"
 import { GET_ALL_EMPLOYEES } from '../../../utils/constants';
-
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -28,16 +27,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 function createData(name, email, functionTitle, functionSub, status, employedDate, avatar) {
     return { name, email, functionTitle, functionSub, status, employedDate, avatar };
 }
-
-// Example employee data
-const rows = [
-    createData('John Michael', 'john@creative-tim.com', 'Manager', 'Organization', 'Online', '23/04/18', '/path-to-avatar/john.png'),
-    createData('Alexa Liras', 'alexa@creative-tim.com', 'Programator', 'Developer', 'Offline', '11/01/19', '/path-to-avatar/alexa.png'),
-    createData('Laurent Perrier', 'laurent@creative-tim.com', 'Executive', 'Projects', 'Online', '19/09/17', '/path-to-avatar/laurent.png'),
-    createData('Michael Levi', 'michael@creative-tim.com', 'Programator', 'Developer', 'Online', '24/12/08', '/path-to-avatar/michael.png'),
-    createData('Richard Gran', 'richard@creative-tim.com', 'Manager', 'Executive', 'Offline', '04/10/21', '/path-to-avatar/richard.png'),
-    createData('Miriam Eric', 'miriam@creative-tim.com', 'Programator', 'Developer', 'Offline', '14/09/20', '/path-to-avatar/miriam.png'),
-];
 
 export default function Employee() {
     const navigate = useNavigate();
@@ -80,33 +69,12 @@ export default function Employee() {
         navigate("add-employee");
     };
 
-    const handlePrev = () => {
-        if (currentPage !== 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    }
-
-    const handleNext = () => {
-        if (currentPage !== npages) {
-            setCurrentPage(currentPage + 1);
-        }
-    }
-
-    const handleChangeCPage = (id) => {
-        setCurrentPage(id);
-    }
-
     return (
-        <div className='py-10 h-full'>
-            <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl shadow-lg h-full relative'>
-                <div className='absolute top-[-6%] left-[50%] translate-x-[-50%] xl:w-[95%]  p-5  bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between items-center shadow-lg'>
-                    <h1 className='uppercase '>Employee Table</h1>
         <div className='py-10'>
             <div className='bg-white p-5 rounded-xl shadow-lg'>
                 <div className='absolute p-5 top-24 bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between shadow-lg w-[160vh]'>
                     <h1>Employee Table</h1>
                     <ul>
-                        <li onClick={handleAddEmployeeClick} className='p-2 flex items-center gap-2 tracking-wider uppercase bg-blue-900 cursor-pointer rounded-lg shadow-xl'> <AiOutlineUserAdd /> Add Employee</li>
                         <li onClick={handleAddEmployeeClick} className='p-2 bg-blue-900 cursor-pointer rounded-lg shadow-xl'>Add Employee</li>
                     </ul>
                 </div>
@@ -163,8 +131,6 @@ export default function Employee() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                )
-                }
 
                 {/* page nation */}
                 <ul className='flex items-center p-5 gap-5'>
@@ -182,20 +148,6 @@ export default function Employee() {
                         <a href="#"> Next </a>
                     </li>
                 </ul>
-                                    {/* Edit Action */}
-                                    <TableCell className='space-x-1'>
-                                        <Button onClick={() => navigate(`edit-employee/${row}`)} variant="outlined" size="small" color="primary">
-                                            Edit
-                                        </Button>
-                                        <Button variant="outlined" size="small" color="primary">
-                                            view
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
             </div>
         </div>
     );
