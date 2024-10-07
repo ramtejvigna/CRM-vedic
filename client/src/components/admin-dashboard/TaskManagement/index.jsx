@@ -75,7 +75,8 @@ const TaskManagementChild = () => {
     setLoadingEmployees(true);
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
-      setEmployees(response.data);
+      console.log(response.data.employees)
+      setEmployees(response.data.employees);
     } catch (error) {
       console.error("Error fetching employees:", error);
       enqueueSnackbar("Error fetching employees", { variant: "error" });
@@ -304,7 +305,7 @@ const TaskManagementChild = () => {
                 value={newTask.assignedTo}
                 onChange={handleInputChange}
               >
-                {employees.map((employee) => (
+                {employees?.map((employee) => (
                   <MenuItem key={employee._id} value={employee._id}>
                     {employee.name}
                   </MenuItem>

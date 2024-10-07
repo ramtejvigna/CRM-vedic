@@ -124,7 +124,7 @@ export const addComment = async (req, res) => {
 
 
 export const getEmployeeTasks = async (req, res) => {
-  const { employeeId } = req.params;
+  const employeeId  = req.user;
 
   try {
     const tasks = await Task.find({ assignedTo: employeeId }).sort({ startTime: -1 });
@@ -145,13 +145,62 @@ export const getEmployees = async (req, res) => {
 };
 
 export const getNotifications = async (req, res) => {
-  const { employeeId } = req.params;
-
+  const employeeId = req.user;
+  console.log(employeeId)
   try {
     const notifications = await Notification.find({ employee: employeeId }).sort({ createdAt: -1 });
     res.json(notifications);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const markNotificationAsRead = async (req, res, next) => {
+  try {
+    const userId = req.user;
+    const notification = await Notification.findById(req.params.id);
+
+    if (!notification) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    // if (!notification.recipients.includes(userId)) {
+    //   return res.status(403).json({ message: 'Not authorized' });
+    // }
+
+    notification.read = true;
+    await notification.save();
+
+    res.json({ message: 'Notification marked as read' });
+  } catch (err) {
+    console.log(err.message)
+    next(err);
+  }
+};
+
+export const createNotification = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { message, recipients } = req.body;
+    const sender = '66f8324f7e51f0aebd0a81c3'; // Replace with actual sender ID
+
+    const notification = new Notification({
+      message,
+      sender,
+      recipients
+    });
+
+    await notification.save();
+
+    res.status(201).json({ message: 'Notification sent successfully', notification });
+  } catch (err) {
+    next(err);
   }
 };
 
