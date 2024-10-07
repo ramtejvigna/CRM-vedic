@@ -7,7 +7,7 @@ import EmployeeRouter from './routes/EmployeeRouter.js';
 import dotenv from 'dotenv';
 import taskRoutes from './routes/TaskRoutes.js'
 import customerRoutes from './routes/customerRoutes.js'
-
+import PdfRouter from './routes/PdfRouter.js';
 import authRoutes from './routes/authRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
@@ -26,6 +26,7 @@ app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/PDF',PdfRouter);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, connectToMongoDB() , ()=> console.log(`Server running on port ${PORT}`));
