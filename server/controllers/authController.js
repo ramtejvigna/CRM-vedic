@@ -1,38 +1,38 @@
 // controllers/authController.js
-import {Employee} from '../models/User.js';
+import { Employee } from '../models/User.js';
+import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+dotenv.config();
+
 
 export const login = async (req, res) => {
-  const { username, password } = req.body;
-  console.log(password)
-  try {
-    const user = await Employee.findOne({ username });
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    const isMatch =  true
-    if (!isMatch) {
+  try {
+    // Find user by username
+    const { username, phone } = req.body;
+
+    // Find employee by username and phone
+    const employee = await Employee.findOne({ username, phone });
+
+    if (!employee) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // Generate JWT token with employee ObjectId and isAdmin flag
     const token = jwt.sign(
-      { userId: user._id, isAdmin: user.isAdmin, username: user.username }, // Include username here
-     'crm',
+      {
+        id: employee._id,
+      },
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
-    return res.status(200).json({
+
+    // Return token in response
+    res.status(200).json({
       token,
-      user: {
-        username: user.username,
-        email: user.email,
-        isAdmin: user.isAdmin,
-      },
+      userId: employee._id,
     });
   } catch (error) {
-    console.log(error)
     return res.status(500).json({ message: 'Server error' });
   }
 };

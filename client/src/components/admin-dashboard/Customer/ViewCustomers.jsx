@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -19,19 +19,7 @@ import {
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import FilterListIcon from '@mui/icons-material/FilterList';
-
-const customerData = [
-  { sino: 1, name: 'Manoj', whatsapp: '7799101777', gender: 'Male', employee: 'Employee1 Ram', status: 'In progress', pdfs: '1' },
-  { sino: 2, name: 'Srikar', whatsapp: '7556575877', gender: 'Male', employee: 'Employee2 Mounika', status: 'Pending', pdfs: '0' },
-  { sino: 3, name: 'Priya', whatsapp: '7799201788', gender: 'Female', employee: 'Employee3 Riya', status: 'In progress', pdfs: '2' },
-  { sino: 4, name: 'Nisha', whatsapp: '7799101788', gender: 'Female', employee: 'Employee4 Riya', status: 'Pending', pdfs: '1' },
-  { sino: 5, name: 'Ajay', whatsapp: '7799101778', gender: 'Male', employee: 'Employee5 Ram', status: 'In progress', pdfs: '1' },
-  { sino: 6, name: 'Ravi', whatsapp: '7799101779', gender: 'Male', employee: 'Employee6 Mounika', status: 'In progress', pdfs: '2' },
-  { sino: 7, name: 'Sita', whatsapp: '7799101780', gender: 'Female', employee: 'Employee7 Riya', status: 'Pending', pdfs: '0' },
-  { sino: 8, name: 'Gita', whatsapp: '7799101781', gender: 'Female', employee: 'Employee8 Riya', status: 'In progress', pdfs: '1' },
-  { sino: 9, name: 'Sunil', whatsapp: '7799101782', gender: 'Male', employee: 'Employee9 Ram', status: 'Pending', pdfs: '2' },
-  { sino: 10, name: 'Neha', whatsapp: '7799101783', gender: 'Female', employee: 'Employee10 Mounika', status: 'In progress', pdfs: '0' },
-];
+import axios from 'axios';
 
 const getStatusContainer = (status) => (
   <Box
@@ -58,6 +46,7 @@ const CustomerDetails = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
+  const [customers, setCustomers] = useState([]);
 
   const handleGenderChange = (event) => {
     setFilteredGender(event.target.value);
@@ -71,8 +60,21 @@ const CustomerDetails = () => {
     setPage(newPage);
   };
 
-  const filteredData = customerData.filter((row) => {
-    const genderMatch = filteredGender === 'All' || row.gender === filteredGender;
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/customers/getCustomers');
+      setCustomers(response.data);
+    } catch (err) {
+      console.error('Error fetching customers', err);
+    }
+  };
+
+  const filteredData = customers.filter((row) => {
+    const genderMatch = filteredGender === 'All' || row.babyGender === filteredGender;
     const statusMatch = filteredStatus === 'All' || row.status === filteredStatus;
     return genderMatch && statusMatch;
   });
@@ -81,7 +83,7 @@ const CustomerDetails = () => {
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   return (
-    <Box sx={{ position: 'relative', padding: '20px', paddingBottom: '80px'}}>
+    <Box sx={{ position: 'relative', padding: '20px', paddingBottom: '80px' }}>
       <Box
         sx={{
           backgroundColor: '#1E90FF',
@@ -111,7 +113,6 @@ const CustomerDetails = () => {
           sx={{
             backgroundColor: '#000',
             borderRadius: '10px',
-            
           }}
         >
           Filter
@@ -137,9 +138,9 @@ const CustomerDetails = () => {
               value={filteredGender}
               onChange={handleGenderChange}
               sx={{
-                border: 'none', // Remove the border
+                border: 'none',
                 '& fieldset': {
-                  border: 'none', // Remove the outline around the Select
+                  border: 'none',
                 },
               }}
             >
@@ -155,9 +156,9 @@ const CustomerDetails = () => {
               value={filteredStatus}
               onChange={handleStatusChange}
               sx={{
-                border: 'none', // Remove the border
+                border: 'none',
                 '& fieldset': {
-                  border: 'none', // Remove the outline around the Select
+                  border: 'none',
                 },
               }}
             >
@@ -169,36 +170,29 @@ const CustomerDetails = () => {
         </Box>
       )}
 
-
-
       <Box sx={{ marginTop: '30px', paddingBottom: '80px' }}>
-        <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px', padding: '10px', borderRadius: '20px'  }}>
-          <Table stickyHeader>
+        <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px', padding: '10px', borderRadius: '20px' }}>
+          <Table stickyHeader sx={{ marginTop: '70px'}}>
             <TableHead>
-              <TableRow>
-                <TableCell colSpan={7} style={{ padding: 0, height: '75px', backgroundColor: 'transparent', border: 'none' }} />
-              </TableRow>
               <TableRow>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>S:no</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Customer Name</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>WhatsApp Number</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Baby's Gender</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Employee Assigned</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Status</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>PDFs Generated</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Preferred Starting Letter</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Preferred God</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedData.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell align="center">{row.sino}</TableCell>
-                  <TableCell align="center">{row.name}</TableCell>
-                  <TableCell align="center">{row.whatsapp}</TableCell>
-                  <TableCell align="center">{row.gender}</TableCell>
-                  <TableCell align="center">{row.employee}</TableCell>
-                  <TableCell align="center">{getStatusContainer(row.status)}</TableCell>
-                  <TableCell align="center">{row.pdfs}</TableCell>
+                  <TableCell align="center">{index + 1}</TableCell>
+                  <TableCell align="center">{row.username}</TableCell>
+                  <TableCell align="center">{row.whatsappNumber}</TableCell>
+                  <TableCell align="center">{row.babyGender}</TableCell>
+                  <TableCell align="center">{row.preferredStartingLetter}</TableCell>
+                  <TableCell align="center">{row.preferredGod}</TableCell>
                   <TableCell align="center">
                     <Button variant="contained" color="primary" size="small">
                       View

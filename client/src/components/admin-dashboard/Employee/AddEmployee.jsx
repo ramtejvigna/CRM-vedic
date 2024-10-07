@@ -148,9 +148,9 @@ const AddEmployee = () => {
             setIsLoading(false);
 
             toast.success("employee created");
-            navigate('/admin-dashboard/employees')
+            navigate('/admin-dashboard/employees');
         } catch (error) {
-            alert(error);
+            alert(error.message);
         }
 
     };
@@ -444,8 +444,8 @@ const AddEmployee = () => {
         </div>
     ) : (
         <div className="h-full p-5 ">
-            <Box className="flex flex-col  h-full p-5 ">
-                <Stepper activeStep={activeStep} className="p-10 w-full">
+            <Box className="flex flex-col gap-5 h-full p-5 ">
+                <Stepper activeStep={activeStep} className="p-7 w-full">
                     {steps.map((label, index) => (
                         <Step className='' key={label}>
                             <StepLabel><span className="hidden xl:block  text-center  tracking-wider">{label}</span></StepLabel>

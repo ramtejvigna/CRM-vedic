@@ -16,9 +16,11 @@ const customerSchema = new mongoose.Schema({
     additionalPreferences: { type: String },
     assignedEmployee: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
     socialMediaUsername: { type: String },
+    paymentStatus: { type: Boolean, default: false },
     paymentDate: { type: Date },
     paymentTime: { type: String },
     payTransactionID: { type: String },
+    pdfGenerated: { type: Number, default: 0 },  // Storing the count of PDFs generated
     amountPaid: { type: String },
     offer: { type: String },
     createdDateTime: { type: Date, default: Date.now }
@@ -31,7 +33,7 @@ const employeeSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
-    password : {type : String , required : true},
+    password : {type : String},
     address: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },

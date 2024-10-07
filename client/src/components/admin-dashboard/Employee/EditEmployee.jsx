@@ -4,25 +4,28 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import {toast} from "react-toastify"
 import { Input } from '@material-tailwind/react';
 import { TextField, InputLabel, Typography } from '@mui/material';
 import {Link, Navigate} from 'react-router-dom';
 import { useNavigate , useParams } from 'react-router-dom';
+import { GET_EMPLOYEE_BY_ID, UPDATE_EMPLOYEE } from '../../../utils/constants';
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
 const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'financial']
 const EditEmployee = () => {
     const navigate = useNavigate();
-    const {user} = useParams();
+    const {id} = useParams();
     const [activeStep, setActiveStep] = useState(0);
     const [errors, setErrors] = useState({});
+    const [isLoading , setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         personalInfo: {
-            fullName: '',
-            dob: '',
+            username: '',
+            name: '',
             phone: '',
             email: '',
             city: '',
-            address : '' ,
+            address: '',
             state: '',
             country: '',
             pincode: '',
@@ -33,10 +36,28 @@ const EditEmployee = () => {
         paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: '' },
     });
 
-    // useEffect(() => setFormData(user)  , []);
+    useEffect(() =>{ 
+        const getEmployee = async () => {
+            try {
+                setIsLoading(true);
+                const res = await fetch(`${GET_EMPLOYEE_BY_ID}?id=${id}`);
+
+                if(!res.ok) {
+                    toast.error("Error !");
+                }
+
+                const data = await res.json();
+                setIsLoading(false);
+                setFormData((prev) => prev =  {...prev , ["personalInfo"] : data.employee});
+            } catch (error) {
+                toast.error(error.message);
+            }
+        }
+
+        getEmployee();
+    }, []);
 
 
-    console.log("Hello")
     const handleNext = () => {
         if (validateForm()) {
             setActiveStep((prev) => prev + 1);
@@ -67,42 +88,44 @@ const EditEmployee = () => {
         const formErrors = {};
 
 
+
         if (activeStep === 0) {
-            if (!form.fullName) formErrors.fullName = 'Full Name is required';
+            if (!form.username) formErrors.fullName = 'Full Name is required';
             if (!form.email) formErrors.email = 'Email is required';
-            if (!form.dob) formErrors.dob = 'Date of Birth is required';
+            if (!form.name) formErrors.dob = 'Date of Birth is required';
             if (!form.address) formErrors.address = 'Address is required';
+            if (!form.city) formErrors.city = 'city is required';
             if (!form.phone) formErrors.phone = 'Phone number is required';
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
         }
 
-        if (activeStep === 1) {
-            if (!form.aadhar) formErrors.aadhar = 'Aadhar Card is required';
-            if (!form.pan) formErrors.pan = 'PAN Card is required';
-            if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-            if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
-        }
+        // if (activeStep === 1) {
+        //     if (!form.aadhar) formErrors.aadhar = 'Aadhar Card is required';
+        //     if (!form.pan) formErrors.pan = 'PAN Card is required';
+        //     if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
+        //     if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
+        // }
 
 
-        if (activeStep === 2) {
-            if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
-            if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
-        }
+        // if (activeStep === 2) {
+        //     if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
+        //     if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
+        // }
 
-        if (activeStep === 3) {
-            if (!form.company) formErrors.company = 'Company Name is required';
-            if (!form.position) formErrors.position = 'Position is required';
-            if (!form.experience) formErrors.experience = 'Years of Experience is required';
-        }
+        // if (activeStep === 3) {
+        //     if (!form.company) formErrors.company = 'Company Name is required';
+        //     if (!form.position) formErrors.position = 'Position is required';
+        //     if (!form.experience) formErrors.experience = 'Years of Experience is required';
+        // }
 
-        if (activeStep === 4) {
-            if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
-            if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
-            if (!form.cvv) formErrors.cvv = 'CVV is required';
-        }
+        // if (activeStep === 4) {
+        //     if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
+        //     if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
+        //     if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
+        //     if (!form.cvv) formErrors.cvv = 'CVV is required';
+        // }
 
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
@@ -122,11 +145,35 @@ const EditEmployee = () => {
 
 
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        try {
+            setIsLoading(true);
+          const res = await fetch(`${UPDATE_EMPLOYEE}`, {
+            method: "PUT",
+            headers: {
+              'Content-Type': "application/json",
+            },
+            body: JSON.stringify({
+              id, ...formData[formKeys[0]], 
+            }),
+          });
+      
 
-        console.log('Form submitted successfully:', formData);
-        alert('Employee added successfully!');
-    };
+          if (!res.ok) {
+            const errorData = await res.json(); 
+            toast.error(errorData.message || "An error occurred");
+            return;
+          }
+      
+          const data = await res.json(); 
+          setIsLoading(false);
+          toast.success(data.message || "Employee updated successfully");
+          navigate('/admin-dashboard/employees');
+        } catch (error) {
+          toast.error(`Error: ${error.message}`);
+        }
+      };
+      
 
 
     const renderForm = () => {
@@ -138,26 +185,26 @@ const EditEmployee = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
                                 className="flex-1"
-                                label="Full Name"
-                                name="fullName"
-                                value={formData.personalInfo.fullName}
+                                label="username"
+                                name="username"
+                                value={formData.personalInfo.username}
                                 onChange={handleChange}
-                                error={!!errors.fullName}
-                                helperText={errors.fullName}
+                                error={!!errors.username}
+                                helperText={errors.username}
                                 InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
                             />
                             <TextField
                                 className="flex-1"
-                                type="date"
-                                name="dob"
-                                value={formData.personalInfo.dob}
+                                label="name"
+                                name="name"
+                                value={formData.personalInfo.name}
                                 onChange={handleChange}
-                                error={!!errors.dob}
-                                helperText={errors.dob}
+                                error={!!errors.name}
+                                helperText={errors.name}
                                 InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
                             />
                         </div>
-    
+
                         <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -179,18 +226,31 @@ const EditEmployee = () => {
                                 className="rounded-md shadow-sm bg-gray-50"
                             />
                         </div>
-    
+
                         <h3 className="text-lg font-semibold text-gray-700">Address</h3>
-                        <TextField
-                            label="Address"
-                            name="address"
-                            value={formData.personalInfo.address}
-                            onChange={handleChange}
-                            error={!!errors.address}
-                            helperText={errors.address}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <TextField
+                                label="Address"
+                                name="address"
+                                value={formData.personalInfo.address}
+                                onChange={handleChange}
+                                error={!!errors.address}
+                                helperText={errors.address}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                            />
+                            <TextField
+                                label="City"
+                                name="city"
+                                value={formData.personalInfo.city}
+                                onChange={handleChange}
+                                error={!!errors.city}
+                                helperText={errors.city}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                            />
+
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <TextField
                                 label="State"
@@ -398,10 +458,14 @@ const EditEmployee = () => {
         }
     };
     
-    return (
+    return isLoading ? (
+        <div className='h-full flex items-center justify-center'>
+            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+        </div>
+    ) :  (
         <div className="h-full p-5 ">
-            <Box className="flex flex-col  h-full p-5 ">
-                <Stepper activeStep={activeStep} className="p-10 w-full">
+            <Box className="flex flex-col gap-5   h-full p-5 ">
+                <Stepper activeStep={activeStep} className="p-7 w-full">
                     {steps.map((label, index) => (
                         <Step className='' key={label}>
                             <StepLabel><span className="hidden xl:block  text-center  tracking-wider">{label}</span></StepLabel>
@@ -424,7 +488,7 @@ const EditEmployee = () => {
                     {activeStep === steps.length - 1 ? (
                         <Button
                             sx={{ border: "1px solid blue", backgroundColor: "green", color: "white", padding: "6px 15px", fontWeight: "700" }}
-                            onClick={handleSubmit}
+                            onClick={ () => handleSubmit()}
                         >
                             Finish
                         </Button>
