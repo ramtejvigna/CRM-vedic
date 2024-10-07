@@ -17,12 +17,24 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  CircularProgress,
+  useMediaQuery,
+  ThemeProvider,
+  createTheme,
+  CssBaseline
 } from "@mui/material";
-import { Edit, Delete, Add, Close, Comment } from "@mui/icons-material";
+import { Edit, Delete, Add, Comment } from "@mui/icons-material";
 import axios from "axios";
-import { useStore } from "../../../store";
+import { SnackbarProvider, useSnackbar } from "notistack";
 
-const TaskManagement = () => {
+// Create a theme instance
+const theme = createTheme({
+  palette: {
+    mode: 'light', // You can toggle this between 'light' and 'dark'
+  },
+});
+
+const TaskManagementChild = () => {
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -36,7 +48,10 @@ const TaskManagement = () => {
     status: "Pending",
   });
   const [newComment, setNewComment] = useState("");
-  const { isDarkMode } = useStore();
+  const { enqueueSnackbar } = useSnackbar();
+  const [loadingTasks, setLoadingTasks] = useState(true);
+  const [loadingEmployees, setLoadingEmployees] = useState(true);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetchTasks();
@@ -44,22 +59,30 @@ const TaskManagement = () => {
   }, []);
 
   const fetchTasks = async () => {
+    setLoadingTasks(true);
     try {
       const response = await axios.get("http://localhost:3000/api/tasks");
       console.log(response.data);
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      enqueueSnackbar("Error fetching tasks", { variant: "error" });
+    } finally {
+      setLoadingTasks(false);
     }
   };
 
   const fetchEmployees = async () => {
+    setLoadingEmployees(true);
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
 
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
+      enqueueSnackbar("Error fetching employees", { variant: "error" });
+    } finally {
+      setLoadingEmployees(false);
     }
   };
 
@@ -89,25 +112,23 @@ const TaskManagement = () => {
     setNewTask((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCommentChange = (e) => {
-    setNewComment(e.target.value);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!newTask.title || !newTask.assignedTo || !newTask.endTime) {
+      enqueueSnackbar("Please fill out all required fields", { variant: "error" });
+      return;
+    }
     try {
       if (selectedTask) {
-        await axios.put(
-          `http://localhost:3000/api/tasks/${selectedTask._id}`,
-          newTask
-        );
+        await axios.put(`http://localhost:3000/api/tasks/${selectedTask._id}`, newTask);
       } else {
         await axios.post("http://localhost:3000/api/tasks", newTask);
       }
       fetchTasks();
       handleCloseModal();
+      enqueueSnackbar("Task saved successfully", { variant: "success" });
     } catch (error) {
-      console.error("Error saving task:", error);
+      enqueueSnackbar("Error saving task", { variant: "error" });
     }
   };
 
@@ -115,21 +136,9 @@ const TaskManagement = () => {
     try {
       await axios.delete(`http://localhost:3000/api/tasks/${id}`);
       fetchTasks();
+      enqueueSnackbar("Task deleted", { variant: "warning" });
     } catch (error) {
-      console.error("Error deleting task:", error);
-    }
-  };
-
-  const handleAddComment = async (id) => {
-    try {
-      await axios.post(`http://localhost:3000/api/tasks/${id}/comment`, {
-        text: newComment,
-        createdBy: "66ff54863b2d6f0e00bdc1a2", // Change this accordingly if user data is available
-      });
-      setNewComment("");
-      fetchTasks();
-    } catch (error) {
-      console.error("Error adding comment:", error);
+      enqueueSnackbar("Error deleting task", { variant: "error" });
     }
   };
 
@@ -143,89 +152,132 @@ const TaskManagement = () => {
     setSelectedTask(null);
   };
 
+  const handleAddComment = async (id) => {
+    try {
+      await axios.post(`http://localhost:3000/api/tasks/${id}/comment`, {
+        text: newComment,
+        createdBy: "66ff54863b2d6f0e00bdc1a2", // Example user ID
+      });
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === id
+            ? { ...task, comments: [...task.comments, { text: newComment, createdBy: "User" }] }
+            : task
+        )
+      );
+      setNewComment("");
+      enqueueSnackbar("Comment added successfully", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Error adding comment", { variant: "error" });
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
-        return "green";
+        return theme.palette.success.main;
       case "In Progress":
-        return "orange";
+        return theme.palette.warning.main;
       default:
-        return "red";
+        return theme.palette.error.main;
     }
   };
 
   return (
-    <div
-      className={`p-4 ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}
-    >
+    <Box sx={{ p: 4 }}>
       <Button
         variant="contained"
         color="primary"
         startIcon={<Add />}
         onClick={() => handleOpenModal()}
-        className="mb-4"
-        sx={{m:3}}
+        sx={{ mb: 4 }}
       >
         Assign New Task
       </Button>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Task Title</TableCell>
-              <TableCell>Assigned To</TableCell>
-              <TableCell>Start Time</TableCell>
-              <TableCell>End Time</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tasks &&
-              tasks.map((task) => (
+      {loadingTasks ? (
+        <CircularProgress />
+      ) : isMobile ? (
+        <Box>
+          {tasks.map((task) => (
+            <Paper key={task._id} sx={{ p: 2, mb: 2 }}>
+              <Typography variant="h6" onClick={() => handleTaskTitleClick(task)} sx={{ cursor: "pointer", color: "primary.main" }}>
+                {task.title}
+              </Typography>
+              <Typography>Assigned To: {task.assignedTo.name}</Typography>
+              <Typography>Start Time: {new Date(task.startTime).toLocaleString()}</Typography>
+              <Typography>End Time: {new Date(task.endTime).toLocaleString()}</Typography>
+              <Typography sx={{ color: getStatusColor(task.status) }}>Status: {task.status}</Typography>
+              <Box sx={{ mt: 1 }}>
+                <IconButton onClick={() => handleOpenModal(task)} color="primary">
+                  <Edit />
+                </IconButton>
+                <IconButton onClick={() => handleDelete(task._id)} color="error">
+                  <Delete />
+                </IconButton>
+                <IconButton onClick={() => handleTaskTitleClick(task)} color="info">
+                  <Comment />
+                </IconButton>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Task Title</TableCell>
+                <TableCell>Assigned To</TableCell>
+                <TableCell>Start Time</TableCell>
+                <TableCell>End Time</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tasks.map((task) => (
                 <TableRow key={task._id}>
                   <TableCell
                     onClick={() => handleTaskTitleClick(task)}
-                    style={{ cursor: "pointer", color: "blue" }}
+                    sx={{ cursor: "pointer", color: "primary.main" }}
                   >
                     {task.title}
                   </TableCell>
                   <TableCell>{task.assignedTo.name}</TableCell>
+                  <TableCell>{new Date(task.startTime).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(task.endTime).toLocaleString()}</TableCell>
+                  <TableCell sx={{ color: getStatusColor(task.status) }}>{task.status}</TableCell>
                   <TableCell>
-                    {new Date(task.startTime).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(task.endTime).toLocaleString()}
-                  </TableCell>
-                  <TableCell style={{ color: getStatusColor(task.status) }}>
-                    {task.status}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleOpenModal(task)}>
+                    <IconButton onClick={() => handleOpenModal(task)} color="primary">
                       <Edit />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(task._id)}>
+                    <IconButton onClick={() => handleDelete(task._id)} color="error">
                       <Delete />
                     </IconButton>
-                    <IconButton onClick={() => handleTaskTitleClick(task)}>
+                    <IconButton onClick={() => handleTaskTitleClick(task)} color="info">
                       <Comment />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          } p-6 rounded-md`}
-        >
-          <Typography variant="h6" className="m-4"   sx={{my:4}}>
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+          borderRadius: 2,
+        }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
             {selectedTask ? "Edit Task" : "Assign New Task"}
           </Typography>
           <form onSubmit={handleSubmit}>
@@ -236,7 +288,7 @@ const TaskManagement = () => {
               sx={{mb:2}}
               value={newTask.title}
               onChange={handleInputChange}
-              className="mb-8 mt-2"
+              sx={{ mb: 2 }}
             />
             <TextField
               name="description"
@@ -246,8 +298,9 @@ const TaskManagement = () => {
               rows={4}
               value={newTask.description}
               onChange={handleInputChange}
-              sx={{mb:2}}            />
-            <FormControl fullWidth className="mb-4 mt-4"   sx={{mb:2}}>
+              sx={{ mb: 2 }}
+            />
+            <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel>Assign To</InputLabel>
               <Select
                 name="assignedTo"
@@ -271,6 +324,7 @@ const TaskManagement = () => {
               sx={{mb:4}}              InputLabelProps={{
                 shrink: true,
               }}
+              sx={{ mb: 2 }}
             />
             <Button type="submit" variant="contained" color="primary" fullWidth>
               {selectedTask ? "Update Task" : "Assign Task"}
@@ -280,29 +334,44 @@ const TaskManagement = () => {
       </Modal>
 
       <Modal open={descriptionModal} onClose={handleCloseDescriptionModal}>
-        <Box
-          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          } p-6 rounded-md`}
-        >
-          <Typography variant="h6" className="mb-4"   sx={{mb:2}}>
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+          borderRadius: 2,
+        }}>
+          <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
             Task Details
           </Typography>
-          <Typography className="mb-4" sx={{mb:2}}>{selectedTask?.description}</Typography>
-          <Typography variant="h6">Comments</Typography>
-          {selectedTask &&
-            selectedTask.comments.map((comment) => (
-              <Typography sx={{my:2}} key={comment._id}>
-                {comment.text} - {comment.createdBy}
-              </Typography>
+          <Typography sx={{ mb: 2 }}>
+            {selectedTask?.description}
+          </Typography>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Comments
+          </Typography>
+          <Box sx={{ maxHeight: 150, overflowY: 'auto', mb: 2, p: 1, bgcolor: 'grey.100', borderRadius: 1 }}>
+            {selectedTask && selectedTask.comments.map((comment, index) => (
+              <Box key={index} sx={{ mb: 1, p: 1, bgcolor: 'grey.200', borderRadius: 1 }}>
+                <Typography variant="body2">
+                  {comment.text}
+                </Typography>
+                <Typography variant="caption" color="textSecondary">
+                  by {comment.createdBy}
+                </Typography>
+              </Box>
             ))}
-
+          </Box>
           <TextField
             label="Comment"
             fullWidth
             value={newComment}
-            onChange={handleCommentChange}
-            className="mb-4"
+            onChange={(e) => setNewComment(e.target.value)}
+            sx={{ mb: 2 }}
           />
           <Button
             variant="contained"
@@ -314,8 +383,17 @@ const TaskManagement = () => {
           </Button>
         </Box>
       </Modal>
-    </div>
+    </Box>
   );
 };
+
+const TaskManagement = () => (
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <SnackbarProvider maxSnack={3}>
+      <TaskManagementChild />
+    </SnackbarProvider>
+  </ThemeProvider>
+);
 
 export default TaskManagement;

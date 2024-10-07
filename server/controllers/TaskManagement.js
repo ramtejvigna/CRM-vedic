@@ -98,7 +98,7 @@ export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { text, createdBy } = req.body;
-
+    console.log('in add comment')
     // Find the task by id
     const task = await Task.findById(id);
     if (!task) {
@@ -106,7 +106,7 @@ export const addComment = async (req, res) => {
     }
 
     // Validate if createdBy is a valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(createdBy)) {
+    if (!createdBy) {
       return res.status(400).json({ message: 'Invalid user ID' });
     }
 
