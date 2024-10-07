@@ -100,3 +100,4 @@ export const getEmployees = async (req ,res) => {
         return res.status(500).send("Internal server error");
     }
 }
+
