@@ -2,7 +2,6 @@ import { Employee, Customer } from "../models/User.js";
 
 export const addCustomerWithAssignment = async (req, res) => {
     const {
-        username,
         fatherName,
         motherName,
         email,
@@ -20,7 +19,6 @@ export const addCustomerWithAssignment = async (req, res) => {
     try {
         // Create new customer
         const newCustomer = new Customer({
-            username,
             fatherName,
             motherName,
             email,
@@ -84,15 +82,17 @@ export const getCustomersBasedOnRequests = async (req, res) => {
 
         // Categorize customers based on payment status and PDF generation
         const customers = employee.customers;
-        const newRequests = customers.filter(customer => !customer.paymentStatus);
-        const inProgress = customers.filter(customer => customer.paymentStatus && customer.pdfGenerated < 1);
-        const completed = customers.filter(customer => customer.paymentStatus && customer.pdfGenerated >= 1);
+        const newRequests = customers.filter(customer => customer.customerStatus === 'newRequests');
+        const inProgress = customers.filter(customer => customer.customerStatus === 'inProgress');
+        const completed = customers.filter(customer => customer.customerStatus === 'completed');
+        const rejected = customers.filter(customer => customer.customerStatus === 'rejected');
 
         // Return the categorized customers
         res.status(200).json({
             newRequests,
             inProgress,
             completed,
+            rejected
         });
     } catch (error) {
         res.status(500).json({ error: "Error fetching customers for employee" });
@@ -101,7 +101,9 @@ export const getCustomersBasedOnRequests = async (req, res) => {
 
 export const getCustomerData = async (req, res) => {
     const { id } = req.params;
-    const { paymentStatus, pdfGenerated, feedback } = req.body;
+    const { paymentStatus, pdfGenerated, feedback, customerStatus,
+        paymentDate, paymentTime, amountPaid, transactionId
+    } = req.body;
 
     try {
         const customer = await Customer.findById(id);
@@ -116,10 +118,12 @@ export const getCustomerData = async (req, res) => {
         if (pdfGenerated !== undefined) {
             customer.pdfGenerated = pdfGenerated;
         }
-        if (feedback) {
-            // Assuming there’s a feedback field you want to store
-            customer.feedback = feedback;
-        }
+        customer.feedback = feedback;
+        customer.customerStatus = customerStatus;
+        customer.payTransactionID = transactionId;
+        customer.amountPaid = amountPaid;
+        customer.paymentDate = paymentDate;
+        customer.paymentTime = paymentTime;
 
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
