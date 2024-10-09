@@ -10,6 +10,7 @@ export default {
   darkMode: 'class', // Enables class-based dark mode
 
   plugins: [
+    require('@tailwindcss/forms'),
     require('tailwind-scrollbar-hide')
   ],
 }
