@@ -32,7 +32,7 @@ export default function Employee() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false)
     const [employees, setEmployees] = useState([]);
-    const recordsPerPage = 5;
+    const recordsPerPage = 7;
     const [currentPage, setCurrentPage] = useState(1);
     const lastIndex = currentPage * recordsPerPage;
     const firstIndex = lastIndex - recordsPerPage;
@@ -82,7 +82,7 @@ export default function Employee() {
         <div className='py-10 h-full w-full '>
             <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl  shadow-2xl h-full relative'>   
                 <div className='absolute top-[-5%] left-[50%] translate-x-[-50%] w-full  xl:w-[70%] p-5  bg-blue-500 font-semibold text-white rounded-xl flex flex-row justify-between items-center shadow-lg'>
-                    <h1 className='uppercase font-semibold sm:text-2xl tracking-wider '>Employee Table</h1>
+                    <h1 className='uppercase font-semibold sm:text-xl tracking-wider '>Employee Table</h1>
                     <ul>
                         <li onClick={handleAddEmployeeClick} className='p-2 flex items-center gap-2 tracking-wider uppercase bg-blue-900 cursor-pointer rounded-lg shadow-xl'> <AiOutlineUserAdd/> Add Employee</li>
                     </ul>
@@ -139,7 +139,7 @@ export default function Employee() {
                                             <Button onClick={() => navigate(`edit-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
                                                 Edit
                                             </Button>
-                                            <Button variant="outlined" size="small" color="primary">
+                                            <Button onClick={() => navigate(`view-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
                                                 view
                                             </Button>
                                         </TableCell>

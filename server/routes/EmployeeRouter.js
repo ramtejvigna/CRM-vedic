@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addEmployee , getEmployees } from "../controllers/EmployeeControllers.js";
+import { addEmployee , getEmployees , getEmployee , updateEmployee } from "../controllers/EmployeeControllers.js";
 import multer from 'multer';
 
 const storage = multer.diskStorage({
@@ -22,5 +22,7 @@ router.post('/add-employee' , uploads.fields([
     {name : "aadhar" , maxCount : 1} ,
     {name : "pan" , maxCount : 1}]) , addEmployee);
 router.get('/get-employees' , getEmployees);
-router.get('/get-employee');
+router.get('/get-employee' , getEmployee);
+router.put('/update-employee' , updateEmployee);
+
 export default router;

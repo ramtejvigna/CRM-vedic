@@ -157,10 +157,6 @@
                 formDataToSend.append(key , formData.paymentDetails[key])
             })
 
-            console.log('FormData contents:');
-            for (let pair of formDataToSend.entries()) {
-                console.log(`${pair[0]}:`, pair[1]);
-            }
             
             try {   
                 setIsLoading(true);
