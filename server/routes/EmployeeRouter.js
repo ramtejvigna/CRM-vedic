@@ -1,7 +1,6 @@
 import { Router } from "express";
 import multer from "multer"
 import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
-
 const router = Router();
 
 router.get('/', getEmployees);

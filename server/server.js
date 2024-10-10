@@ -5,9 +5,9 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import employeeRoutes from './routes/EmployeeRouter.js';
 import dotenv from 'dotenv';
-import taskRoutes from './routes/TaskRoutes.js'
-import customerRoutes from './routes/customerRoutes.js'
-
+import taskRoutes from './routes/TaskRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
+import pdfRoutes from './routes/pdfRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
@@ -32,4 +32,4 @@ app.use('/customers', customerRoutes);
 // app.use('/api/notifications', notificationRoutes);
 // 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, connectToMongoDB() , ()=> console.log(`Server running on port ${PORT}`));
+server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));

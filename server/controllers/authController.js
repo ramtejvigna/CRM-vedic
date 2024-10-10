@@ -35,6 +35,7 @@ export const login = async (req, res) => {
             username : employee.username
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };

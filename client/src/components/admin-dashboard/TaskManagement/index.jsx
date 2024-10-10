@@ -185,7 +185,7 @@ const TaskManagement = () => {
 
   return (
     <div
-      className={`min-h-full p-4 sm:p-8 ${
+      className={`min-h-screen p-4 sm:p-8 ${
         isDarkMode ? "dark bg-gray-900" : "bg-gray-100"
       }`}
     >
