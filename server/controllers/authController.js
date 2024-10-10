@@ -33,6 +33,7 @@ export const login = async (req, res) => {
             userId: employee._id,
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
