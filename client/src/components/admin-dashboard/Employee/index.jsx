@@ -3,8 +3,8 @@ import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, Button, Typography, tableCellClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify"
-import { AiOutlineUserAdd } from "react-icons/ai"
 import { GET_ALL_EMPLOYEES } from '../../../utils/constants';
+import { AiOutlineUserAdd } from "react-icons/ai"
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -82,6 +82,10 @@ export default function Employee() {
         setCurrentPage(id);
     }
 
+
+    
+
+
     return (
         <div className='py-10 h-full'>
             <div className='bg-white pt-20 flex flex-col  p-5 rounded-xl shadow-lg h-full relative'>
@@ -143,7 +147,7 @@ export default function Employee() {
                                             <Button onClick={() => navigate(`edit-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
                                                 Edit
                                             </Button>
-                                            <Button variant="outlined" size="small" color="primary">
+                                            <Button onClick={() => navigate(`view-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
                                                 view
                                             </Button>
                                         </TableCell>
