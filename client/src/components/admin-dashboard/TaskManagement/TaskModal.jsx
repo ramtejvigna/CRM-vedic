@@ -13,9 +13,8 @@ import {
   Backdrop,
   Fade,
 } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { X } from "lucide-react";
 
 const TaskModal = ({
@@ -82,9 +81,7 @@ const TaskModal = ({
               </Typography>
               <div className="space-y-4">
                 <div>
-                  <Typography variant="subtitle1">
-                    Description
-                  </Typography>
+                  <Typography variant="subtitle1">Description</Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }} // Muted color for less important text
@@ -93,9 +90,7 @@ const TaskModal = ({
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    Assigned To
-                  </Typography>
+                  <Typography variant="subtitle1">Assigned To</Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
@@ -104,9 +99,7 @@ const TaskModal = ({
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    End Time
-                  </Typography>
+                  <Typography variant="subtitle1">End Time</Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
@@ -115,29 +108,31 @@ const TaskModal = ({
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    Status
-                  </Typography>
+                  <Typography variant="subtitle1">Status</Typography>
                   <Typography
                     variant="body2"
-                    className={`font-semibold ${getStatusColor(selectedTask.status)}`}
+                    className={`font-semibold ${getStatusColor(
+                      selectedTask.status
+                    )}`}
                   >
                     {selectedTask.status}
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    Comments
-                  </Typography>
+                  <Typography variant="subtitle1">Comments</Typography>
                   <div className="max-h-40 overflow-y-auto space-y-2">
                     {selectedTask.comments.map((comment, index) => (
                       <div
                         key={index}
-                        className={`${isDarkMode ? 'bg-gray-800' : 'bg-slate-200'} p-2 rounded`}
+                        className={`${
+                          isDarkMode ? "bg-gray-800" : "bg-slate-200"
+                        } p-2 rounded`}
                       >
                         <Typography
                           variant="body2"
-                          sx={{ color: isDarkMode ? "#D1D5DB" : "#4B5563" }} // Soft gray for comments
+                          sx={{
+                            color: isDarkMode ? "#D1D5DB" : "#4B5563", // Soft gray for comments
+                          }}
                         >
                           {comment.text}
                         </Typography>
@@ -161,15 +156,29 @@ const TaskModal = ({
                       sx={{
                         backgroundColor: isDarkMode ? "#2D3748" : "#fff",
                         color: isDarkMode ? "#E5E7EB" : "#000",
+                        "& .MuiInputBase-input": {
+                          color: isDarkMode ? "#E5E7EB" : "#000", // Text color inside the input
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: isDarkMode ? "#9CA3AF" : "#000", // Border color for the input
+                        },
                       }}
                     />
                     <Button
                       type="submit"
                       variant="contained"
-                      sx={{ mt: 2, backgroundColor: "#6366F1", color: "#fff" }} // Vibrant color for the comment button
+                      sx={{
+                        mt: 2,
+                        backgroundColor: "#6366F1",
+                        color: "#fff",
+                      }} // Vibrant color for the comment button
                       disabled={isAddingComment}
                     >
-                      {isAddingComment ? <CircularProgress size={24} /> : "Add Comment"}
+                      {isAddingComment ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        "Add Comment"
+                      )}
                     </Button>
                   </form>
                 </div>
@@ -182,6 +191,7 @@ const TaskModal = ({
                 variant="h6"
                 component="h2"
                 className="mb-4"
+                sx={{ mb: 3 }}
               >
                 {selectedTask ? "Edit Task" : "New Task"}
               </Typography>
@@ -190,20 +200,39 @@ const TaskModal = ({
                   label="Task Title"
                   name="title"
                   sx={{
-                    backgroundColor: isDarkMode ? "#2D3748" : "#f7f7f7", // Darker background for input fields
-                    color: isDarkMode ? "#E5E7EB" : "#000", // Light gray text for dark mode
+                    backgroundColor: isDarkMode ? "#2D3748" : "#f7f7f7",
+                    "& .MuiInputBase-input": {
+                      color: isDarkMode ? "#fff" : "#000", // Text color
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: isDarkMode ? "#E5E7EB" : "#000", // Label color
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: isDarkMode ? "#9CA3AF" : "#000", // Border color
+                    },
                   }}
                   value={newTask.title}
                   onChange={handleInputChange}
                   fullWidth
                   required
+                  InputLabelProps={{
+                    style: { color: isDarkMode ? "#E5E7EB" : "#000" }, // Input label color
+                  }}
                 />
                 <TextField
                   label="Description"
                   name="description"
                   sx={{
                     backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
-                    color: isDarkMode ? "#E5E7EB" : "#000",
+                    "& .MuiInputBase-input": {
+                      color: isDarkMode ? "#fff" : "#000",
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: isDarkMode ? "#E5E7EB" : "#000",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: isDarkMode ? "#9CA3AF" : "#000",
+                    },
                   }}
                   value={newTask.description}
                   onChange={handleInputChange}
@@ -212,13 +241,23 @@ const TaskModal = ({
                   fullWidth
                   required
                 />
-                <FormControl fullWidth >
-                  <InputLabel sx={{ color: isDarkMode ? "#9CA3AF" : "#000"  }}>Assign To</InputLabel>
+                <FormControl fullWidth>
+                  <InputLabel
+                    sx={{
+                      color: isDarkMode ? "#E5E7EB" : "#000",
+                     
+                    }}
+                  >
+                    Assign To
+                  </InputLabel>
                   <Select
                     name="assignedTo"
                     sx={{
                       backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
                       color: isDarkMode ? "#E5E7EB" : "#000",
+                      "& .MuiSelect-icon": {
+                        color: isDarkMode ? "#E5E7EB" : "#000",
+                      },
                     }}
                     value={newTask.assignedTo}
                     onChange={handleInputChange}
@@ -232,40 +271,47 @@ const TaskModal = ({
                     ))}
                   </Select>
                 </FormControl>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    label="End Time"
-                    name="endTime"
-                    value={newTask.endTime}
-                    onChange={handleDateChange}
-                    fullWidth
-                    required
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        sx={{
-                          backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
+                <DatePicker
+                  selected={newTask.endTime}
+                  onChange={(date) => handleDateChange(date)}
+                  showTimeSelect
+                  label ="Due"
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  timeCaption="time"
+                  customInput={
+                    <TextField
+                      fullWidth
+                      sx={{
+                        backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
+                        "& .MuiInputBase-input": {
+                          color: isDarkMode ? "#fff" : "#000",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: isDarkMode ? "#9CA3AF" : "#000",
+                        },
+                        "& .MuiInputLabel-root": {
                           color: isDarkMode ? "#E5E7EB" : "#000",
-                        }}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-                <div className="flex justify-end space-x-2">
-                  <Button onClick={handleCloseModal} variant="outlined">
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      backgroundColor: isDarkMode ? "#6366F1" : "#1976d2", // Use a vibrant accent color for buttons
-                      color: "#fff",
-                    }}
-                  >
-                    {selectedTask ? "Update Task" : "Create Task"}
-                  </Button>
-                </div>
+                        },
+                        "& .MuiInputLabel-root.Mui-focused": {
+                          color: isDarkMode ? "#E5E7EB" : "#000",
+                        },
+                      }}
+                    />
+                  }
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#6366F1",
+                    color: "#fff",
+                    display: "block",
+                  }}
+                >
+                  {selectedTask ? "Update Task" : "Create Task"}
+                </Button>
               </form>
             </>
           )}
