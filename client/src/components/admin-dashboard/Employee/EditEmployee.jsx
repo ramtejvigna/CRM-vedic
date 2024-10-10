@@ -6,13 +6,15 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import {toast} from "react-toastify"
 import { Input } from '@material-tailwind/react';
+import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
 import { TextField, InputLabel, Typography } from '@mui/material';
 import {Link, Navigate} from 'react-router-dom';
 import { useNavigate , useParams } from 'react-router-dom';
 import { GET_EMPLOYEE_BY_ID, UPDATE_EMPLOYEE } from '../../../utils/constants';
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
-const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'financial']
+const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'paymentDetails']
 const EditEmployee = () => {
+    const [image , setImage] = useState(null);
     const navigate = useNavigate();
     const {id} = useParams();
     const [activeStep, setActiveStep] = useState(0);
@@ -32,8 +34,8 @@ const EditEmployee = () => {
         },
         idDocuments: { aadhar: '', pan: '', passport: '', ssn: '' },
         education: { degrees: null, transcripts: null },
-        employment: { employerName: '', jobTitle: '', startDate: '', endDate: '', reasonForLeaving: '' },
-        paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: '' },
+        employment: { employerName: '', jobTitle: '', startDate: Date, endDate: Date, reasonForLeaving: '' },
+        paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: Date },
     });
 
     useEffect(() =>{ 
@@ -48,7 +50,60 @@ const EditEmployee = () => {
 
                 const data = await res.json();
                 setIsLoading(false);
-                setFormData((prev) => prev =  {...prev , ["personalInfo"] : data.employee});
+                console.log(data)
+
+                const formatDate = (isoDate) => {
+                    const date = new Date(isoDate);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JS
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                };
+
+                setFormData((prev) => ({
+                    personalInfo: {
+                        ...prev.personalInfo, 
+                        username: data.employee.username, 
+                        name: data.employee.name,
+                        phone: data.employee.phone,
+                        email: data.employee.email,
+                        city: data.employee.city,
+                        address: data.employee.address,
+                        state: data.employee.state,
+                        country: data.employee.country,
+                        pincode: data.employee.pincode,
+                    },
+                    idDocuments: {
+                        ...prev.idDocuments, 
+                        aadhar: data.employee.aadhar,
+                        pan: data.employee.pan,
+                        passport: data.employee.passport,
+                        ssn: data.employee.ssn,
+                    },
+                    education : {
+                        ...prev.educacation ,
+                        degrees : data.employee.degrees,
+                        transcripts : data.employee.transcripts
+                    },
+                    employment: {
+                        ...prev.employment,
+                        employerName: data.employee.employerName,
+                        jobTitle: data.employee.jobTitle,
+                        startDate: formatDate(data.employee.startDate), // Convert date
+                        endDate: formatDate(data.employee.endDate), // Convert date
+                        reasonForLeaving: data.employee.reasonForLeaving,
+                    },
+                    paymentDetails: {
+                        ...prev.paymentDetails,
+                        cardNumber: data.employee.cardNumber,
+                        cardholderName: data.employee.cardholderName,
+                        cvv: data.employee.cvv,
+                        expiryDate: formatDate(data.employee.expiryDate), // Convert date
+                    },
+                }));
+
+                console.log(formData)
+                
             } catch (error) {
                 toast.error(error.message);
             }
@@ -143,40 +198,77 @@ const EditEmployee = () => {
         })
     }
 
+    const handleFileClear = (section , field) => {
+        setFormData({
+            ...formData ,
+            [section]  : {
+                ...formData[section] ,
+                [field] : null
+            }
+        })
+    } 
 
 
-    const handleSubmit = async () => {
-        try {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formDataToSend = new FormData();
+
+        formDataToSend.append("id" , id);
+
+        // personale info
+        Object.keys(formData.personalInfo).forEach((key) => {
+            formDataToSend.append(key , formData.personalInfo[key])
+        })
+
+        // idDocuments
+        formDataToSend.append("aadhar" , formData.idDocuments.aadhar);
+        formDataToSend.append("passport" , formData.idDocuments.passport);
+        formDataToSend.append("pan" , formData.idDocuments.pan);
+        formDataToSend.append("ssn" , formData.idDocuments.ssn);
+
+
+        // degree and transcripts
+        formDataToSend.append('degrees' , formData.education.degrees);
+        formDataToSend.append('transcripts',formData.education.transcripts);
+        
+        // previous employements
+        Object.keys(formData.employment).forEach((key) => {
+            formDataToSend.append(key , formData.employment[key])
+        })
+
+        // payment details
+        Object.keys(formData.paymentDetails).forEach((key) => {
+            formDataToSend.append(key , formData.paymentDetails[key])
+        })
+
+        
+        try {   
             setIsLoading(true);
-          const res = await fetch(`${UPDATE_EMPLOYEE}`, {
-            method: "PUT",
-            headers: {
-              'Content-Type': "application/json",
-            },
-            body: JSON.stringify({
-              id, ...formData[formKeys[0]], 
-            }),
-          });
-      
+            const res = await fetch(`${UPDATE_EMPLOYEE}`, {
+                method: "PUT",
+                body: formDataToSend
+            });
 
-          if (!res.ok) {
-            const errorData = await res.json(); 
-            toast.error(errorData.message || "An error occurred");
-            return;
-          }
-      
-          const data = await res.json(); 
-          setIsLoading(false);
-          toast.success(data.message || "Employee updated successfully");
-          navigate('/admin-dashboard/employees');
+            if (!res.ok) {
+                throw new Error("NetWork issue");
+            }
+
+            const data = await res.json();
+            setIsLoading(false);
+
+            toast.success("employee updated");
+            navigate('/admin-dashboard/employees')
         } catch (error) {
-          toast.error(`Error: ${error.message}`);
+            toast.error(error.message);
         }
-      };
+
+    };
+      
       
 
 
-    const renderForm = () => {
+      const renderForm = () => {
+
         switch (activeStep) {
             case 0:
                 return (
@@ -282,44 +374,90 @@ const EditEmployee = () => {
                         </div>
                     </div>
                 );
-    
+
             case 1:
                 return (
                     <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
                         <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
-                        <TextField
-                            label="Aadhar Card"
-                            name="aadhar"
-                            value={formData.idDocuments.aadhar}
-                            onChange={handleChange}
-                            error={!!errors.aadhar}
-                            helperText={errors.aadhar}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                        <TextField
-                            label="PAN Card"
-                            name="pan"
-                            value={formData.idDocuments.pan}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-    
-                        <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                <label className="w-full h-full flex flex-col items-center justify-center">
-                                    <span className="text-gray-500">Upload File</span>
-                                    <input
-                                        type="file"
-                                        onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
-                                        className="hidden"
-                                    />
-                                </label>
+
+                        {!formData.idDocuments.aadhar ? (
+                            <div className="flex flex-col">
+                                <InputLabel className="text-gray-700">Aadhar Card</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 flex items-center gap-2" > <AiOutlineUpload/> Upload File</span>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'aadhar')}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-    
+
+                        ) : (
+                            <div onClick={() => handleFileClear('idDocuments' , 'aadhar')} className='flex cursor-pointer flex-col'>
+                                <InputLabel className="text-gray-700">Aadhar card</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label  className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
+                        {!formData.idDocuments.pan ? (
+                            <div className="flex flex-col">
+                                <InputLabel className="text-gray-700">Pan card</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 flex items-center gap-2"> <AiOutlineUpload/> Upload File</span>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'pan')}
+                                            className="hidden"
+                                            accept='.jpg, .png, .jpeg'
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+
+                        ) :(
+                            <div onClick={() => handleFileClear('idDocuments' , 'pan')} className='flex cursor-pointer flex-col'>
+                                <InputLabel className="text-gray-700">Pan card</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label  className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
+                                    </label>
+                                </div>
+                            </div>
+                        ) }
+                        
+                        {!formData.idDocuments.passport ? (
+                            <div className="flex flex-col">
+                                <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 flex items-center gap-2"> <AiOutlineUpload/> Upload File</span>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
+                                            className="hidden"
+                                            accept='.jpg, .png, .jpeg'
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+                        ) : (
+                            <div onClick={() => handleFileClear('idDocuments' , 'passport')} className='flex cursor-pointer flex-col'>
+                                <InputLabel className="text-gray-700">Passport card</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label  className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
+
                         <TextField
                             label="Social Security Number"
                             name="ssn"
@@ -330,41 +468,67 @@ const EditEmployee = () => {
                         />
                     </div>
                 );
-    
+
             case 2:
                 return (
                     <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
                         <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
-                        <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                <label className="w-full h-full flex flex-col items-center justify-center">
-                                    <span className="text-gray-500">Upload File</span>
-                                    <input
-                                        type="file"
-                                        onChange={(e) => handleFileChange(e, 'education', 'degrees')}
-                                        className="hidden"
-                                    />
-                                </label>
+
+                        {!formData.education.degrees ? (
+                            <div className="flex flex-col">
+                                <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 flex items-center gap-2"> <AiOutlineUpload/> Upload File</span>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => handleFileChange(e, 'education', 'degrees')}
+                                            className="hidden"
+                                            accept='.jpg, .png, .jpeg'
+                                        />
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-    
-                        <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                <label className="w-full h-full flex flex-col items-center justify-center">
-                                    <span className="text-gray-500">Upload File</span>
-                                    <input
-                                        type="file"
-                                        onChange={(e) => handleFileChange(e, 'education', 'transcripts')}
-                                        className="hidden"
-                                    />
-                                </label>
+                        ) : (
+                            <div onClick={() => handleFileClear('education' , 'degrees')} className='flex cursor-pointer flex-col'>
+                                <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label  className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {!formData.education.transcripts ? (
+                            <div className="flex flex-col">
+                                <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 flex items-center gap-2" > <AiOutlineUpload/> Upload File</span>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => handleFileChange(e, 'education', 'transcripts')}
+                                            className="hidden"
+                                            accept='.jpg, .png, .jpeg'
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+
+                        ) : (
+                            <div onClick={() => handleFileClear('education' , 'transcripts')} className='flex cursor-pointer flex-col'>
+                                <InputLabel className="text-gray-700">UploadTranscripts</InputLabel>
+                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                    <label  className="w-full h-full flex flex-col items-center justify-center">
+                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 );
-    
+
             case 3:
                 return (
                     <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
@@ -385,22 +549,42 @@ const EditEmployee = () => {
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
                         />
-                        <TextField
-                            label="Start Date"
-                            name="startDate"
-                            value={formData.employment.startDate}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                        <TextField
-                            label="End Date"
-                            name="endDate"
-                            value={formData.employment.endDate}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
+                        <div className="grid gap-2">
+                             <label 
+                                htmlFor="startDate" 
+                                 className="block text-sm font-medium "
+                            >
+                                start date
+                            </label>
+                            <TextField
+                                name="startDate"
+                                type='date'
+                                value={formData.employment.startDate}
+                                onChange={handleChange}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                            />
+
+                        </div>
+                        <div className="grid gap-2">
+                             <label 
+                                htmlFor="endDate" 
+                                 className="block text-sm font-medium "
+                            >
+                                end date
+
+                            </label>
+                            <TextField
+                                type='date'
+                                name="endDate"
+                                value={formData.employment.endDate}
+                                onChange={handleChange}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                            />
+
+
+                        </div>
                         <TextField
                             label="Reason for Leaving"
                             name="reasonForLeaving"
@@ -411,13 +595,13 @@ const EditEmployee = () => {
                         />
                     </div>
                 );
-    
+
             case 4:
                 return (
                     <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
                         <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
                         <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
-                        
+
                         <TextField
                             label="Cardholder Name"
                             name="cardholderName"
@@ -435,24 +619,43 @@ const EditEmployee = () => {
                             fullWidth
                         />
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <TextField
-                                label="Expiry Date"
-                                name="expiryDate"
-                                value={formData.paymentDetails.expiryDate}
-                                onChange={handleChange}
-                                className="rounded-md shadow-sm bg-gray-50"
-                            />
-                            <TextField
-                                label="CVV"
-                                name="cvv"
-                                value={formData.paymentDetails.cvv}
-                                onChange={handleChange}
-                                className="rounded-md shadow-sm bg-gray-50"
-                            />
+                            <div className="grid gap-2">
+                                <label 
+                                    htmlFor="expiryDate" 
+                                    className="block text-sm font-medium text-gray-500"
+                                >
+                                    expiry date
+                                </label>
+                                <TextField
+                                    id="expiryDate"
+                                    name="expiryDate"
+                                    
+                                    type='date'
+                                    value={formData.paymentDetails.expiryDate}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <label 
+                                    htmlFor="cvv" 
+                                    className="block text-sm font-medium opacity-0"
+                                >
+                                    cvv
+                                </label>
+                                <TextField
+                                    label="CVV"
+                                    name="cvv"
+                                    value={formData.paymentDetails.cvv}
+                                    onChange={handleChange}
+                                    className="rounded-md shadow-sm bg-gray-50"
+                                />
+                            </div>
+
                         </div>
                     </div>
                 );
-    
+
             default:
                 return null;
         }
@@ -488,7 +691,7 @@ const EditEmployee = () => {
                     {activeStep === steps.length - 1 ? (
                         <Button
                             sx={{ border: "1px solid blue", backgroundColor: "green", color: "white", padding: "6px 15px", fontWeight: "700" }}
-                            onClick={ () => handleSubmit()}
+                            onClick={handleSubmit}
                         >
                             Finish
                         </Button>

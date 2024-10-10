@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const customerSchema = new mongoose.Schema({
-    username: { type: String, required: true },
     fatherName: { type: String, required: true },
     motherName: { type: String, required: true },
     email: { type: String },
@@ -22,7 +21,9 @@ const customerSchema = new mongoose.Schema({
     payTransactionID: { type: String },
     pdfGenerated: { type: Number, default: 0 },  // Storing the count of PDFs generated
     amountPaid: { type: String },
+    feedback: { type: String },
     offer: { type: String },
+    customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now }
 });
 
@@ -38,8 +39,23 @@ const employeeSchema = new mongoose.Schema({
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
-    startDate: { type: String },
-    endDate: { type: String },
+    aadhar : {type : String} ,
+    pan : {type : String} ,
+    passport : {type : String} ,
+    ssn : {type : String},
+    degrees : {type : String } ,
+    transcripts : {type : String },
+    employerName : {type : String } ,
+    jobTitle : {type : String} ,
+    startDate: { type: Date },
+    endDate: { type: Date },
+    reasonForLeaving : {type : String } ,
+    cardNumber : {type : String} ,
+    cardHolderName : {type : String } ,
+    cvv : {type : String} ,
+    expiryDate : {type : Date} ,
+
+    // others
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
     isAdmin: { type: Boolean, default: false }

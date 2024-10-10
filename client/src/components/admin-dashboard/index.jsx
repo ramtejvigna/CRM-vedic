@@ -8,7 +8,7 @@ import AddEmployee from "./Employee/AddEmployee";
 import TaskManagement from "./TaskManagement";
 
 import EditEmployee from "./Employee/EditEmployee";
-import { Customer } from "./Customer/Customer";
+import ViewEmployee from "./Employee/ViewEmployee";
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
 
@@ -35,7 +35,8 @@ const AdminDashboard = () => {
             })}
             <Route path="employees/add-employee" element={<AddEmployee />} />
             <Route path="employees/edit-employee/:id" element={<EditEmployee/>}/>
-            <Route path="customers/:username" element={<Customer />} />
+            <Route path="employees/edit-employee/:id" element={<EditEmployee/>}/>
+            <Route path="employees/view-employee/:id" element={<ViewEmployee/>}/>
             {/* Default route to redirect to the home */}
             <Route path='/tasks' element={<TaskManagement/>}/>
             <Route path="/" element={<Navigate to="/home" />} />

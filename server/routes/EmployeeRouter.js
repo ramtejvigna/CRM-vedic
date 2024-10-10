@@ -1,10 +1,41 @@
 import { Router } from "express";
+import multer from "multer"
 import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
 
 const router = Router();
 
+router.get('/', getEmployees);
 router.post('/add-employee' , addEmployee);
+
+const storage = multer.diskStorage({
+    destination : (req , file , cb) => {
+        cb(null , 'uploads/')
+    },
+    filename: (req, file, cb) => {
+        const username = req.body.username; 
+        const date = Date.now();
+        const fieldName = file.fieldname; 
+        const fileExtension = file.originalname.substring(file.originalname.lastIndexOf('.')); 
+
+        cb(null, `${username}_${date}_${fieldName}${fileExtension}`);
+    }
+})
+
+const uploads = multer({storage});
+
+router.post('/add-employee' , uploads.fields([
+    {name : "passport" , maxCount : 1} , 
+    {name : "degrees" , maxCount : 1} , 
+    {name : "transcripts" , maxCount : 1},
+    {name : "aadhar" , maxCount : 1} ,
+    {name : "pan" , maxCount : 1}]) , addEmployee);
+
 router.get('/get-employees' , getEmployees);
 router.get('/get-employee' , getEmployee);
-router.put('/update-employee' , updateEmployee);
+router.put('/update-employee', uploads.fields([
+    {name : "passport" , maxCount : 1} , 
+    {name : "degrees" , maxCount : 1} , 
+    {name : "transcripts" , maxCount : 1},
+    {name : "aadhar" , maxCount : 1} ,
+    {name : "pan" , maxCount : 1}])  , updateEmployee);
 export default router;
