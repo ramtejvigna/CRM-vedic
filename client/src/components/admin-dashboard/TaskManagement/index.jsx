@@ -1,107 +1,114 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus } from "lucide-react";
+import { useStore } from "../../../store"; // Custom hook for dark mode
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  IconButton,
   Modal,
   Box,
   Typography,
+  Button,
   TextField,
-  FormControl,
-  Select,
   MenuItem,
+  Select,
+  FormControl,
   InputLabel,
   CircularProgress,
-  useMediaQuery,
-  ThemeProvider,
-  createTheme,
-  CssBaseline
+  Backdrop,
+  Fade,
 } from "@mui/material";
-import { Edit, Delete, Add, Comment } from "@mui/icons-material";
-import axios from "axios";
 import { SnackbarProvider, useSnackbar } from "notistack";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import TaskList from "./TaskList";
+import TaskModal from "./TaskModal";
 
-// Create a theme instance
-const theme = createTheme({
-  palette: {
-    mode: 'light', // You can toggle this between 'light' and 'dark'
-  },
-});
-
-const TaskManagementChild = () => {
+const TaskManagement = () => {
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [descriptionModal, setDescriptionModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
     assignedTo: "",
-    endTime: "",
+    endTime: new Date(),
     status: "Pending",
   });
   const [newComment, setNewComment] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAddingComment, setIsAddingComment] = useState(false);
+  const { isDarkMode } = useStore();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const { enqueueSnackbar } = useSnackbar();
-  const [loadingTasks, setLoadingTasks] = useState(true);
-  const [loadingEmployees, setLoadingEmployees] = useState(true);
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetchTasks();
     fetchEmployees();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const fetchTasks = async () => {
-    setLoadingTasks(true);
+    setIsLoading(true);
     try {
       const response = await axios.get("http://localhost:3000/api/tasks");
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      enqueueSnackbar("Error fetching tasks", { variant: "error" });
     } finally {
-      setLoadingTasks(false);
+      setIsLoading(false);
     }
   };
 
   const fetchEmployees = async () => {
-    setLoadingEmployees(true);
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
-      setEmployees(response.data);
+      setEmployees(response.data.employees);
     } catch (error) {
       console.error("Error fetching employees:", error);
-      enqueueSnackbar("Error fetching employees", { variant: "error" });
-    } finally {
-      setLoadingEmployees(false);
     }
   };
 
   const handleOpenModal = (task = null) => {
     setSelectedTask(task);
-    setOpenModal(true);
-    if (!task) {
+    setIsModalOpen(true);
+    if (task) {
+      setNewTask({
+        ...task,
+        assignedTo: task.assignedTo._id,
+        endTime: new Date(task.endTime),
+      });
+    } else {
       setNewTask({
         title: "",
         description: "",
         assignedTo: "",
-        endTime: "",
+        endTime: new Date(),
         status: "Pending",
       });
-    } else {
-      setNewTask({ ...task, assignedTo: task.assignedTo._id });
     }
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleOpenDetailModal = (task) => {
+    setSelectedTask(task);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
     setSelectedTask(null);
   };
 
@@ -110,23 +117,25 @@ const TaskManagementChild = () => {
     setNewTask((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleDateChange = (date) => {
+    setNewTask((prev) => ({ ...prev, endTime: date }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newTask.title || !newTask.assignedTo || !newTask.endTime) {
-      enqueueSnackbar("Please fill out all required fields", { variant: "error" });
-      return;
-    }
     try {
       if (selectedTask) {
-        await axios.put(`http://localhost:3000/api/tasks/${selectedTask._id}`, newTask);
+        await axios.put(
+          `http://localhost:3000/api/tasks/${selectedTask._id}`,
+          newTask
+        );
       } else {
         await axios.post("http://localhost:3000/api/tasks", newTask);
       }
       fetchTasks();
       handleCloseModal();
-      enqueueSnackbar("Task saved successfully", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar("Error saving task", { variant: "error" });
+      console.error("Error saving task:", error);
     }
   };
 
@@ -134,263 +143,110 @@ const TaskManagementChild = () => {
     try {
       await axios.delete(`http://localhost:3000/api/tasks/${id}`);
       fetchTasks();
-      enqueueSnackbar("Task deleted", { variant: "warning" });
     } catch (error) {
-      enqueueSnackbar("Error deleting task", { variant: "error" });
+      console.error("Error deleting task:", error);
     }
   };
 
-  const handleTaskTitleClick = (task) => {
-    setSelectedTask(task);
-    setDescriptionModal(true);
-  };
-
-  const handleCloseDescriptionModal = () => {
-    setDescriptionModal(false);
-    setSelectedTask(null);
-  };
-
   const handleAddComment = async (id) => {
+    setIsAddingComment(true);
     try {
       await axios.post(`http://localhost:3000/api/tasks/${id}/comment`, {
         text: newComment,
-        createdBy: "66ff54863b2d6f0e00bdc1a2", // Example user ID
+        createdBy: "Admin", // Example user ID
       });
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === id
-            ? { ...task, comments: [...task.comments, { text: newComment, createdBy: "User" }] }
-            : task
-        )
-      );
+      setSelectedTask((prevTask) => ({
+        ...prevTask,
+        comments: [
+          ...prevTask.comments,
+          { text: newComment, createdBy: "User" },
+        ],
+      }));
       setNewComment("");
       enqueueSnackbar("Comment added successfully", { variant: "success" });
     } catch (error) {
       enqueueSnackbar("Error adding comment", { variant: "error" });
+    } finally {
+      setIsAddingComment(false);
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
-        return theme.palette.success.main;
+        return isDarkMode ? "text-green-400" : "text-green-600";
       case "In Progress":
-        return theme.palette.warning.main;
+        return isDarkMode ? "text-yellow-400" : "text-yellow-600";
       default:
-        return theme.palette.error.main;
+        return isDarkMode ? "text-red-400" : "text-red-600";
     }
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<Add />}
-        onClick={() => handleOpenModal()}
-        sx={{ mb: 4 }}
-      >
-        Assign New Task
-      </Button>
-      {loadingTasks ? (
-        <CircularProgress />
-      ) : isMobile ? (
-        <Box>
-          {tasks.map((task) => (
-            <Paper key={task._id} sx={{ p: 2, mb: 2 }}>
-              <Typography variant="h6" onClick={() => handleTaskTitleClick(task)} sx={{ cursor: "pointer", color: "primary.main" }}>
-                {task.title}
-              </Typography>
-              <Typography>Assigned To: {task.assignedTo.name}</Typography>
-              <Typography>Start Time: {new Date(task.startTime).toLocaleString()}</Typography>
-              <Typography>End Time: {new Date(task.endTime).toLocaleString()}</Typography>
-              <Typography sx={{ color: getStatusColor(task.status) }}>Status: {task.status}</Typography>
-              <Box sx={{ mt: 1 }}>
-                <IconButton onClick={() => handleOpenModal(task)} color="primary">
-                  <Edit />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(task._id)} color="error">
-                  <Delete />
-                </IconButton>
-                <IconButton onClick={() => handleTaskTitleClick(task)} color="info">
-                  <Comment />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
-        </Box>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Task Title</TableCell>
-                <TableCell>Assigned To</TableCell>
-                <TableCell>Start Time</TableCell>
-                <TableCell>End Time</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tasks.map((task) => (
-                <TableRow key={task._id}>
-                  <TableCell
-                    onClick={() => handleTaskTitleClick(task)}
-                    sx={{ cursor: "pointer", color: "primary.main" }}
-                  >
-                    {task.title}
-                  </TableCell>
-                  <TableCell>{task.assignedTo.name}</TableCell>
-                  <TableCell>{new Date(task.startTime).toLocaleString()}</TableCell>
-                  <TableCell>{new Date(task.endTime).toLocaleString()}</TableCell>
-                  <TableCell sx={{ color: getStatusColor(task.status) }}>{task.status}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleOpenModal(task)} color="primary">
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(task._id)} color="error">
-                      <Delete />
-                    </IconButton>
-                    <IconButton onClick={() => handleTaskTitleClick(task)} color="info">
-                      <Comment />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
-        }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {selectedTask ? "Edit Task" : "Assign New Task"}
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              name="title"
-              label="Task Title"
-              fullWidth
-              value={newTask.title}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              name="description"
-              label="Description"
-              fullWidth
-              multiline
-              rows={4}
-              value={newTask.description}
-              onChange={handleInputChange}
-              sx={{ mb: 2 }}
-            />
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Assign To</InputLabel>
-              <Select
-                name="assignedTo"
-                value={newTask.assignedTo}
-                onChange={handleInputChange}
-              >
-                {employees.map((employee) => (
-                  <MenuItem key={employee._id} value={employee._id}>
-                    {employee.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              name="endTime"
-              label="End Time"
-              type="datetime-local"
-              fullWidth
-              value={newTask.endTime}
-              onChange={handleInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{ mb: 2 }}
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              {selectedTask ? "Update Task" : "Assign Task"}
-            </Button>
-          </form>
-        </Box>
-      </Modal>
-
-      <Modal open={descriptionModal} onClose={handleCloseDescriptionModal}>
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
-        }}>
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-            Task Details
-          </Typography>
-          <Typography sx={{ mb: 2 }}>
-            {selectedTask?.description}
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            Comments
-          </Typography>
-          <Box sx={{ maxHeight: 150, overflowY: 'auto', mb: 2, p: 1, bgcolor: 'grey.100', borderRadius: 1 }}>
-            {selectedTask && selectedTask.comments.map((comment, index) => (
-              <Box key={index} sx={{ mb: 1, p: 1, bgcolor: 'grey.200', borderRadius: 1 }}>
-                <Typography variant="body2">
-                  {comment.text}
-                </Typography>
-                <Typography variant="caption" color="textSecondary">
-                  by {comment.createdBy}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-          <TextField
-            label="Comment"
-            fullWidth
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            sx={{ mb: 2 }}
+    <div
+      className={`min-h-screen p-4 sm:p-8 ${
+        isDarkMode ? "dark bg-gray-900" : "bg-gray-100"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold dark:text-white">
+            Task Management
+          </h1>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => handleOpenModal()}
+          className="mb-6 flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors duration-200"
+        >
+          <Plus size={20} />
+          Assign New Task
+        </motion.button>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <TaskList
+            tasks={tasks}
+            isMobile={isMobile}
+            handleOpenDetailModal={handleOpenDetailModal}
+            handleOpenModal={handleOpenModal}
+            handleDelete={handleDelete}
+            getStatusColor={getStatusColor}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleAddComment(selectedTask._id)}
-            fullWidth
-          >
-            Add Comment
-          </Button>
-        </Box>
-      </Modal>
-    </Box>
+        )}
+
+        <TaskModal
+          isModalOpen={isModalOpen}
+          handleCloseModal={handleCloseModal}
+          selectedTask={selectedTask}
+          newTask={newTask}
+          handleInputChange={handleInputChange}
+          handleDateChange={handleDateChange}
+          handleSubmit={handleSubmit}
+          employees={employees}
+          isDarkMode={isDarkMode}
+        />
+
+        {selectedTask && (
+          <TaskModal
+            isModalOpen={isDetailModalOpen}
+            handleCloseModal={handleCloseDetailModal}
+            selectedTask={selectedTask}
+            newComment={newComment}
+            setNewComment={setNewComment}
+            handleAddComment={handleAddComment}
+            isAddingComment={isAddingComment}
+            getStatusColor={getStatusColor}
+            isDarkMode={isDarkMode}
+            isDetailModal={true}
+          />
+        )}
+      </div>
+    </div>
   );
 };
-
-const TaskManagement = () => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <SnackbarProvider maxSnack={3}>
-      <TaskManagementChild />
-    </SnackbarProvider>
-  </ThemeProvider>
-);
 
 export default TaskManagement;

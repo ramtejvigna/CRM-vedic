@@ -5,16 +5,19 @@ import {
   updateTask,
   deleteTask,
   addComment,
-} from '../controllers/TaskManagement.js';
-import {
   getEmployeeTasks,
   updateTaskStatus,
-  getEmployees
-} from '../controllers/EmployeeController.js';
-import {
+  getEmployees,
   getNotifications,
-  markAsRead,
-} from '../controllers/NotificationController.js';
+  markAsRead
+} from '../controllers/TaskManagement.js';
+// import {
+ 
+// } from '../controllers/EmployeeController.js';
+// import {
+//   getNotifications,
+//   markAsRead,
+// } from '../controllers/NotificationController.js';
 import { auth } from '../middleware/auth.js';
 const router = express.Router();
 
@@ -31,7 +34,7 @@ router.put('/employee/tasks/:id/status', updateTaskStatus);
 router.get('/employees', getEmployees);
 
 // Notifications routes
-// router.get('/notifications/:employeeId', getNotifications);
-// router.put('/notifications/:id/read', markAsRead);
+router.get('/notifications/get', auth , getNotifications);
+router.put('/notifications/:id/read', markAsRead);
 
 export default router;
