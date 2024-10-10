@@ -288,7 +288,6 @@ const TaskManagementChild = () => {
               sx={{mb:2}}
               value={newTask.title}
               onChange={handleInputChange}
-              sx={{ mb: 2 }}
             />
             <TextField
               name="description"
@@ -321,10 +320,10 @@ const TaskManagementChild = () => {
               fullWidth
               value={newTask.endTime}
               onChange={handleInputChange}
-              sx={{mb:4}}              InputLabelProps={{
+              sx={{mb:4}}              
+              InputLabelProps={{
                 shrink: true,
               }}
-              sx={{ mb: 2 }}
             />
             <Button type="submit" variant="contained" color="primary" fullWidth>
               {selectedTask ? "Update Task" : "Assign Task"}
