@@ -24,7 +24,7 @@ const ViewEmployee = () => {
                 const data = await res.json();
                 setIsLoading(false);
                 setEmployee(data.employee)
-                
+                console.log(data.employee)
             } catch (error) {
                 toast.error(error.message);
             }
@@ -32,7 +32,6 @@ const ViewEmployee = () => {
 
         getEmployee();
     }, []);
-
 
   return isLoading ? (
     <div className='h-full flex items-center justify-center'>
@@ -172,13 +171,13 @@ const ViewEmployee = () => {
                     </div>
                     <div className="rounded-md border flex p-3 items-center justify-between">
                         <span>degrees</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.degrees  }`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <button onClick={() => setImage((prev) => prev = `http://localhost:3000/${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>
                     <div className="rounded-md border flex p-3 items-center justify-between">
                         <span>transcripts</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.transcripts  }`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>
@@ -232,7 +231,7 @@ const ViewEmployee = () => {
                                 flex flex-col items-center justify-center overflow-scroll scrollbar-hide">
                         <img 
                             className=' object-cover rounded-lg shadow-lg border border-gray-200 mb-4' 
-                            src={`http://localhost:3000/${employee.passport}`} 
+                            src={image} 
                             alt="Passport Image" 
                         />
                         <button

@@ -35,6 +35,7 @@ const AdminDashboard = () => {
             })}
             <Route path="employees/add-employee" element={<AddEmployee />} />
             <Route path="employees/edit-employee/:id" element={<EditEmployee/>}/>
+            <Route path="employees/edit-employee/:id" element={<EditEmployee/>}/>
             <Route path="employees/view-employee/:id" element={<ViewEmployee/>}/>
             {/* Default route to redirect to the home */}
             <Route path='/tasks' element={<TaskManagement/>}/>

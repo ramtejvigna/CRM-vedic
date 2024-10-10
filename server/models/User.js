@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const customerSchema = new mongoose.Schema({
-    username: { type: String, required: true },
     fatherName: { type: String, required: true },
     motherName: { type: String, required: true },
     email: { type: String },
@@ -22,7 +21,9 @@ const customerSchema = new mongoose.Schema({
     payTransactionID: { type: String },
     pdfGenerated: { type: Number, default: 0 },  // Storing the count of PDFs generated
     amountPaid: { type: String },
+    feedback: { type: String },
     offer: { type: String },
+    customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now }
 });
 

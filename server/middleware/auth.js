@@ -31,7 +31,7 @@ export const auth = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, 'crm');
     console.log(decoded,'decoded')
-    req.user = decoded.userId;
+    req.user = decoded.id;
     next();
   } catch (err) {
     console.log(err.message)
