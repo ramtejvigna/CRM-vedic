@@ -34,13 +34,15 @@ const getStatusContainer = (status) => (
       color: 'white',
       padding: '4px',
       margin: 'auto',
-      backgroundColor: status === 'In progress' ? 'green' : 'black',
+      backgroundColor: 
+        status === 'inProgress' ? 'black' : 
+        status === 'newRequests' ? 'green' : 
+        status === 'completed' ? 'yellow' : 'grey',
     }}
   >
     {status}
   </Box>
 );
-
 const CustomerDetails = () => {
   const [filteredGender, setFilteredGender] = useState('All');
   const [filteredStatus, setFilteredStatus] = useState('All');
@@ -48,7 +50,6 @@ const CustomerDetails = () => {
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
   const [customers, setCustomers] = useState([]);
-
   const navigate = useNavigate();
 
   const handleGenderChange = (event) => {
@@ -78,7 +79,7 @@ const CustomerDetails = () => {
 
   const filteredData = customers.filter((row) => {
     const genderMatch = filteredGender === 'All' || row.babyGender === filteredGender;
-    const statusMatch = filteredStatus === 'All' || row.status === filteredStatus;
+    const statusMatch = filteredStatus === 'All' || row.customerStatus === filteredStatus;
     return genderMatch && statusMatch;
   });
 
@@ -121,7 +122,6 @@ const CustomerDetails = () => {
           Filter
         </Button>
       </Box>
-
       {showFilters && (
         <Box
           sx={{
@@ -153,37 +153,39 @@ const CustomerDetails = () => {
             </Select>
           </FormControl>
           <FormControl fullWidth>
-            <InputLabel id="status-label">Status</InputLabel>
-            <Select
-              labelId="status-label"
-              value={filteredStatus}
-              onChange={handleStatusChange}
-              sx={{
-                border: 'none',
-                '& fieldset': {
-                  border: 'none',
-                },
-              }}
-            >
-              <MenuItem value="All">All</MenuItem>
-              <MenuItem value="In progress">In progress</MenuItem>
-              <MenuItem value="Pending">Pending</MenuItem>
-            </Select>
-          </FormControl>
+  <InputLabel id="status-label">Status</InputLabel>
+  <Select
+    labelId="status-label"
+    value={filteredStatus}
+    onChange={handleStatusChange}
+    sx={{
+      border: 'none',
+      '& fieldset': {
+        border: 'none',
+      },
+    }}
+  >
+    <MenuItem value="All">All</MenuItem>
+    <MenuItem value="inProgress">In progress</MenuItem>
+    <MenuItem value="newRequests">New Requests</MenuItem>
+    <MenuItem value="completed">Completed</MenuItem>
+  </Select>
+</FormControl>
+
         </Box>
       )}
-
       <Box sx={{ marginTop: '30px', paddingBottom: '80px' }}>
         <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px', padding: '10px', borderRadius: '20px' }}>
           <Table stickyHeader sx={{ marginTop: '70px' }}>
             <TableHead>
               <TableRow>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>S:no</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Customer Name</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Father Name</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>WhatsApp Number</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Baby's Gender</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Preferred Starting Letter</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Preferred God</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Assigned Employee</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>work-status</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>generated PDFS</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -191,21 +193,23 @@ const CustomerDetails = () => {
               {paginatedData.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell align="center">{index + 1}</TableCell>
-                  <TableCell align="center">{row.username}</TableCell>
+                  <TableCell align="center">{row.fatherName}</TableCell>
                   <TableCell align="center">{row.whatsappNumber}</TableCell>
                   <TableCell align="center">{row.babyGender}</TableCell>
-                  <TableCell align="center">{row.preferredStartingLetter}</TableCell>
-                  <TableCell align="center">{row.preferredGod}</TableCell>
+                  <TableCell align="center">{row.assignedEmployeeName}</TableCell>
+                  <TableCell align="center">
+  {getStatusContainer(row.customerStatus)}
+</TableCell>
+                  <TableCell align="center">{row.pdfGenerated}</TableCell>
                   <TableCell align="center">
                     <Button
                       variant="contained"
                       color="primary"
                       size="small"
-                      onClick={() => navigate(`${row.username}`)}  // Wrap it inside an arrow function
+                      onClick={() => navigate(`${row.fatherName}`)}
                     >
                       View
                     </Button>
-
                   </TableCell>
                 </TableRow>
               ))}
@@ -213,7 +217,6 @@ const CustomerDetails = () => {
           </Table>
         </TableContainer>
       </Box>
-
       <CardActions
         sx={{
           justifyContent: 'center',
