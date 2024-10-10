@@ -143,7 +143,7 @@ export default function Employee() {
                                             <Button onClick={() => navigate(`edit-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
                                                 Edit
                                             </Button>
-                                            <Button variant="outlined" size="small" color="primary">
+                                            <Button onClick={() => navigate(`view-employee/${employee._id}`)} variant="outlined" size="small" color="primary">
                                                 view
                                             </Button>
                                         </TableCell>

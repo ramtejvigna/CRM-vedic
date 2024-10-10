@@ -26,6 +26,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
+app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);

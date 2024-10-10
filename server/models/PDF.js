@@ -7,7 +7,6 @@ const PdfSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-
 const NameSchema = new mongoose.Schema({
     bookName: { type: String, required: true },
     gender: { type: String, required: true },
