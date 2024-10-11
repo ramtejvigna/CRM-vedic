@@ -61,13 +61,30 @@ export const addCustomerWithAssignment = async (req, res) => {
 
 export const getCustomers = async (req, res) => {
     try {
+        // Fetch all customers
         const customers = await Customer.find();
-        console.log(customers)
-        res.status(200).json(customers);
+        
+        // Fetch all employees
+        const employees = await Employee.find({}, 'name');
+        
+        // Create a map of employee IDs to names
+        const employeeMap = new Map(employees.map(emp => [emp._id.toString(), emp.name]));
+
+        // Add employee names to customer data
+        const customersWithEmployeeNames = customers.map(customer => ({
+            ...customer.toObject(),
+            assignedEmployeeName: customer.assignedEmployee 
+                ? employeeMap.get(customer.assignedEmployee.toString()) || 'Unknown'
+                : 'Not Assigned'
+        }));
+
+        res.status(200).json(customersWithEmployeeNames);
     } catch (error) {
+        console.error("Error fetching customers:", error);
         res.status(500).json({ error: "Error fetching customers" });
     }
 };
+
 
 export const getCustomersBasedOnRequests = async (req, res) => {
     try {
@@ -131,3 +148,31 @@ export const getCustomerData = async (req, res) => {
         res.status(500).json({ message: 'Error updating customer', error: err });
     }
 }
+// Assuming you have an endpoint to get customer details
+export const getCustomerDetails = async (req, res) => {
+        try {
+            const { fatherName } = req.params;
+    
+            // Fetch the customer by fatherName
+            const customer = await Customer.findOne({ fatherName });
+    
+            if (!customer) {
+                return res.status(404).json({ message: 'Customer not found' });
+            }
+    
+            // Fetch the assigned employee
+            const employee = await Employee.findById(customer.assignedEmployee);
+    
+            // Construct the response with customer and employee details
+            const response = {
+                ...customer.toObject(),
+                assignedEmployee: employee ? employee : null, // Include the entire employee object
+            };
+    
+            res.status(200).json(response);
+        } catch (error) {
+            console.error("Error fetching customer details:", error);
+            res.status(500).json({ error: "Error fetching customer details" });
+        }
+    };
+    

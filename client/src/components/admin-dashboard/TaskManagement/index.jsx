@@ -60,6 +60,7 @@ const TaskManagement = () => {
     setIsLoading(true);
     try {
       const response = await axios.get("http://localhost:3000/api/tasks");
+      console.log(response.data);
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
