@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from "../../../store";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Filter, Eye, Sun, Moon } from "lucide-react";
@@ -12,6 +13,8 @@ const CustomerDetails = () => {
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
   const [customers, setCustomers] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCustomers();
@@ -124,7 +127,9 @@ const CustomerDetails = () => {
                     <td className="px-4 py-3 whitespace-nowrap">{row.preferredStartingLetter}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.preferredGod}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <button className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                      <button className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        onClick={() => navigate(`${row.fatherName}`)}
+                      >
                         <Eye size={18} className="mr-2" />
                         View
                       </button>
