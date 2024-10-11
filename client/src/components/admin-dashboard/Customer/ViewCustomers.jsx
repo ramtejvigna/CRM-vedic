@@ -36,8 +36,8 @@ const getStatusContainer = (status) => (
       margin: 'auto',
       backgroundColor: 
         status === 'inProgress' ? 'black' : 
-        status === 'newRequests' ? 'green' : 
-        status === 'completed' ? 'yellow' : 'grey',
+        status === 'newRequests' ? ' #FFC107' : 
+        status === 'completed' ? 'green' : 'grey',
     }}
   >
     {status}
@@ -169,6 +169,7 @@ const CustomerDetails = () => {
     <MenuItem value="inProgress">In progress</MenuItem>
     <MenuItem value="newRequests">New Requests</MenuItem>
     <MenuItem value="completed">Completed</MenuItem>
+    <MenuItem value="inProgress">rejected</MenuItem>
   </Select>
 </FormControl>
 
@@ -185,7 +186,7 @@ const CustomerDetails = () => {
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Baby's Gender</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Assigned Employee</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>work-status</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>generated PDFS</TableCell>
+                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Generated PDFS</TableCell>
                 <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -222,7 +223,6 @@ const CustomerDetails = () => {
           justifyContent: 'center',
           padding: '16px',
           position: 'fixed',
-          backgroundColor: 'white',
           width: '100%',
           maxWidth: '1130px',
           margin: '0 auto',
