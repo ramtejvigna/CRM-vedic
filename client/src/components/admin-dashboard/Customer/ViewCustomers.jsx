@@ -46,12 +46,6 @@ const CustomerDetails = () => {
           <h1 className="text-2xl font-bold">Customer Details</h1>
           <div className="flex items-center space-x-4">
             <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors duration-300"
-            >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors duration-300"
             >
@@ -105,7 +99,7 @@ const CustomerDetails = () => {
           <table className="w-full table-auto">
             <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
               <tr>
-                {['S:no', 'Customer Name', 'WhatsApp Number', "Baby's Gender", 'Preferred Starting Letter', 'Preferred God', 'Actions'].map((header) => (
+                {['S:no', 'Father Name', 'Mother Name', 'WhatsApp Number', "Baby's Gender", 'Preferred Starting Letter', 'Preferred God', 'Actions'].map((header) => (
                   <th key={header} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     {header}
                   </th>
@@ -123,7 +117,8 @@ const CustomerDetails = () => {
                     className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors duration-150`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{row.username}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">{row.fatherName}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">{row.motherName}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.whatsappNumber}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.babyGender}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.preferredStartingLetter}</td>
