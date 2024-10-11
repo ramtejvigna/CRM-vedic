@@ -28,7 +28,7 @@ const CustomerDetails = () => {
 
   const filteredData = customers.filter((row) => {
     const genderMatch = filteredGender === 'All' || row.babyGender === filteredGender;
-    const statusMatch = filteredStatus === 'All' || row.status === filteredStatus;
+    const statusMatch = filteredStatus === 'All' || row.customerStatus === filteredStatus;
     return genderMatch && statusMatch;
   });
 
@@ -85,16 +85,18 @@ const CustomerDetails = () => {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="status" className="block text-sm font-medium mb-1">Status</label>
+                  <label htmlFor="customerStatus" className="block text-sm font-medium mb-1">Status</label>
                   <select
-                    id="status"
+                    id="customerStatus"
                     value={filteredStatus}
                     onChange={handleStatusChange}
                     className={`w-full p-2 rounded-md ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'}`}
                   >
                     <option value="All">All</option>
-                    <option value="In progress">In progress</option>
-                    <option value="Pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="newRequests">New Requests</option>
+                    <option value="rejected">Rejected</option>
+
                   </select>
                 </div>
               </div>
@@ -106,7 +108,7 @@ const CustomerDetails = () => {
           <table className="w-full table-auto">
             <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
               <tr>
-                {['S:no', 'Customer Name', 'WhatsApp Number', "Baby's Gender",'Status', 'Preferred Starting Letter', 'Preferred God', 'Actions'].map((header) => (
+                {['S:no', 'Father Name','Mother Name' ,'WhatsApp Number', "Baby's Gender",'Status', 'Preferred Starting Letter', 'Preferred God', 'Actions'].map((header) => (
                   <th key={header} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     {header}
                   </th>
@@ -124,7 +126,9 @@ const CustomerDetails = () => {
                     className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors duration-150`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{row.username}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">{row.fatherName}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">{row.motherName}</td>
+
                     <td className="px-4 py-3 whitespace-nowrap">{row.whatsappNumber}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.babyGender}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.customerStatus}</td>
