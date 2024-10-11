@@ -33,6 +33,7 @@ const CustomerDetails = () => {
   });
 
   const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  console.log(paginatedData)
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const handleGenderChange = (event) => setFilteredGender(event.target.value);
@@ -105,7 +106,7 @@ const CustomerDetails = () => {
           <table className="w-full table-auto">
             <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
               <tr>
-                {['S:no', 'Customer Name', 'WhatsApp Number', "Baby's Gender", 'Preferred Starting Letter', 'Preferred God', 'Actions'].map((header) => (
+                {['S:no', 'Customer Name', 'WhatsApp Number', "Baby's Gender",'Status', 'Preferred Starting Letter', 'Preferred God', 'Actions'].map((header) => (
                   <th key={header} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     {header}
                   </th>
@@ -126,6 +127,8 @@ const CustomerDetails = () => {
                     <td className="px-4 py-3 whitespace-nowrap">{row.username}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.whatsappNumber}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.babyGender}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">{row.customerStatus}</td>
+
                     <td className="px-4 py-3 whitespace-nowrap">{row.preferredStartingLetter}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{row.preferredGod}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
