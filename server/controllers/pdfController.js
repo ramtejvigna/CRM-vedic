@@ -1,14 +1,19 @@
 // controllers/pdfController.js
-
 import { v4 as uuidv4 } from 'uuid';
-import PDFDocument from 'pdfkit';
 import nodemailer from 'nodemailer';
 import admin from 'firebase-admin';
 import {PDF , babyNames} from '../models/PDF.js'; 
 import dotenv from 'dotenv';
-
+import { PDFDocument, StandardFonts } from 'pdf-lib';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -46,36 +51,121 @@ export const getBabyNames = async (req, res) => {
   export const createPdf = async (req, res) => {
     const { names, customerId } = req.body;
     const uniqueId = uuidv4();
-    const doc = new PDFDocument();
-    let buffers = [];
-  
-    doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', async () => {
-      const pdfBuffer = Buffer.concat(buffers);
-      const base64Pdf = pdfBuffer.toString('base64');
-  
-      try {
+
+    try {
+        // Construct the correct path to the PDF template
+        const pdfPath = path.join(__dirname, '../assets/Shubham Chouhan.pdf');
+        const existingPdfBytes = fs.readFileSync(pdfPath);
+
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        const pages = pdfDoc.getPages();
+        const firstPage = pages[0];
+        const secondPage = pages[1];
+        const thirdPage = pages[2];
+
+        // Static data to fill in the placeholders on the first page
+        const staticData = {
+            gender: 'Girl',
+            zodiacSign: 'Cancer',
+            nakshatra: 'Punarvasu',
+            gemstone: 'Pearl',
+            destinyNumber: 6,
+            luckyColour: 'White',
+            birthDate: '02/08/2024',
+            birthTime: '10:05 PM',
+            numerology: 2,
+            luckyDay: 'Sunday',
+            luckyGod: 'Shiva',
+            luckyMetal: 'Silver',
+        };
+
+// Load the standard font and make it bold if possible
+const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+// Adjusted text with new font size, bold, and moved slightly downward
+// Adjust the y-coordinates, increase font size, and maintain proper spacing
+// Adjust the y-coordinates, increase font size, and maintain proper spacing
+const fontSize = 20; // Increase font size for better visibility
+const lineSpacing = 40; // Maintain space between values
+
+// Initial y-position, adjusted to move everything downward
+let textYPosition = 630;  // Renamed variable
+
+// Add text with adjusted font size and spacing
+firstPage.drawText(staticData.gender, { x: 320, y: textYPosition, size: fontSize, font }); // Gender
+textYPosition -= lineSpacing;  // Move down for the next value
+
+firstPage.drawText(staticData.birthDate, { x: 320, y: textYPosition, size: fontSize, font }); // Birth Date
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.birthTime, { x: 320, y: textYPosition, size: fontSize, font }); // Birth Time
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.zodiacSign, { x: 320, y: textYPosition, size: fontSize, font }); // Zodiac Sign
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.nakshatra, { x: 320, y: textYPosition, size: fontSize, font }); // Nakshatra
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.destinyNumber.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Destiny Number
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.luckyDay, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Day
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.gemstone, { x: 320, y: textYPosition, size: fontSize, font }); // Gemstone
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.luckyGod, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky God
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.luckyMetal, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Metal
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.luckyColour, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Colour
+textYPosition -= lineSpacing;
+
+firstPage.drawText(staticData.numerology.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Numerology
+// Numerology
+
+
+
+
+        // Use the second page to display the list of names
+        let yPosition = 750;
+        secondPage.drawText('Suggested Names:', { x: 50, y: yPosition, size: 18 });
+        yPosition -= 30; // Move down for the list
+
+        // List names on the second page and use the third page if needed
+        names.forEach(({ name, meaning }, index) => {
+            if (yPosition < 50 && index < names.length - 1) {
+                // Switch to the third page if space runs out on the second page
+                secondPage = thirdPage;
+                yPosition = 750;  // Reset position for the third page
+            }
+            secondPage.drawText(`Name: ${name}`, { x: 50, y: yPosition, size: 14 });
+            secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition - 20, size: 12 });
+            yPosition -= 40; // Maintain space between names
+        });
+
+        // Save the modified PDF to bytes
+        const pdfBytes = await pdfDoc.save();
+
+        // Convert the PDF to base64
+        const base64Pdf = Buffer.from(pdfBytes).toString('base64');
+
+        // Save the PDF in MongoDB
         const newPdf = new PDF({ uniqueId, customer: customerId, base64Pdf });
         const savedPdf = await newPdf.save();
-  
+
+        // Send the saved PDF as a JSON response
         res.status(200).json(savedPdf);
-      } catch (err) {
-        console.error('Error saving PDF to the database:', err);
-        res.status(500).json({ error: 'Failed to save PDF to the database' });
-      }
-    });
-  
-    doc.fontSize(25).text('Suggested Names', { align: 'center' });
-    doc.moveDown(2);
-  
-    names.forEach(({ name, meaning }) => {
-      doc.fontSize(14).text(`Name: ${name}`, { align: 'left' });
-      doc.fontSize(12).text(`Meaning: ${meaning}`, { align: 'left' });
-      doc.moveDown(2);
-    });
-  
-    doc.end();
-  };
+    } catch (err) {
+        console.error('Error generating PDF:', err);
+        res.status(500).json({ error: 'Failed to generate PDF' });
+    }
+};
+
   
 
 export const sendPdfEmail = async (req, res) => {
