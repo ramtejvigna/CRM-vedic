@@ -59,9 +59,8 @@ const CustomerDetails = () => {
 
   return (
     <div
-      className={`min-h-screen py-8 px-4 transition-colors duration-300 ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}
+      className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? " text-white" : " text-gray-900"
+        }`}
     >
       <div className="max-w-7xl mx-auto">
         <div className="bg-blue-600 text-white p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
@@ -83,9 +82,8 @@ const CustomerDetails = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className={`mb-6 p-4 rounded-lg shadow-md ${
-                isDarkMode ? "bg-gray-800" : "bg-white"
-              }`}
+              className={`mb-6 p-4 rounded-lg shadow-md ${isDarkMode ? "bg-gray-800" : "bg-white"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -99,11 +97,10 @@ const CustomerDetails = () => {
                     id="gender"
                     value={filteredGender}
                     onChange={handleGenderChange}
-                    className={`w-full p-2 rounded-md ${
-                      isDarkMode
+                    className={`w-full p-2 rounded-md ${isDarkMode
                         ? "bg-gray-700 text-white"
                         : "bg-gray-100 text-gray-900"
-                    }`}
+                      }`}
                   >
                     <option value="All">All</option>
                     <option value="Male">Male</option>
@@ -121,11 +118,10 @@ const CustomerDetails = () => {
                     id="customerStatus"
                     value={filteredStatus}
                     onChange={handleStatusChange}
-                    className={`w-full p-2 rounded-md ${
-                      isDarkMode
+                    className={`w-full p-2 rounded-md ${isDarkMode
                         ? "bg-gray-700 text-white"
                         : "bg-gray-100 text-gray-900"
-                    }`}
+                      }`}
                   >
                     <option value="All">All</option>
                     <option value="inProgress">Completed</option>
@@ -139,9 +135,8 @@ const CustomerDetails = () => {
         </AnimatePresence>
 
         <div
-          className={`overflow-x-auto rounded-lg shadow ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          }`}
+          className={`overflow-x-auto rounded-lg shadow ${isDarkMode ? "bg-gray-800" : "bg-white"
+            }`}
         >
           <table className="w-full table-auto">
             <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
@@ -153,8 +148,6 @@ const CustomerDetails = () => {
                   "WhatsApp Number",
                   "Baby's Gender",
                   "Status",
-                  "Preferred Starting Letter",
-                  "Preferred God",
                   "Actions",
                 ].map((header) => (
                   <th
@@ -174,9 +167,8 @@ const CustomerDetails = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className={`${
-                      isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
-                    } transition-colors duration-150`}
+                    className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                      } transition-colors duration-150`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -195,25 +187,18 @@ const CustomerDetails = () => {
                       <span
                         className={`
       px-2 py-1 rounded-full text-sm font-medium
-      ${
-        row.customerStatus === "newRequests"
-          ? "bg-yellow-200 text-yellow-800"
-          : ""
-      }
-      ${row.customerStatus === "inProgress" ? "bg-green-200 text-green-800" : ""}
-      ${row.customerStatus === "rejected" ? "bg-red-200 text-red-800" : ""}
+      ${row.customerStatus === "newRequests"
+                            ? "text-yellow-600"
+                            : ""
+                          }
+      ${row.customerStatus === "inProgress" ? "text-green-500" : ""}
+      ${row.customerStatus === "rejected" ? "text-red-800" : ""}
     `}
                       >
-                        {row.customerStatus === "newRequests" && "New Req"}
+                        {row.customerStatus === "newRequests" && "New Requests"}
                         {row.customerStatus === "inProgress" && "Completed"}
                         {row.customerStatus === "rejected" && "Rejected"}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {row.preferredStartingLetter}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {row.preferredGod}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <button
@@ -235,30 +220,27 @@ const CustomerDetails = () => {
           <button
             onClick={() => handleChangePage(page - 1)}
             disabled={page === 0}
-            className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-              isDarkMode
+            className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${isDarkMode
                 ? "bg-gray-800 text-white hover:bg-gray-700"
                 : "bg-white text-gray-700 hover:bg-gray-50"
-            } ${page === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+              } ${page === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <ChevronLeft size={20} className="mr-2" />
             Previous
           </button>
           <span
-            className={`text-sm ${
-              isDarkMode ? "text-gray-300" : "text-gray-700"
-            }`}
+            className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
           >
             Page {page + 1} of {totalPages}
           </span>
           <button
             onClick={() => handleChangePage(page + 1)}
             disabled={page >= totalPages - 1}
-            className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-              isDarkMode
+            className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${isDarkMode
                 ? "bg-gray-800 text-white hover:bg-gray-700"
                 : "bg-white text-gray-700 hover:bg-gray-50"
-            } ${page >= totalPages - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+              } ${page >= totalPages - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Next
             <ChevronRight size={20} className="ml-2" />
