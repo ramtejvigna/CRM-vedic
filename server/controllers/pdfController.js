@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import admin from 'firebase-admin';
 import {PDF , babyNames} from '../models/PDF.js'; 
 import dotenv from 'dotenv';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { PDFDocument,rgb, StandardFonts } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -48,6 +48,15 @@ export const getBabyNames = async (req, res) => {
     }
   };
 
+  let boldFont, normalFont;
+
+const loadFonts = async (pdfDoc) => {
+    if (!boldFont || !normalFont) {
+        boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        normalFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    }
+}
+
   export const createPdf = async (req, res) => {
     const { names, customerId } = req.body;
     const uniqueId = uuidv4();
@@ -58,6 +67,7 @@ export const getBabyNames = async (req, res) => {
         const existingPdfBytes = fs.readFileSync(pdfPath);
 
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        await loadFonts(pdfDoc);
         const pages = pdfDoc.getPages();
         const firstPage = pages[0];
         const secondPage = pages[1];
@@ -85,11 +95,11 @@ const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 // Adjusted text with new font size, bold, and moved slightly downward
 // Adjust the y-coordinates, increase font size, and maintain proper spacing
 // Adjust the y-coordinates, increase font size, and maintain proper spacing
-const fontSize = 20; // Increase font size for better visibility
+const fontSize = 25; // Increase font size for better visibility
 const lineSpacing = 40; // Maintain space between values
-
+const lineSpacing1=52;
 // Initial y-position, adjusted to move everything downward
-let textYPosition = 630;  // Renamed variable
+let textYPosition = 620;  // Renamed variable
 
 // Add text with adjusted font size and spacing
 firstPage.drawText(staticData.gender, { x: 320, y: textYPosition, size: fontSize, font }); // Gender
@@ -111,19 +121,19 @@ firstPage.drawText(staticData.destinyNumber.toString(), { x: 320, y: textYPositi
 textYPosition -= lineSpacing;
 
 firstPage.drawText(staticData.luckyDay, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Day
-textYPosition -= lineSpacing;
+textYPosition -= lineSpacing1;
 
 firstPage.drawText(staticData.gemstone, { x: 320, y: textYPosition, size: fontSize, font }); // Gemstone
-textYPosition -= lineSpacing;
+textYPosition -= lineSpacing1;
 
 firstPage.drawText(staticData.luckyGod, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky God
-textYPosition -= lineSpacing;
+textYPosition -= lineSpacing1;
 
 firstPage.drawText(staticData.luckyMetal, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Metal
-textYPosition -= lineSpacing;
+textYPosition -= lineSpacing1;
 
 firstPage.drawText(staticData.luckyColour, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Colour
-textYPosition -= lineSpacing;
+textYPosition -= lineSpacing1;
 
 firstPage.drawText(staticData.numerology.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Numerology
 // Numerology
@@ -132,21 +142,25 @@ firstPage.drawText(staticData.numerology.toString(), { x: 320, y: textYPosition,
 
 
         // Use the second page to display the list of names
-        let yPosition = 750;
-        secondPage.drawText('Suggested Names:', { x: 50, y: yPosition, size: 18 });
-        yPosition -= 30; // Move down for the list
+        let yPosition = 600;
+
+
+        
 
         // List names on the second page and use the third page if needed
         names.forEach(({ name, meaning }, index) => {
-            if (yPosition < 50 && index < names.length - 1) {
+            if (yPosition < 100 && index < names.length - 1) {
                 // Switch to the third page if space runs out on the second page
                 secondPage = thirdPage;
-                yPosition = 750;  // Reset position for the third page
+                yPosition = 600;  // Reset position for the third page
             }
-            secondPage.drawText(`Name: ${name}`, { x: 50, y: yPosition, size: 14 });
-            secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition - 20, size: 12 });
-            yPosition -= 40; // Maintain space between names
+            secondPage.drawText(`name: ${name}`, { x: 50, y: yPosition, size: 25,font});
+            yPosition-=60
+            secondPage.drawText(`meaning": ${meaning}`, { x: 50, y: yPosition, size: 25,font });
+            yPosition -= 80; // Maintain space between names
         });
+
+
 
         // Save the modified PDF to bytes
         const pdfBytes = await pdfDoc.save();
