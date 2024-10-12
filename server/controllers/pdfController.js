@@ -54,7 +54,7 @@ export const getBabyNames = async (req, res) => {
 
     try {
         // Construct the correct path to the PDF template
-        const pdfPath = path.join(__dirname, '../assets/Shubham Chouhan.pdf');
+        const pdfPath = path.join(__dirname, '../assets/Template.pdf');
         const existingPdfBytes = fs.readFileSync(pdfPath);
 
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
