@@ -1,68 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useStore } from "../../../store";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Box,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  CardActions,
-} from '@mui/material';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Eye,
+  Sun,
+  Moon,
+} from "lucide-react";
+import axios from "axios";
 
-const getStatusContainer = (status) => (
-  <Box
-    sx={{
-      width: '100px',
-      height: '30px',
-      borderRadius: '15px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: 'white',
-      padding: '4px',
-      margin: 'auto',
-      backgroundColor: 
-        status === 'inProgress' ? 'black' : 
-        status === 'newRequests' ? 'green' : 
-        status === 'completed' ? 'yellow' : 'grey',
-    }}
-  >
-    {status}
-  </Box>
-);
 const CustomerDetails = () => {
-  const [filteredGender, setFilteredGender] = useState('All');
-  const [filteredStatus, setFilteredStatus] = useState('All');
+  const { isDarkMode, toggleDarkMode } = useStore();
+  const [filteredGender, setFilteredGender] = useState("All");
+  const [filteredStatus, setFilteredStatus] = useState("All");
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
   const [customers, setCustomers] = useState([]);
+
   const navigate = useNavigate();
-
-  const handleGenderChange = (event) => {
-    setFilteredGender(event.target.value);
-  };
-
-  const handleStatusChange = (event) => {
-    setFilteredStatus(event.target.value);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
 
   useEffect(() => {
     fetchCustomers();
@@ -70,194 +29,225 @@ const CustomerDetails = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/customers/getCustomers');
+      const response = await axios.get(
+        "http://localhost:3000/customers/getCustomers"
+      );
       setCustomers(response.data);
     } catch (err) {
-      console.error('Error fetching customers', err);
+      console.error("Error fetching customers", err);
     }
   };
 
   const filteredData = customers.filter((row) => {
-    const genderMatch = filteredGender === 'All' || row.babyGender === filteredGender;
-    const statusMatch = filteredStatus === 'All' || row.customerStatus === filteredStatus;
+    const genderMatch =
+      filteredGender === "All" || row.babyGender === filteredGender;
+    const statusMatch =
+      filteredStatus === "All" || row.customerStatus === filteredStatus;
     return genderMatch && statusMatch;
   });
 
-  const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedData = filteredData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+  console.log(paginatedData);
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
-  return (
-    <Box sx={{ position: 'relative', padding: '20px', paddingBottom: '80px' }}>
-      <Box
-        sx={{
-          backgroundColor: '#1E90FF',
-          color: '#fff',
-          padding: '1.25rem',
-          borderRadius: '20px',
-          width: '1100px',
-          height: '75px',
-          position: 'absolute',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Typography className='text-xl' component="div" sx={{ fontWeight: 'bold' }}>
-          Customer Details
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<FilterListIcon />}
-          onClick={() => setShowFilters(!showFilters)}
-          sx={{
-            backgroundColor: '#000',
-            borderRadius: '10px',
-          }}
-        >
-          Filter
-        </Button>
-      </Box>
-      {showFilters && (
-        <Box
-          sx={{
-            position: 'absolute',
-            right: '20px',
-            top: '120px',
-            zIndex: 3,
-            backgroundColor: 'white',
-            padding: '16px',
-            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="gender-label">Gender</InputLabel>
-            <Select
-              labelId="gender-label"
-              value={filteredGender}
-              onChange={handleGenderChange}
-              sx={{
-                border: 'none',
-                '& fieldset': {
-                  border: 'none',
-                },
-              }}
-            >
-              <MenuItem value="All">All</MenuItem>
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-  <InputLabel id="status-label">Status</InputLabel>
-  <Select
-    labelId="status-label"
-    value={filteredStatus}
-    onChange={handleStatusChange}
-    sx={{
-      border: 'none',
-      '& fieldset': {
-        border: 'none',
-      },
-    }}
-  >
-    <MenuItem value="All">All</MenuItem>
-    <MenuItem value="inProgress">In progress</MenuItem>
-    <MenuItem value="newRequests">New Requests</MenuItem>
-    <MenuItem value="completed">Completed</MenuItem>
-  </Select>
-</FormControl>
+  const handleGenderChange = (event) => setFilteredGender(event.target.value);
+  const handleStatusChange = (event) => setFilteredStatus(event.target.value);
+  const handleChangePage = (newPage) => setPage(newPage);
 
-        </Box>
-      )}
-      <Box sx={{ marginTop: '30px', paddingBottom: '80px' }}>
-        <TableContainer component={Paper} sx={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', maxHeight: '600px', padding: '10px', borderRadius: '20px' }}>
-          <Table stickyHeader sx={{ marginTop: '70px' }}>
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>S:no</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Father Name</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>WhatsApp Number</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Baby's Gender</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Assigned Employee</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>work-status</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>generated PDFS</TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold', color: 'gray' }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedData.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell align="center">{index + 1}</TableCell>
-                  <TableCell align="center">{row.fatherName}</TableCell>
-                  <TableCell align="center">{row.whatsappNumber}</TableCell>
-                  <TableCell align="center">{row.babyGender}</TableCell>
-                  <TableCell align="center">{row.assignedEmployeeName}</TableCell>
-                  <TableCell align="center">
-  {getStatusContainer(row.customerStatus)}
-</TableCell>
-                  <TableCell align="center">{row.pdfGenerated}</TableCell>
-                  <TableCell align="center">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={() => navigate(`${row.fatherName}`)}
-                    >
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-      <CardActions
-        sx={{
-          justifyContent: 'center',
-          padding: '16px',
-          position: 'fixed',
-          backgroundColor: 'white',
-          width: '100%',
-          maxWidth: '1130px',
-          margin: '0 auto',
-          bottom: 0,
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={(event) => handleChangePage(event, page - 1)}
-          disabled={page === 0}
-          startIcon={<ArrowBackIosIcon />}
-          sx={{
-            marginRight: '16px',
-            backgroundColor: '#007bff',
-          }}
+  return (
+    <div
+      className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? " text-white" : " text-gray-900"
+        }`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-blue-600 text-white p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Customer Details</h1>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors duration-300"
+            >
+              <Filter size={20} />
+              <span>Filter</span>
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className={`mb-6 p-4 rounded-lg shadow-md ${isDarkMode ? "bg-gray-800" : "bg-white"
+                }`}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Gender
+                  </label>
+                  <select
+                    id="gender"
+                    value={filteredGender}
+                    onChange={handleGenderChange}
+                    className={`w-full p-2 rounded-md ${isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-gray-100 text-gray-900"
+                      }`}
+                  >
+                    <option value="All">All</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="customerStatus"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Status
+                  </label>
+                  <select
+                    id="customerStatus"
+                    value={filteredStatus}
+                    onChange={handleStatusChange}
+                    className={`w-full p-2 rounded-md ${isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-gray-100 text-gray-900"
+                      }`}
+                  >
+                    <option value="All">All</option>
+                    <option value="inProgress">Completed</option>
+                    <option value="newRequests">New Requests</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div
+          className={`overflow-x-auto rounded-lg shadow ${isDarkMode ? "bg-gray-800" : "bg-white"
+            }`}
         >
-          Previous
-        </Button>
-        <Typography variant="body1" sx={{ alignSelf: 'center' }}>
-          Page {page + 1} of {totalPages}
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={(event) => handleChangePage(event, page + 1)}
-          disabled={page >= totalPages - 1}
-          endIcon={<ArrowForwardIosIcon />}
-          sx={{
-            marginLeft: '16px',
-            backgroundColor: '#007bff',
-          }}
-        >
-          Next
-        </Button>
-      </CardActions>
-    </Box>
+          <table className="w-full table-auto">
+            <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
+              <tr>
+                {[
+                  "S:no",
+                  "Father Name",
+                  "Mother Name",
+                  "WhatsApp Number",
+                  "Baby's Gender",
+                  "Status",
+                  "Actions",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              <AnimatePresence>
+                {paginatedData.map((row, index) => (
+                  <motion.tr
+                    key={index}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                      } transition-colors duration-150`}
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {row.fatherName}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {row.motherName}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {row.whatsappNumber}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {row.babyGender}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span
+                        className={`
+      px-2 py-1 rounded-full text-sm font-medium
+      ${row.customerStatus === "newRequests"
+                            ? "text-yellow-600"
+                            : ""
+                          }
+      ${row.customerStatus === "inProgress" ? "text-green-500" : ""}
+      ${row.customerStatus === "rejected" ? "text-red-800" : ""}
+    `}
+                      >
+                        {row.customerStatus === "newRequests" && "New Requests"}
+                        {row.customerStatus === "inProgress" && "Completed"}
+                        {row.customerStatus === "rejected" && "Rejected"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <button
+                        className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        onClick={() => navigate(`${row.fatherName}`)}
+                      >
+                        <Eye size={18} className="mr-2" />
+                        View
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            onClick={() => handleChangePage(page - 1)}
+            disabled={page === 0}
+            className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${isDarkMode
+                ? "bg-gray-800 text-white hover:bg-gray-700"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+              } ${page === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <ChevronLeft size={20} className="mr-2" />
+            Previous
+          </button>
+          <span
+            className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+          >
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            onClick={() => handleChangePage(page + 1)}
+            disabled={page >= totalPages - 1}
+            className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${isDarkMode
+                ? "bg-gray-800 text-white hover:bg-gray-700"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+              } ${page >= totalPages - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            Next
+            <ChevronRight size={20} className="ml-2" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
