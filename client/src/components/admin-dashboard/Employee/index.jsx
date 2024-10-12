@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
-import { Edit, Trash, MessageCircle } from "lucide-react";
+import { Edit, Trash, Eye } from "lucide-react";
 import { useStore } from "../../../store";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
 
@@ -217,7 +217,8 @@ const EmployeeTable = () => {
                                 : "text-green-600 hover:text-green-900"
                             }`}
                           >
-                            <MessageCircle size={18} />
+                            <Eye size={18} />
+                            {/* <MessageCircle size={18} /> */}
                           </button>
                           {/* <button
                             onClick={() => handleDelete(employee._id)}
