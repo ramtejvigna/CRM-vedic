@@ -10,7 +10,7 @@ import { TbMoneybag } from "react-icons/tb";
 
 // Components
 import Home from "./components/admin-dashboard/Home";
-import Employee from "./components/admin-dashboard/Employee";
+import { EmployeeTable } from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
 
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
@@ -37,7 +37,7 @@ export const routes = [
     name: "employees",
     icon: <AiOutlineFileDone {...icon} />,
     path: "employees",
-    element: <Employee />,
+    element: <EmployeeTable />,
   },
   {
     name: "customers",

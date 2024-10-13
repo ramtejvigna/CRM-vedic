@@ -26,15 +26,14 @@ router.post('/add-employee' , uploads.fields([
     {name : "passport" , maxCount : 1} , 
     {name : "degrees" , maxCount : 1} , 
     {name : "transcripts" , maxCount : 1},
-    {name : "aadhar" , maxCount : 1} ,
-    {name : "pan" , maxCount : 1}]) , addEmployee);
+    {name : "aadharOrPan" , maxCount : 1} ,]) , addEmployee);
 
 router.get('/get-employees' , getEmployees);
 router.get('/get-employee' , getEmployee);
+
 router.put('/update-employee', uploads.fields([
     {name : "passport" , maxCount : 1} , 
     {name : "degrees" , maxCount : 1} , 
     {name : "transcripts" , maxCount : 1},
-    {name : "aadhar" , maxCount : 1} ,
-    {name : "pan" , maxCount : 1}])  , updateEmployee);
+    {name : "aadharOrPan" , maxCount : 1} ,])  , updateEmployee);
 export default router;

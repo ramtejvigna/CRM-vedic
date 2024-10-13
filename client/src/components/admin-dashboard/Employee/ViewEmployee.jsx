@@ -60,75 +60,75 @@ const ViewEmployee = () => {
                 </div>
             </Card>
 
-            <Card className='flex flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
-                <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
-                    <h1 className="text-xl uppercase font-bold text-gray-800">Personal Information</h1>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                        {/* Username */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>Username</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.username || 'N/A'}</span>
-                        </div>
-                        {/* Name */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>Name</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.name || 'N/A'}</span>
-                        </div>
-                        {/* Email */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>Email</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.email || 'N/A'}</span>
-                        </div>
-                        {/* Phone */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>Phone</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.phone || 'N/A'}</span>
-                        </div>
+        <Card className='flex flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
+            <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
+                <h1 className="text-xl uppercase font-bold text-gray-800">Personal Information</h1>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                {/* first */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>first name</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.firstName || 'N/A'}</span>
+                </div>
+                {/* Name */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>last name</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.lastName || 'N/A'}</span>
+                </div>
+                {/* Email */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>Email</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.email || 'N/A'}</span>
+                </div>
+                {/* Phone */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>Phone</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.phone || 'N/A'}</span>
+                </div>
+                </div>
+            </Box>
+            <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
+                <h1 className="text-xl uppercase font-bold text-gray-800">Address</h1>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                {/* State */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>State</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.state || 'N/A'}</span>
+                </div>
+                {/* City */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>City</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.city || 'N/A'}</span>
+                </div>
+                {/* Country */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>Country</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.country || 'N/A'}</span>
+                </div>
+                {/* Pincode */}
+                <div className="flex flex-col gap-2">
+                    <span className='text-sm font-semibold text-gray-600'>Pincode</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.pincode || 'N/A'}</span>
+                </div>
+                </div>
+            </Box>
+            <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
+                <h1 className="text2xl uppercase font-bold text-gray-700 mb-4">previous employement details</h1>
+                
+                <div className='grid grid-cols-1 sm:grid-cols-2  gap-4'>
+                    <div className="flex flex-col gap-1">
+                        <span className='text-sm font-semibold text-gray-500'>employeer name</span>
+                        <span className='text-xl font-medium text-gray-800'>{employee?.employerName || 'N/A'}</span>
                     </div>
-                </Box>
-                <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
-                    <h1 className="text-xl uppercase font-bold text-gray-800">Address</h1>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                        {/* State */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>State</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.state || 'N/A'}</span>
-                        </div>
-                        {/* City */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>City</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.city || 'N/A'}</span>
-                        </div>
-                        {/* Country */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>Country</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.country || 'N/A'}</span>
-                        </div>
-                        {/* Pincode */}
-                        <div className="flex flex-col gap-2">
-                            <span className='text-sm font-semibold text-gray-600'>Pincode</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.pincode || 'N/A'}</span>
-                        </div>
+                    {/* city */}
+                    <div className="flex flex-col gap-1">
+                        <span className='text-sm font-semibold text-gray-500'>job title</span>
+                        <span className='text-xl font-medium text-gray-800'>{employee?.jobTitle || 'N/A'}</span>
                     </div>
-                </Box>
-                <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
-                    <h1 className="text-2xl uppercase font-bold text-gray-700 mb-4">Previous Employment Details</h1>
-
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                        <div className="flex flex-col gap-1">
-                            <span className='text-sm font-semibold text-gray-500'>Employer Name</span>
-                            <span className='text-xl font-medium text-gray-800'>{employee.employerName || 'N/A'}</span>
-                        </div>
-                        {/* Job Title */}
-                        <div className="flex flex-col gap-1">
-                            <span className='text-sm font-semibold text-gray-500'>Job Title</span>
-                            <span className='text-xl font-medium text-gray-800'>{employee.jobTitle || 'N/A'}</span>
-                        </div>
-                        {/* Start Date */}
-                        <div className="flex flex-col gap-1">
-                            <span className='text-sm font-semibold text-gray-500'>Start Date</span>
-                            <span className='text-xl font-medium text-gray-800'>
-                                {employee.startDate ? `${new Date(employee.startDate).getDate()}/${new Date(employee.startDate).getMonth()}/${new Date(employee.startDate).getFullYear()} ` : 'N/A'}
+                    {/* country */}
+                    <div className="flex flex-col gap-1">
+                        <span className='text-sm font-semibold text-gray-500'>start date</span>
+                        <span className='text-xl font-medium text-gray-800'>
+                            {employee?.startDate ? `${new Date(employee?.startDate).getDate()}/${new Date(employee?.startDate).getMonth()}/${new Date(employee?.startDate).getFullYear()} ` :  'N/A'}
                             </span>
                         </div>
                         {/* End Date */}
@@ -153,54 +153,49 @@ const ViewEmployee = () => {
                 <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
                     <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Employee Details</h1>
 
-                    <div className='flex flex-col p-2'>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Aadhar Card</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.aadhar}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Pan Card</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.pan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Passport</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Degrees</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Transcripts</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
+                <div className='flex flex-col p-2'>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span className=''>Aadhar or pan card</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
                     </div>
-                </Box>
-                <Box className="flex-1 basis-[400px] item-center flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
-                    <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Financial Details</h1>
-                    <div className='flex items-center justify-center h-full'>
-                        <div className="w-[80%] basis-[350px] sm:basis-[500px] h-[90%] p-10 justify-center bg-black text-white rounded-lg shadow-xl relative">
-                            {/* Cardholder and Card Number */}
-                            <div className="flex flex-col gap-4">
-                                <div>
-                                    <span className="block text-sm font-light text-gray-300">Cardholder</span>
-                                    <span className="block text-lg font-semibold">{employee.cardholderName ? employee.cardholderName : "xxxxx"}</span>
-                                </div>
-                                <div>
-                                    <span className="block text-sm font-light text-gray-300">Card Number</span>
-                                    <span className="block text-xl font-semibold tracking-widest">{employee.cardNumber ? employee.cardNumber : "xxx xxx xxx"}</span>
-                                </div>
-                            </div>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span>passport</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
+                    </div>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span>degrees</span>
+                        <button onClick={() => setImage((prev) => prev = `http://localhost:3000/${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
+                    </div>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span>transcripts</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
+                    </div>
+                </div>
+                
+            </Box>
+            <Box className="flex-1 basis-[400px] item-center flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
+                <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Financial details</h1>
+                <div className='flex items-center justify-center h-full'>
+                    <div className="w-[80%] basis-[350px] sm:basis-[500px] h-[90%] p-10 justify-center bg-black text-white rounded-lg  shadow-xl relative">
+                        {/* Cardholder and Card Number */}
+                        <div className="flex flex-col gap-4">
+                        <div>
+                            <span className="block text-sm font-light text-gray-300">Cardholder</span>
+                            <span className="block text-lg font-semibold">{employee?.cardholderName ? employee?.cardholderName  : "xxxxx"}</span>
+                        </div>
+                        <div>
+                            <span className="block text-sm font-light text-gray-300">Card Number</span>
+                            <span className="block text-xl font-semibold tracking-widest">{employee?.cardNumber ? employee?.cardNumber  : "xxx xxx xxx"} </span>
+                        </div>
+                        </div>
 
                             {/* CVV and Expiry Date */}
                             <div className="flex justify-between mt-8">

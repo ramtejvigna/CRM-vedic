@@ -16,8 +16,7 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // Update isOnline status
-        await Employee.findOneAndUpdate({ _id: employee._id }, { isOnline: true });
+        employee.isOnline = true ;
 
         // Generate JWT token with employee ObjectId and isAdmin flag
         const token = jwt.sign(
@@ -26,7 +25,7 @@ export const login = async (req, res) => {
                 username: employee.username
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '8h' }
         );
 
         // Return token in response
@@ -40,3 +39,8 @@ export const login = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const logout = async (req , res) => {
+    // logic for logout
+    // add employee.isOnline = false;
+}
