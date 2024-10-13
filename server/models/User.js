@@ -53,8 +53,7 @@ const employeeSchema = new mongoose.Schema({
     cardHolderName : {type : String } ,
     cvv : {type : String} ,
     expiryDate : {type : Date} ,
-    isOnline :  {type : Boolean , default : false},
-    // others
+    isOnline : {type : Boolean , default : false},
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
     isAdmin: { type: Boolean, default: false }

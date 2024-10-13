@@ -99,7 +99,6 @@ export const addEmployee = async (req, res) => {
 export const getEmployees = async (req ,res) => {
     try {
         const employees = await Employee.find();
-
         return res.status(200).json({employees});
     } catch (error) {
         return res.status(500).send("Internal server error");

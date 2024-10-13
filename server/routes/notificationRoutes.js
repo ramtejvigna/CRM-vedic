@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { createNotification, getNotifications, markNotificationAsRead,markAsRead } from '../controllers/NotificationController.js';
+import { createNotification, getNotifications, markNotificationAsRead,markAsRead } from '../controllers/TaskManagement.js';
 import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
