@@ -14,8 +14,8 @@ export const addEmployee = async (req, res) => {
     try {
 
         const {
-            username,
-            name,
+            firstName,
+            lastName,
             phone,
             email,
             city,
@@ -43,27 +43,25 @@ export const addEmployee = async (req, res) => {
 
         // File handling
         const passportFile = req.files.passport ? req.files.passport[0] : null;
-        const aadharFile = req.files.aadhar ? req.files.aadhar[0] : null;
-        const panFile = req.files.pan ? req.files.pan[0] : null;
+        const aadharOrPanFile = req.files.aadharOrPan ? req.files.aadharOrPan[0] : null;
         const degreesFile = req.files.degrees ? req.files.degrees[0] : null;
         const transcriptsFile = req.files.transcripts ? req.files.transcripts[0] : null;
 
         // Check if all required files are uploaded
-        if (!passportFile || !aadharFile || !panFile || !degreesFile || !transcriptsFile) {
+        if (!passportFile || !aadharOrPanFile  || !degreesFile || !transcriptsFile) {
             return res.status(400).json({ message: "Missing required document files" });
         }
 
         // Replace backslashes for file paths (Windows to UNIX-style paths)
         const passportFilePath = passportFile.path.replace(/\\/g, '/');
-        const aadharFilePath = aadharFile.path.replace(/\\/g, '/');
-        const panFilePath = panFile.path.replace(/\\/g, '/');
+        const aadharOrPanFilePath = aadharOrPanFile.path.replace(/\\/g, '/');
         const degreesFilePath = degreesFile.path.replace(/\\/g, '/');
         const transcriptsFilePath = transcriptsFile.path.replace(/\\/g, '/');
 
         // Create new employee
         const newEmployee = await Employee.create({
-            username,
-            name,
+            firstName,
+            lastName,
             phone,
             email,
             city,
@@ -81,8 +79,7 @@ export const addEmployee = async (req, res) => {
             cardholderName,
             cvv,
             expiryDate,
-            aadhar: aadharFilePath,
-            pan: panFilePath,
+            aadharOrPan: aadharOrPanFilePath,
             passport: passportFilePath,
             degrees: degreesFilePath,
             transcripts: transcriptsFilePath,
@@ -133,7 +130,7 @@ export const getEmployee = async (req , res) => {
 // @access public
 export const updateEmployee = async (req, res) => {
     try {
-        const { id, username, name, phone, email, city, address, state, country, pincode, ssn,
+        const { id, firstName, lastName, phone, email, city, address, state, country, pincode, ssn,
             employerName, jobTitle, startDate, endDate, reasonForLeaving,
             cardNumber, cardholderName, cvv, expiryDate } = req.body;
 
@@ -148,8 +145,7 @@ export const updateEmployee = async (req, res) => {
 
         // Handling file uploads and existing file paths
         const passportFile = req.files && req.files.passport ? req.files.passport[0] : null;
-        const aadharFile = req.files && req.files.aadhar ? req.files.aadhar[0] : null;
-        const panFile = req.files && req.files.pan ? req.files.pan[0] : null;
+        const aadharOrPanFile = req.files && req.files.aadharOrPan ? req.files.aadharOrPan[0] : null;
         const degreesFile = req.files && req.files.degrees ? req.files.degrees[0] : null;
         const transcriptsFile = req.files && req.files.transcripts ? req.files.transcripts[0] : null;
 
@@ -163,15 +159,13 @@ export const updateEmployee = async (req, res) => {
 
         // Set file paths or keep existing paths if no new file uploaded
         const passportFilePath = passportFile ? passportFile.path.replace(/\\/g, '/') : employee.passport;
-        const aadharFilePath = aadharFile ? aadharFile.path.replace(/\\/g, '/') : employee.aadhar;
-        const panFilePath = panFile ? panFile.path.replace(/\\/g, '/') : employee.pan;
+        const aadharOrPanFilePath = aadharOrPanFile ? aadharOrPanFile.path.replace(/\\/g, '/') : employee.aadharOrPan;
         const degreesFilePath = degreesFile ? degreesFile.path.replace(/\\/g, '/') : employee.degrees;
         const transcriptsFilePath = transcriptsFile ? transcriptsFile.path.replace(/\\/g, '/') : employee.transcripts;
 
         // Delete old files if new files have been uploaded
         if (passportFile) deleteFile(path.join(__dirname, '..', employee.passport));
-        if (aadharFile) deleteFile(path.join(__dirname, '..', employee.aadhar));
-        if (panFile) deleteFile(path.join(__dirname, '..', employee.pan));
+        if (aadharOrPanFile) deleteFile(path.join(__dirname, '..', employee.aadharOrPan));
         if (degreesFile) deleteFile(path.join(__dirname, '..', employee.degrees));
         if (transcriptsFile) deleteFile(path.join(__dirname, '..', employee.transcripts));
 
@@ -179,8 +173,8 @@ export const updateEmployee = async (req, res) => {
         const updatedEmployee = await Employee.findByIdAndUpdate(
             id,
             {
-                username,
-                name,
+                firstName,
+                lastName,
                 phone,
                 email,
                 city,
@@ -199,8 +193,7 @@ export const updateEmployee = async (req, res) => {
                 cvv,
                 expiryDate,
                 passport: passportFilePath,
-                aadhar: aadharFilePath,
-                pan: panFilePath,
+                aadharOrPan: aadharOrPanFilePath,
                 degrees: degreesFilePath,
                 transcripts: transcriptsFilePath,
             },
