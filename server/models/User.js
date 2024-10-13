@@ -29,8 +29,9 @@ const customerSchema = new mongoose.Schema({
 
 
 const employeeSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    username: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
