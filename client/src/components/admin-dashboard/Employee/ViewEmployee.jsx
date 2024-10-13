@@ -61,15 +61,15 @@ const ViewEmployee = () => {
             <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
                 <h1 className="text-xl uppercase font-bold text-gray-800">Personal Information</h1>
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                {/* Username */}
+                {/* first */}
                 <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>Username</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.username || 'N/A'}</span>
+                    <span className='text-sm font-semibold text-gray-600'>first name</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.firstName || 'N/A'}</span>
                 </div>
                 {/* Name */}
                 <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>Name</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.name || 'N/A'}</span>
+                    <span className='text-sm font-semibold text-gray-600'>last name</span>
+                    <span className='text-lg font-medium text-gray-900'>{employee?.lastName || 'N/A'}</span>
                 </div>
                 {/* Email */}
                 <div className="flex flex-col gap-2">
@@ -152,14 +152,8 @@ const ViewEmployee = () => {
 
                 <div className='flex flex-col p-2'>
                     <div className="rounded-md border flex p-3 items-center justify-between">
-                        <span className=''>Aadhar card</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.aadhar}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                            view
-                        </button>
-                    </div>
-                    <div className="rounded-md border flex p-3 items-center justify-between">
-                        <span>pan card</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.pan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <span className=''>Aadhar or pan card</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>

@@ -29,8 +29,8 @@ const customerSchema = new mongoose.Schema({
 
 
 const employeeSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
@@ -39,8 +39,7 @@ const employeeSchema = new mongoose.Schema({
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
-    aadhar : {type : String} ,
-    pan : {type : String} ,
+    aadharOrPan : {type : String} ,
     passport : {type : String} ,
     ssn : {type : String},
     degrees : {type : String } ,
@@ -54,7 +53,7 @@ const employeeSchema = new mongoose.Schema({
     cardHolderName : {type : String } ,
     cvv : {type : String} ,
     expiryDate : {type : Date} ,
-
+    isOnline :  {type : Boolean , default : false},
     // others
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,

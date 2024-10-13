@@ -23,8 +23,8 @@
         const [isLoading, setIsLoading] = useState(false);
         const [formData, setFormData] = useState({
             personalInfo: {
-                username: '',
-                name: '',
+                firstName: '',
+                lastName: '',
                 phone: '',
                 email: '',
                 city: '',
@@ -33,7 +33,7 @@
                 country: '',
                 pincode: '',
             },
-            idDocuments: { aadhar: '', pan: '', passport: '', ssn: '' },
+            idDocuments: { aadharOrPan: '', passport: '', ssn: '' },
             education: { degrees: null, transcripts: null },
             employment: { employerName: '', jobTitle: '', startDate: '', endDate: '', reasonForLeaving: '' },
             paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: '' },
@@ -70,43 +70,45 @@
             const formErrors = {};
 
 
-            // if (activeStep === 0) {
-            //     if (!form.username) formErrors.fullName = 'Full Name is required';
-            //     if (!form.email) formErrors.email = 'Email is required';
-            //     if (!form.name) formErrors.dob = 'Date of Birth is required';
-            //     if (!form.address) formErrors.address = 'Address is required';
-            //     if (!form.city) formErrors.city = 'city is required';
-            //     if (!form.phone) formErrors.phone = 'Phone number is required';
-            //     if (!form.state) formErrors.state = 'State is required';
-            //     if (!form.pincode) formErrors.pincode = 'Pincode is required';
-            //     if (!form.country) formErrors.country = 'Country is required';
-            // }
+            if (activeStep === 0) {
+                if (!form.firstName) formErrors.firstName = 'firstname  is required';
+                if (!form.email) formErrors.email = 'Email is required';
+                if (!form.lastName) formErrors.lastName = 'lastname is required';
+                if (!form.address) formErrors.address = 'Address is required';
+                if (!form.city) formErrors.city = 'city is required';
+                if (!form.phone) formErrors.phone = 'Phone number is required';
+                if(isNaN(form.phone) ) formErrors.phone = "only digits are allowed"
+                if(form.phone.length !== 10) formErrors.phone = "Enter 10 digit phone number";
+                if (!form.state) formErrors.state = 'State is required';
+                if (!form.pincode) formErrors.pincode = 'Pincode is required';
+                if (!form.country) formErrors.country = 'Country is required';
+            }
 
-            // if (activeStep === 1) {
-            //     if (!form.aadhar) formErrors.aadhar = 'Aadhar Card is required';
-            //     if (!form.pan) formErrors.pan = 'PAN Card is required';
-            //     if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-            //     if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
-            // }
+            if (activeStep === 1) {
+                if (!form.aadharOrPan) formErrors.aadharOrPan = 'Aadhar Card or Pan Card is required';
+                if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
+                if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
+            }
 
 
-            // if (activeStep === 2) {
-            //     if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
-            //     if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
-            // }
+            if (activeStep === 2) {
+                if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
+                if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
+            }
+            if (activeStep === 3) {
+                if (!form.employerName) formErrors.employerName = 'employer Name is required';
+                if (!form.jobTitle) formErrors.jobTitle = 'job title is required';
+                if (!form.startDate) formErrors.startDate = 'date is required';
+                if (!form.endDate) formErrors.endDate = 'date is required';
+                if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'reason is required';
+            }
 
-            // if (activeStep === 3) {
-            //     if (!form.company) formErrors.company = 'Company Name is required';
-            //     if (!form.position) formErrors.position = 'Position is required';
-            //     if (!form.experience) formErrors.experience = 'Years of Experience is required';
-            // }
-
-            // if (activeStep === 4) {
-            //     if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            //     if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
-            //     if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
-            //     if (!form.cvv) formErrors.cvv = 'CVV is required';
-            // }
+            if (activeStep === 4) {
+                if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
+                if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
+                if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
+                if (!form.cvv) formErrors.cvv = 'CVV is required';
+            }
 
             setErrors(formErrors);
             return Object.keys(formErrors).length === 0;
@@ -146,9 +148,8 @@
             })
 
             // idDocuments
-            formDataToSend.append("aadhar" , formData.idDocuments.aadhar);
+            formDataToSend.append("aadharOrPan" , formData.idDocuments.aadharOrPan);
             formDataToSend.append("passport" , formData.idDocuments.passport);
-            formDataToSend.append("pan" , formData.idDocuments.pan);
             formDataToSend.append("ssn" , formData.idDocuments.ssn);
 
 
@@ -206,23 +207,21 @@
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <TextField
                                     className="flex-1"
-                                    label="username"
-                                    name="username"
-                                    value={formData.personalInfo.username}
+                                    label="firstname"
+                                    name="firstName"
+                                    value={formData.personalInfo.firstName}
                                     onChange={handleChange}
-                                    error={!!errors.username}
-                                    helperText={errors.username}
-                                    InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
+                                    error={!!errors.firstName}
+                                    helperText={errors.firstName}
                                 />
                                 <TextField
                                     className="flex-1"
-                                    label="name"
-                                    name="name"
-                                    value={formData.personalInfo.name}
+                                    label="lastname"
+                                    name="lastName"
+                                    value={formData.personalInfo.lastName}
                                     onChange={handleChange}
-                                    error={!!errors.name}
-                                    helperText={errors.name}
-                                    InputProps={{ className: 'rounded-md shadow-sm bg-gray-50' }}
+                                    error={!!errors.lastName}
+                                    helperText={errors.lastName}
                                 />
                             </div>
 
@@ -309,15 +308,15 @@
                         <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
                             <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
-                            {!formData.idDocuments.aadhar  ? (
+                            {!formData.idDocuments.aadharOrPan  ? (
                                 <div className="flex flex-col">
-                                    <InputLabel className="text-gray-700">Aadhar Card</InputLabel>
+                                    <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
                                     <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                         <label  className="w-full h-full flex flex-col items-center justify-center">
                                             <span className="text-gray-500 flex gap-2 items-center"> <AiOutlineUpload/> Upload File</span>
                                             <input
                                                 type="file"
-                                                onChange={(e) => handleFileChange(e, 'idDocuments', 'aadhar')}
+                                                onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
                                                 className="hidden"
                                             />
                                         </label>
@@ -325,31 +324,6 @@
                                 </div>
                             ) : (
                                 <div onClick={() => handleFileClear('idDocuments' , 'aadhar')} className='flex cursor-pointer flex-col'>
-                                    <InputLabel className="text-gray-700">Aadhar Card</InputLabel>
-                                    <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                        <label  className="w-full h-full flex flex-col items-center justify-center">
-                                            <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            )}
-                            {!formData.idDocuments.pan ? (
-                                <div className="flex flex-col">
-                                    <InputLabel className="text-gray-700">Pan card</InputLabel>
-                                    <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                        <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex gap-2 items-center"> <AiOutlineUpload/> Upload File</span>                                            
-                                        <input
-                                                type="file"
-                                                onChange={(e) => handleFileChange(e, 'idDocuments', 'pan')}
-                                                className="hidden"
-                                                accept='.jpg, .png, .jpeg'
-                                            />
-                                        </label>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div onClick={() => handleFileClear('idDocuments' , 'pan')} className='flex cursor-pointer flex-col'>
                                     <InputLabel className="text-gray-700">Aadhar Card</InputLabel>
                                     <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                         <label  className="w-full h-full flex flex-col items-center justify-center">
