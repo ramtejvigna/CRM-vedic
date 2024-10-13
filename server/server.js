@@ -9,6 +9,7 @@ import taskRoutes from './routes/TaskRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import pdfRoutes from './routes/pdfRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import {tokenExpirationMiddleware} from './middleware/auth.js';
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
 // import errorMiddleware from './middleware/errorMiddleware.js';

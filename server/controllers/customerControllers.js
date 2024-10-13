@@ -1,5 +1,5 @@
 import { Employee, Customer } from "../models/User.js";
-
+import { PDF } from "../models/PDF.js";
 export const addCustomerWithAssignment = async (req, res) => {
     const {
         fatherName,
@@ -174,4 +174,29 @@ export const getCustomerDetails = async (req, res) => {
             res.status(500).json({ error: "Error fetching customer details" });
         }
     };
+    export const getCustomerPdfs = async (req, res) => {
+        try {
+            // Find the customer by father's name
+            const customer = await Customer.findOne({ fatherName: req.params.fatherName });
     
+            // Check if the customer exists
+            if (!customer) {
+                return res.status(404).json({ message: 'Customer not found' });
+            }
+    
+            // Find PDFs associated with the customer
+            const pdfs = await PDF.find({ customer: customer._id });
+    
+            // Check if any PDFs were found
+            if (pdfs.length === 0) {
+                return res.status(404).json({ message: 'No PDFs found for this customer' });
+            }
+    
+            // Return the PDFs
+            res.json(pdfs);
+        } catch (error) {
+            // Log the error for debugging
+            console.error('Error retrieving PDFs:', error);
+            res.status(500).json({ message: 'Error retrieving PDFs', error: error.message });
+        }
+    };

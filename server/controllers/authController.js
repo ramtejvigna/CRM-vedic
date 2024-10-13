@@ -40,3 +40,20 @@ export const login = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const logout = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        console.log(token)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Update isOnline status to false
+        await Employee.findOneAndUpdate({ _id: decoded.id }, { isOnline: false });
+
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        console.log(error.message);
+        
+        res.status(500).json({ message: 'Server error' });
+    }
+}
