@@ -26,7 +26,7 @@ export const login = async (req, res) => {
                 username: employee.username
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '8h' }
         );
 
         // Return token in response

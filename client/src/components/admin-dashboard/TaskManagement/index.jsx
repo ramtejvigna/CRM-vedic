@@ -218,18 +218,22 @@ const TaskManagement = () => {
             getStatusColor={getStatusColor}
           />
         )}
-
-        <TaskModal
-          isModalOpen={isModalOpen}
-          handleCloseModal={handleCloseModal}
-          selectedTask={selectedTask}
-          newTask={newTask}
-          handleInputChange={handleInputChange}
-          handleDateChange={handleDateChange}
-          handleSubmit={handleSubmit}
-          employees={employees}
-          isDarkMode={isDarkMode}
-        />
+{
+  employees && (
+    <TaskModal
+    isModalOpen={isModalOpen}
+    handleCloseModal={handleCloseModal}
+    selectedTask={selectedTask}
+    newTask={newTask}
+    handleInputChange={handleInputChange}
+    handleDateChange={handleDateChange}
+    handleSubmit={handleSubmit}
+    employees={employees}
+    isDarkMode={isDarkMode}
+  />
+  )
+}
+       
 
         {selectedTask && (
           <TaskModal
