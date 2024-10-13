@@ -45,7 +45,6 @@ export const addCustomerWithAssignment = async (req, res) => {
         // Assign the new customer to the employee with the fewest customers
         const employeeToAssign = employees[0];
         employeeToAssign.customers.push(newCustomer);
-
         // Save the employee's ID in the customer document
         newCustomer.assignedEmployee = employeeToAssign._id;
 
