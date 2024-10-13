@@ -206,6 +206,7 @@ export const updateEmployee = async (req, res) => {
         }
 
         return res.status(200).json({ message: "Employee details updated", employee: updatedEmployee });
+        
     } catch (error) {
         console.error('Error updating employee:', error.message);
         return res.status(500).json({ message: 'Internal server error', error: error.message });

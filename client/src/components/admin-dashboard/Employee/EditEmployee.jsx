@@ -211,6 +211,7 @@ const EditEmployee = () => {
         e.preventDefault();
         const formDataToSend = new FormData();
 
+        formDataToSend.append("id" , id);
         // personale info
         Object.keys(formData.personalInfo).forEach((key) => {
             formDataToSend.append(key , formData.personalInfo[key])
@@ -246,16 +247,16 @@ const EditEmployee = () => {
 
             if (!res.ok) {
                 throw new Error("NetWork issue");
-                navigate('/admin-dashboard/employees')
             }
-
+            
             const data = await res.json();
             setIsLoading(false);
-
+            
             toast.success("employee details updated");
             navigate('/admin-dashboard/employees')
         } catch (error) {
             toast.error(error.message);
+            navigate('/admin-dashboard/employees')
         }
 
     }
@@ -389,7 +390,7 @@ const EditEmployee = () => {
                             </div>
                         ) : (
                             <div onClick={() => handleFileClear('idDocuments' , 'aadhar')} className='flex cursor-pointer flex-col'>
-                                <InputLabel className="text-gray-700">Aadhar Card</InputLabel>
+                                <InputLabel className="text-gray-700">Aadhar or pan</InputLabel>
                                 <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                     <label  className="w-full h-full flex flex-col items-center justify-center">
                                         <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>

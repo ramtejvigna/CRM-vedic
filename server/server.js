@@ -26,7 +26,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/employees',EmployeeRouter);
 app.use('/api',taskRoutes)
 app.use('/api/', authRoutes);
-app.use('/api/employees', employeeRoutes);
+// app.use('/api/employees', employeeRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/api/notifications', notificationRoutes);

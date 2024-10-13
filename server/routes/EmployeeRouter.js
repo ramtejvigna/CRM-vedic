@@ -33,4 +33,7 @@ router.put('/update-employee', uploads.fields([
     {name : "degrees" , maxCount : 1} , 
     {name : "transcripts" , maxCount : 1},
     {name : "aadharOrPan" , maxCount : 1} ,])  , updateEmployee);
+
+
+
 export default router;
