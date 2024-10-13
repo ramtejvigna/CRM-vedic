@@ -48,7 +48,7 @@ const ViewEmployee = () => {
                             <span className='text-3xl font-bold tracking-wide'>{employee?.name?.charAt(0).toUpperCase()}</span>
                         )}
                     </Avatar>
-                    <span className='text-3xl font-bold tracking-wide'>{employee.username || "xxxxxxx"}</span>
+                    <span className='text-3xl font-bold tracking-wide'>{employee?.firstName || "xxxxxxx"}</span>
                 </div>
                 <div className="flex gap-4">
                     <Button onClick={() => navigate(`/admin-dashboard/employees/edit-employee/${employee._id}`)} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
@@ -67,12 +67,12 @@ const ViewEmployee = () => {
                         {/* Username */}
                         <div className="flex flex-col gap-2">
                             <span className='text-sm font-semibold text-gray-600'>Username</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.username || 'N/A'}</span>
+                            <span className='text-lg font-medium text-gray-900'>{employee?.firstName || 'N/A'}</span>
                         </div>
                         {/* Name */}
                         <div className="flex flex-col gap-2">
                             <span className='text-sm font-semibold text-gray-600'>Name</span>
-                            <span className='text-lg font-medium text-gray-900'>{employee.name || 'N/A'}</span>
+                            <span className='text-lg font-medium text-gray-900'>{employee?.lastName || 'N/A'}</span>
                         </div>
                         {/* Email */}
                         <div className="flex flex-col gap-2">
@@ -153,54 +153,49 @@ const ViewEmployee = () => {
                 <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
                     <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Employee Details</h1>
 
-                    <div className='flex flex-col p-2'>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Aadhar Card</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.aadhar}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Pan Card</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.pan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Passport</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Degrees</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
-                        <div className="rounded-md border flex p-3 items-center justify-between">
-                            <span>Transcripts</span>
-                            <button onClick={() => setImage(`http://localhost:3000/${employee.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                View
-                            </button>
-                        </div>
+                <div className='flex flex-col p-2'>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span className=''>Aadhar card</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
                     </div>
-                </Box>
-                <Box className="flex-1 basis-[400px] item-center flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
-                    <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Financial Details</h1>
-                    <div className='flex items-center justify-center h-full'>
-                        <div className="w-[80%] basis-[350px] sm:basis-[500px] h-[90%] p-10 justify-center bg-black text-white rounded-lg shadow-xl relative">
-                            {/* Cardholder and Card Number */}
-                            <div className="flex flex-col gap-4">
-                                <div>
-                                    <span className="block text-sm font-light text-gray-300">Cardholder</span>
-                                    <span className="block text-lg font-semibold">{employee.cardholderName ? employee.cardholderName : "xxxxx"}</span>
-                                </div>
-                                <div>
-                                    <span className="block text-sm font-light text-gray-300">Card Number</span>
-                                    <span className="block text-xl font-semibold tracking-widest">{employee.cardNumber ? employee.cardNumber : "xxx xxx xxx"}</span>
-                                </div>
-                            </div>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span>passport</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
+                    </div>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span>degrees</span>
+                        <button onClick={() => setImage((prev) => prev = `http://localhost:3000/${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
+                    </div>
+                    <div className="rounded-md border flex p-3 items-center justify-between">
+                        <span>transcripts</span>
+                        <button onClick={() => setImage(`http://localhost:3000/${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                            view
+                        </button>
+                    </div>
+                </div>
+                
+            </Box>
+            <Box className="flex-1 basis-[400px] item-center flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
+                <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Financial details</h1>
+                <div className='flex items-center justify-center h-full'>
+                    <div className="w-[80%] basis-[350px] sm:basis-[500px] h-[90%] p-10 justify-center bg-black text-white rounded-lg  shadow-xl relative">
+                        {/* Cardholder and Card Number */}
+                        <div className="flex flex-col gap-4">
+                        <div>
+                            <span className="block text-sm font-light text-gray-300">Cardholder</span>
+                            <span className="block text-lg font-semibold">{employee?.cardholderName ? employee?.cardholderName  : "xxxxx"}</span>
+                        </div>
+                        <div>
+                            <span className="block text-sm font-light text-gray-300">Card Number</span>
+                            <span className="block text-xl font-semibold tracking-widest">{employee?.cardNumber ? employee?.cardNumber  : "xxx xxx xxx"} </span>
+                        </div>
+                        </div>
 
                             {/* CVV and Expiry Date */}
                             <div className="flex justify-between mt-8">

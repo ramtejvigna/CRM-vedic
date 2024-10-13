@@ -58,7 +58,8 @@ const TaskManagement = () => {
     setIsLoadingEmployees(true);
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
-      setEmployees(response.data.employees);
+      console.log(response.data)
+      setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
       enqueueSnackbar("Failed to fetch employees", { variant: "error" });

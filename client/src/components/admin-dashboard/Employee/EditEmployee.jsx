@@ -146,11 +146,9 @@ const EditEmployee = () => {
             if (!form.lastName) formErrors.lastName = 'lastname is required';
             if (!form.address) formErrors.address = 'Address is required';
             if (!form.city) formErrors.city = 'city is required';
-            if (!form.phone) formErrors.phone = 'Phone number is required';
-            if(isNaN(form.phone) ) formErrors.phone = "only digits are allowed"
-            if(form.phone.length !== 10) formErrors.phone = "Enter 10 digit phone number";
+            if(!(/^(?:7|8|9)\d{9}$/.test(form.phone))) formErrors.phone = "invalid number"
             if (!form.state) formErrors.state = 'State is required';
-            if (!form.pincode) formErrors.pincode = 'Pincode is required';
+            if (!(/^[1-9][0-9]{5}$/.test(form.pincode))) formErrors.pincode = 'invalid pincode';
             if (!form.country) formErrors.country = 'Country is required';
         }
 
@@ -279,6 +277,7 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.firstName}
                                 helperText={errors.firstName}
+
                             />
                             <TextField
                                 className="flex-1"

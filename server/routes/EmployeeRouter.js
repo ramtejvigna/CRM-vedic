@@ -1,6 +1,9 @@
 import { Router } from "express";
-import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
 import multer from "multer"
+import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
+const router = Router();
+
+
 const storage = multer.diskStorage({
     destination : (req , file , cb) => {
         cb(null , 'uploads/')
@@ -14,8 +17,6 @@ const storage = multer.diskStorage({
         cb(null, `${username}_${date}_${fieldName}${fileExtension}`);
     }
 })
-const router = Router();
-
 
 const uploads = multer({storage});
 
@@ -23,7 +24,7 @@ router.post('/add-employee' , uploads.fields([
     {name : "passport" , maxCount : 1} , 
     {name : "degrees" , maxCount : 1} , 
     {name : "transcripts" , maxCount : 1},
-    {name : "aadharOrPan" , maxCount : 1} ,]) , addEmployee);
+    {name : "aadharOrPan" , maxCount : 1} ]) , addEmployee);
 
 router.get('/get-employees' , getEmployees);
 router.get('/get-employee' , getEmployee);
