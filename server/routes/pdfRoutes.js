@@ -5,6 +5,7 @@ import * as pdfController from '../controllers/pdfController.js';
 
 const router = express.Router();
 
+router.get('/generatedpdf', pdfController.getPdfsByCustomerId);
 router.get('/names', pdfController.getBabyNames);
 router.post('/create-pdf', pdfController.createPdf);
 router.post('/send-pdf-email', pdfController.sendPdfEmail);
