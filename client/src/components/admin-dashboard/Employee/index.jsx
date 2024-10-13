@@ -129,6 +129,7 @@ export default function Employee() {
 
                                         {/* Status */}
                                         <TableCell>
+                                            {employee?.status ? 
                                             <span style={{
                                                 padding: '4px 8px',
                                                 borderRadius: '12px',
@@ -136,7 +137,16 @@ export default function Employee() {
                                                 backgroundColor: '#4caf50'
                                             }}>
                                                 {"Online"}
+                                            </span> :
+                                            <span style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                color: '#fff',
+                                                backgroundColor: 'black'
+                                            }}>
+                                                {"Offline"}
                                             </span>
+                                            }
                                         </TableCell>
 
                                         {/* Employed Phone */}
