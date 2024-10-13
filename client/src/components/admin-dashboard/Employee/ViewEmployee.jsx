@@ -48,7 +48,7 @@ const ViewEmployee = () => {
                             <span className='text-3xl font-bold tracking-wide'>{employee?.name?.charAt(0).toUpperCase()}</span>
                         )}
                     </Avatar>
-                    <span className='text-3xl font-bold tracking-wide'>{employee.username || "xxxxxxx"}</span>
+                    <span className='text-3xl font-bold tracking-wide'>{employee?.firstName || "xxxxxxx"}</span>
                 </div>
                 <div className="flex gap-4">
                     <Button onClick={() => navigate(`/admin-dashboard/employees/edit-employee/${employee._id}`)} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">

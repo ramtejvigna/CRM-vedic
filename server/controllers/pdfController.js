@@ -231,3 +231,24 @@ export const sendPdfWhatsApp = async (req, res) => {
         });
     }
 };
+
+
+export const getPdfsByCustomerId = async (req, res) => {
+  const { customerId } = req.query;
+  
+  if (!customerId) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+  }
+
+  try {
+      const pdfs = await PDF.find({ customer: customerId }).sort({ createdAt: -1 });
+      if (!pdfs) {
+          return res.status(404).json({ error: 'No PDFs found for this customer' });
+      }
+      
+      res.status(200).json(pdfs);
+  } catch (error) {
+      console.error('Error fetching PDFs:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+};

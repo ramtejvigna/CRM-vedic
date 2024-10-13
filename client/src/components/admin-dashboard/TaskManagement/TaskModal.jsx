@@ -225,7 +225,7 @@ const TaskModal = ({
                     required
                   >
                     <MenuItem value="">Select an employee</MenuItem>
-                    {employees.map((employee) => (
+                    {employees?.map((employee) => (
                       <MenuItem key={employee._id} value={employee._id}>
                         {employee.name}
                       </MenuItem>

@@ -1,364 +1,273 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 import {
-    Card,
-    CardContent,
-    Typography,
-    Button,
-    Box,
-    Divider,
-    CircularProgress,
-    Modal,
-    Grid
-} from '@mui/material';
-import { Edit, Delete, FileText, X } from 'lucide-react';
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
+import { Edit, Delete, FileText, TypeOutline } from "lucide-react";
 
 const Customer = () => {
-    const { fatherName } = useParams();
-    const [customerDetails, setCustomerDetails] = useState(null);
-    const [pdfs, setPdfs] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-    const [selectedPdf, setSelectedPdf] = useState(null);
+  const { fatherName } = useParams();
+  const [customerDetails, setCustomerDetails] = useState(null);
+  const [pdfs, setPdfs] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const getCustomerDetails = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/customers/getCustomerDetails/${fatherName}`);
-                setCustomerDetails(response.data);
-                setLoading(false);
-            } catch (err) {
-                setError(err.response ? err.response.data.message : 'Error fetching customer details');
-                setLoading(false);
-            }
-        };
-
-        const getCustomerPdfs = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/customers/getCustomerPdfs/${fatherName}`);
-                setPdfs(response.data);
-            } catch (err) {
-                console.error('Error fetching PDF data', err);
-            }
-        };
-
-        getCustomerDetails();
-        getCustomerPdfs();
-    }, [fatherName]);
-
-    const handleDelete = () => {
-        console.log("Delete customer");
-    };
-
-    const handleEdit = () => {
-        console.log("Edit customer");
-    };
-
-    const viewPdf = (pdf) => {
-        setSelectedPdf(pdf);
-        setIsPdfModalOpen(true);
-    };
-
-    const closePdfModal = () => {
-        setIsPdfModalOpen(false);
-        setSelectedPdf(null);
-    };
-
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-                <CircularProgress />
-            </Box>
+  useEffect(() => {
+    const getCustomerDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/customers/getCustomerDetails/${fatherName}`
         );
-    }
+        setCustomerDetails(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(
+          err.response
+            ? err.response.data.message
+            : "Error fetching customer details"
+        );
+        setLoading(false);
+      }
+    };
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+    const getCustomerPdfs = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/customers/getCustomerPdfs/${fatherName}`
+        );
+        setPdfs(response.data);
+      } catch (err) {
+        console.error("Error fetching PDF data", err);
+      }
+    };
 
-    if (!customerDetails) {
-        return <div>No customer details found.</div>;
-    }
+    getCustomerDetails();
+    getCustomerPdfs();
+  }, [fatherName]);
 
-    return (
-        <Box display="flex" flexDirection="column" padding={2} bgcolor="#f4f6f8">
-            {/* Profile Card */}
-            <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Box sx={{ width: '150%' }}>
-                <Card variant="outlined" sx={{ height: 'auto', borderRadius: 2, padding: 2 }}>
-    <CardContent>
-        {/* Header */}
-        <Typography variant="h6" component="div" gutterBottom sx={{ fontWeight: 'bold', color: "rgb(52, 71, 103)" }}>
-            Profile 
-        </Typography>
-        <Divider sx={{ margin: '10px 0' }} />
+  const handleDelete = () => {
+    console.log("Delete customer");
+  };
 
-        {/* 3x3 Grid Layout */}
-        <Grid container spacing={2}>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Father's Name:</strong> {customerDetails.fatherName || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Mother's Name:</strong> {customerDetails.motherName || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>WhatsApp Number:</strong> {customerDetails.whatsappNumber || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Email:</strong> {customerDetails.email || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Baby's Gender:</strong> {customerDetails.babyGender || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Baby's Birth Date:</strong> {customerDetails.babyBirthDate ? new Date(customerDetails.babyBirthDate).toLocaleDateString() : 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Baby's Birth Time:</strong> {customerDetails.babyBirthTime || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Birthplace:</strong> {customerDetails.birthplace || 'N/A'}
-                </Typography>
-            </Grid>
-            <Grid item xs={4}>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Preferred Starting Letter:</strong> {customerDetails.preferredStartingLetter || 'N/A'}
-                </Typography>
-            </Grid>
-        </Grid>
+  const handleEdit = () => {
+    console.log("Edit customer");
+  };
 
-        {/* Requested Date */}
-        <Box sx={{ mt: 3 }}>
-            <Typography variant="caption" sx={{ color: '#777' }}>
-                Requested on: {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : 'N/A'}
-            </Typography>
-        </Box>
-    </CardContent>
-</Card>
-
-
-
-
-                </Box>
-
-                {/* Generated PDFs Card */}
-                <Box sx={{ width: '45%', marginLeft: 2 }}>
-                <Card variant="outlined" sx={{ height: '280px', boxShadow: 1, borderRadius: 2 }}>
-    <CardContent sx={{ padding: 2 }}>
-        <Typography variant="h6" component="div" gutterBottom sx={{ fontWeight: 'bold', color: "rgb(52, 71, 103)" }}>
-            Assigned Employee
-        </Typography>
-        <Divider sx={{ margin: '10px 0' }} />
-        
-        {customerDetails.assignedEmployee ? (
-            <Box sx={{ lineHeight: 1.5, color: '#555' }}>
-                <Typography variant="h5z" component="span" sx={{ color: '#333', fontWeight: 'bold' }}>
-                    {customerDetails.assignedEmployee.name}
-                </Typography>
-                <Box sx={{ marginTop: 1 }}>
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Email:</strong> {customerDetails.assignedEmployee.email}<br />
-                    <strong style={{ color: "rgb(52, 71, 103)" }}>Contact:</strong> {customerDetails.assignedEmployee.phone}<br />
-                </Box>
-            </Box>
-        ) : (
-            <Typography variant="body2" sx={{ color: '#555' }}>
-                No employee assigned.
-            </Typography>
-        )}
-    </CardContent>
-</Card>
-
-                </Box>
-            </Box>
-
-            {/* Assigned Employee Card */}
-            <Box display="flex" justifyContent="flex-end" padding={3}>
-    <Box sx={{ width: "46%", marginRight: -3, marginTop: -3 }}>
-    <Card variant="outlined" sx={{ height: '350px', boxShadow: 1, borderRadius: 2 }}>
-  <CardContent>
-    <Box sx={{ marginTop: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Typography variant="h6" component="div" gutterBottom sx={{ fontWeight: 'bold', color: "rgb(52, 71, 103)" }}>
-        Generated PDFs
-      </Typography>
-    </Box>
-    <Divider sx={{ margin: '0px 0' }} />
-
-    {/* Table-like header */}
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, mb: 1, fontWeight: 'bold' }}>
-      <Typography variant="body2" sx={{ flex: 0.1, color: "rgb(52, 71, 103)", fontWeight: 'bold' }}>S.No</Typography>
-      <Typography variant="body2" sx={{ flex: 0.4, color: "rgb(52, 71, 103)", fontWeight: 'bold' }}>Generated Date</Typography>
-      <Typography variant="body2" sx={{ flex: 0.2, color: "rgb(52, 71, 103)", fontWeight: 'bold', textAlign: 'center' }}>Action</Typography>
-    </Box>
-
-    {/* Scrollable list */}
-    <Box sx={{ maxHeight: '250px', overflowY: 'auto' }}>
-      {pdfs.length > 0 ? (
-        pdfs.map((pdf, index) => (
-          <Box key={index} display="flex" justifyContent="space-between" alignItems="center" sx={{ margin: '10px 0' }}>
-            {/* Serial number */}
-            <Typography variant="body2" sx={{ flex: 0.1, color: "rgb(52, 71, 103)" }}>
-              {index + 1}
-            </Typography>
-
-            {/* Generated Time */}
-            <Typography variant="body2" sx={{ flex: 0.4, color: "rgb(52, 71, 103)" }}>
-              {new Date(pdf.createdAt).toLocaleDateString()}
-            </Typography>
-
-            {/* PDF button */}
-            <Box sx={{ flex: 0.2, textAlign: 'center' }}>
-              <Button
-                onClick={() => viewPdf(pdf)}
-                sx={{ color: "rgb(52, 71, 103)", display: 'flex', fontWeight: 'bold', alignItems: 'center' }}
-              >
-                <FileText size={16} style={{ marginRight: 4 }} /> PDF
-              </Button>
-            </Box>
-          </Box>
-        ))
-      ) : (
-        <Typography variant="body2" sx={{ color: "rgb(52, 71, 103)", textAlign: 'center', marginTop: 2 }}>
-          No PDFs Generated
-        </Typography>
-      )}
-    </Box>
-  </CardContent>
-</Card>
-
-    </Box>
-</Box>
-
-
-            {/* Astrological Details Card */}
-            <Box display="flex" padding={1}>
-                <Box sx={{ width: "55%", marginLeft: -1 ,marginTop: -48}}>
-                <Card variant="outlined" sx={{ boxShadow: 1, borderRadius: 2 ,height: '350px',}}>
-            <CardContent>
-                <Typography variant="h5" component="div" gutterBottom sx={{ fontWeight: 'bold', color: "rgb(52, 71, 103)", textAlign: 'left' }}>
-                    Astrological Details
-                </Typography>
-                <Divider sx={{ margin: '10px 0' }} />
-
-                <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} sx={{ marginTop: 2 }}>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Zodiac Sign:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        Leo
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Nakshatra:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        Ashwini
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Destiny Number:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        5
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Gemstone:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        Ruby
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Lucky Metal:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        Gold
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Numerology:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        3
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        <strong>Preferred Starting Letter:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#555' }}>
-                        A
-                    </Typography>
-                </Box>
-
-                <Divider sx={{ margin: '10px 0', marginTop: 3 }} />
-                <Typography variant="body2" sx={{ color: '#555', textAlign: 'center' }}>
-                    <strong>Suggested Baby Names:</strong> <span style={{ color: "rgb(52, 71, 103)" }}>Aryan, Aadhya</span>
-                </Typography>
-            </CardContent>
-        </Card>
-                </Box>
-            </Box>
-
-            {/* PDF Modal */}
-            <Modal
-                open={isPdfModalOpen}
-                onClose={closePdfModal}
-                aria-labelledby="pdf-modal"
-            >
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '50%',
-                    height: '80%',
-                    bgcolor: 'white',
-                    boxShadow: 24,
-                    p: 2,
-                    borderRadius: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}>
-                    <Button 
-                        onClick={closePdfModal} 
-                        sx={{ 
-                            alignSelf: 'flex-end', 
-                            minWidth: 'unset', 
-                            p: 0.5
-                        }}
-                    >
-                        <X size={24} />
-                    </Button>
-                    {selectedPdf && (
-                        <iframe
-                            src={`data:application/pdf;base64,${selectedPdf.base64Pdf}`}
-                            width="100%"
-                            height="100%"
-                            style={{ border: 'none' }}
-                            title="PDF Viewer"
-                        />
-                    )}
-                </Box>
-            </Modal>
-        </Box>
+  const viewPdf = (base64Pdf) => {
+    const pdfWindow = window.open();
+    pdfWindow.document.write(
+      `<iframe width='100%' height='100%' src='data:application/pdf;base64,${base64Pdf}'></iframe>`
     );
+  };
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!customerDetails) {
+    return <div>No customer details found.</div>;
+  }
+
+  return (
+    <div className="min-h-screen p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 gap-5 ">
+          {/* Profile Card */}
+          <div className="w-full  bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 relative overflow-hidden">
+            <div className="absolute inset-0  opacity-30 rounded-lg"></div>
+            <div className="relative z-10">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                  Profile
+                </h2>
+                <button
+                  onClick={() => setShowEditModal(true)}
+                  className="text-blue-500 hover:text-blue-700 transition duration-200"
+                >
+                  <Edit size={20} />
+                </button>
+              </div>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>Father's Name:</strong>{" "}
+                  {customerDetails.fatherName || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>Mother's Name:</strong>{" "}
+                  {customerDetails.motherName || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>Email:</strong> {customerDetails.email || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>WhatsApp Number:</strong>{" "}
+                  {customerDetails.whatsappNumber || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>Baby's Gender:</strong>{" "}
+                  {customerDetails.babyGender || "N/A"}
+                </p>
+                <hr className="my-2" />
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>payment date:</strong>{" "}
+                  {customerDetails?.paymentDate || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>payment time:</strong>{" "}
+                  {customerDetails.paymentTime || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>payment transaction id:</strong>{" "}
+                  {customerDetails?.payTransactionID || "N/A"}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 grid grid-cols-2 w-2/3">
+                  <strong>Amount paid:</strong>{" "}
+                  {customerDetails?.amountPaid || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Astrological Details Card */}
+          <div className="w-full  bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 relative overflow-hidden">
+            <div className="absolute inset-0  opacity-30 rounded-lg"></div>
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                Astrological Details
+              </h2>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Zodiac Sign:</strong> Leo
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Nakshatra:</strong> Ashwini
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Destiny Number:</strong> 5
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Gemstone:</strong> Ruby
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Lucky Metal:</strong> Gold
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Numerology:</strong> 3
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Preferred Starting Letter:</strong> A
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  <strong>Suggested Baby Names:</strong> Aryan, Aadhya
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Generated PDFs Card */}
+          <div className="w-full col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 relative overflow-hidden">
+            <div className="absolute inset-0  opacity-30 rounded-lg"></div>
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                Generated PDFs
+              </h2>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                {pdfs.length > 0 ? (
+                  <table className="min-w-full border-collapse border border-gray-200 dark:border-gray-700">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-gray-700 ">
+                        <th className="border  border-gray-200 dark:border-gray-700 p-2 text-center">
+                          S.No
+                        </th>
+                        <th className="border  border-gray-200 dark:border-gray-700 p-2 text-center">
+                          pdf
+                        </th>
+                        <th className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                          Generated Time/Date
+                        </th>
+                        <th className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                          Actions
+                        </th>
+                        <th className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                          Rating
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pdfs.map((pdf, index) => (
+                        <tr
+                          key={pdf.uniqueId}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-200"
+                        >
+                          <td className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                            {"pdf1"}
+                          </td>
+                          <td className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                            <span>{"12/12/2023 3:00 PM"}</span>
+                          </td>
+                          <td className="border border-gray-200 dark:border-gray-700 p-2 text-center">
+                            <button className=" text-blue-700 rounded-lg px-4 py-1 transition duration-200">
+                              {" "}
+                              <FaDownload />{" "}
+                            </button>
+                            <button className=" text-green-700 rounded-lg px-4 py-1 transition duration-200">
+                              {" "}
+                              <FaWhatsapp />{" "}
+                            </button>
+                            <button className=" text-red-700 rounded-lg px-4 py-1 transition duration-200">
+                              {" "}
+                              <FaEnvelope />{" "}
+                            </button>
+                          </td>
+                          <td className="border justify-center flex gap-2 border-gray-200 dark:border-gray-700 p-2 text-center">
+                            <button className="flex items-center text-gray-700 rounded-lg px-4 py-1 bg-gray-200 hover:bg-gray-300 transition duration-200">
+                              <FaEye className="mr-2" /> {/* Eye icon */}
+                              view
+                            </button>
+                            <button className="flex items-center text-red-700 rounded-lg px-4 py-1 bg-red-200 hover:bg-red-300 transition duration-200">
+                              <FaStar className="mr-2" /> {/* Star icon */}
+                              edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="text-gray-600 dark:text-gray-300">
+                    No PDFs generated yet.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Customer;
