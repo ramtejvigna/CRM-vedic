@@ -19,7 +19,7 @@ const customerSchema = new mongoose.Schema({
     paymentDate: { type: Date },
     paymentTime: { type: String },
     payTransactionID: { type: String },
-    pdfGenerated: { type: Number, default: 0 },  // Storing the count of PDFs generated
+    pdfGenerated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PDF' }],
     amountPaid: { type: String },
     feedback: { type: String },
     offer: { type: String },

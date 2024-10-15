@@ -2,9 +2,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
 import admin from 'firebase-admin';
-import {PDF , babyNames} from '../models/PDF.js'; 
+import { Customer } from '../models/User.js';
+import { PDF, babyNames } from '../models/PDF.js';
 import dotenv from 'dotenv';
-import { PDFDocument,rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -41,15 +42,15 @@ const uploadPdfToFirebase = async (base64Pdf, uniqueId, bucket) => {
 
 export const getBabyNames = async (req, res) => {
     try {
-      const names = await babyNames.find({});
-      res.json(names);
+        const names = await babyNames.find({});
+        res.json(names);
     } catch (error) {
-      console.error('Error fetching names:', error);
-      res.status(500).send('Error fetching names');
+        console.error('Error fetching names:', error);
+        res.status(500).send('Error fetching names');
     }
-  };
+};
 
-  let boldFont, normalFont;
+let boldFont, normalFont;
 
 const loadFonts = async (pdfDoc) => {
     if (!boldFont || !normalFont) {
@@ -185,6 +186,54 @@ export const createPdf = async (req, res) => {
     }
 };
 
+export const sendDetails = async (req, res) => {
+    const { names, customerId } = req.body;
+
+    if (!names || names.length === 0) {
+        return res.status(400).json({ error: 'No baby names selected' });
+    }
+
+    try {
+        // Fetch the selected baby names from the database using the provided names
+        const selectedNames = await babyNames.find({ name: { $in: names } });
+
+        console.log("Selected names from DB:", selectedNames);
+
+        if (!selectedNames || selectedNames.length === 0) {
+            return res.status(404).json({ error: 'Baby names not found' });
+        }
+
+        // Extract the IDs of the selected baby names
+        const selectedNamesIds = selectedNames.map(name => name._id);
+
+        // Save the baby names' IDs and other PDF metadata in the PDF collection
+        const newPdf = new PDF({
+            babyNames: selectedNamesIds,  // Store baby names' IDs
+        });
+
+        const savedPdf = await newPdf.save();
+
+        console.log("PDF saved:", savedPdf);
+
+        // Store the PDF document ID in the customer's record
+        await Customer.findByIdAndUpdate(customerId, {
+            $push: { pdfGenerated: savedPdf._id }  // Add the PDF document's ID to the customer record
+        });
+
+        console.log("PDF ID added to customer record");
+
+        // Send a response indicating success and the stored PDF metadata
+        res.status(200).json({
+            message: 'PDF details saved successfully',
+            pdfId: savedPdf._id,
+            customerId: customerId,
+        });
+    } catch (err) {
+        console.error('Error generating PDF:', err);
+        res.status(500).json({ error: 'Failed to generate PDF' });
+    }
+}
+
 export const getPdfsByCustomerId = async (req, res) => {
     const { customerId } = req.query;
 
@@ -193,32 +242,31 @@ export const getPdfsByCustomerId = async (req, res) => {
     }
 
     try {
-        const pdfs = await PDF.find({ customer: customerId }).sort({ createdAt: -1 });
+        const customer = await Customer.findById(customerId).populate({
+            path: 'pdfGenerated',
+            populate: {
+                path: 'babyNames',
+                model: 'babyNames'
+            }
+        });
+
+        if (!customer) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        const pdfs = customer.pdfGenerated;
 
         if (!pdfs || pdfs.length === 0) {
             return res.status(404).json({ error: 'No PDFs found for this customer' });
         }
 
-        // Decompress each PDF before sending
-        const decompressedPdfs = await Promise.all(
-            pdfs.map(async (pdf) => {
-                return new Promise((resolve, reject) => {
-                    zlib.gunzip(Buffer.from(pdf.base64Pdf, 'base64'), (err, decompressedPdf) => {
-                        if (err) return reject(err);
-                        resolve({ ...pdf.toObject(), base64Pdf: decompressedPdf.toString('base64') });
-                    });
-                });
-            })
-        );
-
-        // Send the decompressed PDFs
-        res.status(200).json(decompressedPdfs);
+        res.status(200).json(pdfs);
     } catch (error) {
         console.error('Error fetching PDFs:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-  
+
 
 export const sendPdfEmail = async (req, res) => {
     const { email, base64Pdf, uniqueId } = req.body;
@@ -250,7 +298,7 @@ export const sendPdfWhatsApp = async (req, res) => {
 
     try {
         const pdfUrl = await uploadPdfToFirebase(base64Pdf, uniqueId, bucket);
-        
+
         await twilioClient.messages.create({
             from: 'whatsapp:+14155238886',
             to: `whatsapp:+${phoneNumber}`,
