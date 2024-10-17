@@ -50,142 +50,6 @@ export const getBabyNames = async (req, res) => {
     }
 };
 
-let boldFont, normalFont;
-
-const loadFonts = async (pdfDoc) => {
-    if (!boldFont || !normalFont) {
-        boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        normalFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    }
-}
-
-export const createPdf = async (req, res) => {
-    const { names, customerId } = req.body;
-    const uniqueId = uuidv4();
-
-    try {
-        // Load PDF template
-        const pdfPath = path.join(__dirname, '../assets/Template.pdf');
-        const existingPdfBytes = fs.readFileSync(pdfPath);
-
-        const pdfDoc = await PDFDocument.load(existingPdfBytes);
-        await loadFonts(pdfDoc); // Assuming you have this function
-        const pages = pdfDoc.getPages();
-        const firstPage = pages[0];
-        let secondPage = pages[1];
-        const thirdPage = pages[2];
-
-        // Static data
-        const staticData = {
-            gender: 'Girl',
-            zodiacSign: 'Cancer',
-            nakshatra: 'Punarvasu',
-            gemstone: 'Pearl',
-            destinyNumber: 6,
-            luckyColour: 'White',
-            birthDate: '02/08/2024',
-            birthTime: '10:05 PM',
-            numerology: 2,
-            luckyDay: 'Sunday',
-            luckyGod: 'Shiva',
-            luckyMetal: 'Silver',
-        };
-
-        const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        const fontSize = 25;
-        const lineSpacing = 40;
-        const lineSpacing1 = 52;
-        let textYPosition = 620;
-
-        // Draw static data on the first page
-        firstPage.drawText(staticData.gender, { x: 320, y: textYPosition, size: fontSize, font }); // Gender
-        textYPosition -= lineSpacing;  // Move down for the next value
-
-        firstPage.drawText(staticData.birthDate, { x: 320, y: textYPosition, size: fontSize, font }); // Birth Date
-        textYPosition -= lineSpacing;
-
-        firstPage.drawText(staticData.birthTime, { x: 320, y: textYPosition, size: fontSize, font }); // Birth Time
-        textYPosition -= lineSpacing;
-
-        firstPage.drawText(staticData.zodiacSign, { x: 320, y: textYPosition, size: fontSize, font }); // Zodiac Sign
-        textYPosition -= lineSpacing;
-
-        firstPage.drawText(staticData.nakshatra, { x: 320, y: textYPosition, size: fontSize, font }); // Nakshatra
-        textYPosition -= lineSpacing;
-
-        firstPage.drawText(staticData.destinyNumber.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Destiny Number
-        textYPosition -= lineSpacing;
-
-        firstPage.drawText(staticData.luckyDay, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Day
-        textYPosition -= lineSpacing1;
-
-        firstPage.drawText(staticData.gemstone, { x: 320, y: textYPosition, size: fontSize, font }); // Gemstone
-        textYPosition -= lineSpacing1;
-
-        firstPage.drawText(staticData.luckyGod, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky God
-        textYPosition -= lineSpacing1;
-
-        firstPage.drawText(staticData.luckyMetal, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Metal
-        textYPosition -= lineSpacing1;
-
-        firstPage.drawText(staticData.luckyColour, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Colour
-        textYPosition -= lineSpacing1;
-
-        firstPage.drawText(staticData.numerology.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Numerology
-
-        // Draw names on the second and third pages
-        let yPosition = 600;
-        names.forEach(({ name, meaning }, index) => {
-            if (yPosition < 100 && index < names.length - 1) {
-                secondPage = thirdPage;
-                yPosition = 600;
-            }
-            secondPage.drawText(`Name: ${name}`, { x: 50, y: yPosition, size: 25, font });
-            yPosition -= 60;
-            secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition, size: 25, font });
-            yPosition -= 80;
-        });
-
-        // Save the modified PDF
-        const pdfBytes = await pdfDoc.save();
-
-        // Compress the PDF using zlib
-        zlib.gzip(pdfBytes, async (err, compressedPdf) => {
-            if (err) {
-                console.error('Error compressing PDF:', err);
-                return res.status(500).json({ error: 'Failed to compress PDF' });
-            }
-
-            // Convert compressed PDF to Base64
-            const base64Pdf = compressedPdf.toString('base64');
-
-            // Save the compressed PDF to MongoDB
-            const newPdf = new PDF({ uniqueId, customer: customerId, base64Pdf });
-            const savedPdf = await newPdf.save();
-
-            // Decompress the PDF after saving
-            zlib.gunzip(Buffer.from(savedPdf.base64Pdf, 'base64'), (decompressErr, decompressedPdf) => {
-                if (decompressErr) {
-                    console.error('Error decompressing PDF:', decompressErr);
-                    return res.status(500).json({ error: 'Failed to decompress PDF' });
-                }
-
-                // Convert decompressed PDF to Base64 for response
-                const decompressedBase64Pdf = decompressedPdf.toString('base64');
-
-                // Respond with the decompressed PDF
-                res.status(200).json({
-                    ...savedPdf.toObject(),
-                    base64Pdf: decompressedBase64Pdf, // Send the decompressed PDF
-                });
-            });
-        });
-    } catch (err) {
-        console.error('Error generating PDF:', err);
-        res.status(500).json({ error: 'Failed to generate PDF' });
-    }
-};
-
 export const sendDetails = async (req, res) => {
     const { names, customerId } = req.body;
 
@@ -247,7 +111,8 @@ export const getPdfsByCustomerId = async (req, res) => {
             populate: {
                 path: 'babyNames',
                 model: 'babyNames'
-            }
+            },
+            options: { sort: { createdAt: -1 } }
         });
 
         if (!customer) {
