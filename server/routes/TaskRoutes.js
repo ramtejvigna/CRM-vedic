@@ -26,7 +26,7 @@ router.get('/tasks', getTasks);
 router.post('/tasks', createTask);
 router.put('/tasks/:id', updateTask);
 router.delete('/tasks/:id', deleteTask);
-router.post('/tasks/:id/comment', addComment);
+router.post('/employee/tasks/:id/comments',auth , addComment);
 
 // Employee routes
 router.get('/employee/tasks', auth, getEmployeeTasks);

@@ -4,12 +4,20 @@ import Notification from '../models/Notification.js';
 import mongoose from 'mongoose';
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find().populate('assignedTo', 'name');
-    res.json(tasks);
+    const { page = 1, limit = 5 } = req.query;
+    console.log(page)
+    const tasks = await Task.find()
+      .populate('assignedTo', 'name')
+      .sort({ startTime: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalTasks = await Task.countDocuments();
+    console.log(tasks)
+    res.json({ tasks, totalPages: Math.ceil(totalTasks / limit) });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
+}
 
 export const createTask = async (req, res) => {
   const { title, description, assignedTo, endTime } = req.body;
@@ -93,21 +101,27 @@ export const deleteTask = async (req, res) => {
   }
 };
 
-
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text, createdBy } = req.body;
-    console.log('in add comment')
+    const { text } = req.body.newComment;
+    console.log('in add comment');
+    console.log(req.body);
+    console.log(req.user);
+
+    // Find the employee by id
+    const employee = await Employee.findById(req.user);
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+
+    const createdBy = employee.firstName
+    console.log(createdBy)
     // Find the task by id
     const task = await Task.findById(id);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
-    }
-
-    // Validate if createdBy is a valid ObjectId
-    if (!createdBy) {
-      return res.status(400).json({ message: 'Invalid user ID' });
     }
 
     // Push the new comment

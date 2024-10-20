@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer"
 import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
+import { applyLeave, getLeaveHistory, getPendingLeaves } from "../controllers/LeaveController.js";
 const router = Router();
 
 
@@ -35,6 +36,8 @@ router.put('/update-employee', uploads.fields([
     {name : "transcripts" , maxCount : 1},
     {name : "aadharOrPan" , maxCount : 1} ,])  , updateEmployee);
 
-
+router.post('/apply',applyLeave)
+router.get('/leaves/pending',getPendingLeaves)
+router.get('/leaves/history',getLeaveHistory)
 
 export default router;

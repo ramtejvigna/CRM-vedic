@@ -16,7 +16,7 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { X } from "lucide-react";
+import { X, Send } from "lucide-react";
 
 const TaskModal = ({
   isModalOpen,
@@ -257,6 +257,7 @@ const TaskModal = ({
                       color: "#fff",
                     }}
                   >
+                    <Send size={20} className="mr-2" />
                     {selectedTask ? "Update Task" : "Create Task"}
                   </Button>
                 </div>
