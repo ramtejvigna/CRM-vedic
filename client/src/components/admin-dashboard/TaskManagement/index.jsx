@@ -24,6 +24,8 @@ const TaskManagement = () => {
   const [newComment, setNewComment] = useState("");
   const [isLoadingTasks, setIsLoadingTasks] = useState(true);
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
@@ -55,18 +57,24 @@ const TaskManagement = () => {
     } catch (error) {
       console.error("Error fetching tasks:", error);
       enqueueSnackbar("Failed to fetch tasks", { variant: "error" });
+      enqueueSnackbar("Failed to fetch tasks", { variant: "error" });
     } finally {
+      setIsLoadingTasks(false);
       setIsLoadingTasks(false);
     }
   };
 
   const fetchEmployees = async () => {
     setIsLoadingEmployees(true);
+    setIsLoadingEmployees(true);
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
+      enqueueSnackbar("Failed to fetch employees", { variant: "error" });
+    } finally {
+      setIsLoadingEmployees(false);
       enqueueSnackbar("Failed to fetch employees", { variant: "error" });
     } finally {
       setIsLoadingEmployees(false);
@@ -126,8 +134,10 @@ const TaskManagement = () => {
           newTask
         );
         enqueueSnackbar("Task updated successfully", { variant: "success" });
+        enqueueSnackbar("Task updated successfully", { variant: "success" });
       } else {
         await axios.post("http://localhost:3000/api/tasks", newTask);
+        enqueueSnackbar("Task created successfully", { variant: "success" });
         enqueueSnackbar("Task created successfully", { variant: "success" });
       }
       fetchTasks(currentPage);
@@ -213,7 +223,9 @@ const TaskManagement = () => {
           Assign New Task
         </motion.button>
         {isLoadingTasks || isLoadingEmployees ? (
+        {isLoadingTasks || isLoadingEmployees ? (
           <div className="flex justify-center items-center h-64">
+            <CircularProgress size={64} />
             <CircularProgress size={64} />
           </div>
         ) : (
@@ -232,6 +244,17 @@ const TaskManagement = () => {
             isDarkMode={isDarkMode}
           />
         )}
+        <TaskModal
+          isModalOpen={isModalOpen}
+          handleCloseModal={handleCloseModal}
+          selectedTask={selectedTask}
+          newTask={newTask}
+          handleInputChange={handleInputChange}
+          handleDateChange={handleDateChange}
+          handleSubmit={handleSubmit}
+          employees={employees}
+          isDarkMode={isDarkMode}
+        />
         <TaskModal
           isModalOpen={isModalOpen}
           handleCloseModal={handleCloseModal}

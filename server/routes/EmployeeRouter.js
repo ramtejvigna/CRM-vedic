@@ -17,6 +17,7 @@ const storage = multer.diskStorage({
 
         cb(null, `${username}_${date}_${fieldName}${fileExtension}`);
     }
+    
 })
 
 const uploads = multer({storage});
