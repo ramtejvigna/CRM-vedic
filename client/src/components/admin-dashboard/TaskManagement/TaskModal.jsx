@@ -218,7 +218,7 @@ const TaskModal = ({
                     {employees.length > 0 ? (
                       employees.map((employee) => (
                         <MenuItem key={employee._id} value={employee._id}>
-                          {employee.name}
+                          {employee.firstName}
                         </MenuItem>
                       ))
                     ) : (

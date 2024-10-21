@@ -7,7 +7,7 @@ export const getTasks = async (req, res) => {
     const { page = 1, limit = 5 } = req.query;
     console.log(page)
     const tasks = await Task.find()
-      .populate('assignedTo', 'name')
+      .populate('assignedTo', 'firstName')
       .sort({ startTime: -1 })
       .skip((page - 1) * limit)
       .limit(limit);

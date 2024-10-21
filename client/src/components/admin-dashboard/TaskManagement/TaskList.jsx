@@ -17,6 +17,7 @@ const TaskList = ({
   fetchTasks,
   isDarkMode,
 }) => {
+  console.log(tasks)
   const indexOfLastRecord = currentPage * tasksPerPage;
   const indexOfFirstRecord = indexOfLastRecord - tasksPerPage;
   const renderPaginationButtons = () => {
@@ -107,7 +108,7 @@ const TaskList = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500 dark:text-gray-300">
-                        {task.assignedTo.name}
+                        {task.assignedTo?.firstName}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
