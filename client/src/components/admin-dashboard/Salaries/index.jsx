@@ -131,9 +131,7 @@ function Salaries() {
     if (!formData.totalAllowance || formData.totalAllowance <= 0) formErrors.totalAllowance = "Total allowance required";
     if (!formData.totalDeduction || formData.totalDeduction < 0) formErrors.totalDeduction = "Total deduction required";
     if (!formData.year || formData.year === "select year") formErrors.year = "Please select year";
-    if (!formData.month || formData.month === "select month") formErrors.month = "Please select month";
-    if(!formData.bankStatement) formErrors.bankStatement = "upload file"
-  
+    if (!formData.month || formData.month === "select month") formErrors.month = "Please select month";  
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
@@ -346,8 +344,8 @@ function Salaries() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             {statement?.bankStatement ? (
                               <span className="text-sm px-2 py-1 bg-green-500 font-semibold tracking-wider   text-white rounded-md shadow-sm">{"PAID"}</span>
-                            ) : (
-                              <span className="text-sm">{}</span>
+                              ) : (
+                                <span className="text-sm px-2 py-1 bg-red-500 font-semibold tracking-wider   text-white rounded-md shadow-sm">{"PENDING"}</span>
                             )}
                           </td>
 
