@@ -26,6 +26,8 @@ function Salaries() {
   const [employees , setEmployees] = useState([]);
   const [filteringYear , setFilteringYear] = useState("")
   const [filteringMonth , setFilteringMonth] = useState("")
+  const [currentPage , setCurrentPage ] = useState(1)
+  const recordsPerPage = 5
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -226,6 +228,33 @@ function Salaries() {
 
   }
 
+
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = employees.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(employees.length / recordsPerPage);
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`relative inline-flex items-center px-4 py-2 border ${
+            isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+          } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+            currentPage === i ? "bg-blue-500 text-white" : ""
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return buttons;
+  };
+
+
   const handleClear = () => {
     setFormData({
       ...formData ,
@@ -379,6 +408,62 @@ function Salaries() {
                 </table>
               </div>
       </div>
+
+      <div
+              className={`px-4 py-3 flex items-center justify-between border-t ${
+                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+              } sm:px-6`}
+            >
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing {indexOfFirstRecord + 1} to {indexOfLastRecord} of {employees.length} results
+                  </p>
+                </div>
+                <div>
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${
+                        isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                      } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+                    >
+                      Previous
+                    </button>
+                    {renderPaginationButtons()}
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
+                        isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                      } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
 
       {showForm && (
         <div className='fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black/40 backdrop-blur-sm '>
