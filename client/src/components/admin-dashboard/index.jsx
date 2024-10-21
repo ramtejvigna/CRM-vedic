@@ -9,6 +9,7 @@ import TaskManagement from "./TaskManagement";
 import EditEmployee from "./Employee/EditEmployee";
 import Customer from "./Customer/Customer"; // Default import
 import ViewEmployee from "./Employee/ViewEmployee";
+import BabyDatabase from "./BabyDatabase";
 
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();

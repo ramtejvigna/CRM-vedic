@@ -14,6 +14,7 @@ import { EmployeeTable } from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
 
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
+import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
 const Component = ({ name }) => {
   return (
     <>
@@ -53,9 +54,9 @@ export const routes = [
   },
   {
     name: "baby database",
-    path: "baby",
+    path: "babyDatabase",
     icon: <BiSolidBabyCarriage {...icon} />,
-    element: <Home />,
+    element: <BabyDatabase />,
   },
   {
     name: "work day calculation",
