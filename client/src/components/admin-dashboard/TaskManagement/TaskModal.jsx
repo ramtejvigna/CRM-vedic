@@ -16,7 +16,7 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { X } from "lucide-react";
+import { X, Send } from "lucide-react";
 
 const TaskModal = ({
   isModalOpen,
@@ -26,7 +26,7 @@ const TaskModal = ({
   handleInputChange,
   handleDateChange,
   handleSubmit,
-  employees,
+  employees = [],
   isDarkMode,
   newComment,
   setNewComment,
@@ -53,8 +53,8 @@ const TaskModal = ({
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: { xs: "90%", sm: "60%", md: "40%" },
-            bgcolor: isDarkMode ? "#1E293B" : "#fff", // Dark slate blue for background
-            color: isDarkMode ? "#E5E7EB" : "#000", // Light gray text color for visibility
+            bgcolor: isDarkMode ? "#1E293B" : "#fff",
+            color: isDarkMode ? "#E5E7EB" : "#000",
             borderRadius: "10px",
             boxShadow: 24,
             p: 4,
@@ -82,31 +82,25 @@ const TaskModal = ({
               </Typography>
               <div className="space-y-4">
                 <div>
-                  <Typography variant="subtitle1">
-                    Description
-                  </Typography>
+                  <Typography variant="subtitle1">Description</Typography>
                   <Typography
                     variant="body2"
-                    sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }} // Muted color for less important text
+                    sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
                   >
                     {selectedTask.description}
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    Assigned To
-                  </Typography>
+                  <Typography variant="subtitle1">Assigned To</Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
                   >
-                    {selectedTask.assignedTo.name}
+                    {selectedTask.assignedTo?.name || "Not assigned"}
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    End Time
-                  </Typography>
+                  <Typography variant="subtitle1">End Time</Typography>
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
@@ -115,9 +109,7 @@ const TaskModal = ({
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    Status
-                  </Typography>
+                  <Typography variant="subtitle1">Status</Typography>
                   <Typography
                     variant="body2"
                     className={`font-semibold ${getStatusColor(selectedTask.status)}`}
@@ -126,18 +118,16 @@ const TaskModal = ({
                   </Typography>
                 </div>
                 <div>
-                  <Typography variant="subtitle1">
-                    Comments
-                  </Typography>
+                  <Typography variant="subtitle1">Comments</Typography>
                   <div className="max-h-40 overflow-y-auto space-y-2">
-                    {selectedTask.comments.map((comment, index) => (
+                    {(selectedTask.comments || []).map((comment, index) => (
                       <div
                         key={index}
                         className={`${isDarkMode ? 'bg-gray-800' : 'bg-slate-200'} p-2 rounded`}
                       >
                         <Typography
                           variant="body2"
-                          sx={{ color: isDarkMode ? "#D1D5DB" : "#4B5563" }} // Soft gray for comments
+                          sx={{ color: isDarkMode ? "#D1D5DB" : "#4B5563" }}
                         >
                           {comment.text}
                         </Typography>
@@ -166,7 +156,7 @@ const TaskModal = ({
                     <Button
                       type="submit"
                       variant="contained"
-                      sx={{ mt: 2, backgroundColor: "#6366F1", color: "#fff" }} // Vibrant color for the comment button
+                      sx={{ mt: 2, backgroundColor: "#6366F1", color: "#fff" }}
                       disabled={isAddingComment}
                     >
                       {isAddingComment ? <CircularProgress size={24} /> : "Add Comment"}
@@ -190,8 +180,8 @@ const TaskModal = ({
                   label="Task Title"
                   name="title"
                   sx={{
-                    backgroundColor: isDarkMode ? "#2D3748" : "#f7f7f7", // Darker background for input fields
-                    color: isDarkMode ? "#E5E7EB" : "#000", // Light gray text for dark mode
+                    backgroundColor: isDarkMode ? "#2D3748" : "#f7f7f7",
+                    color: isDarkMode ? "#E5E7EB" : "#000",
                   }}
                   value={newTask.title}
                   onChange={handleInputChange}
@@ -212,8 +202,8 @@ const TaskModal = ({
                   fullWidth
                   required
                 />
-                <FormControl fullWidth >
-                  <InputLabel sx={{ color: isDarkMode ? "#9CA3AF" : "#000"  }}>Assign To</InputLabel>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: isDarkMode ? "#9CA3AF" : "#000" }}>Assign To</InputLabel>
                   <Select
                     name="assignedTo"
                     sx={{
@@ -225,11 +215,15 @@ const TaskModal = ({
                     required
                   >
                     <MenuItem value="">Select an employee</MenuItem>
-                    {employees.map((employee) => (
-                      <MenuItem key={employee._id} value={employee._id}>
-                        {employee.name}
-                      </MenuItem>
-                    ))}
+                    {employees.length > 0 ? (
+                      employees.map((employee) => (
+                        <MenuItem key={employee._id} value={employee._id}>
+                          {employee.firstName}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled>No employees available</MenuItem>
+                    )}
                   </Select>
                 </FormControl>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -259,10 +253,11 @@ const TaskModal = ({
                     type="submit"
                     variant="contained"
                     sx={{
-                      backgroundColor: isDarkMode ? "#6366F1" : "#1976d2", // Use a vibrant accent color for buttons
+                      backgroundColor: isDarkMode ? "#6366F1" : "#1976d2",
                       color: "#fff",
                     }}
                   >
+                    <Send size={20} className="mr-2" />
                     {selectedTask ? "Update Task" : "Create Task"}
                   </Button>
                 </div>

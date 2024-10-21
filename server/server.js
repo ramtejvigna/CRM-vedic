@@ -10,6 +10,7 @@ import customerRoutes from './routes/customerRoutes.js';
 import pdfRoutes from './routes/pdfRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import {tokenExpirationMiddleware} from './middleware/auth.js';
+import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
 // import errorMiddleware from './middleware/errorMiddleware.js';
@@ -25,12 +26,14 @@ app.use('/uploads', express.static('uploads'));
 
 app.use(express.json());
 app.use(bodyParser.json());
+
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
+app.use('/admin',adminLeaveRoutes)
 // app.use('/api/notifications', notificationRoutes);
 // 
 const PORT = process.env.PORT || 3000;

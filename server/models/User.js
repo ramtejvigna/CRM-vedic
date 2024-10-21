@@ -29,7 +29,7 @@ const customerSchema = new mongoose.Schema({
 
 
 const employeeSchema = new mongoose.Schema({
-    username: { type: String, required: true },
+    // username: { type: String, required: true },
     firstName: { type: String },
     lastName: { type: String },
     phone: { type: String, required: true },
@@ -55,7 +55,8 @@ const employeeSchema = new mongoose.Schema({
     cvv : {type : String} ,
     expiryDate : {type : Date} ,
     isOnline :  {type : Boolean , default : false},
-    // others
+    leaveBalance: { type: Number, default: 15 },
+    lastLeaveReset: { type: Date, default: new Date() },    // others
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
     isAdmin: { type: Boolean, default: false }

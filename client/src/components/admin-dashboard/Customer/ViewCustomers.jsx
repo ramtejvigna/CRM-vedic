@@ -246,6 +246,8 @@ const CustomerDetails = () => {
             <ChevronRight size={20} className="ml-2" />
           </button>
         </div>
+
+        
       </div>
     </div>
   );

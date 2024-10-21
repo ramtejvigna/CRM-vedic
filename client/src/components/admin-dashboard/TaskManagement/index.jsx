@@ -1,26 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus } from "lucide-react";
+import { motion } from "framer-motion";
+import { Plus, Send } from "lucide-react";
 import { useStore } from "../../../store"; // Custom hook for dark mode
-import {
-  Modal,
-  Box,
-  Typography,
-  Button,
-  TextField,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  CircularProgress,
-  Backdrop,
-  Fade,
-} from "@mui/material";
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 import { SnackbarProvider, useSnackbar } from "notistack";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import TaskList from "./TaskList";
 import TaskModal from "./TaskModal";
 
@@ -38,11 +22,17 @@ const TaskManagement = () => {
     status: "Pending",
   });
   const [newComment, setNewComment] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
   const [isAddingComment, setIsAddingComment] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
   const { isDarkMode } = useStore();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const { enqueueSnackbar } = useSnackbar();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [tasksPerPage] = useState(5);
 
   useEffect(() => {
     fetchTasks();
@@ -56,25 +46,30 @@ const TaskManagement = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const fetchTasks = async () => {
-    setIsLoading(true);
+  const fetchTasks = async (page = 1) => {
+    setIsLoadingTasks(true);
     try {
-      const response = await axios.get("http://localhost:3000/api/tasks");
-      console.log(response.data);
-      setTasks(response.data);
+      const response = await axios.get(`http://localhost:3000/api/tasks?page=${page}&limit=${tasksPerPage}`);
+      setTasks(response.data.tasks);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      enqueueSnackbar("Failed to fetch tasks", { variant: "error" });
     } finally {
-      setIsLoading(false);
+      setIsLoadingTasks(false);
     }
   };
 
   const fetchEmployees = async () => {
+    setIsLoadingEmployees(true);
     try {
       const response = await axios.get("http://localhost:3000/api/employees");
-      setEmployees(response.data.employees);
+      setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
+      enqueueSnackbar("Failed to fetch employees", { variant: "error" });
+    } finally {
+      setIsLoadingEmployees(false);
     }
   };
 
@@ -130,22 +125,35 @@ const TaskManagement = () => {
           `http://localhost:3000/api/tasks/${selectedTask._id}`,
           newTask
         );
+        enqueueSnackbar("Task updated successfully", { variant: "success" });
       } else {
         await axios.post("http://localhost:3000/api/tasks", newTask);
+        enqueueSnackbar("Task created successfully", { variant: "success" });
       }
-      fetchTasks();
+      fetchTasks(currentPage);
       handleCloseModal();
     } catch (error) {
       console.error("Error saving task:", error);
+      enqueueSnackbar("Failed to save task", { variant: "error" });
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
+    setTaskToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/tasks/${id}`);
-      fetchTasks();
+      await axios.delete(`http://localhost:3000/api/tasks/${taskToDelete}`);
+      fetchTasks(currentPage);
+      enqueueSnackbar("Task deleted successfully", { variant: "success" });
     } catch (error) {
       console.error("Error deleting task:", error);
+      enqueueSnackbar("Failed to delete task", { variant: "error" });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setTaskToDelete(null);
     }
   };
 
@@ -204,9 +212,9 @@ const TaskManagement = () => {
           <Plus size={20} />
           Assign New Task
         </motion.button>
-        {isLoading ? (
+        {isLoadingTasks || isLoadingEmployees ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            <CircularProgress size={64} />
           </div>
         ) : (
           <TaskList
@@ -216,9 +224,14 @@ const TaskManagement = () => {
             handleOpenModal={handleOpenModal}
             handleDelete={handleDelete}
             getStatusColor={getStatusColor}
+            currentPage={currentPage}
+            tasksPerPage={tasksPerPage}
+            fetchTasks={fetchTasks}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            isDarkMode={isDarkMode}
           />
         )}
-
         <TaskModal
           isModalOpen={isModalOpen}
           handleCloseModal={handleCloseModal}
@@ -245,6 +258,28 @@ const TaskManagement = () => {
             isDetailModal={true}
           />
         )}
+
+        <Dialog
+          open={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Delete Task"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to delete this task?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsDeleteModalOpen(false)} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={confirmDelete} color="secondary" autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );

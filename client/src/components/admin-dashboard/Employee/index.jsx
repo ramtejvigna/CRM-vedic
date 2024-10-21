@@ -127,7 +127,7 @@ export const EmployeeTable = () => {
                         <Avatar />
                         <div style={{ marginLeft: 10 }}>
                           <Typography variant="body1" fontWeight="bold">
-                            {employee.name}
+                            {employee.firstName}
                           </Typography>
                           <Typography variant="body2" color="textSecondary">
                             {employee.email}

@@ -7,10 +7,10 @@ dotenv.config();
 export const login = async (req, res) => {
     try {
         // Find user by username
-        const { username, phone } = req.body;
+        const { email, phone } = req.body;
 
         // Find employee by username and phone
-        const employee = await Employee.findOne({ username, phone });
+        const employee = await Employee.findOne({ email, phone });
 
         if (!employee) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -25,7 +25,7 @@ export const login = async (req, res) => {
                 username: employee.username
             },
             process.env.JWT_SECRET,
-            { expiresIn: '8h' }
+            { expiresIn: '1d' }
         );
 
         // Return token in response

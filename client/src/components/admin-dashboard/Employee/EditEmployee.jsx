@@ -146,11 +146,9 @@ const EditEmployee = () => {
             if (!form.lastName) formErrors.lastName = 'lastname is required';
             if (!form.address) formErrors.address = 'Address is required';
             if (!form.city) formErrors.city = 'city is required';
-            if (!form.phone) formErrors.phone = 'Phone number is required';
-            if(isNaN(form.phone) ) formErrors.phone = "only digits are allowed"
-            if(form.phone.length !== 10) formErrors.phone = "Enter 10 digit phone number";
+            if(!(/^(?:7|8|9)\d{9}$/.test(form.phone))) formErrors.phone = "invalid number"
             if (!form.state) formErrors.state = 'State is required';
-            if (!form.pincode) formErrors.pincode = 'Pincode is required';
+            if (!(/^[1-9][0-9]{5}$/.test(form.pincode))) formErrors.pincode = 'invalid pincode';
             if (!form.country) formErrors.country = 'Country is required';
         }
 
@@ -211,6 +209,7 @@ const EditEmployee = () => {
         e.preventDefault();
         const formDataToSend = new FormData();
 
+        formDataToSend.append("id" , id);
         // personale info
         Object.keys(formData.personalInfo).forEach((key) => {
             formDataToSend.append(key , formData.personalInfo[key])
@@ -246,16 +245,16 @@ const EditEmployee = () => {
 
             if (!res.ok) {
                 throw new Error("NetWork issue");
-                navigate('/admin-dashboard/employees')
             }
-
+            
             const data = await res.json();
             setIsLoading(false);
-
+            
             toast.success("employee details updated");
             navigate('/admin-dashboard/employees')
         } catch (error) {
             toast.error(error.message);
+            navigate('/admin-dashboard/employees')
         }
 
     }
@@ -278,6 +277,7 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.firstName}
                                 helperText={errors.firstName}
+
                             />
                             <TextField
                                 className="flex-1"
@@ -389,7 +389,7 @@ const EditEmployee = () => {
                             </div>
                         ) : (
                             <div onClick={() => handleFileClear('idDocuments' , 'aadhar')} className='flex cursor-pointer flex-col'>
-                                <InputLabel className="text-gray-700">Aadhar Card</InputLabel>
+                                <InputLabel className="text-gray-700">Aadhar or pan</InputLabel>
                                 <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                     <label  className="w-full h-full flex flex-col items-center justify-center">
                                         <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>

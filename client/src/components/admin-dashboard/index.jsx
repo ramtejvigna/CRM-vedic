@@ -10,6 +10,7 @@ import EditEmployee from "./Employee/EditEmployee";
 import Customer from "./Customer/Customer"; // Default import
 import ViewEmployee from "./Employee/ViewEmployee";
 import BabyDatabase from "./BabyDatabase";
+import Leaves from "./Leaves";
 
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
@@ -38,6 +39,8 @@ const AdminDashboard = () => {
             <Route path="customers/:fatherName" element={<Customer />} /> {/* Ensure correct import */}
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
+            <Route path='/leaves' element={<Leaves />} />
+
             <Route path="/" element={<Navigate to="/home" />} />
           </Routes>
         </div>
