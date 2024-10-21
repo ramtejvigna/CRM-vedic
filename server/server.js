@@ -11,6 +11,7 @@ import pdfRoutes from './routes/pdfRoutes.js';
 import salaryRoutes from "./routes/SalariesRoutes.js"
 import authRoutes from './routes/authRoutes.js';
 import {tokenExpirationMiddleware} from './middleware/auth.js';
+import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
 // import errorMiddleware from './middleware/errorMiddleware.js';
@@ -35,6 +36,7 @@ app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
+app.use('/admin',adminLeaveRoutes)
 app.use('/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
 // 

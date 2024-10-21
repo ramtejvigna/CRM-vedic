@@ -1,7 +1,10 @@
-
-import { Router } from "express";
-import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
+import express from 'express';
 import multer from "multer"
+import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
+import { applyLeave, getLeaveHistory, getPendingLeaves, getLeaveBalance} from "../controllers/LeaveController.js";
+const router = express.Router();
+
+import { auth } from "../middleware/auth.js";
 const storage = multer.diskStorage({
     destination : (req , file , cb) => {
         cb(null , 'uploads/')
@@ -16,8 +19,6 @@ const storage = multer.diskStorage({
     }
     
 })
-const router = Router();
-
 
 const uploads = multer({storage});
 
@@ -36,6 +37,10 @@ router.put('/update-employee', uploads.fields([
     {name : "transcripts" , maxCount : 1},
     {name : "aadharOrPan" , maxCount : 1} ,])  , updateEmployee);
 
+router.post('/leaves/apply',auth,applyLeave)
+router.get('/leaves/pending',auth, getPendingLeaves)
+router.get('/leaves/history',auth , getLeaveHistory)
+router.get('/leave-balance',auth,getLeaveBalance)
 
 
 export default router;

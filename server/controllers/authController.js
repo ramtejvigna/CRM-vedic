@@ -7,17 +7,16 @@ dotenv.config();
 export const login = async (req, res) => {
     try {
         // Find user by username
-        const { username, phone } = req.body;
+        const { email, phone } = req.body;
 
         // Find employee by username and phone
-        const employee = await Employee.findOne({ username, phone });
+        const employee = await Employee.findOne({ email, phone });
 
         if (!employee) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // Update isOnline status
-        await Employee.findOneAndUpdate({ _id: employee._id }, { isOnline: true });
+        employee.isOnline = true ;
 
         // Generate JWT token with employee ObjectId and isAdmin flag
         const token = jwt.sign(

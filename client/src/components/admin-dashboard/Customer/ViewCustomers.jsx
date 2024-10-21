@@ -20,7 +20,6 @@ const CustomerDetails = () => {
   const [rowsPerPage] = useState(6);
   const [showFilters, setShowFilters] = useState(false);
   const [customers, setCustomers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -30,11 +29,9 @@ const CustomerDetails = () => {
 
   const fetchCustomers = async () => {
     try {
-      setIsLoading(true)
       const response = await axios.get(
         "http://localhost:3000/customers/getCustomers"
       );
-      setIsLoading(false)
       setCustomers(response.data);
     } catch (err) {
       console.error("Error fetching customers", err);
@@ -65,7 +62,7 @@ const CustomerDetails = () => {
       className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? " text-white" : " text-gray-900"
         }`}
     >
-      {/* <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="bg-blue-600 text-white p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Customer Details</h1>
           <div className="flex items-center space-x-4">
@@ -76,22 +73,6 @@ const CustomerDetails = () => {
               <Filter size={20} />
               <span>Filter</span>
             </button>
-          </div>
-        </div> */}
-
-        <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Customer Details</h1>
-          <div className="flex items-center space-x-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-300"
-            >
-               <Filter size={20} />
-               <span>Filter</span>
-            </motion.button>
           </div>
         </div>
 
@@ -143,10 +124,8 @@ const CustomerDetails = () => {
                       }`}
                   >
                     <option value="All">All</option>
-                    <option value="inProgress">In Progress</option>
+                    <option value="inProgress">Completed</option>
                     <option value="newRequests">New Requests</option>
-                    <option value="completed">Completed</option>
-
                     <option value="rejected">Rejected</option>
                   </select>
                 </div>
@@ -154,12 +133,7 @@ const CustomerDetails = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : (
-          <>
+
         <div
           className={`overflow-x-auto rounded-lg shadow ${isDarkMode ? "bg-gray-800" : "bg-white"
             }`}
@@ -214,19 +188,15 @@ const CustomerDetails = () => {
                         className={`
       px-2 py-1 rounded-full text-sm font-medium
       ${row.customerStatus === "newRequests"
-                            ? "text-blue-600"
+                            ? "text-yellow-600"
                             : ""
                           }
-                                ${row.customerStatus === "inProgress" ? "text-yellow-800" : ""}
-
-      ${row.customerStatus === "completed" ? "text-green-500" : ""}
+      ${row.customerStatus === "inProgress" ? "text-green-500" : ""}
       ${row.customerStatus === "rejected" ? "text-red-800" : ""}
     `}
                       >
                         {row.customerStatus === "newRequests" && "New Requests"}
-                        {row.customerStatus === "inProgress" && "In Progress"}
-                        {row.customerStatus === "completed" && "Completed"}
-
+                        {row.customerStatus === "inProgress" && "Completed"}
                         {row.customerStatus === "rejected" && "Rejected"}
                       </span>
                     </td>
@@ -276,12 +246,10 @@ const CustomerDetails = () => {
             <ChevronRight size={20} className="ml-2" />
           </button>
         </div>
-        </>
-        )
-      }
+
+        
       </div>
     </div>
-    
   );
 };
 

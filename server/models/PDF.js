@@ -1,9 +1,7 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const PdfSchema = new mongoose.Schema({
-    uniqueId: { type: String, unique: true },
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-    base64Pdf: String,
+    babyNames: [{ type: mongoose.Schema.Types.ObjectId, ref: 'babyNames' }],
     createdAt: { type: Date, default: Date.now },
 });
 
@@ -19,5 +17,4 @@ const NameSchema = new mongoose.Schema({
 }, { collection: 'babyNames' });  // Explicitly set the collection name
 
 export const babyNames = mongoose.model('babyNames', NameSchema);
-
 export const PDF = mongoose.model('PDF', PdfSchema);
