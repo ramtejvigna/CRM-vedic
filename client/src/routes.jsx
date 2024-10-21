@@ -7,13 +7,15 @@ import { BiSolidBabyCarriage, BiSolidCustomize } from "react-icons/bi";
 import { GiExpense } from "react-icons/gi";
 import { AiOutlineFileDone } from "react-icons/ai";
 import { TbMoneybag } from "react-icons/tb";
+import { GiThreeLeaves } from "react-icons/gi";
 
 // Components
 import Home from "./components/admin-dashboard/Home";
-import Employee from "./components/admin-dashboard/Employee";
+import { EmployeeTable } from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
 
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
+import Leaves from "./components/admin-dashboard/Leaves";
 const Component = ({ name }) => {
   return (
     <>
@@ -37,7 +39,7 @@ export const routes = [
     name: "employees",
     icon: <AiOutlineFileDone {...icon} />,
     path: "employees",
-    element: <Employee />,
+    element: <EmployeeTable />,
   },
   {
     name: "customers",
@@ -62,6 +64,12 @@ export const routes = [
     path: "work-day",
     icon: <FaNetworkWired {...icon} />,
     element: <Home />,
+  },
+  {
+    name: "leave management",
+    path: "leave",
+    icon: <GiThreeLeaves {...icon} />,
+    element: <Leaves />,
   },
   {
     name: "reports",

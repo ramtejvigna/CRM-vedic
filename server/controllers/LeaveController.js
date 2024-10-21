@@ -1,10 +1,11 @@
 import { Leave } from "../models/Leave.js";
+import { Employee } from "../models/User.js";
 
 export const applyLeave = async (req, res) => {
     try {
       const { startDate, endDate, leaveType, reason } = req.body;
       const leave = new Leave({
-        employee: req.user._id,
+        employee: req.user,
         startDate,
         endDate,
         leaveType,
@@ -13,6 +14,7 @@ export const applyLeave = async (req, res) => {
       await leave.save();
       res.status(201).json(leave);
     } catch (error) {
+      console.log(error.message)
       res.status(400).json({ message: error.message });
     }
   };
@@ -26,12 +28,18 @@ export const getPendingLeaves = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
-  
+  export const getLeaveBalance = async (req,res)=> {
+    const empId = req.user
+    const employee = await Employee.findById(empId)
+    const leaveBalance = employee.leaveBalance
+    res.json({leaveBalance})
+  }
 export const getLeaveHistory = async (req, res) => {
     try {
-      const leaveHistory = await Leave.find({ employee: req.user._id }).sort({ createdAt: -1 });
+      const leaveHistory = await Leave.find({ employee: req.user }).sort({ createdAt: -1 });
       res.json(leaveHistory);
     } catch (error) {
+      console.log(error.message)
       res.status(500).json({ message: error.message });
     }
   };

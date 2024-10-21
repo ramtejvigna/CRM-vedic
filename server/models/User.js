@@ -19,7 +19,7 @@ const customerSchema = new mongoose.Schema({
     paymentDate: { type: Date },
     paymentTime: { type: String },
     payTransactionID: { type: String },
-    pdfGenerated: { type: Number, default: 0 },  // Storing the count of PDFs generated
+    pdfGenerated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PDF' }],
     amountPaid: { type: String },
     feedback: { type: String },
     offer: { type: String },
@@ -29,8 +29,9 @@ const customerSchema = new mongoose.Schema({
 
 
 const employeeSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    // username: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
@@ -53,7 +54,9 @@ const employeeSchema = new mongoose.Schema({
     cardHolderName : {type : String } ,
     cvv : {type : String} ,
     expiryDate : {type : Date} ,
-    isOnline : {type : Boolean , default : false},
+    isOnline :  {type : Boolean , default : false},
+    leaveBalance: { type: Number, default: 15 },
+    lastLeaveReset: { type: Date, default: new Date() },    // others
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
     isAdmin: { type: Boolean, default: false }
