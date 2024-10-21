@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Avatar, Typography, Button } from "@mui/material";
 import { toast } from "react-toastify";
 import { AiOutlineUserAdd } from "react-icons/ai";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Edit, Trash, Eye } from "lucide-react";
 import { useStore } from "../../../store";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
 
-export const EmployeeTable = () => {
+const EmployeeTable = () => {
   const navigate = useNavigate();
-  const { isDarkMode } = useStore();
+  const { isDarkMode, toggleDarkMode } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,7 +17,7 @@ export const EmployeeTable = () => {
 
   useEffect(() => {
     fetchEmployees();
-  }, []); // Empty dependency ensures `fetchEmployees` runs only once on mount.
+  }, []);
 
   const fetchEmployees = async () => {
     try {
@@ -25,6 +25,7 @@ export const EmployeeTable = () => {
       const res = await fetch(GET_ALL_EMPLOYEES);
       if (!res.ok) throw new Error("Failed to fetch employees");
       const data = await res.json();
+      console.log(data.employees)
       setEmployees(data.employees);
     } catch (error) {
       toast.error("Error fetching employees!");
@@ -36,49 +37,36 @@ export const EmployeeTable = () => {
   const handleAddEmployee = () => navigate("add-employee");
   const handleEdit = (id) => navigate(`edit-employee/${id}`);
   const handleView = (id) => navigate(`view-employee/${id}`);
-  
-  // Pagination logic
+  const handleDelete = (id) => navigate(`delete-employee/${id}`);
+
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = employees.slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(employees.length / recordsPerPage);
 
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-  
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const handleChangeCPage = (page) => {
-    setCurrentPage(page);
-  };
+  const getStatusColor = (isOnline) =>
+    isOnline
+      ? `${isDarkMode ? "bg-green-800 text-green-100" : "bg-green-100 text-green-800"}`
+      : `${isDarkMode ? "bg-red-800 text-red-100" : "bg-red-100 text-red-800"}`;
 
   const renderPaginationButtons = () => {
-    const numbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-    return (
-      <>
-        <li onClick={handlePrev} className={`${currentPage === 1 ? "hidden" : "bg-blue-500 text-white"} link cursor-pointer p-2 text-base px-5 rounded-xl`}>
-          <a href="#">Prev</a>
-        </li>
-        <li className="flex-1 flex overflow-x-scroll scrollbar-hide gap-1">
-          {numbers.map((n) => (
-            <a
-              key={n}
-              onClick={() => handleChangeCPage(n)}
-              className={`${currentPage === n ? "bg-blue-500 text-white" : "border-blue-500 border text-blue-500"} text-sm rounded-full p-2 px-4`}
-              href="#"
-            >
-              {n}
-            </a>
-          ))}
-        </li>
-        <li onClick={handleNext} className={`${currentPage === totalPages ? "hidden" : "bg-blue-500 text-white"} link cursor-pointer p-2 text-base px-5 rounded-xl`}>
-          <a href="#">Next</a>
-        </li>
-      </>
-    );
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`relative inline-flex items-center px-4 py-2 border ${
+            isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+          } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+            currentPage === i ? "bg-blue-500 text-white" : ""
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return buttons;
   };
 
   return (
@@ -104,8 +92,8 @@ export const EmployeeTable = () => {
         </div>
 
         {isLoading ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : (
           <div
@@ -311,3 +299,5 @@ export const EmployeeTable = () => {
     </div>
   );
 };
+
+export default EmployeeTable;
