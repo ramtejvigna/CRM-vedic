@@ -63,13 +63,13 @@ const CustomerDetails = () => {
         }`}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="bg-blue-600 text-white p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Customer Details</h1>
+        <div className="  p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Customer Details</h1>
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors duration-300"
-            >
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-300"
+              >
               <Filter size={20} />
               <span>Filter</span>
             </button>

@@ -14,6 +14,8 @@ import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
 // import errorMiddleware from './middleware/errorMiddleware.js';
+import expensesRoutes from './routes/expensesRoutes.js';
+
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
@@ -35,6 +37,7 @@ app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
 // app.use('/api/notifications', notificationRoutes);
-// 
+app.use('/api/expenses', expensesRoutes);     // Expenses routes
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
