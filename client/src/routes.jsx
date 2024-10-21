@@ -12,7 +12,7 @@ import { TbMoneybag } from "react-icons/tb";
 import Home from "./components/admin-dashboard/Home";
 import Employee from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
-
+import Salaries from "./components/admin-dashboard/Salaries";
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
 const Component = ({ name }) => {
   return (
@@ -73,7 +73,7 @@ export const routes = [
     name: "salaries",
     path: "salaries",
     icon: <TbMoneybag {...icon} />,
-    element: <Home />,
+    element: <Salaries />,
   },
   {
     name: "expenses",

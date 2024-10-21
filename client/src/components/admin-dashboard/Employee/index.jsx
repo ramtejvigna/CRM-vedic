@@ -109,7 +109,7 @@ const EmployeeTable = () => {
                   }`}
                 >
                   <tr>
-                    {["Employee", "Status", "Phone", "Actions"].map(
+                    {["Employee", "phone" , "Status", "Actions"].map(
                       (header) => (
                         <th
                           key={header}
@@ -182,6 +182,13 @@ const EmployeeTable = () => {
                             </div>
                           </div>
                         </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            isDarkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
+                        >
+                          {employee.phone}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
@@ -191,13 +198,7 @@ const EmployeeTable = () => {
                             {employee.isOnline ? "Online" : "Offline"}
                           </span>
                         </td>
-                        <td
-                          className={`px-6 py-4 whitespace-nowrap text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-500"
-                          }`}
-                        >
-                          {employee.phone}
-                        </td>
+
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleEdit(employee._id)}
