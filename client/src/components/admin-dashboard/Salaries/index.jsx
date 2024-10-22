@@ -206,7 +206,7 @@ function Salaries() {
                         onClick={() => setShowFilters((prev) => !prev)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 rounded-lg bg-indigo-600 text-white transition duration-300"
+                        className="px-4 py-2 rounded-lg bg-blue-500 text-white transition duration-300"
                     >
                         <Filter className="h-5 w-5 inline-block mr-2" />
                         Filters
@@ -373,9 +373,7 @@ function Salaries() {
         </div>
 
         <div
-              className={`px-4 py-3 flex items-center justify-between border-t ${
-                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-              } sm:px-6`}
+              className={`px-4 py-3 flex items-center justify-between border-t sm:px-6`}
             >
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
