@@ -155,7 +155,7 @@ const BabyDatabase = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleFilters}
-                        className="px-4 py-2 rounded-lg bg-indigo-600 text-white transition duration-300"
+                        className="px-4 py-2 rounded-lg bg-blue-600 text-white transition duration-300"
                     >
                         <Filter className="h-5 w-5 inline-block mr-2" />
                         Filters

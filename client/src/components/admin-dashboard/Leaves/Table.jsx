@@ -2,8 +2,20 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, MessageCircle } from "lucide-react";
 import axios from "axios";
+import {
+  TablePagination,
+} from "@mui/material";
 
-const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
+const LeaveRequestTable = ({
+  leaves,
+  activeTab,
+  fetchLeaves,
+  page,
+  rowsPerPage,
+  handleChangePage,
+  handleChangeRowsPerPage,
+  totalLeaves,
+}) => {
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -46,20 +58,21 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
     setShowConfirmationModal(false);
     setConfirmationAction(null);
   };
+
   const getStatusColor = (status) => {
     switch (status) {
-      case "Accepted":
+      case "Approved":
         return "text-green-600";
       case "Rejected":
-        return  "text-red-600";
+        return "text-red-600";
       default:
-        return "text-yelllow-600";
+        return "text-yellow-600";
     }
   };
 
   return (
     <div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full h-full">
         <table className="w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-200 dark:bg-gray-700">
             <tr>
@@ -80,6 +93,9 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                 No. of Days
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Leave applied date
               </th>
               {activeTab === "pending" ? (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -125,6 +141,9 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
                       (1000 * 60 * 60 * 24) +
                       1}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {new Date(leave.createdAt).toLocaleDateString()}
+                  </td>
                   {activeTab === "pending" ? (
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
@@ -139,16 +158,10 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
                       >
                         <XCircle size={18} />
                       </button>
-                      {/* <button
-                        onClick={() => handleOpenDetailModal(leave)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200"
-                      >
-                        <MessageCircle size={18} />
-                      </button> */}
                     </td>
                   ) : (
                     <td
-                      className={` whitespace-nowrap text-sm font-medium ${getStatusColor(leave.status)}`}
+                      className={`whitespace-nowrap text-sm font-medium ${getStatusColor(leave.status)}`}
                     >
                       <div className="flex items-center">
                         {leave.status === "Approved" ? (
@@ -170,69 +183,73 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
         </table>
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold mb-4">Leave Details</h2>
-            <p>
-              <strong>Employee Name:</strong> {selectedLeave.employee.name}
-            </p>
-            <p>
-              <strong>Leave Type:</strong> {selectedLeave.leaveType}
-            </p>
-            <p>
-              <strong>From:</strong>{" "}
-              {new Date(selectedLeave.startDate).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>To:</strong>{" "}
-              {new Date(selectedLeave.endDate).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>No. of Days:</strong>{" "}
-              {(new Date(selectedLeave.endDate) -
-                new Date(selectedLeave.startDate)) /
-                (1000 * 60 * 60 * 24) +
-                1}
-            </p>
-            <p>
-              <strong>Reason:</strong> {selectedLeave.reason}
-            </p>
-            <button
-              onClick={handleCloseModal}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={totalLeaves}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
 
-      {showConfirmationModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold mb-4">Confirmation</h2>
-            <p>
-              Are you sure you want to {confirmationAction.toLowerCase()} this
-              leave request?
-            </p>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={handleConfirm}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mr-2"
-              >
-                Confirm
-              </button>
-              <button
-                onClick={handleCancelConfirmation}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+{showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Leave Details</h2>
+      <p>
+        <strong>Employee Name:</strong> {selectedLeave.employee.firstName}
+      </p>
+      <p>
+        <strong>Leave Type:</strong> {selectedLeave.leaveType}
+      </p>
+      <p>
+        <strong>From:</strong> {new Date(selectedLeave.startDate).toLocaleDateString()}
+      </p>
+      <p>
+        <strong>To:</strong> {new Date(selectedLeave.endDate).toLocaleDateString()}
+      </p>
+      <p>
+        <strong>No. of Days:</strong> {(new Date(selectedLeave.endDate) - new Date(selectedLeave.startDate)) / (1000 * 60 * 60 * 24) + 1}
+      </p>
+      <p>
+        <strong>Reason:</strong> {selectedLeave.reason}
+      </p>
+      <button
+        onClick={handleCloseModal}
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+{showConfirmationModal && (
+  <div className="fixed inset-0  z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Confirmation</h2>
+      <p>
+        Are you sure you want to {confirmationAction.toLowerCase()} this leave request?
+      </p>
+      <div className="flex justify-end mt-4">
+        <button
+          onClick={handleConfirm}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mr-2"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={handleCancelConfirmation}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

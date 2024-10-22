@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from "multer"
 import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
-import { applyLeave, getLeaveHistory, getPendingLeaves, getLeaveBalance} from "../controllers/LeaveController.js";
+import { applyLeave, getLeaveHistory, getPendingLeaves, getLeaveBalance,deleteLeave} from "../controllers/LeaveController.js";
 const router = express.Router();
 
 import { auth } from "../middleware/auth.js";
@@ -42,5 +42,6 @@ router.get('/leaves/pending',auth, getPendingLeaves)
 router.get('/leaves/history',auth , getLeaveHistory)
 router.get('/leave-balance',auth,getLeaveBalance)
 
+router.delete('/leaves/:id',deleteLeave );
 
 export default router;
