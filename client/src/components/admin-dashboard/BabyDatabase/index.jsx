@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from "axios"
-import { Search, Upload, User, Users, Filter } from 'lucide-react';
+import axios from "axios";
+import { Search, Upload, Edit, Save, Filter, Download } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import { CSVLink } from 'react-csv';
+import 'react-toastify/dist/ReactToastify.css';
 
 const BabyDatabase = () => {
     const [page, setPage] = useState(0);
@@ -10,21 +13,29 @@ const BabyDatabase = () => {
     const [genderFilter, setGenderFilter] = useState('all');
     const [startingLetterFilter, setStartingLetterFilter] = useState('');
     const [showFilters, setShowFilters] = useState(false);
-
     const [babyNames, setBabyNames] = useState([]);
+    const [editingName, setEditingName] = useState(null);
 
     const fetchBabyNames = async () => {
         try {
             const response = await axios.get("http://localhost:3000/api/names");
             setBabyNames(response.data);
-        }
-        catch (err) {
+        } catch (err) {
             console.error(err);
+            toast.error("Failed to fetch baby names", {
+                onClose: () => {}, // Empty callback to prevent undefined error
+                toastId: 'fetch-error' // Unique ID to prevent duplicate toasts
+            });
         }
-    }
+    };
 
     useEffect(() => {
         fetchBabyNames();
+        
+        // Cleanup function to dismiss all toasts when component unmounts
+        return () => {
+            toast.dismiss();
+        };
     }, []);
 
     const filteredNames = babyNames.filter(
@@ -63,8 +74,69 @@ const BabyDatabase = () => {
         setShowFilters(!showFilters);
     };
 
+    // Handle CSV upload
+    const handleCsvUpload = async (event) => {
+        const formData = new FormData();
+        formData.append('csv', event.target.files[0]);
+        try {
+            await axios.post("http://localhost:3000/uploadCsvNames", formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            fetchBabyNames();
+            toast.success("File uploaded successfully!", {
+                onClose: () => {}, // Empty callback to prevent undefined error
+                toastId: 'upload-success'
+            });
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to upload the file", {
+                onClose: () => {}, // Empty callback to prevent undefined error
+                toastId: 'upload-error'
+            });
+        }
+    };
+
+    // Handle editing
+    const startEdit = (baby) => {
+        setEditingName(baby);
+    };
+
+    const saveEdit = async () => {
+        try {
+            await axios.put(`http://localhost:3000/updateBabyName/${editingName._id}`, editingName);
+            setEditingName(null);
+            fetchBabyNames();
+            toast.success("Baby name updated successfully!", {
+                onClose: () => {}, // Empty callback to prevent undefined error
+                toastId: 'update-success'
+            });
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to update the baby name", {
+                onClose: () => {}, // Empty callback to prevent undefined error
+                toastId: 'update-error'
+            });
+        }
+    };
+
+    const csvData = filteredNames.map(({ _id, ...rest }) => rest);
+
     return (
         <div className="p-8 min-h-screen">
+            <ToastContainer 
+                position="bottom-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                limit={3} // Limit number of toasts shown at once
+                enableMultiContainer={false} // Disable multi-container feature
+                containerId="main-toast" // Unique container ID
+            />
             <h1 className="text-4xl font-bold mb-20">Baby Names Database</h1>
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
@@ -89,14 +161,30 @@ const BabyDatabase = () => {
                         Filters
                     </motion.button>
                 </div>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
-                >
-                    <Upload className="h-5 w-5 inline-block mr-2" />
-                    Upload BabyNames
-                </motion.button>
+                <div className="flex space-x-4">
+                    <motion.label
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer"
+                    >
+                        <Upload className="h-5 w-5 inline-block mr-2" />
+                        Upload Baby Names
+                        <input
+                            type="file"
+                            accept=".csv"
+                            onChange={handleCsvUpload}
+                            className="hidden"
+                        />
+                    </motion.label>
+                    <CSVLink
+                        data={csvData}
+                        filename="filtered_baby_names.csv"
+                        className="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center"
+                    >
+                        <Download className="h-5 w-5 inline-block mr-2" />
+                        Export Names
+                    </CSVLink>
+                </div>
             </div>
 
             {showFilters && (
@@ -146,14 +234,14 @@ const BabyDatabase = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {['Book Name', 'Gender', 'Name', 'Meaning', 'Name in Hindi', 'Meaning in Hindi', 'Shlok No.', 'Page No.'].map((header) => (
+                            {['Book Name', 'Gender', 'Name', 'Meaning', 'Name in Hindi', 'Meaning in Hindi', 'Shlok No.', 'Page No.', 'Edit'].map((header) => (
                                 <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {header}
                                 </th>
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y text-sm divide-gray-200">
                         {filteredNames
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((baby, index) => (
@@ -162,16 +250,95 @@ const BabyDatabase = () => {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                                    className="hover:bg-gray-50 transition-colors duration-150"
+                                    className="hover:bg-gray-50"
                                 >
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.bookName}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.gender}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.meaning}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.nameInHindi}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.meaningInHindi}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.shlokNo}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{baby.pageNo}</td>
+                                    {editingName && editingName._id === baby._id ? (
+                                        <>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.bookName}
+                                                    onChange={(e) => setEditingName({ ...editingName, bookName: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.gender}
+                                                    onChange={(e) => setEditingName({ ...editingName, gender: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.name}
+                                                    onChange={(e) => setEditingName({ ...editingName, name: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.meaning}
+                                                    onChange={(e) => setEditingName({ ...editingName, meaning: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.nameInHindi}
+                                                    onChange={(e) => setEditingName({ ...editingName, nameInHindi: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.meaningInHindi}
+                                                    onChange={(e) => setEditingName({ ...editingName, meaningInHindi: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.shlokNo}
+                                                    onChange={(e) => setEditingName({ ...editingName, shlokNo: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <input
+                                                    value={editingName.pageNo}
+                                                    onChange={(e) => setEditingName({ ...editingName, pageNo: e.target.value })}
+                                                    className="w-full border border-gray-300 rounded-md px-2"
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <button
+                                                    className="px-4 py-2 rounded-lg"
+                                                    onClick={saveEdit}
+                                                >
+                                                    <Save className="h-5 w-5 text-green-600 inline-block mr-2" />
+                                                </button>
+                                            </td>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.bookName}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.gender}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.meaning}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.nameInHindi}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.meaningInHindi}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.shlokNo}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{baby.pageNo}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <button
+                                                    className="px-4 py-2 rounded-lg"
+                                                    onClick={() => startEdit(baby)}
+                                                >
+                                                    <Edit className="h-5 w-5 text-blue-800 inline-block mr-2" />
+                                                </button>
+                                            </td>
+                                        </>
+                                    )}
                                 </motion.tr>
                             ))}
                     </tbody>

@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import fileUpload from 'express-fileupload';
 import { connectToMongoDB } from './db.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -9,6 +10,7 @@ import taskRoutes from './routes/TaskRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import pdfRoutes from './routes/pdfRoutes.js';
 import salaryRoutes from "./routes/SalariesRoutes.js"
+import nameRoutes from "./routes/nameRoutes.js"
 import authRoutes from './routes/authRoutes.js';
 import {tokenExpirationMiddleware} from './middleware/auth.js';
 import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
@@ -29,11 +31,13 @@ app.use('/uploads', express.static('uploads'));
 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(fileUpload());
 
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);
+app.use('/',nameRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
