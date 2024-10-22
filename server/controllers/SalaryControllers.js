@@ -124,7 +124,7 @@ export const filterSalariesByYearAndMonth = async (req, res) => {
 
     try {
         // Fetch salaries based on the constructed query
-        const salaries = await Salaries.find(searchQuery);
+        const salaries = await Salaries.find(searchQuery).populate("employee");
 
         // Return an empty array if no results are found
         if (salaries.length === 0) {
