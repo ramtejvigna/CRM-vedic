@@ -11,6 +11,30 @@ const notificationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const Notification = mongoose.model('Notification', notificationSchema);
+// models/Notification.js
 
-export default Notification;
+const notificationSchemaAdmin = new mongoose.Schema({
+  message: {
+    type: String,
+    required: true,
+  },
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee',
+    required: true,
+  },
+  isRead: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export const NotificationAdmin = mongoose.model('NotificationAdmin', notificationSchemaAdmin);
+
+
+export const Notification = mongoose.model('Notification', notificationSchema);
+

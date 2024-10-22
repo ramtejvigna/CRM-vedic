@@ -2,8 +2,20 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, MessageCircle } from "lucide-react";
 import axios from "axios";
+import {
+  TablePagination,
+} from "@mui/material";
 
-const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
+const LeaveRequestTable = ({
+  leaves,
+  activeTab,
+  fetchLeaves,
+  page,
+  rowsPerPage,
+  handleChangePage,
+  handleChangeRowsPerPage,
+  totalLeaves,
+}) => {
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -46,14 +58,15 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
     setShowConfirmationModal(false);
     setConfirmationAction(null);
   };
+
   const getStatusColor = (status) => {
     switch (status) {
-      case "Accepted":
+      case "Approved":
         return "text-green-600";
       case "Rejected":
-        return  "text-red-600";
+        return "text-red-600";
       default:
-        return "text-yelllow-600";
+        return "text-yellow-600";
     }
   };
 
@@ -139,16 +152,10 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
                       >
                         <XCircle size={18} />
                       </button>
-                      {/* <button
-                        onClick={() => handleOpenDetailModal(leave)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200"
-                      >
-                        <MessageCircle size={18} />
-                      </button> */}
                     </td>
                   ) : (
                     <td
-                      className={` whitespace-nowrap text-sm font-medium ${getStatusColor(leave.status)}`}
+                      className={`whitespace-nowrap text-sm font-medium ${getStatusColor(leave.status)}`}
                     >
                       <div className="flex items-center">
                         {leave.status === "Approved" ? (
@@ -170,12 +177,22 @@ const LeaveRequestTable = ({ leaves, activeTab, fetchLeaves }) => {
         </table>
       </div>
 
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={totalLeaves}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+
       {showModal && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2">
             <h2 className="text-xl font-bold mb-4">Leave Details</h2>
             <p>
-              <strong>Employee Name:</strong> {selectedLeave.employee.name}
+              <strong>Employee Name:</strong> {selectedLeave.employee.firstName}
             </p>
             <p>
               <strong>Leave Type:</strong> {selectedLeave.leaveType}

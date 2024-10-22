@@ -1,6 +1,6 @@
 import Task from '../models/Task.js';
 import { Employee } from '../models/User.js';
-import Notification from '../models/Notification.js';
+import {Notification} from '../models/Notification.js';
 import mongoose from 'mongoose';
 export const getTasks = async (req, res) => {
   try {
