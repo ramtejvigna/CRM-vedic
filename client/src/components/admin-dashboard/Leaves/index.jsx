@@ -4,6 +4,9 @@ import LeaveRequestTable from './Table';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Filter, X, ChevronDown, Search } from 'lucide-react';
 import { CircularProgress } from '@mui/material';
+import { LeaveDetailsModal, ConfirmationModal } from './Modals';
+
+// import { Calendar, Clock, FileText, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
 
 const Leaves = () => {
   const [leaves, setLeaves] = useState([]);
