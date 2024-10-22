@@ -96,82 +96,205 @@ const EmployeeTable = () => {
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          <TableContainer className="flex-1" sx={{ marginTop: "30px" }}>
-            <Table sx={{ minWidth: 700 }} aria-label="employee table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Employee Name</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentRecords.map((employee) => (
-                  <TableRow key={employee._id}>
-                    {/* Avatar and Name */}
-                    <TableCell component="th" scope="row">
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <Avatar />
-                        <div style={{ marginLeft: 10 }}>
-                          <Typography variant="body1" fontWeight="bold">
-                            {employee.firstName}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            {employee.email}
-                          </Typography>
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    {/* Status */}
-                    <TableCell>
-                      {employee?.status ? (
-                        <span
-                          style={{
-                            padding: "4px 8px",
-                            borderRadius: "12px",
-                            color: "#fff",
-                            backgroundColor: "#4caf50",
-                          }}
+          <div
+            className={`shadow-xl rounded-lg overflow-hidden transition-colors duration-300 ${
+              isDarkMode ? "bg-gray-800" : "bg-white"
+            }`}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead
+                  className={`${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                  }`}
+                >
+                  <tr>
+                    {["Employee", "phone" , "Status", "Actions"].map(
+                      (header) => (
+                        <th
+                          key={header}
+                          className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                            isDarkMode ? "text-gray-300" : "text-gray-700"
+                          }`}
                         >
-                          Online
-                        </span>
-                      ) : (
-                        <span
-                          style={{
-                            padding: "4px 8px",
-                            borderRadius: "12px",
-                            color: "#fff",
-                            backgroundColor: "black",
-                          }}
+                          {header}
+                        </th>
+                      )
+                    )}
+                  </tr>
+                </thead>
+                <tbody
+                  className={`divide-y ${
+                    isDarkMode ? "divide-gray-700" : "divide-gray-200"
+                  }`}
+                >
+                  <AnimatePresence>
+                    {currentRecords.map((employee) => (
+                      <motion.tr
+                        key={employee._id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className={` ${
+                          isDarkMode
+                            ? "hover:bg-gray-600"
+                            : "hover:bg-gray-100"
+                        } transition-colors duration-150`}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10">
+                              {employee.avatar ? (
+                                <img
+                                  className="h-10 w-10 rounded-full"
+                                  src={employee.avatar}
+                                  alt={employee.name}
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center">
+                                  <span className="text-white font-bold">
+                                    {employee?.name?.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="ml-4">
+                              <div
+                                className={`text-sm font-medium ${
+                                  isDarkMode
+                                    ? "text-white"
+                                    : "text-gray-900"
+                                }`}
+                              >
+                                {employee.name}
+                              </div>
+                              <div
+                                className={`text-sm ${
+                                  isDarkMode
+                                    ? "text-gray-300"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                {employee.email}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            isDarkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
                         >
-                          Offline
-                        </span>
-                      )}
-                    </TableCell>
+                          {employee.phone}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                              employee.isOnline
+                            )}`}
+                          >
+                            {employee.isOnline ? "Online" : "Offline"}
+                          </span>
+                        </td>
 
-                    {/* Phone */}
-                    <TableCell>{employee.phone}</TableCell>
-
-                    {/* Actions */}
-                    <TableCell className="space-x-1">
-                      <Button onClick={() => handleEdit(employee._id)} variant="outlined" size="small" color="primary">
-                        Edit
-                      </Button>
-                      <Button onClick={() => handleView(employee._id)} variant="outlined" size="small" color="primary">
-                        View
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEdit(employee._id)}
+                            className={`mr-4 transition-colors duration-300 ${
+                              isDarkMode
+                                ? "text-indigo-400 hover:text-indigo-200"
+                                : "text-indigo-600 hover:text-indigo-900"
+                            }`}
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleView(employee._id)}
+                            className={`mr-4 transition-colors duration-300 ${
+                              isDarkMode
+                                ? "text-green-400 hover:text-green-200"
+                                : "text-green-600 hover:text-green-900"
+                            }`}
+                          >
+                            <Eye size={18} />
+                            {/* <MessageCircle size={18} /> */}
+                          </button>
+                          {/* <button
+                            onClick={() => handleDelete(employee._id)}
+                            className={`transition-colors duration-300 ${
+                              isDarkMode
+                                ? "text-red-400 hover:text-red-200"
+                                : "text-red-600 hover:text-red-900"
+                            }`}
+                          >
+                            <Trash size={18} />
+                          </button> */}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+            <div
+              className={`px-4 py-3 flex items-center justify-between border-t ${
+                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+              } sm:px-6`}
+            >
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing {indexOfFirstRecord + 1} to {indexOfLastRecord} of {employees.length} results
+                  </p>
+                </div>
+                <div>
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${
+                        isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                      } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+                    >
+                      Previous
+                    </button>
+                    {renderPaginationButtons()}
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
+                        isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                      } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
-
-        {/* Pagination */}
-        <ul className="flex items-center p-5 gap-5">{renderPaginationButtons()}</ul>
       </div>
     </div>
   );
