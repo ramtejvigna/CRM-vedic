@@ -59,6 +59,8 @@ const employeeSchema = new mongoose.Schema({
     lastLeaveReset: { type: Date, default: new Date() },    // others
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
+    lastLeaveAcceptedDate: { type: Date, default: null },
+
     isAdmin: { type: Boolean, default: false }
 });
 
