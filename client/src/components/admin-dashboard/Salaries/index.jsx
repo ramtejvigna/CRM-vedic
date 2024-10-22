@@ -21,7 +21,7 @@ function Salaries() {
   const [filteringYear , setFilteringYear] = useState("")
   const [filteringMonth , setFilteringMonth] = useState("")
   const [currentPage , setCurrentPage ] = useState(1)
-  const recordsPerPage = 5
+  const recordsPerPage = 6
   const [searchTerm , setSearchTerm] = useState("")
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 
@@ -125,7 +125,6 @@ function Salaries() {
   };
   
   const downloadImage =  async (url) => {
-    console.log(image)
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
@@ -350,7 +349,7 @@ function Salaries() {
                                       : "text-green-600 hover:text-green-900"
                                   }`}
                                 >
-                                  <Eye size={18} /> {"PAYSLIP"}
+                                  <Eye size={18} /> {"VIEW PAYSLIP"}
                                 </button>
                                 <button
                                   onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
@@ -461,7 +460,7 @@ function Salaries() {
                       className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[900px] shadow-xl h-full my-auto max-h-[700px] relative"
                     >
                       {/* Close button */}
-                      <div className='flex absolute top-0 right-0 justify-end items-end'>
+                      <div className='flex absolute top-1 right-1 justify-end items-end '>
                         <AiOutlineClose className='text-xl cursor-pointer' onClick={() => setImage(null)} />
                       </div>
 
