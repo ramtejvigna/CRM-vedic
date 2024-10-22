@@ -320,14 +320,16 @@ const ViewExpenses = () => {
           </select>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleFilter}
-          className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-300"
-        >
-          Submit
-        </motion.button>
+       <div className="flex justify-end mt-6"> {/* Button wrapper */}
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleFilter}
+      className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-300"
+    >
+      Submit
+    </motion.button>
+  </div>
       </div>
 
       <div className="flex justify-end">
