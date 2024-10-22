@@ -11,12 +11,14 @@ import { GiThreeLeaves } from "react-icons/gi";
 
 // Components
 import Home from "./components/admin-dashboard/Home";
-import { EmployeeTable } from "./components/admin-dashboard/Employee";
+import EmployeeTable from "./components/admin-dashboard/Employee";
 import ViewCustomers from "./components/admin-dashboard/Customer/ViewCustomers"; // Correctly imported ViewCustomers
+import ViewExpenses from "./components/admin-dashboard/Expenses/ViewExpenses"; 
+
 import Salaries from "./components/admin-dashboard/Salaries";
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
-import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
 import Leaves from "./components/admin-dashboard/Leaves";
+import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
 const Component = ({ name }) => {
   return (
     <>
@@ -88,7 +90,7 @@ export const routes = [
     name: "expenses",
     path: "expenses",
     icon: <GiExpense {...icon} />,
-    element: <Home />,
+    element: <ViewExpenses />,
   },
   {
     name: 'customization',
