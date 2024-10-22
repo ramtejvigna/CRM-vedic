@@ -72,7 +72,7 @@ const LeaveRequestTable = ({
 
   return (
     <div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full h-full">
         <table className="w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-200 dark:bg-gray-700">
             <tr>
@@ -93,6 +93,9 @@ const LeaveRequestTable = ({
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                 No. of Days
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Leave applied date
               </th>
               {activeTab === "pending" ? (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -137,6 +140,9 @@ const LeaveRequestTable = ({
                     {(new Date(leave.endDate) - new Date(leave.startDate)) /
                       (1000 * 60 * 60 * 24) +
                       1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {new Date(leave.createdAt).toLocaleDateString()}
                   </td>
                   {activeTab === "pending" ? (
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -187,69 +193,63 @@ const LeaveRequestTable = ({
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
 
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold mb-4">Leave Details</h2>
-            <p>
-              <strong>Employee Name:</strong> {selectedLeave.employee.firstName}
-            </p>
-            <p>
-              <strong>Leave Type:</strong> {selectedLeave.leaveType}
-            </p>
-            <p>
-              <strong>From:</strong>{" "}
-              {new Date(selectedLeave.startDate).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>To:</strong>{" "}
-              {new Date(selectedLeave.endDate).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>No. of Days:</strong>{" "}
-              {(new Date(selectedLeave.endDate) -
-                new Date(selectedLeave.startDate)) /
-                (1000 * 60 * 60 * 24) +
-                1}
-            </p>
-            <p>
-              <strong>Reason:</strong> {selectedLeave.reason}
-            </p>
-            <button
-              onClick={handleCloseModal}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+{showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Leave Details</h2>
+      <p>
+        <strong>Employee Name:</strong> {selectedLeave.employee.firstName}
+      </p>
+      <p>
+        <strong>Leave Type:</strong> {selectedLeave.leaveType}
+      </p>
+      <p>
+        <strong>From:</strong> {new Date(selectedLeave.startDate).toLocaleDateString()}
+      </p>
+      <p>
+        <strong>To:</strong> {new Date(selectedLeave.endDate).toLocaleDateString()}
+      </p>
+      <p>
+        <strong>No. of Days:</strong> {(new Date(selectedLeave.endDate) - new Date(selectedLeave.startDate)) / (1000 * 60 * 60 * 24) + 1}
+      </p>
+      <p>
+        <strong>Reason:</strong> {selectedLeave.reason}
+      </p>
+      <button
+        onClick={handleCloseModal}
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
 
-      {showConfirmationModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold mb-4">Confirmation</h2>
-            <p>
-              Are you sure you want to {confirmationAction.toLowerCase()} this
-              leave request?
-            </p>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={handleConfirm}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mr-2"
-              >
-                Confirm
-              </button>
-              <button
-                onClick={handleCancelConfirmation}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+{showConfirmationModal && (
+  <div className="fixed inset-0  z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-1/2 max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Confirmation</h2>
+      <p>
+        Are you sure you want to {confirmationAction.toLowerCase()} this leave request?
+      </p>
+      <div className="flex justify-end mt-4">
+        <button
+          onClick={handleConfirm}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mr-2"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={handleCancelConfirmation}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
