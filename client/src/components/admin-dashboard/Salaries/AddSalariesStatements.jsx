@@ -14,7 +14,7 @@ function AddSalariesStatements() {
         'July', 'August', 'September', 'October', 'November', 'December'
       ];
 
-        // Generate years from 1950 to 10 years ahead of the current year
+  const [showFilters , setShowFilters] = useState(false)
   const currentYear = new Date().getFullYear();
   const startYear = 2000;
   const endYear = currentYear + 10;
