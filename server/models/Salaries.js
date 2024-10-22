@@ -11,25 +11,11 @@ const SalariesSchema = new mongoose.Schema({
         ref: "Employee",
         required: true
     },
-    basicSalary: {
+    amountPaid: {
         type: String,
         required: true ,
         default : 0,
     },
-    totalAllowance: {
-        type: String,
-        required: true,
-        default : 0
-    },
-    totalDeduction: {
-        type: String,
-        required: true,
-        default : 0
-    },
-    totalSalary : {
-        type : Number ,
-        default :0 
-    } ,
     year: {
         type: Number,
         required: true

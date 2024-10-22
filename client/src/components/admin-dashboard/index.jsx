@@ -9,8 +9,10 @@ import TaskManagement from "./TaskManagement";
 import EditEmployee from "./Employee/EditEmployee";
 import Customer from "./Customer/Customer"; // Default import
 import ViewEmployee from "./Employee/ViewEmployee";
+import BabyDatabase from "./BabyDatabase";
 import AddExpense from "./Expenses/AddExpense.jsx";
-import Leaves from "./Leaves"; // Added Leaves component
+import Leaves from "./Leaves";
+import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
@@ -38,9 +40,10 @@ const AdminDashboard = () => {
             <Route path="employees/edit-employee/:id" element={<EditEmployee />} />
             <Route path="customers/:fatherName" element={<Customer />} /> {/* Ensure correct import */}
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
-            <Route path="/tasks" element={<TaskManagement />} />
+            <Route path='/tasks' element={<TaskManagement />} />
             <Route path="/expenses/add-expense" element={<AddExpense />} />
-            <Route path="/leaves" element={<Leaves />} /> {/* Added Leaves route */}
+            <Route path='/leaves' element={<Leaves />} />
+            <Route path='/add-salaries' element={<AddSalariesStatements />} />
 
             <Route path="/" element={<Navigate to="/home" />} />
           </Routes>

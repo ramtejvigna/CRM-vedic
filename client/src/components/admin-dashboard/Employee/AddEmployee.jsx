@@ -107,6 +107,45 @@ const AddEmployee = () => {
             if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
             if (!form.cvv) formErrors.cvv = 'CVV is required';
         }
+            if (activeStep === 0) {
+                if (!form.firstName) formErrors.firstName = 'firstname  is required';
+                if (!form.email) formErrors.email = 'Email is required';
+                if (!form.lastName) formErrors.lastName = 'lastname is required';
+                if (!form.address) formErrors.address = 'Address is required';
+                if (!form.city) formErrors.city = 'city is required';
+                if (!form.phone) formErrors.phone = 'Phone number is required';
+                if(isNaN(form.phone) ) formErrors.phone = "only digits are allowed"
+                if(form.phone.length !== 10) formErrors.phone = "Enter 10 digit phone number";
+                if (!form.state) formErrors.state = 'State is required';
+                if (!form.pincode) formErrors.pincode = 'Pincode is required';
+                if (!form.country) formErrors.country = 'Country is required';
+            }
+
+            if (activeStep === 1) {
+                if (!form.aadharOrPan) formErrors.aadharOrPan = 'Aadhar Card or Pan Card is required';
+                if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
+                if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
+            }
+
+
+            if (activeStep === 2) {
+                if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
+                if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
+            }
+            if (activeStep === 3) {
+                if (!form.employerName) formErrors.employerName = 'employer Name is required';
+                if (!form.jobTitle) formErrors.jobTitle = 'job title is required';
+                if (!form.startDate) formErrors.startDate = 'date is required';
+                if (!form.endDate) formErrors.endDate = 'date is required';
+                if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'reason is required';
+            }
+
+            if (activeStep === 4) {
+                if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
+                if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
+                if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
+                if (!form.cvv) formErrors.cvv = 'CVV is required';
+            }
 
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
