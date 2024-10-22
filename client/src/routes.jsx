@@ -18,6 +18,7 @@ import ViewExpenses from "./components/admin-dashboard/Expenses/ViewExpenses";
 import Salaries from "./components/admin-dashboard/Salaries";
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
 import Leaves from "./components/admin-dashboard/Leaves";
+import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
 const Component = ({ name }) => {
   return (
     <>
@@ -57,9 +58,9 @@ export const routes = [
   },
   {
     name: "baby database",
-    path: "baby",
+    path: "babyDatabase",
     icon: <BiSolidBabyCarriage {...icon} />,
-    element: <Home />,
+    element: <BabyDatabase />,
   },
   {
     name: "work day calculation",

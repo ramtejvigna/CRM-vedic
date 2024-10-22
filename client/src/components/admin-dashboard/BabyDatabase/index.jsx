@@ -23,7 +23,7 @@ const BabyDatabase = () => {
         } catch (err) {
             console.error(err);
             toast.error("Failed to fetch baby names", {
-                onClose: () => {}, // Empty callback to prevent undefined error
+                onClose: () => { }, // Empty callback to prevent undefined error
                 toastId: 'fetch-error' // Unique ID to prevent duplicate toasts
             });
         }
@@ -31,7 +31,7 @@ const BabyDatabase = () => {
 
     useEffect(() => {
         fetchBabyNames();
-        
+
         // Cleanup function to dismiss all toasts when component unmounts
         return () => {
             toast.dismiss();
@@ -84,13 +84,13 @@ const BabyDatabase = () => {
             });
             fetchBabyNames();
             toast.success("File uploaded successfully!", {
-                onClose: () => {}, // Empty callback to prevent undefined error
+                onClose: () => { }, // Empty callback to prevent undefined error
                 toastId: 'upload-success'
             });
         } catch (err) {
             console.error(err);
             toast.error("Failed to upload the file", {
-                onClose: () => {}, // Empty callback to prevent undefined error
+                onClose: () => { }, // Empty callback to prevent undefined error
                 toastId: 'upload-error'
             });
         }
@@ -107,23 +107,23 @@ const BabyDatabase = () => {
             setEditingName(null);
             fetchBabyNames();
             toast.success("Baby name updated successfully!", {
-                onClose: () => {}, // Empty callback to prevent undefined error
+                onClose: () => { }, // Empty callback to prevent undefined error
                 toastId: 'update-success'
             });
         } catch (err) {
             console.error(err);
             toast.error("Failed to update the baby name", {
-                onClose: () => {}, // Empty callback to prevent undefined error
+                onClose: () => { }, // Empty callback to prevent undefined error
                 toastId: 'update-error'
             });
         }
     };
 
-    const csvData = filteredNames.map(({ _id, ...rest }) => rest);
+    const csvData = filteredNames.map(({ _id, _v, ...rest }) => rest);
 
     return (
         <div className="p-8 min-h-screen">
-            <ToastContainer 
+            <ToastContainer
                 position="bottom-right"
                 autoClose={3000}
                 hideProgressBar={false}
@@ -176,14 +176,20 @@ const BabyDatabase = () => {
                             className="hidden"
                         />
                     </motion.label>
-                    <CSVLink
-                        data={csvData}
-                        filename="filtered_baby_names.csv"
-                        className="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center"
+                    <motion.label
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                     >
-                        <Download className="h-5 w-5 inline-block mr-2" />
-                        Export Names
-                    </CSVLink>
+                        <CSVLink
+                            data={csvData}
+                            filename="filtered_baby_names.csv"
+                            className="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center"
+                        >
+                            <Download className="h-5 w-5 inline-block mr-2" />
+                            Export Names
+                        </CSVLink>
+                    </motion.label>
+
                 </div>
             </div>
 

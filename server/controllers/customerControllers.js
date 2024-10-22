@@ -213,7 +213,7 @@ export const getCustomerPdfs = async (req, res) => {
 // In customerControllers.js
 export const updateCustomerData = async (req, res) => {
     const { id } = req.params;
-    const { paymentStatus, pdfGenerated, feedback, customerStatus, 
+    const { paymentStatus, feedback, customerStatus, 
         paymentDate, paymentTime, amountPaid, transactionId 
     } = req.body;
 
@@ -226,9 +226,6 @@ export const updateCustomerData = async (req, res) => {
 
         if (paymentStatus !== undefined) {
             customer.paymentStatus = paymentStatus;
-        }
-        if (pdfGenerated !== undefined) {
-            customer.pdfGenerated = pdfGenerated;
         }
         customer.feedback = feedback;
         customer.customerStatus = customerStatus;
