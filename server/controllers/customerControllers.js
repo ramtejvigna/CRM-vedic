@@ -210,3 +210,33 @@ export const getCustomerPdfs = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving PDFs', error: error.message });
     }
 };
+// In customerControllers.js
+export const updateCustomerData = async (req, res) => {
+    const { id } = req.params;
+    const { paymentStatus, feedback, customerStatus, 
+        paymentDate, paymentTime, amountPaid, transactionId 
+    } = req.body;
+
+    try {
+        const customer = await Customer.findById(id);
+
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
+
+        if (paymentStatus !== undefined) {
+            customer.paymentStatus = paymentStatus;
+        }
+        customer.feedback = feedback;
+        customer.customerStatus = customerStatus;
+        customer.payTransactionID = transactionId;
+        customer.amountPaid = amountPaid;
+        customer.paymentDate = paymentDate;
+        customer.paymentTime = paymentTime;
+
+        await customer.save();
+        res.status(200).json({ message: 'Customer updated successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating customer', error: err });
+    }
+};

@@ -204,7 +204,7 @@ const EditEmployee = () => {
         })
     } 
 
-
+    console.log(formData.education.degrees)
     const handleSubmit = async (e) => { 
         e.preventDefault();
         const formDataToSend = new FormData();
@@ -371,130 +371,182 @@ const EditEmployee = () => {
             case 1:
                 return (
                     <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
-                        <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
+                    <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
-                        {!formData.idDocuments.aadharOrPan  ? (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label  className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex gap-2 items-center"> <AiOutlineUpload/> Upload File</span>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                </div>
+                    {/* Aadhar or PAN section */}
+                    {!formData.idDocuments.aadharOrPan ? (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                            <label className="w-full h-full flex flex-col items-center justify-center">
+                            <span className="text-gray-500 flex gap-2 items-center">
+                                <AiOutlineUpload /> Upload File
+                            </span>
+                            <input
+                                type="file"
+                                accept=".jpg,.png,.jpeg"
+                                onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
+                                error={!!errors.aadharOrPan}
+                                helperText={errors.aadharOrPan}
+                                className="hidden"
+                            />
+                            </label>
+                        </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
+                            <img
+                            src={( typeof formData.idDocuments.aadharOrPan === "string" ? `http://localhost:3000/${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan))}
+                            alt="Aadhar or Pan"
+                            className="h-96 object-cover"
+                            />
+                        </div>
+                        <button
+                            onClick={() => handleFileClear('idDocuments', 'aadharOrPan')}
+                            className="text-red-500 mt-2 flex items-center gap-2"
+                        >
+                            <AiOutlineDelete /> Clear Upload
+                        </button>
+                        </div>
+                    )}
+
+                    {/* Passport or Driving License section */}
+                    {!formData.idDocuments.passport ? (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                            <label className="w-full h-full flex flex-col items-center justify-center">
+                            <span className="text-gray-500 flex gap-2 items-center">
+                                <AiOutlineUpload /> Upload File
+                            </span>
+                            <input
+                                type="file"
+                                accept=".jpg,.png,.jpeg"
+                                onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
+                                error={!!errors.passport}
+                                helperText={errors.passport}
+                                className="hidden"
+                            />
+                            </label>
+                        </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                            <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
+                                <img
+                            src={( typeof formData.idDocuments.passport === "string" ? `http://localhost:3000/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
+                            alt="Passport or Driving License"
+                                className=" h-96 object-cover"
+                                />
                             </div>
-                        ) : (
-                            <div onClick={() => handleFileClear('idDocuments' , 'aadhar')} className='flex cursor-pointer flex-col'>
-                                <InputLabel className="text-gray-700">Aadhar or pan</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label  className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
-                                    </label>
-                                </div>
-                            </div>
-                        )}
+                            <button
+                                onClick={() => handleFileClear('idDocuments', 'passport')}
+                                className="text-red-500 mt-2 flex items-center gap-2"
+                            >
+                                <AiOutlineDelete /> Clear Upload
+                            </button>
+                        </div>
+                    )}
 
-                        {!formData.idDocuments.passport ? (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                    <span className="text-gray-500 flex gap-2 items-center"> <AiOutlineUpload/> Upload File</span>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
-                                            className="hidden"
-                                            accept='.jpg, .png, .jpeg'
-                                        />
-                                    </label>
-                                </div>
-                            </div>
-
-                        ) : (
-                            <div onClick={() => handleFileClear('idDocuments' , 'passport')} className='flex cursor-pointer flex-col'>
-                                <InputLabel className="text-gray-700">passport or Driving License</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label  className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
-                                    </label>
-                                </div>
-                            </div>
-                        )}
-
-
-                        <TextField
-                            label="Social Security Number"
-                            name="ssn"
-                            value={formData.idDocuments.ssn}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
+                    {/* Social Security Number input */}
+                    <TextField
+                        label="Social Security Number"
+                        name="ssn"
+                        value={formData.idDocuments.ssn}
+                        onChange={handleChange}
+                        className="rounded-md shadow-sm bg-gray-50"
+                        fullWidth
+                        error={!!errors.ssn}
+                        helperText={errors.snn}
+                    />
                     </div>
                 );
 
             case 2:
                 return (
                     <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
-                        <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
-                        {!formData.education.degrees ? (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex items-center gap-2"> <AiOutlineUpload/> Upload File</span>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleFileChange(e, 'education', 'degrees')}
-                                            className="hidden"
-                                            accept='.jpg, .png, .jpeg'
-                                        />
-                                    </label>
-                                </div>
-                            </div>
+                    <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
 
-                        ) : (
-                            <div onClick={() => handleFileClear('education' , 'degrees')} className='flex cursor-pointer flex-col'>
-                                <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label  className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
-                                    </label>
-                                </div>
-                            </div>
-                        )}
+                    {/* Degrees/Certificates Section */}
+                    {!formData.education.degrees ? (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                            <label className="w-full h-full flex flex-col items-center justify-center">
+                            <span className="text-gray-500 flex items-center gap-2">
+                                <AiOutlineUpload /> Upload File
+                            </span>
+                            <input
+                                type="file"
+                                onChange={(e) => handleFileChange(e, 'education', 'degrees')}
+                                className="hidden"
+                                accept=".jpg,.png,.jpeg"
+                                error={!!errors.degrees}
+                                helperText={errors.degrees}
+                            />
+                            </label>
+                        </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                            <img
+                            src={( typeof formData.education.degrees === "string" ? `http://localhost:3000/${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees))}
+                            alt="Degrees/Certificates"
+                            className=" h-64 object-cover"
+                            />
+                        </div>
+                        <button
+                            onClick={() => handleFileClear('education', 'degrees')}
+                            className="text-red-500 mt-2 flex items-center gap-2"
+                        >
+                            <AiOutlineDelete /> Clear Upload
+                        </button>
+                        </div>
+                    )}
 
-                        {!formData.education.transcripts ? (
-
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex items-center gap-2"> <AiOutlineUpload/>Upload File</span>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleFileChange(e, 'education', 'transcripts')}
-                                            className="hidden"
-                                            accept='.jpg, .png, .jpeg'
-                                        />
-                                    </label>
-                                </div>
-                            </div>
-
-                        ) : (
-                            <div onClick={() => handleFileClear('education' , 'transcripts')} className='flex cursor-pointer flex-col'>
-                                <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label  className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 cursor-pointer flex items-center gap-2" > <AiOutlineDelete/> Clear upload</span>
-                                    </label>
-                                </div>
-                            </div>
-                        )}
+                    {/* Transcripts Section */}
+                    {!formData.education.transcripts ? (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                            <label className="w-full h-full flex flex-col items-center justify-center">
+                            <span className="text-gray-500 flex items-center gap-2">
+                                <AiOutlineUpload /> Upload File
+                            </span>
+                            <input
+                                type="file"
+                                onChange={(e) => handleFileChange(e, 'education', 'transcripts')}
+                                className="hidden"
+                                accept=".jpg,.png,.jpeg"
+                                error={!!errors.transcripts}
+                                helperText={errors.transcripts}
+                            />
+                            </label>
+                        </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Transcripts</InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                            <img
+                            src={( typeof formData.education.transcripts === "string" ? `http://localhost:3000/${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts))}
+                            alt="Transcripts"
+                            className="h-64 object-cover"
+                            />
+                        </div>
+                        <button
+                            onClick={() => handleFileClear('education', 'transcripts')}
+                            className="text-red-500 mt-2 flex items-center gap-2"
+                        >
+                            <AiOutlineDelete /> Clear Upload
+                        </button>
+                        </div>
+                    )}
                     </div>
                 );
 
@@ -572,36 +624,43 @@ const EditEmployee = () => {
                         <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
 
                         <TextField
-                            label="Cardholder Name"
+                            label="Card Holder Name"
                             name="cardholderName"
                             value={formData.paymentDetails.cardholderName}
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
+                            error={!!errors.cardholderName}
+                            helperText={errors.cardholderName}
                             fullWidth
                         />
+                        
                         <TextField
                             label="Card Number"
                             name="cardNumber"
                             value={formData.paymentDetails.cardNumber}
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
+                            error={!!errors.cardNumber}
+                            helperText={errors.cardNumber}
                             fullWidth
                         />
+                        
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="grid gap-2">
                                 <label 
                                     htmlFor="expiryDate" 
                                     className="block text-sm font-medium text-gray-500"
                                 >
-                                    expiry date
+                                    Expiry Date 
                                 </label>
                                 <TextField
                                     id="expiryDate"
                                     name="expiryDate"
-                                    
                                     type='date'
                                     value={formData.paymentDetails.expiryDate}
                                     onChange={handleChange}
+                                    error={!!errors.expiryDate}
+                                    helperText={errors.expiryDate}
                                     className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
                                 />
                             </div>
@@ -610,17 +669,19 @@ const EditEmployee = () => {
                                     htmlFor="cvv" 
                                     className="block text-sm font-medium opacity-0"
                                 >
-                                    cvv
+                                    CVV 
                                 </label>
                                 <TextField
                                     label="CVV"
                                     name="cvv"
-                                    value={formData.paymentDetails?.cvv || ''}
+                                    type="password"
+                                    value={formData.paymentDetails.cvv || ''}
                                     onChange={handleChange}
+                                    error={!!errors.cvv}
+                                    helperText={errors.cvv}
                                     className="rounded-md shadow-sm bg-gray-50"
                                 />
                             </div>
-
                         </div>
                     </div>
                 );
