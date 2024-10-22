@@ -11,6 +11,7 @@ import Customer from "./Customer/Customer"; // Default import
 import ViewEmployee from "./Employee/ViewEmployee";
 import BabyDatabase from "./BabyDatabase";
 import Leaves from "./Leaves";
+import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
@@ -40,6 +41,7 @@ const AdminDashboard = () => {
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
             <Route path='/leaves' element={<Leaves />} />
+            <Route path='/add-salaries' element={<AddSalariesStatements />} />
 
             <Route path="/" element={<Navigate to="/home" />} />
           </Routes>

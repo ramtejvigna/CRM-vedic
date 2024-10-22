@@ -5,9 +5,9 @@ import path from "path";
 // Create Salary Statement
 export const createSalaryStatement = async (req, res) => {
     try {
-        const { employee, year, month, basicSalary, totalAllowance, totalDeduction } = req.body;
+        const { employee, year, month, amountPaid } = req.body;
 
-        if (!employee || !year || !month || !basicSalary || !totalAllowance || !totalDeduction) {
+        if (!employee || !year || !month || !amountPaid) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
@@ -19,9 +19,7 @@ export const createSalaryStatement = async (req, res) => {
             employee,
             year,
             month,
-            basicSalary,
-            totalAllowance,
-            totalDeduction,
+            amountPaid,
             bankStatement: filePath
         });
 
