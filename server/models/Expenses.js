@@ -1,4 +1,3 @@
-// models/Expenses.js
 import mongoose from 'mongoose';
 
 const expenseSchema = new mongoose.Schema({
@@ -13,6 +12,11 @@ const expenseSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now,
+  },
+  // Required field to store the bank statement filename
+  bank_statement: {
+    type: String,
+    required: true,  // Now it's mandatory
   },
 });
 

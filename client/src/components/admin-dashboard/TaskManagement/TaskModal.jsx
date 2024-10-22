@@ -215,15 +215,11 @@ const TaskModal = ({
                     required
                   >
                     <MenuItem value="">Select an employee</MenuItem>
-                    {employees.length > 0 ? (
-                      employees.map((employee) => (
-                        <MenuItem key={employee._id} value={employee._id}>
-                          {employee.firstName}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem disabled>No employees available</MenuItem>
-                    )}
+                    {employees.map((employee) => (
+                      <MenuItem key={employee._id} value={employee._id}>
+                        {employee.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>

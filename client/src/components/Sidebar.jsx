@@ -21,7 +21,7 @@ export function Sidenav() {
         duration: 0.5,
         ease: "easeInOut",
       }}
-      className={`transition-all duration-300 flex flex-col gap-4 overflow-auto m-5 w-72 rounded-lg shadow-xl p-4 px-5 md:static z-30 fixed top-0 left-0 bottom-0 text-white bg-slate-900`}
+      className={`transition-all duration-300 flex flex-col gap-4 overflow-auto m-5 w-72 rounded-lg shadow-xl p-3 px-5 md:static z-30 fixed top-0 left-0 bottom-0 text-white bg-slate-900`}
     >
       <Link to="/">
         <Typography className="font-semibold text-center text-xl p-2">
@@ -29,7 +29,7 @@ export function Sidenav() {
         </Typography>
       </Link>
 
-      <ul className="w-full gap-1.5 flex flex-col flex-1">
+      <ul className="w-full gap-0.5 flex flex-col flex-1">
         {routes.map((route, index) => {
           return (
             <li key={index} className={`w-full ${route.name === "settings" ? "mt-auto bg-blue-500 rounded-xl" : ""}`}>

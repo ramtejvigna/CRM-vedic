@@ -67,7 +67,7 @@ const AddExpense = () => {
 
       if (data.success) {
         toast.success("Expense added successfully!");
-        navigate("/expenses");
+        navigate("/admin-dashboard/expenses"); // Redirect to the correct URL
       } else {
         toast.error("Failed to add expense!");
       }

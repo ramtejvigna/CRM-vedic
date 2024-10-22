@@ -184,7 +184,7 @@ const BabyDatabase = () => {
                     <select
                         value={rowsPerPage}
                         onChange={handleChangeRowsPerPage}
-                        className="border border-gray-300 rounded-2xl pr-7 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+                        className="border border-gray-300 rounded-2xl pl-2 pr-5 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
                     >
                         {[5, 10, 25].map((option) => (
                             <option key={option} value={option}>

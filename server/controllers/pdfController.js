@@ -80,9 +80,14 @@ export const sendDetails = async (req, res) => {
         console.log("PDF saved:", savedPdf);
 
         // Store the PDF document ID in the customer's record
-        await Customer.findByIdAndUpdate(customerId, {
-            $push: { pdfGenerated: savedPdf._id }  // Add the PDF document's ID to the customer record
-        });
+        // If 'pdfGenerated' array doesn't exist, it will be created
+        await Customer.findByIdAndUpdate(
+            customerId,
+            {
+                $push: { pdfGenerated: savedPdf._id }  // Add the PDF document's ID to the customer record
+            },
+            { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is updated/inserted and array created if missing
+        );
 
         console.log("PDF ID added to customer record");
 
@@ -122,7 +127,7 @@ export const getPdfsByCustomerId = async (req, res) => {
         const pdfs = customer.pdfGenerated;
 
         if (!pdfs || pdfs.length === 0) {
-            return res.status(404).json({ error: 'No PDFs found for this customer' });
+            return res.status(200).json({ message: 'No PDFs found for this customer' });
         }
 
         res.status(200).json(pdfs);
