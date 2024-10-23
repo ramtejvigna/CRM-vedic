@@ -111,35 +111,55 @@ const AddExpense = () => {
 
           {/* Bank Statement File Upload */}
           <div className="col-span-2 flex flex-col gap-3">
-            <label className="uppercase text-xs tracking-wider font-semibold">Bank Statement</label>
-            {!bankStatement ? (
-              <div className="h-36 p-4 border-dashed border-2 border-blue-500 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                <label className="w-full cursor-pointer h-full flex flex-col items-center justify-center">
-                  <img src={uploadImage} alt="Upload" className="h-28 w-28" />
-                  <span className="font-bold text-xl">Upload File</span>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    required
-                  />
-                </label>
-              </div>
-            ) : (
-              <div className="h-36 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                <img src={URL.createObjectURL(bankStatement)} alt="Bank Statement" className="object-cover h-full" />
-                <button
-                  type="button"
-                  onClick={() => setBankStatement(null)}
-                  className="text-red-500 mt-2"
-                >
-                  Clear Upload
-                </button>
-              </div>
-            )}
-            {errors.bankStatement && <span className="text-xs text-red-400">{errors.bankStatement}</span>}
-          </div>
+  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+    Bank Statement
+  </label>
+  {!bankStatement ? (
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      className="mt-2 p-8 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 cursor-pointer"
+    >
+      <label className="w-full cursor-pointer">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
+          <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG,PDF</p>
+        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept=".jpg,.png,.jpeg"
+          className="hidden"
+        />
+      </label>
+    </motion.div>
+  ) : (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="mt-2"
+    >
+      <div className="relative w-40 h-40 rounded-lg overflow-hidden">
+        <img
+          src={URL.createObjectURL(bankStatement)}
+          alt="Bank Statement"
+          className="w-full h-full object-cover"
+        />
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setBankStatement(null)}
+          className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white"
+        >
+          <XCircleIcon size={20} />
+        </motion.button>
+      </div>
+    </motion.div>
+  )}
+  {errors.bankStatement && <span className="text-xs text-red-400">{errors.bankStatement}</span>}
+</div>
+
 
           {/* Submit Button */}
           <div className="col-span-2 flex items-center justify-end gap-5">
