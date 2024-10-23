@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 const PdfSchema = new mongoose.Schema({
     babyNames: [{ type: mongoose.Schema.Types.ObjectId, ref: 'babyNames' }],
     createdAt: { type: Date, default: Date.now },
+    whatsappStatus: { type: Boolean, default: false },
+    mailStatus: { type: Boolean, default: false },
 });
 
 const NameSchema = new mongoose.Schema({
