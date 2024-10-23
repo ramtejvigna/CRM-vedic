@@ -67,6 +67,8 @@ export const addCustomerWithAssignment = async (req, res) => {
     }    
 };
 
+
+
 export const getCustomers = async (req, res) => {
     try {
         // Fetch all customers

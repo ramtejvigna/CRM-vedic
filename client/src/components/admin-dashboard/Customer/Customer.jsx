@@ -15,18 +15,19 @@ import { Edit, Delete, FileText } from 'lucide-react';
 import { FaDownload, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import { AiOutlineArrowLeft, AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
+import pdfTemplate from "../../../assets/Template.pdf";
+
 // PDF Viewer Component
 const PDFViewer = ({ pdfUrl, handleDownload, handleSendMail, email, enabledRow, pdfId, onClose }) => {
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-75">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 text-3xl p-2">
-                    &times;
-                </button>
+               
                 
                 <h2 className="mb-4 text-xl font-semibold">Generated PDF:</h2>
                 
                 <div className="flex justify-end mb-4 space-x-2">
+                  
                     <button
                         onClick={() => handleDownload(pdfUrl, pdfId)}
                         disabled={enabledRow !== pdfId}
@@ -54,6 +55,7 @@ const PDFViewer = ({ pdfUrl, handleDownload, handleSendMail, email, enabledRow, 
                     >
                         <FaEnvelope />
                     </button>
+                    
                 </div>
                 
                 <iframe
