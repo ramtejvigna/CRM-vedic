@@ -65,7 +65,7 @@ const CustomerDetails = () => {
   const filteredData = customers.filter((row) => {
     const genderMatch = filteredGender === "All" || row.babyGender === filteredGender;
     const statusMatch = filteredStatus === "All" || row.customerStatus === filteredStatus;
-    const employeeMatch = filteredAssignedEmployee === "All" || row.assignedEmployee === filteredAssignedEmployee;
+    const employeeMatch = filteredAssignedEmployee === "All" || row.assignedEmployeeName === filteredAssignedEmployee;
     const searchMatch =
       row.fatherName?.toLowerCase().includes(searchTerm) ||
       row.customerId?.toLowerCase().includes(searchTerm) ||
@@ -179,18 +179,18 @@ const CustomerDetails = () => {
             Assigned Employee
           </label>
           <select
-            id="assignedEmployee"
-            value={filteredAssignedEmployee}
-            onChange={handleAssignedEmployeeChange}
-            className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
-          >
-            <option value="All">All Employees</option>
-            {employees.map((employee) => (
-              <option key={employee.id} value={employee.firstName} className="text-black">
-                {employee.firstName} 
-              </option>
-            ))}
-          </select>
+  id="assignedEmployee"
+  value={filteredAssignedEmployee}
+  onChange={handleAssignedEmployeeChange}
+  className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
+>
+  <option value="All">All Employees</option>
+  {employees.map((employee) => (
+    <option key={employee.id} value={employee.firstName}>
+      {employee.firstName}
+    </option>
+  ))}
+</select>
         </div>
       </div>
     </motion.div>
