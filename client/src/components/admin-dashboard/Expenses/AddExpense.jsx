@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useStore } from "../../../store";
 import uploadImage from "../../../assets/upload3.jpg"; // Use the same upload image
 import axios from 'axios';
-
+import { XCircleIcon, } from 'lucide-react';
 const ADD_EXPENSE = "http://localhost:3000/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
@@ -39,27 +39,38 @@ const AddExpense = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (validateForm()) {
       const formData = new FormData();
       formData.append("expense_name", expenseName);
       formData.append("amount_spent", amountSpent);
       formData.append("date", expenseDate);
       formData.append("bank_statement", bankStatement);
+  
       try {
+        console.log("Submitting form...");
         setIsLoading(true);
         const res = await axios.post(ADD_EXPENSE, formData);
-        if (res.status === 200) {
+  
+        console.log("Response from server:", res); // Log the response
+        if (res.status === 200 || res.status === 201) {
           toast.success("Expense added successfully!");
-          navigate("/admin-dashboard/expenses");
+  
+          // Delay navigation to allow toast to show
+          setTimeout(() => {
+            navigate("/admin-dashboard/expenses");
+          }, 1500);
         }
       } catch (error) {
-        console.error("Error adding expense:", error);
+        console.error("Error adding expense:", error); // Log error details
         toast.error("Error adding expense!");
       } finally {
         setIsLoading(false);
       }
     }
   };
+  
+  
 
   return (
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
