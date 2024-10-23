@@ -84,7 +84,7 @@ const PDFDisplayComponent = ({ customerId }) => {
 
   const savePdfToDatabase = async (customerId, pdfUrl, babyNames) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/savePdf', {
+      const response = await axios.post('https://vedic-backend-neon.vercel.app/api/savePdf', {
         customerId,
         pdfUrl,
         babyNames: babyNames.map(name => name._id)
@@ -101,11 +101,11 @@ const PDFDisplayComponent = ({ customerId }) => {
       try {
         setLoading(true);
         // Fetch customer details
-        const customerResponse = await axios.get(`http://localhost:3000/api/customers/${customerId}`);
+        const customerResponse = await axios.get(`https://vedic-backend-neon.vercel.app/api/customers/${customerId}`);
         const customerData = customerResponse.data;
 
         // Fetch associated baby names
-        const namesResponse = await axios.get(`http://localhost:3000/api/babyNames/${customerId}`);
+        const namesResponse = await axios.get(`https://vedic-backend-neon.vercel.app/api/babyNames/${customerId}`);
         const babyNames = namesResponse.data;
 
         // Generate PDF

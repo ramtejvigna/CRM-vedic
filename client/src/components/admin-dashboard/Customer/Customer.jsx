@@ -86,7 +86,7 @@ const Customer = () => {
     useEffect(() => {
         const getCustomerDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/customers/getCustomerDetails/${fatherName}`);
+                const response = await axios.get(`https://vedic-backend-neon.vercel.app/customers/getCustomerDetails/${fatherName}`);
                 setCustomerDetails(response.data);
                 setLoading(false);
                 if (response.data._id) {
@@ -105,7 +105,7 @@ const Customer = () => {
       setPdfLoading(true);
       try {
           const customerId = customerObjectId.toString ? customerObjectId.toString() : customerObjectId;
-          const response = await axios.get(`http://localhost:3000/api/generatedpdf`, {
+          const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf`, {
               params: {
                   customerId: customerId
               }
@@ -141,7 +141,7 @@ const Customer = () => {
 
     const handleSendMail = async (pdfUrl, pdfId, email) => {
         try {
-            await axios.post('http://localhost:3000/api/send-pdf', {
+            await axios.post('https://vedic-backend-neon.vercel.app/api/send-pdf', {
                 pdfUrl,
                 pdfId,
                 email

@@ -6,7 +6,7 @@ import { useStore } from "../../../store";
 import uploadImage from "../../../assets/upload3.jpg"; // Use the same upload image
 import axios from 'axios';
 
-const ADD_EXPENSE = "http://localhost:3000/api/expenses"; // Define your API URL here
+const ADD_EXPENSE = "https://vedic-backend-neon.vercel.app/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
   const { isDarkMode } = useStore();
