@@ -45,7 +45,7 @@ const ViewEmployee = () => {
                         {employee.avatar ? (
                             <img src={employee.avatar} alt={employee.name} />
                         ) : (
-                            <span className='text-3xl font-bold tracking-wide'>{employee?.name?.charAt(0).toUpperCase()}</span>
+                            <span className='text-3xl font-bold tracking-wide'>{employee?.firstName?.charAt(0).toUpperCase()}</span>
                         )}
                     </Avatar>
                     <span className='text-3xl font-bold tracking-wide'>{employee?.firstName || "xxxxxxx"}</span>

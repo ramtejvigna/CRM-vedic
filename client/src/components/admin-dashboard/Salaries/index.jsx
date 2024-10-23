@@ -188,7 +188,7 @@ function Salaries() {
 
   return (
     <div className='flex p-8 h-full w-full flex-col gap-5'>
-        <h1 className="text-4xl font-bold mb-20">Salaries</h1>
+        <h1 className="text-4xl font-bold mb-10">Salaries</h1>
         
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
@@ -217,8 +217,8 @@ function Salaries() {
                     whileTap={{ scale: 0.95 }}
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
-                  <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/add-salaries"}>
-                    <AiOutlineAlipay/> <span>add salary </span>
+                  <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/salaries/add-salaries"}>
+                    <AiOutlineAlipay/> <span>add salary</span>
                   </Link>
                 </motion.button>
             </div>

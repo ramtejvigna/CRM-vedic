@@ -42,8 +42,7 @@ const AdminDashboard = () => {
             <Route path='/tasks' element={<TaskManagement />} />
             <Route path="/expenses/add-expense" element={<AddExpense />} />
             <Route path='/leaves' element={<Leaves />} />
-            <Route path='/add-salaries' element={<AddSalariesStatements />} />
-
+            <Route path='/salaries/add-salaries' element={<AddSalariesStatements />} />
             <Route path="/" element={<Navigate to="/home" />} />
           </Routes>
         </div>

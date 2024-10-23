@@ -116,24 +116,23 @@ function AddSalariesStatements() {
   return (
     <div className='flex   items-center justify-center flex-col  h-full w-full p-5 md:p-10'>
 
-            <form onSubmit={handleSubmit} className='grid grid-cols-2 grid-rows-5 gap-5 p-10 bg-white rounded-xl shadow-2xl  w-full h-full mx-auto  '>
-                {/* <div className="col-span-2 text-center font-bold text-5xl uppercase tracking-widest" >salaries</div> */}
+            <form onSubmit={handleSubmit} className='grid  lg:grid-cols-2 grid-col-1 grid-rows-5 gap-5 p-5 lg:p-10 bg-white rounded-xl shadow-2xl  w-full h-full  '>
                 <div className='flex flex-col gap-3  w-full'>
                   <label htmlFor="employee" className='uppercase text-xs tracking-wider font-semibold'>Employee </label>
                   <select name='employee' value={formData.employee} onChange={handleChange} className="w-full  p-4 rounded-sm transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white ">
                   <option value="select employee">select employee</option>
                   {employees.map((employee, index) => (
                       <>
-                      <option key={index} value={employee._id}>
-                          {employee.firstName ||  employee?.name}
-                      </option>
+                        <option key={index} value={employee._id}>
+                            {employee.firstName ||  employee?.name}
+                        </option>
                       </>
                   ))}
                   </select>
                   {errors.employee && (<span className='text-xs text-red-400'>{errors.employee}</span>)}
                 </div>
 
-                <div className='flex flex-col gap-3'>
+                <div className='flex flex-col gap-3 w-full'>
                   <label className='uppercase text-xs tracking-wider font-semibold'> Amount Paid </label>
                   <TextField
                       placeholder='amount'
@@ -175,11 +174,10 @@ function AddSalariesStatements() {
                     ))}
                 </select>
                 {errors.year && (<span className='text-xs text-red-400'>{errors.year}</span>)}
-
                 </div>
 
                 {!formData.bankStatement ? (
-                        <div className="flex flex-col row-span-2 col-span-2">
+                        <div className="flex flex-col row-span-2 lg:col-span-2">
                             <label className='uppercase text-xs tracking-wider font-semibold' >Bank Statement</label>
                             <div className="mt-2 h-full  p-4 border-dashed border-2 border-blue-500 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                 <label className="w-full cursor-pointer h-full flex flex-col items-center justify-center">
@@ -201,7 +199,7 @@ function AddSalariesStatements() {
                             {errors.bankStatement && (<span className='text-xs text-red-400'>{errors.bankStatement}</span>)}
                         </div>
                     ) : (
-                        <div className="flex flex-col row-span-2">
+                        <div className="flex flex-col row-span-2 lg:col-span-2">
                           <label className='uppercase text-xs tracking-wider font-semibold' >bank statement</label>
                           <div className="mt-2 p-4  h-36 w-36 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                               <img
@@ -212,7 +210,7 @@ function AddSalariesStatements() {
                           </div>
                           <button
                               onClick={() => handleClear()}
-                              className="text-red-500 mt-2 border flex items-center gap-2"
+                              className="text-red-500 mt-2  flex items-center gap-2"
                           >
                               <AiOutlineDelete /> Clear Upload
                           </button>

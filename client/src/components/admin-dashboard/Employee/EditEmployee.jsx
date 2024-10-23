@@ -396,11 +396,11 @@ const EditEmployee = () => {
                     ) : (
                         <div className="flex flex-col">
                         <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
-                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
+                        <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
                             <img
                             src={( typeof formData.idDocuments.aadharOrPan === "string" ? `http://localhost:3000/${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan))}
                             alt="Aadhar or Pan"
-                            className="h-96 object-cover"
+                            className="object-cover"
                             />
                         </div>
                         <button
@@ -435,11 +435,11 @@ const EditEmployee = () => {
                     ) : (
                         <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
+                            <div className="mt-2 h-40 w-40 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
-                            src={( typeof formData.idDocuments.passport === "string" ? `http://localhost:3000/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
-                            alt="Passport or Driving License"
-                                className=" h-96 object-cover"
+                                src={( typeof formData.idDocuments.passport === "string" ? `http://localhost:3000/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
+                                alt="Passport or Driving License"
+                                className="object-cover"
                                 />
                             </div>
                             <button
@@ -493,11 +493,11 @@ const EditEmployee = () => {
                     ) : (
                         <div className="flex flex-col">
                         <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
-                        <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                        <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
                             src={( typeof formData.education.degrees === "string" ? `http://localhost:3000/${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees))}
                             alt="Degrees/Certificates"
-                            className=" h-64 object-cover"
+                            className="object-cover"
                             />
                         </div>
                         <button
@@ -532,11 +532,11 @@ const EditEmployee = () => {
                     ) : (
                         <div className="flex flex-col">
                         <InputLabel className="text-gray-700">Transcripts</InputLabel>
-                        <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                        <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
                             src={( typeof formData.education.transcripts === "string" ? `http://localhost:3000/${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts))}
                             alt="Transcripts"
-                            className="h-64 object-cover"
+                            className="object-cover"
                             />
                         </div>
                         <button
@@ -621,7 +621,7 @@ const EditEmployee = () => {
                 return (
                     <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
                         <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
-                        <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
+                        <p className="text-sm text-gray-500">Please provide employee payment details for billing.</p>
 
                         <TextField
                             label="Card Holder Name"
@@ -632,6 +632,7 @@ const EditEmployee = () => {
                             error={!!errors.cardholderName}
                             helperText={errors.cardholderName}
                             fullWidth
+
                         />
                         
                         <TextField
