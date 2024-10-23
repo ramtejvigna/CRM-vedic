@@ -155,6 +155,19 @@ export const sendPdfEmail = async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
+        
+        // Find the PDF document and update the mailStatus
+        const updatedPdf = await PDF.findByIdAndUpdate(
+            uniqueId,
+            { mailStatus: true },
+            { new: true } // Return the updated document
+        );
+
+        // Check if the document was found and updated
+        if (!updatedPdf) {
+            return res.status(404).json({ error: 'PDF document not found' });
+        }
+
         res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
         console.error('Error sending email:', error);
