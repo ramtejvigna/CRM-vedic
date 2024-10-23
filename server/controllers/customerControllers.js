@@ -68,31 +68,55 @@ export const addCustomerWithAssignment = async (req, res) => {
 };
 
 
+import { Customer, Employee } from '../models'; // Adjust your model import paths as needed
+
 export const getCustomers = async (req, res) => {
     try {
         // Fetch all customers
         const customers = await Customer.find();
 
-        // Fetch all employees
-        const employees = await Employee.find({}, 'name');
+        // Fetch all employees and retrieve only the 'firstName' field
+        const employees = await Employee.find({}, 'firstName');
 
-        // Create a map of employee IDs to names
-        const employeeMap = new Map(employees.map(emp => [emp._id.toString(), emp.name]));
+        // Log the employees fetched from the database
+        console.log("Employees Fetched:", employees);
 
-        // Add employee names to customer data
-        const customersWithEmployeeNames = customers.map(customer => ({
-            ...customer.toObject(),
-            assignedEmployeeName: customer.assignedEmployee
-                ? employeeMap.get(customer.assignedEmployee.toString()) || 'Unknown'
-                : 'Not Assigned'
-        }));
+        // Create a map for employee names using their _id as the key
+        const employeeMap = new Map(employees.map(emp => [
+            emp._id.toString(),  // Ensure _id is a string
+            `${emp.firstName}`  // Store the firstName
+        ]));
 
+        // Log the employee map
+        console.log("Employee Map:", employeeMap);
+
+        // Map customers to include assigned employee names
+        const customersWithEmployeeNames = customers.map(customer => {
+            const assignedEmployeeId = customer.assignedEmployee ? customer.assignedEmployee.toString() : null;
+            
+            // Log the assigned employee ID for each customer
+            console.log("Assigned Employee ID for Customer:", assignedEmployeeId);
+
+            const employeeName = assignedEmployeeId ? employeeMap.get(assignedEmployeeId) : 'Not Assigned';
+            
+            // Log the result of the employee map lookup
+            console.log("Mapped Employee Name:", employeeName || 'Unknown');
+
+            return {
+                ...customer.toObject(),
+                assignedEmployeeName: employeeName || 'Unknown'  // Use 'Unknown' if no employee found in the map
+            };
+        });
+
+        // Send the response with customers including employee names
         res.status(200).json(customersWithEmployeeNames);
     } catch (error) {
         console.error("Error fetching customers:", error);
         res.status(500).json({ error: "Error fetching customers" });
     }
 };
+
+    
 
 
 export const getCustomersBasedOnRequests = async (req, res) => {
