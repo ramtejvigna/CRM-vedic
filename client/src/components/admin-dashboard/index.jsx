@@ -37,7 +37,7 @@ const AdminDashboard = () => {
             ))}
             <Route path="employees/add-employee" element={<AddEmployee />} />
             <Route path="employees/edit-employee/:id" element={<EditEmployee />} />
-            <Route path="customers/:fatherName" element={<Customer />} /> {/* Ensure correct import */}
+            <Route path="customers/:id" element={<Customer />} /> {/* Ensure correct import */}
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
             <Route path="/expenses/add-expense" element={<AddExpense />} />
