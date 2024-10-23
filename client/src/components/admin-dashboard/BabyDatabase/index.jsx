@@ -18,7 +18,7 @@ const BabyDatabase = () => {
 
     const fetchBabyNames = async () => {
         try {
-            const response = await axios.get("http://localhost:3000/api/names");
+            const response = await axios.get("https://vedic-backend-neon.vercel.app/api/names");
             setBabyNames(response.data);
         } catch (err) {
             console.error(err);
@@ -79,7 +79,7 @@ const BabyDatabase = () => {
         const formData = new FormData();
         formData.append('csv', event.target.files[0]);
         try {
-            await axios.post("http://localhost:3000/uploadCsvNames", formData, {
+            await axios.post("https://vedic-backend-neon.vercel.app/uploadCsvNames", formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             fetchBabyNames();
@@ -103,7 +103,7 @@ const BabyDatabase = () => {
 
     const saveEdit = async () => {
         try {
-            await axios.put(`http://localhost:3000/updateBabyName/${editingName._id}`, editingName);
+            await axios.put(`https://vedic-backend-neon.vercel.app/updateBabyName/${editingName._id}`, editingName);
             setEditingName(null);
             fetchBabyNames();
             toast.success("Baby name updated successfully!", {
@@ -155,7 +155,7 @@ const BabyDatabase = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleFilters}
-                        className="px-4 py-2 rounded-lg bg-indigo-600 text-white transition duration-300"
+                        className="px-4 py-2 rounded-lg bg-blue-600 text-white transition duration-300"
                     >
                         <Filter className="h-5 w-5 inline-block mr-2" />
                         Filters
@@ -188,6 +188,20 @@ const BabyDatabase = () => {
                             <Download className="h-5 w-5 inline-block mr-2" />
                             Export Names
                         </CSVLink>
+                    </motion.label>
+                    <motion.label
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-slate-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center"
+                    >
+                        <a
+                            href="/baby_names_records.csv" // Update the path accordingly
+                            download="baby_names_template.csv"
+                            className="flex items-center"
+                        >
+                            <Download className="h-5 w-5 inline-block mr-2" />
+                            Template
+                        </a>
                     </motion.label>
 
                 </div>
