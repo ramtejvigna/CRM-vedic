@@ -8,15 +8,14 @@ import {
   deleteExpense,
   checkFile,serveFile 
 } from '../controllers/ExpensesController.js';
-import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
 // Routes
-router.post('/', upload.single('bank_statement'), addExpense);
+router.post('/', addExpense);
 router.get('/getAllExpenses', getAllExpenses);
 router.get('/:id', getExpenseById);
-router.put('/:id', upload.single('bank_statement'), updateExpense);
+router.put('/:id', updateExpense);
 router.delete('/deleteExpense/:id', deleteExpense);
 router.get('/file/:filename', serveFile);
 router.get('/check-file/:filename', checkFile)
