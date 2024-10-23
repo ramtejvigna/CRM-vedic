@@ -189,6 +189,20 @@ const BabyDatabase = () => {
                             Export Names
                         </CSVLink>
                     </motion.label>
+                    <motion.label
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-yellow-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center"
+                    >
+                        <a
+                            href="/baby_names_records.csv" // Update the path accordingly
+                            download="baby_names_template.csv"
+                            className="flex items-center"
+                        >
+                            <Download className="h-5 w-5 inline-block mr-2" />
+                            Download Template
+                        </a>
+                    </motion.label>
 
                 </div>
             </div>
