@@ -8,7 +8,7 @@ import { useStore } from "../../../store";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
 import { Search, Upload, User, Users, Filter  } from 'lucide-react';
 import { Link } from "react-router-dom";
-
+import axios from "axios";
 const EmployeeTable = () => {
   const navigate = useNavigate();
   const [status , setStatus] = useState("");
@@ -88,23 +88,26 @@ const EmployeeTable = () => {
     }
   } , [searchTerm])
 
-  useEffect(() => {
-    if(status !== "select status") {
-      let filteredEmployees;
-      switch(status) {
-        case "online" :
-            filteredEmployees  = employees.filter((employee) => employee.isOnline === true ) 
-            break;
-        case "offline" :
-            filteredEmployees  =  employees.filter((employee) => employee.isOnline === false )
-            break;
-        default :
-          fetchEmployees();
-      }
-      setEmployees(filteredEmployees)
+  const filterData = async () => {
+
+    if(status) {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/employees/search?status=${status}`);
+          if(response.status === 200) {
+            setEmployees(response.data);
+          }
+
+        } catch (error) {
+          console.error("Error filtering employees:", error.message);
+          toast.error("Error filtering employees")
+        }
     }else {
-      fetchEmployees();
+      toast.error(error.message)
     }
+
+  }
+  useEffect(() => {
+    filterData();
   } , [status])
 
   return (
