@@ -206,6 +206,7 @@ export const getCustomerDetails = async (req, res) => {
     try {
         console.log(req.params);
         const { id } = req.params;
+        console.log(req.params)
 
         // Fetch the customer by fatherName
         const customer = await Customer.findById(id);
