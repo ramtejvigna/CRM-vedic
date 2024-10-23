@@ -67,9 +67,6 @@ export const addCustomerWithAssignment = async (req, res) => {
     }    
 };
 
-
-import { Customer, Employee } from '../models'; // Adjust your model import paths as needed
-
 export const getCustomers = async (req, res) => {
     try {
         // Fetch all customers
