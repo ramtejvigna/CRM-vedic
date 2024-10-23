@@ -264,7 +264,7 @@ const CustomerDetails = () => {
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span
                        className={`
-                        px-2 py-1 rounded-full text-sm font-medium inline-flex leading-5 font-semibold
+                        px-2 py-1 rounded-full text-sm inline-flex leading-5 font-semibold
                         ${row.customerStatus === "newRequests" 
                           ? "text-yellow-600 bg-yellow-100" 
                           : ""}
