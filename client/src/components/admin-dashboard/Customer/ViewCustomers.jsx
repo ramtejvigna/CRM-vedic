@@ -30,7 +30,7 @@ const CustomerDetails = () => {
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/customers/getCustomers"
+        "https://vedic-backend.netlify.app/customers/getCustomers"
       );
       setCustomers(response.data);
     } catch (err) {

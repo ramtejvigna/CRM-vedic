@@ -12,7 +12,7 @@ import pdfRoutes from './routes/pdfRoutes.js';
 import salaryRoutes from "./routes/SalariesRoutes.js"
 import nameRoutes from "./routes/nameRoutes.js"
 import authRoutes from './routes/authRoutes.js';
-import {tokenExpirationMiddleware} from './middleware/auth.js';
+import { tokenExpirationMiddleware } from './middleware/auth.js';
 import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from './routes/adminNotifications.js'
 // import employeeRoutes from './routes/employeeRoutes.js';
@@ -28,8 +28,19 @@ const server = http.createServer(app);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // middlewares
-app.use(cors());
-app.use(express.json({limit : '100mb'}));
+const allowedOrigins = ['http://localhost:5173','http://localhost:5174', 'http://localhost:5175', 'https://vedic-backend.netlify.app'];
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+}));
+app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -37,16 +48,16 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(fileUpload());
 
-app.use('/api/employees',employeeRoutes);
-app.use('/api',taskRoutes)
+app.use('/api/employees', employeeRoutes);
+app.use('/api', taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);
-app.use('/',nameRoutes);
+app.use('/', nameRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
-app.use('/admin',adminLeaveRoutes)
-app.use('/salaries' , salaryRoutes)
-app.use('/admin',adminNotifications)
+app.use('/admin', adminLeaveRoutes)
+app.use('/salaries', salaryRoutes)
+app.use('/admin', adminNotifications)
 // app.use('/api/notifications', notificationRoutes);
 app.use('/api/expenses', expensesRoutes);     // Expenses routes
 

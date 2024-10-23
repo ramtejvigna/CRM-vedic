@@ -26,7 +26,7 @@ const Leaves = () => {
     const fetchLeaves = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:3000/admin/${activeTab}-leaves`, {
+        const response = await axios.get(`https://vedic-backend.netlify.app/admin/${activeTab}-leaves`, {
           params: {
             ...filters,
             page,

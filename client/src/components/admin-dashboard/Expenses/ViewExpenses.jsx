@@ -154,7 +154,7 @@ const ViewExpenses = () => {
   const fetchExpenses = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:3000/api/expenses/getAllExpenses");
+      const res = await fetch("https://vedic-backend.netlify.app/api/expenses/getAllExpenses");
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to fetch expenses");
@@ -200,7 +200,7 @@ const ViewExpenses = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/expenses/deleteExpense/${expenseToDelete}`,
+        `https://vedic-backend.netlify.app/api/expenses/deleteExpense/${expenseToDelete}`,
         {
           method: "DELETE",
           headers: {
@@ -234,9 +234,9 @@ const ViewExpenses = () => {
   const handlePayslip = (id) => {
     const expense = filteredExpenses.find((exp) => exp._id === id);
     if (expense && expense.bank_statement) {
-      const fileUrl = `http://localhost:3000/api/expenses/file/${expense.bank_statement}`;
+      const fileUrl = `https://vedic-backend.netlify.app/api/expenses/file/${expense.bank_statement}`;
       
-      fetch(`http://localhost:3000/api/expenses/check-file/${expense.bank_statement}`)
+      fetch(`https://vedic-backend.netlify.app/api/expenses/check-file/${expense.bank_statement}`)
         .then(response => response.json())
         .then(data => {
           if (data.exists) {

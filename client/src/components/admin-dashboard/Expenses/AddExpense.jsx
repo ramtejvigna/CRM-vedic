@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useStore } from "../../../store";
 import { AiOutlineArrowLeft, AiOutlineDelete, AiOutlineUpload } from "react-icons/ai"; // Import your icons
 
-const ADD_EXPENSE = "http://localhost:3000/api/expenses"; // Define your API URL here
+const ADD_EXPENSE = "https://vedic-backend.netlify.app/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
   const { isDarkMode } = useStore();
