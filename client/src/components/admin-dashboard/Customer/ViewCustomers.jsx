@@ -208,9 +208,8 @@ const CustomerDetails = () => {
               <tr>
                 {[
                   "S:no",
-
-                  "Father Name",
                   "Customer_Id",
+                  "Father Name",
                   "WhatsApp Number",
                   "Baby's Gender",
                   "Assigned Employee",
@@ -239,12 +238,14 @@ const CustomerDetails = () => {
                   >
                     <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
+                     {row.customerID
+}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {row.fatherName}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                     123
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    
+               <td className="px-4 py-3 whitespace-nowrap">
                       {row.whatsappNumber}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
