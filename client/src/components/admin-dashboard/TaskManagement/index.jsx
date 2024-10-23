@@ -49,7 +49,7 @@ const TaskManagement = () => {
   const fetchTasks = async (page = 1) => {
     setIsLoadingTasks(true);
     try {
-      const response = await axios.get(`http://localhost:3000/api/tasks?page=${page}&limit=${tasksPerPage}`);
+      const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/tasks?page=${page}&limit=${tasksPerPage}`);
       setTasks(response.data.tasks);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -63,7 +63,7 @@ const TaskManagement = () => {
   const fetchEmployees = async () => {
     setIsLoadingEmployees(true);
     try {
-      const response = await axios.get("http://localhost:3000/api/employees");
+      const response = await axios.get("https://vedic-backend-neon.vercel.app/api/employees");
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -122,12 +122,12 @@ const TaskManagement = () => {
     try {
       if (selectedTask) {
         await axios.put(
-          `http://localhost:3000/api/tasks/${selectedTask._id}`,
+          `https://vedic-backend-neon.vercel.app/api/tasks/${selectedTask._id}`,
           newTask
         );
         enqueueSnackbar("Task updated successfully", { variant: "success" });
       } else {
-        await axios.post("http://localhost:3000/api/tasks", newTask);
+        await axios.post("https://vedic-backend-neon.vercel.app/api/tasks", newTask);
         enqueueSnackbar("Task created successfully", { variant: "success" });
       }
       fetchTasks(currentPage);
@@ -145,7 +145,7 @@ const TaskManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/tasks/${taskToDelete}`);
+      await axios.delete(`https://vedic-backend-neon.vercel.app/api/tasks/${taskToDelete}`);
       fetchTasks(currentPage);
       enqueueSnackbar("Task deleted successfully", { variant: "success" });
     } catch (error) {
@@ -160,7 +160,7 @@ const TaskManagement = () => {
   const handleAddComment = async (id) => {
     setIsAddingComment(true);
     try {
-      await axios.post(`http://localhost:3000/api/tasks/${id}/comment`, {
+      await axios.post(`https://vedic-backend-neon.vercel.app/api/tasks/${id}/comment`, {
         text: newComment,
         createdBy: "Admin", // Example user ID
       });

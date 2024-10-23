@@ -14,7 +14,7 @@ const CustomerDetails = () => {
     const getCustomerDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/customers/getCustomerDetails/${fatherName}`
+          `https://vedic-backend-neon.vercel.app/customers/getCustomerDetails/${fatherName}`
         );
         setCustomerDetails(response.data);
         setLoading(false);
@@ -31,7 +31,7 @@ const CustomerDetails = () => {
     const getCustomerPdfs = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/customers/getCustomerPdfs/${fatherName}`
+          `https://vedic-backend-neon.vercel.app/customers/getCustomerPdfs/${fatherName}`
         );
         setPdfs(response.data);
       } catch (err) {

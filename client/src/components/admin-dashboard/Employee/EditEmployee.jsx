@@ -398,7 +398,7 @@ const EditEmployee = () => {
                         <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
                             <img
-                            src={( typeof formData.idDocuments.aadharOrPan === "string" ? `http://localhost:3000/${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan))}
+                            src={( typeof formData.idDocuments.aadharOrPan === "string" ? `https://vedic-backend-neon.vercel.app/${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan))}
                             alt="Aadhar or Pan"
                             className="h-96 object-cover"
                             />
@@ -437,7 +437,7 @@ const EditEmployee = () => {
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
-                            src={( typeof formData.idDocuments.passport === "string" ? `http://localhost:3000/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
+                            src={( typeof formData.idDocuments.passport === "string" ? `https://vedic-backend-neon.vercel.app/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
                             alt="Passport or Driving License"
                                 className=" h-96 object-cover"
                                 />
@@ -495,7 +495,7 @@ const EditEmployee = () => {
                         <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
-                            src={( typeof formData.education.degrees === "string" ? `http://localhost:3000/${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees))}
+                            src={( typeof formData.education.degrees === "string" ? `https://vedic-backend-neon.vercel.app/${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees))}
                             alt="Degrees/Certificates"
                             className=" h-64 object-cover"
                             />
@@ -534,7 +534,7 @@ const EditEmployee = () => {
                         <InputLabel className="text-gray-700">Transcripts</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
-                            src={( typeof formData.education.transcripts === "string" ? `http://localhost:3000/${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts))}
+                            src={( typeof formData.education.transcripts === "string" ? `https://vedic-backend-neon.vercel.app/${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts))}
                             alt="Transcripts"
                             className="h-64 object-cover"
                             />

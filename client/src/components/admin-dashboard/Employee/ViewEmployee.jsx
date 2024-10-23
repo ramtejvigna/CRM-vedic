@@ -156,25 +156,25 @@ const ViewEmployee = () => {
                 <div className='flex flex-col p-2'>
                     <div className="rounded-md border flex p-3 items-center justify-between">
                         <span className=''>Aadhar card</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <button onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>
                     <div className="rounded-md border flex p-3 items-center justify-between">
                         <span>passport</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <button onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>
                     <div className="rounded-md border flex p-3 items-center justify-between">
                         <span>degrees</span>
-                        <button onClick={() => setImage((prev) => prev = `http://localhost:3000/${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <button onClick={() => setImage((prev) => prev = `https://vedic-backend-neon.vercel.app/${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>
                     <div className="rounded-md border flex p-3 items-center justify-between">
                         <span>transcripts</span>
-                        <button onClick={() => setImage(`http://localhost:3000/${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <button onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
                             view
                         </button>
                     </div>
