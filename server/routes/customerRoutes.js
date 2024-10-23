@@ -16,7 +16,7 @@ router.post('/addCustomerWithAssignment', addCustomerWithAssignment);
 router.get('/getCustomers', getCustomers);
 router.get('/employees/:employeeId/customers', getCustomersBasedOnRequests);
 router.put('/:id', updateCustomerData); // Update customer by ID
-router.get('/getCustomerDetails/:fatherName', getCustomerDetails);
+router.get('/getCustomerDetails/:id', getCustomerDetails);
 router.get('/getCustomerPdfs/:fatherName', getCustomerPdfs);
 
 export default router;

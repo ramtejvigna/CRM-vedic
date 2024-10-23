@@ -77,7 +77,11 @@ const CustomerDetails = () => {
     return genderMatch && statusMatch && employeeMatch && searchMatch;
   });
 
-  const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedData = filteredData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+  
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const handleGenderChange = (event) => {
@@ -283,14 +287,13 @@ const CustomerDetails = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                    <button
-  className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-transparent hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-  onClick={() => navigate(`${row.fatherName}`)}
->
-  <Eye size={18} className="mr-2 text-blue-600" /> {/* Eye icon with blue text color */}
-  
-</button>
-
+                      <button
+                        className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        onClick={() => navigate(`${row._id}`)}
+                      >
+                        <Eye size={18} className="mr-2" />
+                        View
+                      </button>
                     </td>
                   </motion.tr>
                 ))}
