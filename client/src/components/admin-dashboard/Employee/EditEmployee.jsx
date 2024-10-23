@@ -392,6 +392,7 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
+                        {errors.aadharOrPan ? <span className='text-xs text-red-500'>aadhar or Pan is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
@@ -431,13 +432,15 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
+                        {errors.passport ? <span className='text-xs text-red-500'>passport is required</span> : ""}
+
                         </div>
                     ) : (
                         <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
                             <div className="mt-2 h-40 w-40 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
-                                src={( typeof formData.idDocuments.passport === "string" ? `http://localhost:3000/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
+                                src={( typeof formData.idDocuments.passport === "string" ? `https://vedic-backend-neon.vercel.app/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
                                 alt="Passport or Driving License"
                                 className="object-cover"
                                 />
@@ -489,6 +492,8 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
+                        {errors.degrees ? <span className='text-xs text-red-500'>degrees is required</span> : ""}
+
                         </div>
                     ) : (
                         <div className="flex flex-col">
@@ -528,6 +533,7 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
+                        {errors.transcripts ? <span className='text-xs text-red-500'>transcript is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
@@ -603,8 +609,6 @@ const EditEmployee = () => {
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
                             />
-
-
                         </div>
                         <TextField
                             label="Reason for Leaving"
@@ -632,9 +636,7 @@ const EditEmployee = () => {
                             error={!!errors.cardholderName}
                             helperText={errors.cardholderName}
                             fullWidth
-
                         />
-                        
                         <TextField
                             label="Card Number"
                             name="cardNumber"

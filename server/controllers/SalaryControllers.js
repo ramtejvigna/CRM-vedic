@@ -7,6 +7,7 @@ export const createSalaryStatement = async (req, res) => {
     try {
         const { employee, year, month, amountPaid } = req.body;
 
+        
         if (!employee || !year || !month || !amountPaid) {
             return res.status(400).json({ message: "All fields are required" });
         }
