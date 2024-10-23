@@ -13,6 +13,7 @@ import nameRoutes from "./routes/nameRoutes.js"
 import authRoutes from './routes/authRoutes.js';
 import {tokenExpirationMiddleware} from './middleware/auth.js';
 import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
+import adminNotifications from "./routes/adminNotifications.js"
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
 // import errorMiddleware from './middleware/errorMiddleware.js';
@@ -42,6 +43,7 @@ app.use('/',nameRoutes);
 app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
+app.use('/admin', adminNotifications)
 app.use('/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
 app.use('/api/expenses', expensesRoutes);     // Expenses routes
