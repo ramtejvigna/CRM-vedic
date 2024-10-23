@@ -37,7 +37,7 @@ function AddSalariesStatements() {
 
     const fetchEmployees = async () => {
         try {
-          const response = await axios.get("https://vedic-backend.netlify.app/api/employees");
+          const response = await axios.get("https://vedic-backend-neon.vercel.app/api/employees");
           setEmployees(response.data);
         } catch (error) {
           console.error("Error fetching employees:", error);
@@ -76,7 +76,7 @@ function AddSalariesStatements() {
     
           
           try {
-            const response = await axios.post(`https://vedic-backend.netlify.app/salaries/`,formDataToSend );
+            const response = await axios.post(`https://vedic-backend-neon.vercel.app/salaries/`,formDataToSend );
             if(response.status === 200) {
               toast.success("Salary added successfully")
                 navigate("/admin-dashboard/salaries")

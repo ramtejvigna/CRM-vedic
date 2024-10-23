@@ -13,7 +13,7 @@ const CustomerDetails = () => {
     useEffect(() => {
         const customerDetails = async () => {
             try {
-                const response = await fetch(`https://vedic-backend.netlify.app/customers/customersDetails/${id}`); // Use template literals
+                const response = await fetch(`https://vedic-backend-neon.vercel.app/customers/customersDetails/${id}`); // Use template literals
                 if (!response.ok) {
                     throw new Error(`Failed to fetch customer data: ${response.statusText}`); // Improved error message
                 }

@@ -43,7 +43,7 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await axios.get("https://vedic-backend.netlify.app/salaries/");
+      const response = await axios.get("https://vedic-backend-neon.vercel.app/salaries/");
       setSalaryStatements(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -61,7 +61,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`https://vedic-backend.netlify.app/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`https://vedic-backend-neon.vercel.app/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
@@ -82,7 +82,7 @@ function Salaries() {
 
     if(filterData || filteringMonth) {
         try {
-          const response = await axios.get(`https://vedic-backend.netlify.app/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
+          const response = await axios.get(`https://vedic-backend-neon.vercel.app/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
           if(response.status === 200) {
             setSalaryStatements(response.data);
           }
@@ -342,7 +342,7 @@ function Salaries() {
   
                               <td className="px-6  py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
                                 <button
-                                  onClick={() => setImage(`https://vedic-backend.netlify.app/${statement.bankStatement}`)}
+                                  onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${statement.bankStatement}`)}
                                   className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
                                     isDarkMode
                                       ? "text-green-400 hover:text-green-200"

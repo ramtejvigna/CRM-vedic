@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://vedic-backend.netlify.app',
+        target: 'https://vedic-backend-neon.vercel.app',
         changeOrigin: true,
       },
     },
