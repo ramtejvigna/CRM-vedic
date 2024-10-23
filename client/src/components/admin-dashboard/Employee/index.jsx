@@ -154,7 +154,7 @@ const EmployeeTable = () => {
                               ) : (
                                 <div className="h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center">
                                   <span className="text-white font-bold">
-                                    {employee?.name?.charAt(0).toUpperCase()}
+                                    {employee?.firstName?.charAt(0).toUpperCase()}
                                   </span>
                                 </div>
                               )}
@@ -168,7 +168,7 @@ const EmployeeTable = () => {
                                     : "text-gray-900"
                                 }`}
                               >
-                                {employee.name}
+                                {employee.firstName}
                               </div>
                               <div
                                 className={`text-sm ${

@@ -134,7 +134,6 @@ export const updateEmployee = async (req, res) => {
             employerName, jobTitle, startDate, endDate, reasonForLeaving,
             cardNumber, cardholderName, cvv, expiryDate } = req.body;
 
-        // Fetch the existing employee data
         const employee = await Employee.findById(id);
         if (!employee) {
             return res.status(404).json({ message: "Employee with provided ID does not exist" });

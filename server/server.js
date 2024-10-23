@@ -1,6 +1,5 @@
 import express from 'express';
 import http from 'http';
-import fileUpload from 'express-fileupload';
 import { connectToMongoDB } from './db.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -34,7 +33,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(fileUpload());
 
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
@@ -47,6 +45,7 @@ app.use('/admin',adminLeaveRoutes)
 app.use('/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
 app.use('/api/expenses', expensesRoutes);     // Expenses routes
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));

@@ -8,6 +8,8 @@ import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineArrowLeft} 
 import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import uploadImage from "../../../assets/upload3.jpg"
 function AddSalariesStatements() {
     const months = [
         'January', 'February', 'March', 'April', 'May', 'June', 
@@ -17,10 +19,10 @@ function AddSalariesStatements() {
   const [showFilters , setShowFilters] = useState(false)
   const currentYear = new Date().getFullYear();
   const startYear = 2000;
-  const endYear = currentYear + 10;
+  const endYear = currentYear;
   const years = [];
   
-  for (let year = startYear; year <= endYear; year++) {
+  for (let year = endYear; year >= startYear; year--) {
     years.push(year);
   }
     const [employees , setEmployees] = useState([]);
@@ -112,72 +114,59 @@ function AddSalariesStatements() {
         })
       }
   return (
-    <div className='flex w-full h-full flex-col p-10'>
-            <div className='w-full flex '>
-            <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 transform hover:scale-105 active:scale-95"
-            >
-            <AiOutlineArrowLeft className="text-xl" />
-            Back
-            </button>
-            </div>
+    <div className='flex   items-center justify-center flex-col  h-full w-full p-5 md:p-10'>
 
-            <form onSubmit={handleSubmit} className='flex flex-col gap-5 p-5 bg-white rounded-xl shadow-xl  w-full max-w-[600px] mx-auto  '>
-                <div className='text-2xl font-bold text-center uppercase tracking-wider'>
-                    Add Your Salary and Bank Details
-                </div>
-                <div className='text-sm font-thin text-center  text-gray-600'>
-                    Submit Your Salary Information and Bank Statements
-                </div>
-
-
-
-                <div className='flex flex-col gap-2  w-full'>
-                <label htmlFor="employee">Employee </label>
-                <select name='employee' value={formData.employee} onChange={handleChange} className="w-full p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white focus:border-blue-400">
-                <option value="select employee">select employee</option>
-                {employees.map((employee, index) => (
-                    <>
-                    <option key={index} value={employee._id}>
-                        {employee.firstName ||  employee?.name}
-                    </option>
-                    </>
-                ))}
-                </select>
-                {errors.employee && (<span className='text-xs text-red-400'>{errors.employee}</span>)}
+            <form onSubmit={handleSubmit} className='grid grid-cols-2 grid-rows-5 gap-5 p-10 bg-white rounded-xl shadow-2xl  w-full h-full mx-auto  '>
+                {/* <div className="col-span-2 text-center font-bold text-5xl uppercase tracking-widest" >salaries</div> */}
+                <div className='flex flex-col gap-3  w-full'>
+                  <label htmlFor="employee" className='uppercase text-xs tracking-wider font-semibold'>Employee </label>
+                  <select name='employee' value={formData.employee} onChange={handleChange} className="w-full  p-4 rounded-sm transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white ">
+                  <option value="select employee">select employee</option>
+                  {employees.map((employee, index) => (
+                      <>
+                      <option key={index} value={employee._id}>
+                          {employee.firstName ||  employee?.name}
+                      </option>
+                      </>
+                  ))}
+                  </select>
+                  {errors.employee && (<span className='text-xs text-red-400'>{errors.employee}</span>)}
                 </div>
 
-                <label >Amount Paid </label>
-                <TextField
-                    label="Basic salary"
-                    name="amountPaid"
-                    type='number'
-                    value={formData.amountPaid}
-                    onChange={handleChange}
-                    error={!!errors.amountPaid}
-                    helperText={errors.amountPaid}
-                    className="rounded-md shadow-sm bg-gray-50"
-                    fullWidth
-                />
+                <div className='flex flex-col gap-3'>
+                  <label className='uppercase text-xs tracking-wider font-semibold'> Amount Paid </label>
+                  <TextField
+                      placeholder='amount'
+                      name="amountPaid"
+                      type='number'
+                      value={formData.amountPaid}
+                      onChange={handleChange}
+                      error={!!errors.amountPaid}
+                      helperText={errors.amountPaid}
+                      className="rounded-md shadow-sm bg-gray-50"
+                      fullWidth
+                  />
+                </div>
 
-                <div className='flex flex-col gap-2  w-full'>
-                <label htmlFor="month">Select Month:</label>
-                <select value={formData.month} onChange={handleChange} id="month" name="month" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white focus:border-blue-400">
-                    <option value="select month">select month</option>
-                    {months.map((month, index) => (
-                    <option key={index} value={month}>
-                        {month}
-                    </option>
-                    ))}
-                </select>
-                {errors.month && (<span className='text-xs text-red-400'>{errors.month}</span>)}
+
+                <div className='flex flex-col gap-3  w-full'>
+                  <label htmlFor="month" className='uppercase text-xs tracking-wider font-semibold'>Select Month</label>
+                  <select value={formData.month} onChange={handleChange} id="month" name="month" className="w-full  p-4 rounded-sm transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white ">
+                      <option value="select month">select month</option>
+                      {months.map((month, index) => (
+                      <option key={index} value={month}>
+                          {month}
+                      </option>
+                      ))}
+                  </select>
+                  
+                  {errors.month && (<span className='text-xs text-red-400'>{errors.month}</span>)}
 
                 </div>
 
                 <div className='flex flex-col gap-2  w-full'>
-                <label htmlFor="year">Select Year:</label>
-                <select value={formData.year} onChange={handleChange} id="year" name="year"  className="p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white focus:border-blue-400">
+                <label htmlFor="year" className='uppercase text-xs tracking-wider font-semibold'>Select Year</label>
+                <select value={formData.year} onChange={handleChange} id="year" name="year"  className="w-full p-4 rounded-sm transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white ">
                 <option value="select year">select year</option>
                     {years.map(year => (
                     <option key={year} value={year}>
@@ -190,46 +179,54 @@ function AddSalariesStatements() {
                 </div>
 
                 {!formData.bankStatement ? (
-                        <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Bank Statement</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                <label className="w-full h-full flex flex-col items-center justify-center">
-                                <span className="text-gray-500 flex gap-2 items-center">
-                                    <AiOutlineUpload /> Upload File
-                                </span>
-                                <input
-                                    type="file"
-                                    accept=".jpg,.png,.jpeg"
-                                    // onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
-                                    onChange={(e) => handleFileChange(e)}
-                                    className="hidden"
-                                />
+                        <div className="flex flex-col row-span-2 col-span-2">
+                            <label className='uppercase text-xs tracking-wider font-semibold' >Bank Statement</label>
+                            <div className="mt-2 h-full  p-4 border-dashed border-2 border-blue-500 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                <label className="w-full cursor-pointer h-full flex flex-col items-center justify-center">
+                                  <span className="text-gray-500 flex-col flex gap-2 items-center">
+                                    <div className='h-28 w-28  object-cover'>
+                                      <img src={uploadImage} className='h-28 w-28' alt="upload"  />
+                                    </div>
+                                    <span className='font-bold text-xl '> upload file</span>
+                                  </span>
+                                  <input
+                                      type="file"
+                                      accept=".jpg,.png,.jpeg"
+                                      // onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
+                                      onChange={(e) => handleFileChange(e)}
+                                      className="hidden"
+                                  />
                                 </label>
                             </div>
                             {errors.bankStatement && (<span className='text-xs text-red-400'>{errors.bankStatement}</span>)}
                         </div>
                     ) : (
-                        <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">bank statement</InputLabel>
-                        <div className="mt-2 p-4  h-36 w-36 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                            <img
-                            src={URL.createObjectURL(formData.bankStatement)}
-                            alt="Aadhar or Pan"
-                            className="object-cover"
-                            />
-                        </div>
-                        <button
-                            onClick={() => handleClear()}
-                            className="text-red-500 mt-2 flex items-center gap-2"
-                        >
-                            <AiOutlineDelete /> Clear Upload
-                        </button>
+                        <div className="flex flex-col row-span-2">
+                          <label className='uppercase text-xs tracking-wider font-semibold' >bank statement</label>
+                          <div className="mt-2 p-4  h-36 w-36 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                              <img
+                              src={URL.createObjectURL(formData.bankStatement)}
+                              alt="Aadhar or Pan"
+                              className="object-cover"
+                              />
+                          </div>
+                          <button
+                              onClick={() => handleClear()}
+                              className="text-red-500 mt-2 border flex items-center gap-2"
+                          >
+                              <AiOutlineDelete /> Clear Upload
+                          </button>
                         </div>
                     )}
 
-                <button type="submit" className="flex uppercase w-full  items-center justify-center text-xl whitespace-nowrap px-5  py-2 text-white bg-blue-500 hover:bg-blue-600">
-                {false ? <div className="w-[25px] h-[25px] rounded-full border-[2px] border-dotted border-gray-200 border-t-black animate-spin transition-all duration-200" /> : "add salary"}
-                </button>
+                <div className="flex items-center  justify-end gap-5 col-span-2">
+                  <Link to="/admin-dashboard/salaries" className="flex uppercase   items-center justify-center  whitespace-nowrap px-5 border tracking-wider border-red-500  py-2 text-red-500  hover:bg-gray-100">
+                    {false ? <div className="w-[25px] h-[25px] rounded-full border-[2px] border-dotted border-gray-200 border-t-black animate-spin transition-all duration-200" /> : "cancel"}
+                  </Link>
+                  <button type="submit" className="flex uppercase items-center justify-center  whitespace-nowrap px-5  py-2 text-white bg-blue-500 hover:bg-blue-600">
+                  {false ? <div className="w-[25px] h-[25px] rounded-full border-[2px] border-dotted border-gray-200 border-t-black animate-spin transition-all duration-200" /> : "add salary"}
+                  </button>
+                </div>
 
             </form>
     </div>

@@ -204,7 +204,7 @@ const EditEmployee = () => {
         })
     } 
 
-    console.log(formData.education.degrees)
+
     const handleSubmit = async (e) => { 
         e.preventDefault();
         const formDataToSend = new FormData();

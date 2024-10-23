@@ -188,7 +188,7 @@ function Salaries() {
 
   return (
     <div className='flex p-8 h-full w-full flex-col gap-5'>
-        <h1 className="text-4xl font-bold mb-20">Salary statements</h1>
+        <h1 className="text-4xl font-bold mb-20">Salaries</h1>
         
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
@@ -218,7 +218,7 @@ function Salaries() {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/add-salaries"}>
-                    <AiOutlineAlipay/> <span>add salary statement</span>
+                    <AiOutlineAlipay/> <span>add salary </span>
                   </Link>
                 </motion.button>
             </div>
@@ -327,13 +327,13 @@ function Salaries() {
                                 <span className="text-sm">{statement.month}</span>
                               </td>
   
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 whitespace-nowrap text-center">
                                 {statement?.bankStatement ? (
-                                  <span className="text-sm px-3 py-1.5 text-green-500 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
-                                    Paid
+                                  <span className="text-sm px-3 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
+                                    paid
                                   </span>
                                 ) : (
-                                  <span className="text-sm px-3 py-1.5 text-red-500 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
+                                  <span className="text-sm px-3 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
                                     Pending
                                   </span>
                                 )}
@@ -457,7 +457,7 @@ function Salaries() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0 }}
                       transition={{ duration: 0.5, ease: "backInOut" }}
-                      className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[900px] shadow-xl h-full my-auto max-h-[700px] relative"
+                      className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
                     >
                       {/* Close button */}
                       <div className='flex absolute top-1 right-1 justify-end items-end '>
