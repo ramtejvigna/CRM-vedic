@@ -112,7 +112,6 @@ export const addComment = async (req, res) => {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-
     const createdBy = employee.firstName
     console.log(createdBy)
     // Find the task by id
