@@ -229,7 +229,7 @@ const Customer = () => {
                     <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Assigned Employee</h2>
                     {customerDetails.assignedEmployee ? (
                         <div className="text-gray-600">
-                            <p><strong>Name:</strong> {customerDetails.assignedEmployee.name}</p>
+                            <p className="capitalize"><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
                             <p><strong>Email:</strong> {customerDetails.assignedEmployee.email}</p>
                             <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
                         </div>
