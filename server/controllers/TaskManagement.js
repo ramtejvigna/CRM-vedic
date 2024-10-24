@@ -104,7 +104,7 @@ export const deleteTask = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text } = req.body.newComment;
+    const { text } = req.body;
     console.log('in add comment');
     console.log(req.body);
     console.log(req.user);
