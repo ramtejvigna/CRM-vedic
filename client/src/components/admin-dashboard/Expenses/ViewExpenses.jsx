@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Filter, Download, Eye, Trash, Search } from "lucide-react";
 import { useStore } from "../../../store";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AiOutlineDownload, AiOutlinePrinter, AiOutlineClose } from 'react-icons/ai';
 
 // Delete Modal Component
 const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
@@ -12,26 +13,27 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" onClick={onClose} />
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white rounded-lg p-8 shadow-xl z-50 w-96 relative min-h-[200px] flex flex-col justify-between"
+        exit={{ scale: 0, opacity: 0 }}
+        transition={{ duration: 0.5, ease: "backInOut" }}
+        className="bg-white rounded-xl shadow-2xl p-7 min-w-[400px] flex flex-col justify-between"
       >
         <div className='text-3xl font-bold uppercase text-center'>ARE YOU SURE</div>
-        <div className='text-xs text-center'>you want to delete this statement?</div>
-        
-        <div className="flex justify-center space-x-4 mt-auto">
+        <div className='text-xs text-center'>you want to delete this expense?</div>
+
+        <div className="flex justify-end gap-2 mt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200"
+            className='rounded-lg border border-gray-200 uppercase px-3 py-2'
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-transparent text-red-600 border border-red-600 rounded-md hover:bg-red-600 hover:text-white transition-colors duration-200"
+            className="px-4 rounded-lg flex items-center justify-center bg-red-500 text-white py-2 hover:bg-red-600"
           >
             Delete
           </button>
@@ -40,7 +42,35 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
     </div>
   );
 };
-
+const printImage = () => {
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Print Image</title>
+        <style>
+          body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white;
+          }
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+        </style>
+      </head>
+      <body>
+        <img src="${image}" alt="Image to print" />
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+};
 // Payslip Modal Component
 const PayslipModal = ({ fileUrl, onClose }) => {
   const isPdf = fileUrl.toLowerCase().endsWith('.pdf');
@@ -75,54 +105,68 @@ const PayslipModal = ({ fileUrl, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed z-50 inset-0 flex items-center justify-center">
       <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white rounded-lg p-0 shadow-xl z-50 w-[800px] relative"
+        className="bg-white w-full max-w-[800px] relative p-0 shadow-xl rounded-lg overflow-hidden"
       >
-        <div className="bg-black text-white p-4 rounded-t-lg">
+        {/* Header with increased height and margins */}
+        <div className="bg-black text-white p-4 flex justify-between items-center" style={{ minHeight: '80px', marginTop: '20px', marginLeft: '40px', marginRight: '40px' }}>
           <h3 className="text-lg font-semibold">Payslip</h3>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleDownload}
+              className="flex items-center justify-center p-2 text-white  rounded-md transition-all"
+            >
+              <AiOutlineDownload size={24} />
+            </button>
+            <button
+              onClick={printImage}
+              className="flex items-center justify-center p-2 text-white  rounded-md transition-all"
+            >
+              <AiOutlinePrinter size={24} />
+            </button>
+          </div>
         </div>
 
-        <div className="p-6">
+        {/* Iframe and Image Container with scrollbar */}
+        <div className="flex items-center justify-center w-full h-[70vh] p-6 overflow-auto">
           {isPdf ? (
             <iframe
               src={fileUrl}
-              className="w-full h-[70vh] mb-4 border rounded-md"
+              className="w-full h-full border rounded-md"
               title="Payslip PDF"
+              style={{ minHeight: '100%', maxHeight: '100%', overflow: 'auto' }} // Added overflow auto for iframe
             />
           ) : isImage ? (
             <img
               src={fileUrl}
               alt="Payslip"
-              className="w-full h-[70vh] mb-4 border rounded-md"
+              className="max-w-full max-h-full object-contain border rounded-md"
+              style={{ maxHeight: '100%', overflowY: 'auto' }} // Maintain max height and allow overflow
             />
           ) : (
             <p>Unsupported file type</p>
           )}
         </div>
 
-        <div className="absolute top-4 right-4 flex space-x-2">
-          <button
-            onClick={handleDownload}
-            className="text-gray-500 hover:text-blue-500 transition-colors"
-          >
-            <Download size={24} />
-          </button>
+        {/* Cancel Button positioned outside of the header */}
+        <div className="absolute top-1 right-1">
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-red-500 transition-colors"
+            className="flex items-center justify-center p-0 text-gray-500 hover:text-red-500 transition-colors"
           >
-            <X size={24} />
+            <AiOutlineClose size={24} />
           </button>
         </div>
       </motion.div>
     </div>
   );
 };
+
 
 // Main ViewExpenses Component
 const ViewExpenses = () => {
@@ -142,24 +186,33 @@ const ViewExpenses = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5); // State for rows per page
 
-  const recordsPerPage = 5;
   
+  const totalExpenses = filteredExpenses.length;
+  const totalPages = Math.ceil(totalExpenses / rowsPerPage); // Total pages based on filtered expenses
+  const indexOfLastRecord = currentPage * rowsPerPage; // Index of the last record on the current page
+  const indexOfFirstRecord = indexOfLastRecord - rowsPerPage; // Index of the first record on the current page
+  const currentRecords = filteredExpenses.slice(indexOfFirstRecord, indexOfLastRecord); // Current records to display
 
   const currentYear = new Date().getFullYear();
   const startYear = 2010;
   const endYear = currentYear;
   const years = [];
-  
+
   for (let year = endYear; year >= startYear; year--) {
     years.push(year);
   }
 
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
   useEffect(() => {
-    fetchExpenses();
+    fetchExpenses(); // Ensure fetchExpenses is defined and implemented
   }, []);
 
   useEffect(() => {
-    handleFilterAndSearch();
+    handleFilterAndSearch(); // Ensure this function is defined and implemented
   }, [searchTerm, expenses, selectedMonth, selectedYear]);
 
   const fetchExpenses = async () => {
@@ -197,11 +250,14 @@ const ViewExpenses = () => {
     if (selectedMonth || selectedYear) {
       filtered = filtered.filter((expense) => {
         const expenseDate = new Date(expense.date);
-        const expenseMonth = expenseDate.getMonth() + 1;
-        const expenseYear = expenseDate.getFullYear();
+        
+        // Get month (0-11) and convert selected month to same format
+        const expenseMonth = months[expenseDate.getMonth()]; // Get month name
+        const expenseYear = expenseDate.getFullYear().toString();
 
-        const monthMatch = !selectedMonth || expenseMonth === parseInt(selectedMonth);
-        const yearMatch = !selectedYear || expenseYear === parseInt(selectedYear);
+        // Check if month and year match the selected filters
+        const monthMatch = !selectedMonth || expenseMonth === selectedMonth;
+        const yearMatch = !selectedYear || expenseYear === selectedYear;
 
         return monthMatch && yearMatch;
       });
@@ -275,14 +331,28 @@ const ViewExpenses = () => {
       toast.info("No bank statement available for this expense");
     }
   };
+    
 
   const handleAddExpense = () => navigate("add-expense");
   const handleEdit = (id) => navigate(`edit-expense/${id}`);
 
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = filteredExpenses.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(filteredExpenses.length / recordsPerPage);
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`relative inline-flex items-center px-2 py-2 border ${
+            currentPage === i ? (isDarkMode ? "bg-gray-700" : "bg-gray-200") : (isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white")
+          } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return buttons;
+  };
 
   return (
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${
@@ -317,16 +387,16 @@ const ViewExpenses = () => {
 
             <div className="flex items-center space-x-2"> 
           
-  <div className="relative" style={{ width: '60%' }}> 
-    <input
-      type="text"
-      placeholder="Search expenses..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-  </div>
+            <div className="relative w-full" style={{ width: '60%' }}>
+  <input
+    type="text"
+    placeholder="Search expenses..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+  />
+  <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+</div>
 
   <motion.button
     whileHover={{ scale: 1.02 }}
@@ -351,52 +421,50 @@ const ViewExpenses = () => {
               </motion.button>
             </div>
 
-            <AnimatePresence>
-              {showFilters && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex items-center space-x-4 py-4">
-                    <div className="flex-1 min-w-[150px]">
-                      <label htmlFor="month" className="block text-sm font-medium text-gray-700">Month</label>
-                      <select
-  id="month"
-  value={selectedMonth}
-  onChange={(e) => setSelectedMonth(e.target.value)} // Remove handleFilterAndSearch() call
-  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
->
-  <option value="">Select Month</option>
-  {[
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ].map((month, index) => (
-    <option key={index} value={index + 1}>{month}</option>
-  ))}
-</select>
-                    </div>
+            {showFilters && (
+      <div className="flex gap-5 items-center justify-start">
+        <form className='flex w-full gap-5 flex-wrap'>
+          <div className='flex gap-2 items-center min-w-[150px]'>
+            <label htmlFor="month" className="mr-2">Month:</label>
+            <select 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(e.target.value)} 
+              id="month" 
+              name="month" 
+              className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+            >
+              <option value="">select month</option>
+              {months.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+      
+          <div className='flex gap-2 items-center min-w-[150px]'>
+            <label htmlFor="year" className="mr-2">Year:</label>
+            <select 
+              value={selectedYear} 
+              onChange={(e) => setSelectedYear(e.target.value)} 
+              id="year" 
+              name="year"  
+              className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+            >
+              <option value="">select year</option>
+              {years.map(year => (
+                <option key={year} value={year.toString()}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+        </form>
+      </div>
+    )}
 
-                    <div className="flex-1 min-w-[150px]">
-                      <label htmlFor="year" className="block text-sm font-medium mb-1">Year</label>
-                      <select
-  id="year"
-  value={selectedYear}
-  onChange={(e) => setSelectedYear(e.target.value)} // Remove handleFilterAndSearch() call
-  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
->
-  <option value="">Select Year</option>
-  {years.map((year) => (
-    <option key={year} value={year}>{year}</option>
-  ))}
-</select>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          
+
           </div>
         </div>
 
@@ -430,6 +498,17 @@ const ViewExpenses = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center">
+                          
+                          <button
+                            onClick={() => handlePayslip(expense._id)}
+                            className={`mr-7 flex gap-2 transition-colors duration-300 ${
+                              isDarkMode
+                                ? "text-green-400 hover:text-green-200"
+                                : "text-green-600 hover:text-green-900"
+                            }`}
+                          >
+                            <Eye size={18} /> 
+                          </button>
                           <button
                             onClick={() => initiateDelete(expense._id)}
                             className={`mr-3 flex gap-2 transition-colors duration-300 ${
@@ -438,17 +517,7 @@ const ViewExpenses = () => {
                                 : "text-red-600 hover:text-red-900"
                             }`}
                           >
-                            <Trash size={18} /> {"DELETE"}
-                          </button>
-                          <button
-                            onClick={() => handlePayslip(expense._id)}
-                            className={`mr-3 flex gap-2 transition-colors duration-300 ${
-                              isDarkMode
-                                ? "text-green-400 hover:text-green-200"
-                                : "text-green-600 hover:text-green-900"
-                            }`}
-                          >
-                            <Eye size={18} /> {"PAYSLIP"}
+                            <Trash size={18} /> 
                           </button>
                         </div>
                       </td>
@@ -472,35 +541,50 @@ const ViewExpenses = () => {
   </div>
 
   {/* Pagination controls on the right */}
-  <div className="flex items-center space-x-4">
-  <button
-    onClick={() => handleChangePage(currentPage - 1)}
-    disabled={currentPage === 1}
-    className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${isDarkMode
-      ? "bg-gray-800 text-white hover:bg-gray-700"
-      : "bg-white text-gray-700 hover:bg-gray-50"
-    } ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
-  >
-    <ChevronLeft size={20} className="mr-2" />
-    Previous
-  </button>
-
-  <span className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-    Page {currentPage} of {totalPages}
-  </span>
-
-  <button
-    onClick={() => handleChangePage(currentPage + 1)}
-    disabled={currentPage >= totalPages}
-    className={`flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${isDarkMode
-      ? "bg-gray-800 text-white hover:bg-gray-700"
-      : "bg-white text-gray-700 hover:bg-gray-50"
-    } ${currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
-  >
-    Next
-    <ChevronRight size={20} className="ml-2" />
-  </button>
-</div>
+  <div className={`px-4 py-3 flex items-center justify-between border-t sm:px-6`}>
+        <div className="flex-1 flex justify-between sm:hidden">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            Next
+          </button>
+        </div>
+        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+         
+          <div>
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${
+                  isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+              >
+                Previous
+              </button>
+              {renderPaginationButtons()}
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
+                  isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        </div>
+        </div>
 </div>
 
              

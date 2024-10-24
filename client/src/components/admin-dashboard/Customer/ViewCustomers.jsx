@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useStore } from "../../../store";
 import { motion, AnimatePresence } from "framer-motion";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
-import { ChevronLeft, ChevronRight, Filter, Eye, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight,Filter, Eye, Search } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -77,7 +77,11 @@ const CustomerDetails = () => {
     return genderMatch && statusMatch && employeeMatch && searchMatch;
   });
 
-  const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedData = filteredData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+  
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const handleGenderChange = (event) => {
@@ -116,13 +120,17 @@ const CustomerDetails = () => {
       <div className="flex flex-col mb-4">
   <h1 className="text-4xl font-bold mb-8">Customer Details</h1>
   <div className="flex items-center space-x-4 mt-8"> {/* Added mt-2 for margin-top */}
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearch}
-      placeholder="Search..."
-      className="border rounded-lg px-4 py-2"
-    />
+  <div className="relative w-full" style={{ width: '22%' }}>
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={handleSearch}
+    placeholder="Search..."
+    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+  />
+  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+</div>
+
     <button
       onClick={() => setShowFilters(!showFilters)}
       className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-300"
@@ -284,11 +292,10 @@ const CustomerDetails = () => {
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                     <button
-  className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-transparent hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-  onClick={() => navigate(`${row.fatherName}`)}
+  className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+  onClick={() => navigate(`${row._id}`)}
 >
-  <Eye size={18} className="mr-2 text-blue-600" /> {/* Eye icon with blue text color */}
-  
+  <Eye size={18} className="mr-2 text-blue-600" />
 </button>
 
                     </td>

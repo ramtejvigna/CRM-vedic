@@ -437,7 +437,7 @@ const EditEmployee = () => {
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
                             <div className="mt-2 h-40 w-40 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
-                                src={( typeof formData.idDocuments.passport === "string" ? `http://localhost:3000/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
+                                src={( typeof formData.idDocuments.passport === "string" ? `https://vedic-backend-neon.vercel.app/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
                                 alt="Passport or Driving License"
                                 className="object-cover"
                                 />

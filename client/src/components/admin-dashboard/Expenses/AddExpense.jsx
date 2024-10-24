@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useStore } from "../../../store";
 import uploadImage from "../../../assets/upload3.jpg"; // Use the same upload image
 import axios from 'axios';
-import { XCircleIcon, } from 'lucide-react';
+import { XCircleIcon, ArrowLeft } from 'lucide-react'; // Import the back arrow icon
 const ADD_EXPENSE = "http://localhost:3000/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
@@ -75,6 +75,15 @@ const AddExpense = () => {
   return (
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-10">
+      <div className="flex items-center mb-6">
+          <button 
+            onClick={() => navigate(-1)} // Navigate back
+            className="flex items-center text-gray-600 hover:text-blue-500"
+          >
+            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+           
+          </button>
+        </div>
         <h1 className="text-3xl font-bold mb-6 text-center">Add Expense</h1>
 
         {/* Form Grid Layout */}
@@ -177,8 +186,8 @@ const AddExpense = () => {
             <button
               type="button"
               onClick={() => navigate("/admin-dashboard/expenses")}
-              className="px-5 py-2 border border-red-500 text-red-500 hover:bg-gray-100"
-            >
+              className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
               Cancel
             </button>
             <motion.button

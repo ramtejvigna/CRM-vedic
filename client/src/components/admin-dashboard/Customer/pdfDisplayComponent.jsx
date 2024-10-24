@@ -1,147 +1,104 @@
-import React, { useEffect, useState } from 'react';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import axios from 'axios';
 import pdfTemplate from "../../../assets/Template.pdf";
 
-const PDFDisplayComponent = ({ customerId }) => {
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// Extracted generatePdf function to reuse it elsewhere
+export const generatePdf = async (babyNames) => {
+  try {
+    const pdfTemplateBytes = await fetch(pdfTemplate).then(res => {
+      if (!res.ok) throw new Error('Network response was not ok');
+      return res.arrayBuffer();
+    });
 
-  const generatePdf = async (customerData, babyNames) => {
-    try {
-      // Fetch the PDF template
-      const pdfTemplateBytes = await fetch(pdfTemplate).then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.arrayBuffer();
-      });
+    const pdfDoc = await PDFDocument.load(pdfTemplateBytes);
+    const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 25;
+    const lineSpacing = 40;
+    const lineSpacing1=52;
+    const firstPage = pdfDoc.getPage(0);
+    let secondPage = pdfDoc.getPage(1);  // Initially assume second page
+    let thirdPage = pdfDoc.getPageCount() > 2 ? pdfDoc.getPage(2) : null;  // Check if third page already exists
 
-      const pdfDoc = await PDFDocument.load(pdfTemplateBytes);
-      const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-      const fontSize = 25;
-      const lineSpacing = 40;
-      const lineSpacing1 = 52;
-
-      // Get the pages
-      const firstPage = pdfDoc.getPage(0);
-      let secondPage = pdfDoc.getPage(1);
-      let thirdPage = pdfDoc.getPageCount() > 2 ? pdfDoc.getPage(2) : null;
-
-      // Calculate astrological details based on birth date and time
-      const birthDate = new Date(customerData.babyBirthDate);
-      const staticData = {
-        gender: customerData.babyGender,
-        zodiacSign: getZodiacSign(birthDate), // You'll need to implement this
-        nakshatra: getNakshatra(birthDate), // You'll need to implement this
-        gemstone: getGemstone(birthDate), // You'll need to implement this
-        destinyNumber: calculateDestinyNumber(birthDate), // You'll need to implement this
-        luckyColour: getLuckyColor(birthDate), // You'll need to implement this
-        birthDate: birthDate.toLocaleDateString(),
-        birthTime: customerData.babyBirthTime,
-        numerology: calculateNumerology(birthDate), // You'll need to implement this
-        luckyDay: getLuckyDay(birthDate), // You'll need to implement this
-        luckyGod: customerData.preferredGod || 'Not specified',
-        luckyMetal: getLuckyMetal(birthDate), // You'll need to implement this
-      };
-
-      // Embed static data on first page
-      let textYPosition = 620;
-      firstPage.drawText(staticData.gender, { x: 320, y: textYPosition, size: fontSize, font });
-      textYPosition -= lineSpacing;
-      // ... (rest of the static data embedding)
-
-      // Embed baby names on second/third page
-      let yPosition = 600;
-      babyNames.forEach(({ name, meaning }, index) => {
-        if (yPosition < 100 && !thirdPage) {
-          thirdPage = pdfDoc.addPage();
-          yPosition = 600;
-        } else if (yPosition < 100 && thirdPage) {
-          secondPage = thirdPage;
-          yPosition = 600;
-        }
-
-        secondPage.drawText(`Name: ${name}`, { x: 50, y: yPosition, size: fontSize, font });
-        yPosition -= 60;
-        secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition, size: fontSize, font });
-        yPosition -= 80;
-      });
-
-      // Save the PDF
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-
-      // Save PDF to database
-      await savePdfToDatabase(customerId, url, babyNames);
-
-      return url;
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      throw error;
-    }
+    // Static data
+    const staticData = {
+      gender: 'Girl',
+      zodiacSign: 'Cancer',
+      nakshatra: 'Punarvasu',
+      gemstone: 'Pearl',
+      destinyNumber: 6,
+      luckyColour: 'White',
+      birthDate: '02/08/2024',
+      birthTime: '10:05 PM',
+      numerology: 2,
+      luckyDay: 'Sunday',
+      luckyGod: 'Shiva',
+      luckyMetal: 'Silver',
   };
 
-  const savePdfToDatabase = async (customerId, pdfUrl, babyNames) => {
-    try {
-      const response = await axios.post('http://localhost:3000/api/savePdf', {
-        customerId,
-        pdfUrl,
-        babyNames: babyNames.map(name => name._id)
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error saving PDF:', error);
-      throw error;
-    }
-  };
+    // Embed static data on the first page
+    let textYPosition = 620;
+    firstPage.drawText(staticData.gender, { x: 320, y: textYPosition, size: fontSize, font }); // Gender
+        textYPosition -= lineSpacing;  // Move down for the next value
 
-  useEffect(() => {
-    const fetchDataAndGeneratePdf = async () => {
-      try {
-        setLoading(true);
-        // Fetch customer details
-        const customerResponse = await axios.get(`http://localhost:3000/api/customers/${customerId}`);
-        const customerData = customerResponse.data;
+        firstPage.drawText(staticData.birthDate, { x: 320, y: textYPosition, size: fontSize, font }); // Birth Date
+        textYPosition -= lineSpacing;
 
-        // Fetch associated baby names
-        const namesResponse = await axios.get(`http://localhost:3000/api/babyNames/${customerId}`);
-        const babyNames = namesResponse.data;
+        firstPage.drawText(staticData.birthTime, { x: 320, y: textYPosition, size: fontSize, font }); // Birth Time
+        textYPosition -= lineSpacing;
 
-        // Generate PDF
-        const generatedPdfUrl = await generatePdf(customerData, babyNames);
-        setPdfUrl(generatedPdfUrl);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+        firstPage.drawText(staticData.zodiacSign, { x: 320, y: textYPosition, size: fontSize, font }); // Zodiac Sign
+        textYPosition -= lineSpacing;
+
+        firstPage.drawText(staticData.nakshatra, { x: 320, y: textYPosition, size: fontSize, font }); // Nakshatra
+        textYPosition -= lineSpacing;
+
+        firstPage.drawText(staticData.destinyNumber.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Destiny Number
+        textYPosition -= lineSpacing;
+
+        firstPage.drawText(staticData.luckyDay, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Day
+        textYPosition -= lineSpacing1;
+
+        firstPage.drawText(staticData.gemstone, { x: 320, y: textYPosition, size: fontSize, font }); // Gemstone
+        textYPosition -= lineSpacing1;
+
+        firstPage.drawText(staticData.luckyGod, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky God
+        textYPosition -= lineSpacing1;
+
+        firstPage.drawText(staticData.luckyMetal, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Metal
+        textYPosition -= lineSpacing1;
+
+        firstPage.drawText(staticData.luckyColour, { x: 320, y: textYPosition, size: fontSize, font }); // Lucky Colour
+        textYPosition -= lineSpacing1;
+
+        firstPage.drawText(staticData.numerology.toString(), { x: 320, y: textYPosition, size: fontSize, font }); // Numerology
+
+
+    // Embed babyNames on the second (or third) page
+    let yPosition = 600;
+    babyNames.forEach(({ name, meaning }, index) => {
+      if (yPosition < 100 && !thirdPage) {
+        // Move to third page, check if it's already present
+        thirdPage = pdfDoc.addPage();  // Add third page if it doesn't exist
+        yPosition = 600;
+      } else if (yPosition < 100 && thirdPage) {
+        // If we already have the third page, use it
+        secondPage = thirdPage;
+        yPosition = 600;
       }
-    };
 
-    if (customerId) {
-      fetchDataAndGeneratePdf();
-    }
-  }, [customerId]);
+      // Draw text on the current page (either second or third)
+      secondPage.drawText(`Name: ${name}`, { x: 50, y: yPosition, size: fontSize, font });
+      yPosition -= 60;
+      secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition, size: fontSize, font });
+      yPosition -= 80;
+    });
 
-  if (loading) {
-    return <div>Loading PDF...</div>;
+    // Save the PDF and return Blob URL
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    return blobUrl; // Return the generated PDF URL
+  } catch (error) {
+    console.error('Error generating PDF:', error);
   }
-
-  if (error) {
-    return <div>Error generating PDF: {error}</div>;
-  }
-
-  return (
-    <div className="w-full h-screen">
-      {pdfUrl && (
-        <iframe
-          src={pdfUrl}
-          className="w-full h-full border-none"
-          title="Generated PDF"
-        />
-      )}
-    </div>
-  );
 };
-
-export default PDFDisplayComponent;

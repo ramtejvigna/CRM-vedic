@@ -204,10 +204,12 @@ export const getCustomerData = async (req, res) => {
 // Assuming you have an endpoint to get customer details
 export const getCustomerDetails = async (req, res) => {
     try {
-        const { fatherName } = req.params;
+        console.log(req.params);
+        const { id } = req.params;
+        console.log(req.params)
 
         // Fetch the customer by fatherName
-        const customer = await Customer.findOne({ fatherName });
+        const customer = await Customer.findById(id);
 
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
@@ -228,6 +230,7 @@ export const getCustomerDetails = async (req, res) => {
         res.status(500).json({ error: "Error fetching customer details" });
     }
 };
+
 export const getCustomerPdfs = async (req, res) => {
     try {
         // Find the customer by father's name

@@ -142,34 +142,10 @@ function Salaries() {
     }
   };
 
-  const printImage = () => {
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Image</title>
-          <style>
-            body {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-              margin: 0;
-              background-color: white;
-            }
-            img {
-              max-width: 100%;
-              height: auto;
-            }
-          </style>
-        </head>
-        <body>
-          <img src="${image}" alt="Image to print" />
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+  const printImage = (imageUrl) => {
+    const newWindow = window.open('', '_blank'); // Opens a new blank window
+    newWindow.document.write(`<img src="${imageUrl}" onload="window.print();window.close()" />`); // Writes the image into the window and triggers print on load
+    newWindow.document.close(); // Closes the document
   };
 
   useEffect(() => {
@@ -218,41 +194,54 @@ function Salaries() {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/salaries/add-salaries"}>
-                    <AiOutlineAlipay/> <span>add salary</span>
+                    <AiOutlineAlipay/> <span>Add Salary</span>
                   </Link>
                 </motion.button>
             </div>
-          {
-            showFilters && (
-                <div className="flex gap-5   items-center justify-center ">
-                  <form  className='flex w-full gap-5 flex-wrap' >
-                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
-                      <label htmlFor="month"> Month:</label>
-                      <select value={filteringMonth} onChange={(e) => setFilteringMonth(e.target.value)} id="month" name="month" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
-                        <option value="select month">select month</option>
-                        {months.map((month, index) => (
-                          <option key={index} value={month}>
-                            {month}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
-                      <label htmlFor="year"> Year:</label>
-                      <select value={filteringYear} onChange={(e) => setFilteringYear(e.target.value)} id="year" name="year"  className="p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
-                      <option value="select year">select year</option>
-                        {years.map(year => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </form>
+          
+           {showFilters && (
+            <div className="flex gap-5 items-center justify-start">
+              <form className='flex w-full gap-5 flex-wrap'>
+                <div className='flex gap-2 items-center min-w-[150px]'>
+                  <label htmlFor="month" className="mr-2">Month:</label>
+                  <select 
+                    value={filteringMonth} 
+                    onChange={(e) => setFilteringMonth(e.target.value)} 
+                    id="month" 
+                    name="month" 
+                    className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+                  >
+                    <option value="select month">select month</option>
+                    {months.map((month, index) => (
+                      <option key={index} value={month}>
+                        {month}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-            )
-          }
+          
+                <div className='flex gap-2 items-center min-w-[150px]'>
+                  <label htmlFor="year" className="mr-2">Year:</label>
+                  <select 
+                    value={filteringYear} 
+                    onChange={(e) => setFilteringYear(e.target.value)} 
+                    id="year" 
+                    name="year"  
+                    className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+                  >
+                    <option value="select year">select year</option>
+                    {years.map(year => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </form>
+            </div>
+          )}
+          
+          
 
         <div className="flex flex-1">
           <div className="overflow-x-auto w-full">
@@ -275,7 +264,7 @@ function Salaries() {
                           (header) => (
                             <th
                               key={header}
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                              className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${
                                 isDarkMode ? "text-gray-300" : "text-gray-700"
                               }`}
                             >
@@ -303,16 +292,16 @@ function Salaries() {
                                 isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
                               } transition-colors duration-150`}
                             >
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{index + 1}</span>
                               </td>                        
                               
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="text-sm">{statement.employee?.firstName}</span>
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
+                                <span className="text-sm capitalize">{statement.employee?.firstName}</span>
                               </td>
   
                               {/* Amount Paid Section */}
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <div className="text-sm font-medium">
                                   <div className="flex flex-col">
                                     <strong>{statement.amountPaid}</strong>
@@ -320,46 +309,46 @@ function Salaries() {
                                 </div>
                               </td>
   
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{statement.year}</span>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{statement.month}</span>
                               </td>
   
                               <td className="px-6 py-4 whitespace-nowrap text-center">
                                 {statement?.bankStatement ? (
-                                  <span className="text-sm px-3 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
-                                    paid
+                                  <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
+                                    Paid
                                   </span>
                                 ) : (
-                                  <span className="text-sm px-3 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
+                                  <span className="text-sm px-2 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
                                     Pending
                                   </span>
                                 )}
                               </td>
   
   
-                              <td className="px-6  py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
+                              <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
                                 <button
                                   onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${statement.bankStatement}`)}
-                                  className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
+                                  className={`flex items-center justify-center w-1/2 transition-colors duration-300 ${
                                     isDarkMode
                                       ? "text-green-400 hover:text-green-200"
                                       : "text-green-600 hover:text-green-900"
                                   }`}
                                 >
-                                  <Eye size={18} /> {"VIEW PAYSLIP"}
+                                  <Eye size={18} />
                                 </button>
                                 <button
                                   onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
-                                  className={`mr-4 flex gap-3 transition-colors duration-300 ${
+                                  className={`transition-colors duration-300 ${
                                     isDarkMode
                                       ? "text-red-400 hover:text-red-200"
                                       : "text-red-600 hover:text-red-900"
                                   }`}
                                 >
-                                  <Trash size={18} /> {"DELETE"}
+                                  <Trash size={18} />
                                 </button>
                               </td>
                             </motion.tr>

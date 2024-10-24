@@ -92,7 +92,7 @@ const EmployeeTable = () => {
 
     if(status) {
         try {
-          const response = await axios.get(`http://localhost:3000/api/employees/search?status=${status}`);
+          const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
           if(response.status === 200) {
             setEmployees(response.data);
           }

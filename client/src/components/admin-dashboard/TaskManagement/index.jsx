@@ -160,7 +160,7 @@ const TaskManagement = () => {
   const handleAddComment = async (id) => {
     setIsAddingComment(true);
     try {
-      await axios.post(`https://vedic-backend-neon.vercel.app/api/tasks/${id}/comment`, {
+      await axios.post(`https://vedic-backend-neon.vercel.app/api/employee/tasks/${id}/comments`, {
         text: newComment,
         createdBy: "Admin", // Example user ID
       });
