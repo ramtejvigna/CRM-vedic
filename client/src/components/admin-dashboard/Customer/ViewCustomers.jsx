@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useStore } from "../../../store";
 import { motion, AnimatePresence } from "framer-motion";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
-import { ChevronLeft, ChevronRight,Filter, Eye, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Clock,XCircle,Filter, Eye, Search } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -276,7 +276,7 @@ const CustomerDetails = () => {
                           ? "text-gray-900 bg-gray-100" 
                           : ""}
                         ${row.customerStatus === "completed" 
-                          ? "text-green-500 bg-green-100" 
+                          ? " text-green-500 bg-green-100" 
                           : ""}
                         ${row.customerStatus === "rejected" 
                           ? "text-red-800 bg-red-100" 
@@ -284,10 +284,30 @@ const CustomerDetails = () => {
                       `}
                       
                       >
-                        {row.customerStatus === "newRequests" && "New Requests"}
-                        {row.customerStatus === "inProgress" && "Inprogress"}
-                        {row.customerStatus === "completed" && "Completed"}
-                        {row.customerStatus === "rejected" && "Rejected"}
+                        {row.customerStatus === "newRequests" && (
+      <>
+        <AlertCircle className="w-4 h-4 mr-1" />
+        New Requests
+      </>
+    )}
+    {row.customerStatus === "inProgress" && (
+      <>
+        <Clock className="w-4 h-4 mr-1" />
+        Inprogress
+      </>
+    )}
+    {row.customerStatus === "completed" && (
+      <>
+        <CheckCircle className="w-4 h-4 mr-1" />
+        Completed
+      </>
+    )}
+    {row.customerStatus === "rejected" && (
+      <>
+        <XCircle className="w-4 h-4 mr-1" />
+        Rejected
+      </>
+    )}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">

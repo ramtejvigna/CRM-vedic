@@ -146,7 +146,7 @@ const EmployeeTable = () => {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/employees/add-employee"}>
-                    <AiOutlineAlipay/> <span>add employee</span>
+                    <AiOutlineUserAdd/> <span>add employee</span>
                   </Link>
                 </motion.button>
             </div>
