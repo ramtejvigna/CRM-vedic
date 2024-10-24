@@ -105,12 +105,9 @@ export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { text } = req.body;
-    console.log('in add comment');
-    console.log(req.body);
-    console.log(req.user);
 
     // Find the employee by id
-    const employee = await Employee.findById(req.user);
+    const employee = await Employee.findById(id);
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
