@@ -1,22 +1,9 @@
-import React from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  Button,
-  TextField,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  CircularProgress,
-  Backdrop,
-  Fade,
-} from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { X, Send } from "lucide-react";
+import React, { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { X, Send, Calendar, User2 } from 'lucide-react';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 const TaskModal = ({
   isModalOpen,
@@ -35,238 +22,237 @@ const TaskModal = ({
   getStatusColor,
   isDetailModal = false,
 }) => {
+
   return (
-    <Modal
-      open={isModalOpen}
-      onClose={handleCloseModal}
-      closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{
-        timeout: 500,
-      }}
-    >
-      <Fade in={isModalOpen}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: "90%", sm: "60%", md: "40%" },
-            bgcolor: isDarkMode ? "#1E293B" : "#fff",
-            color: isDarkMode ? "#E5E7EB" : "#000",
-            borderRadius: "10px",
-            boxShadow: 24,
-            p: 4,
-          }}
+    <Transition appear show={isModalOpen} as={Fragment}>
+      <Dialog 
+        as="div" 
+        className="relative z-50"
+        onClose={handleCloseModal}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          <button
-            onClick={handleCloseModal}
-            className={`absolute top-2 right-2 ${
-              isDarkMode
-                ? "text-gray-300 hover:text-gray-100"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <X size={24} />
-          </button>
-          {isDetailModal ? (
-            <>
-              <Typography
-                id="detail-modal-title"
-                variant="h6"
-                component="h2"
-                className="mb-4"
-              >
-                {selectedTask.title}
-              </Typography>
-              <div className="space-y-4">
-                <div>
-                  <Typography variant="subtitle1">Description</Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
+          <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className={`w-full max-w-md transform overflow-hidden rounded-2xl ${isDarkMode ? 'bg-slate-800' : 'bg-white'} p-6 shadow-xl transition-all`}>
+                <div className="relative">
+                  <button
+                    onClick={handleCloseModal}
+                    className={`absolute right-0 top-0 p-1 rounded-full ${
+                      isDarkMode 
+                        ? 'hover:bg-slate-700 text-slate-400 hover:text-slate-200' 
+                        : 'hover:bg-slate-100 text-slate-500 hover:text-slate-700'
+                    } transition-colors`}
                   >
-                    {selectedTask.description}
-                  </Typography>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">Assigned To</Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
-                  >
-                    {selectedTask.assignedTo?.name || "Not assigned"}
-                  </Typography>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">End Time</Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
-                  >
-                    {new Date(selectedTask.endTime).toLocaleString()}
-                  </Typography>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">Status</Typography>
-                  <Typography
-                    variant="body2"
-                    className={`font-semibold ${getStatusColor(selectedTask.status)}`}
-                  >
-                    {selectedTask.status}
-                  </Typography>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">Comments</Typography>
-                  <div className="max-h-40 overflow-y-auto space-y-2">
-                    {(selectedTask.comments || []).map((comment, index) => (
-                      <div
-                        key={index}
-                        className={`${isDarkMode ? 'bg-gray-800' : 'bg-slate-200'} p-2 rounded`}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{ color: isDarkMode ? "#D1D5DB" : "#4B5563" }}
-                        >
-                          {comment.text}
-                        </Typography>
+                    <X size={20} />
+                  </button>
+
+                  {isDetailModal ? (
+                    <div className="space-y-4">
+                      <Dialog.Title className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                        {selectedTask.title}
+                      </Dialog.Title>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <h4 className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-700'}`}>Description</h4>
+                          <p className={`mt-1 text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                            {selectedTask.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <User2 size={16} className={isDarkMode ? 'text-slate-400' : 'text-slate-500'} />
+                          <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                            {selectedTask.assignedTo?.firstName || "Not assigned"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Calendar size={16} className={isDarkMode ? 'text-slate-400' : 'text-slate-500'} />
+                          <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                            {new Date(selectedTask.endTime).toLocaleString()}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedTask.status)}`}>
+                            {selectedTask.status}
+                          </span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <h4 className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-700'}`}>Comments</h4>
+                          <div className="max-h-32 overflow-y-auto space-y-2">
+                            {(selectedTask.comments || []).map((comment, index) => (
+                              <div
+                                key={index}
+                                className={`p-2 rounded-lg ${isDarkMode ? 'bg-slate-700' : 'bg-slate-50'}`}
+                              >
+                                <p className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                  {comment.text}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleAddComment(selectedTask._id);
+                          }}>
+                            <input
+                              type="text"
+                              value={newComment}
+                              onChange={(e) => setNewComment(e.target.value)}
+                              placeholder="Add a comment..."
+                              className={`w-full px-3 py-2 rounded-lg border ${
+                                isDarkMode 
+                                  ? 'bg-slate-700 border-slate-600 text-slate-200 placeholder-slate-400' 
+                                  : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400'
+                              } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                            />
+                            <button
+                              type="submit"
+                              disabled={isAddingComment}
+                              className="mt-2 w-full inline-flex justify-center items-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isAddingComment ? (
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                "Add Comment"
+                              )}
+                            </button>
+                          </form>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleAddComment(selectedTask._id);
-                    }}
-                    className="mt-4"
-                  >
-                    <TextField
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Add a comment..."
-                      multiline
-                      rows={1}
-                      fullWidth
-                      sx={{
-                        backgroundColor: isDarkMode ? "#2D3748" : "#fff",
-                        color: isDarkMode ? "#E5E7EB" : "#000",
-                      }}
-                    />
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      sx={{ mt: 2, backgroundColor: "#6366F1", color: "#fff" }}
-                      disabled={isAddingComment}
-                    >
-                      {isAddingComment ? <CircularProgress size={24} /> : "Add Comment"}
-                    </Button>
-                  </form>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <Dialog.Title className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                        {selectedTask ? "Edit Task" : "New Task"}
+                      </Dialog.Title>
+                      
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                          <input
+                            type="text"
+                            name="title"
+                            placeholder="Task Title"
+                            value={newTask.title}
+                            onChange={handleInputChange}
+                            required
+                            className={`w-full px-3 py-2 rounded-lg border ${
+                              isDarkMode 
+                                ? 'bg-slate-700 border-slate-600 text-slate-200 placeholder-slate-400' 
+                                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400'
+                            } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                          />
+                        </div>
+
+                        <div>
+                          <textarea
+                            name="description"
+                            placeholder="Description"
+                            value={newTask.description}
+                            onChange={handleInputChange}
+                            required
+                            rows={3}
+                            className={`w-full px-3 py-2 rounded-lg border ${
+                              isDarkMode 
+                                ? 'bg-slate-700 border-slate-600 text-slate-200 placeholder-slate-400' 
+                                : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400'
+                            } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                          />
+                        </div>
+
+                        <div>
+                          <select
+                            name="assignedTo"
+                            value={newTask.assignedTo}
+                            onChange={handleInputChange}
+                            required
+                            className={`w-full px-3 py-2 rounded-lg border ${
+                              isDarkMode 
+                                ? 'bg-slate-700 border-slate-600 text-slate-200' 
+                                : 'bg-white border-slate-200 text-slate-900'
+                            } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                          >
+                            <option value="">Select an employee</option>
+                            {employees.map((employee) => (
+                              <option key={employee._id} value={employee._id}>
+                                {employee.firstName}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                          <DateTimePicker
+                            label="End Time"
+                            value={newTask.endTime}
+                            onChange={handleDateChange}
+                            renderInput={(params) => (
+                              <input
+                                {...params}
+                                className={`w-full px-3 py-2 rounded-lg border ${
+                                  isDarkMode 
+                                    ? 'bg-slate-700 border-slate-600 text-slate-200' 
+                                    : 'bg-white border-slate-200 text-slate-900'
+                                } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                              />
+                            )}
+                          />
+                        </LocalizationProvider>
+
+                        <div className="flex justify-end gap-2 pt-4">
+                          <button
+                            type="button"
+                            onClick={handleCloseModal}
+                            className={`px-4 py-2 rounded-lg border ${
+                              isDarkMode
+                                ? 'border-slate-600 text-slate-200 hover:bg-slate-700'
+                                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                            } transition-colors`}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                          >
+                            <Send size={16} className="mr-2" />
+                            {selectedTask ? "Update Task" : "Create Task"}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <Typography
-                id="modal-title"
-                variant="h6"
-                component="h2"
-                className="mb-4"
-              >
-                {selectedTask ? "Edit Task" : "New Task"}
-              </Typography>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <TextField
-                  label="Task Title"
-                  name="title"
-                  sx={{
-                    backgroundColor: isDarkMode ? "#2D3748" : "#f7f7f7",
-                    color: isDarkMode ? "#E5E7EB" : "#000",
-                  }}
-                  value={newTask.title}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Description"
-                  name="description"
-                  sx={{
-                    backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
-                    color: isDarkMode ? "#E5E7EB" : "#000",
-                  }}
-                  value={newTask.description}
-                  onChange={handleInputChange}
-                  multiline
-                  rows={3}
-                  fullWidth
-                  required
-                />
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: isDarkMode ? "#9CA3AF" : "#000" }}>Assign To</InputLabel>
-                  <Select
-                    name="assignedTo"
-                    sx={{
-                      backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
-                      color: isDarkMode ? "#E5E7EB" : "#000",
-                    }}
-                    value={newTask.assignedTo}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <MenuItem value="">Select an employee</MenuItem>
-                    {employees.length > 0 ? (
-                      employees.map((employee) => (
-                        <MenuItem key={employee._id} value={employee._id}>
-                          {employee.firstName}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem disabled>No employees available</MenuItem>
-                    )}
-                  </Select>
-                </FormControl>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    label="End Time"
-                    name="endTime"
-                    value={newTask.endTime}
-                    onChange={handleDateChange}
-                    fullWidth
-                    required
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        sx={{
-                          backgroundColor: isDarkMode ? "#374151" : "#f7f7f7",
-                          color: isDarkMode ? "#E5E7EB" : "#000",
-                        }}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-                <div className="flex justify-end space-x-2">
-                  <Button onClick={handleCloseModal} variant="outlined">
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      backgroundColor: isDarkMode ? "#6366F1" : "#1976d2",
-                      color: "#fff",
-                    }}
-                  >
-                    <Send size={20} className="mr-2" />
-                    {selectedTask ? "Update Task" : "Create Task"}
-                  </Button>
-                </div>
-              </form>
-            </>
-          )}
-        </Box>
-      </Fade>
-    </Modal>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
   );
 };
 

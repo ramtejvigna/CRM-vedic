@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../../store';
 import { AnimatePresence , motion } from 'framer-motion';
-import { Delete, Edit , Eye, Trash } from 'lucide-react';
+import { Delete, Edit , Eye, Plus, Trash } from 'lucide-react';
 import { TextField , InputLabel } from '@mui/material';
 import axios from 'axios';
 import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineDownload, AiOutlinePrinter} from "react-icons/ai"
@@ -218,7 +218,7 @@ function Salaries() {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/salaries/add-salaries"}>
-                    <AiOutlineAlipay/> <span>Add Salary</span>
+                    <Plus/> <span>Add Salary</span>
                   </Link>
                 </motion.button>
             </div>
