@@ -131,7 +131,33 @@ export const addComment = async (req, res) => {
   }
 };
 
+export const addCommentAdmin = async (req,res)=> {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+    console.log('in admin add comment ');
+   
 
+    
+
+    const createdBy = "Admin"
+    console.log(createdBy)
+    // Find the task by id
+    const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Push the new comment
+    task.comments.push({ text, createdBy });
+    await task.save();
+
+    res.json(task);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json({ message: error.message });
+  }
+}
 
 export const getEmployeeTasks = async (req, res) => {
   const employeeId  = req.user;

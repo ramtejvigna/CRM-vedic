@@ -9,6 +9,7 @@ import {
   updateTaskStatus,
   getEmployees,
   getNotifications,
+  addCommentAdmin,
   markAsRead
 } from '../controllers/TaskManagement.js';
 // import {
@@ -26,7 +27,8 @@ router.get('/tasks', getTasks);
 router.post('/tasks', createTask);
 router.put('/tasks/:id', updateTask);
 router.delete('/tasks/:id', deleteTask);
-router.post('/employee/tasks/:id/comments', addComment);
+router.post('/employee/tasks/:id/comments' ,auth , addComment);
+router.post('/admin/tasks/:id/comments'  , addCommentAdmin);
 
 // Employee routes
 router.get('/employee/tasks', auth, getEmployeeTasks);
