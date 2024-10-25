@@ -35,30 +35,33 @@ export const addEmployee = async (req, res) => {
             expiryDate,
         } = req.body;
 
+        if(!req.files) {
+            return res.status(400).json({message : "files are missing"})
+        }
+
+        
+
         // Check if employee already exists
         const isExist = await Employee.findOne({ email });
         if (isExist) {
             return res.status(400).json({ message: "Employee already exists with this email" });
         }
 
-        // File handling
         const passportFile = req.files.passport ? req.files.passport[0] : null;
         const aadharOrPanFile = req.files.aadharOrPan ? req.files.aadharOrPan[0] : null;
         const degreesFile = req.files.degrees ? req.files.degrees[0] : null;
         const transcriptsFile = req.files.transcripts ? req.files.transcripts[0] : null;
 
-        // Check if all required files are uploaded
+
         if (!passportFile || !aadharOrPanFile  || !degreesFile || !transcriptsFile) {
             return res.status(400).json({ message: "Missing required document files" });
         }
 
-        // Replace backslashes for file paths (Windows to UNIX-style paths)
         const passportFilePath = passportFile.path.replace(/\\/g, '/');
         const aadharOrPanFilePath = aadharOrPanFile.path.replace(/\\/g, '/');
         const degreesFilePath = degreesFile.path.replace(/\\/g, '/');
         const transcriptsFilePath = transcriptsFile.path.replace(/\\/g, '/');
 
-        // Create new employee
         const newEmployee = await Employee.create({
             firstName,
             lastName,

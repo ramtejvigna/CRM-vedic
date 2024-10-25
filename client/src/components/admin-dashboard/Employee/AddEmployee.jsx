@@ -62,7 +62,6 @@ const AddEmployee = () => {
                 [name]: value
             }
         });
-        // validateForm();
     };
 
     const validateForm = () => {
@@ -88,12 +87,11 @@ const AddEmployee = () => {
                 if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
                 if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
             }
-
-
             if (activeStep === 2) {
                 if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
                 if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
             }
+
             if (activeStep === 3) {
                 if (!form.employerName) formErrors.employerName = 'employer Name is required';
                 if (!form.jobTitle) formErrors.jobTitle = 'job title is required';
@@ -201,7 +199,6 @@ const AddEmployee = () => {
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
-                                
                                 className="flex-1"
                                 label="firstname"
                                 name="firstName"
@@ -231,6 +228,11 @@ const AddEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.phone}
                                 helperText={errors.phone}
+                                inputProps={{
+                                    maxLength: 10,
+                                    inputMode: 'numeric', 
+                                    pattern: '[0-9]*' 
+                                }}
                                 className="rounded-md shadow-sm bg-gray-50"
                             />
                             <TextField
@@ -324,6 +326,7 @@ const AddEmployee = () => {
                             />
                             </label>
                         </div>
+                            {errors.aadharOrPan ? <span className='text-xs text-red-500'>aadhar or Pan is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
@@ -347,22 +350,23 @@ const AddEmployee = () => {
                     {/* Passport or Driving License section */}
                     {!formData.idDocuments.passport ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
-                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                            <label className="w-full h-full flex flex-col items-center justify-center">
-                            <span className="text-gray-500 flex gap-2 items-center">
-                                <AiOutlineUpload /> Upload File
-                            </span>
-                            <input
-                                type="file"
-                                accept=".jpg,.png,.jpeg"
-                                onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
-                                error={!!errors.passport}
-                                helperText={errors.passport}
-                                className="hidden"
-                            />
-                            </label>
-                        </div>
+                            <InputLabel className="text-gray-700">Passport </InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                <label className="w-full h-full flex flex-col items-center justify-center">
+                                <span className="text-gray-500 flex gap-2 items-center">
+                                    <AiOutlineUpload /> Upload File
+                                </span>
+                                <input
+                                    type="file"
+                                    accept=".jpg,.png,.jpeg"
+                                    onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
+                                    error={!!errors.passport}
+                                    helperText={errors.passport}
+                                    className="hidden"
+                                />
+                                </label>
+                            </div>
+                            {errors.passport ? <span className='text-xs text-red-500'>passport or driving liscense is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
@@ -422,6 +426,7 @@ const AddEmployee = () => {
                                 />
                                 </label>
                             </div>
+                                {errors.degrees ? <span className='text-xs text-red-500'>degree certificate is required</span> : ""}
                             </div>
                         ) : (
                             <div className="flex flex-col">
@@ -461,6 +466,7 @@ const AddEmployee = () => {
                                 />
                                 </label>
                             </div>
+                            {errors.transcripts ? <span className='text-xs text-red-500'>transcript is required</span> : ""}
                             </div>
                         ) : (
                             <div className="flex flex-col">

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from "axios";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidenav from "../Sidebar";
@@ -20,28 +19,35 @@ export const VoiceRecognition = () => {
     const [isListening, setIsListening] = useState(false);
     const navigate = useNavigate();
 
-    const language = 'en';
-
-    const getResponse = async () => {
-        try {
-            const response = await axios.get('http://127.0.0.1:9000/callRoutes', {
-                params: {
-                    language: language,
-                }
-            });
-            const route = response.data.description.toLowerCase();
-            console.log(route)
-
-            handleCommand(route);
-        } catch (error) {
-            console.error('Error getting response:', error);
-        }
-    };
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
 
     useEffect(() => {
         if (isListening) {
-            getResponse();
+            recognition.start();
+        } else {
+            recognition.stop();
         }
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            handleCommand(transcript);
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        return () => {
+            recognition.stop();
+        };
     }, [isListening]);
 
     const handleCommand = (command) => {
@@ -63,32 +69,25 @@ export const VoiceRecognition = () => {
         } else if (command.includes('add expense') || command.includes('new expense') || command.includes('create expense') || command.includes('expense add') || command.includes('expense new')) {
             navigate('/admin-dashboard/expenses/add-expense');
             speak('Opened add expense page');
-            setIsListening(!isListening)
         } else if (command.includes('leaves') || command.includes('leave management') || command.includes('manage leaves') || command.includes('leave list') || command.includes('leave view')) {
             navigate('/admin-dashboard/leaves');
             speak('Opened leave management page');
-            setIsListening(!isListening)
         } else if (command.includes('salaries') || command.includes('new salaries') || command.includes('add salaries') || command.includes('salaries add') || command.includes('salaries new')) {
             navigate('/admin-dashboard/salaries/add-salaries');
             speak('Opened add salaries page');
-            setIsListening(!isListening)
         } else if (command.includes('customers') || command.includes('customer details') || command.includes('customer list') || command.includes('customer view') || command.includes('customer info')) {
             navigate('/admin-dashboard/customers');
             speak('Opened customers page');
-            setIsListening(!isListening)
-        } 
-        else if (command.includes('baby') || command.includes('baby database') || command.includes('baby names') || command.includes('names') || command.includes('baby')) {
+        } else if (command.includes('baby') || command.includes('baby database') || command.includes('baby names') || command.includes('names') || command.includes('baby')) {
             navigate('/admin-dashboard/babyDatabase');
             speak('Opened baby database page');
-            setIsListening(!isListening)
         } else {
             navigate('/admin-dashboard/home');
             speak('Command not recognized. Please try again.');
-            setIsListening(!isListening)
         }
-        setIsListening(!isListening)
+        setIsListening(false);
     };
-    
+
     const speak = (text) => {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
@@ -108,3 +107,5 @@ export const VoiceRecognition = () => {
         </button>
     );
 };
+
+export default VoiceRecognition

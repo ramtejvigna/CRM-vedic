@@ -12,7 +12,8 @@ import ViewEmployee from "./Employee/ViewEmployee";
 import AddExpense from "./Expenses/AddExpense.jsx";
 import Leaves from "./Leaves";
 import AddSalariesStatements from "./Salaries/AddSalariesStatements";
-import { VoiceRecognition } from "./VoiceRecognition.jsx";
+// import { VoiceRecognition } from "./VoiceRecognition.jsx";
+import VoiceRecognition from './Voice2.jsx'
 // import {VoiceRecognition} from './VoiceRecognition.jsx'
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();

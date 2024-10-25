@@ -323,11 +323,12 @@ function Salaries() {
                               <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{statement.year}</span>
                               </td>
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
+
+                              <td className="px-6 py-4 whitespace-nowrap">
                                 <span className="text-sm">{statement.month}</span>
                               </td>
   
-                              <td className="px-6 py-4 whitespace-nowrap text-center">
+                              <td className="px-6 py-4 whitespace-nowrap ">
                                 {statement?.bankStatement ? (
                                   <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
                                     Paid
