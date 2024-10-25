@@ -24,7 +24,7 @@ export const VoiceRecognition = () => {
 
     const getResponse = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:9000/callRoutes', {
+            const response = await axios.get('https://voice-assistant-fawn.vercel.app/callRoutes', {
                 params: {
                     language: language,
                 }
