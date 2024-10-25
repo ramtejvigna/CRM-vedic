@@ -1,239 +1,328 @@
-import React, { useEffect, useState } from 'react'
-import { useStore } from '../../../store';
-import { AnimatePresence , motion } from 'framer-motion';
-import { Delete, Edit , Eye, Trash } from 'lucide-react';
-import { TextField , InputLabel } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { XCircleIcon, } from 'lucide-react';
+import { TextField } from '@mui/material';
 import axios from 'axios';
-import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineArrowLeft} from "react-icons/ai"
-import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-function AddSalariesStatements() {
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June', 
-        'July', 'August', 'September', 'October', 'November', 'December'
-      ];
+import { useNavigate, Link } from 'react-router-dom';
 
-  const [showFilters , setShowFilters] = useState(false)
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
+const AddSalariesStatements = () => {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
   const currentYear = new Date().getFullYear();
-  const startYear = 2000;
-  const endYear = currentYear + 10;
-  const years = [];
+  const years = Array.from({ length: currentYear - 1999 }, (_, i) => currentYear - i);
   
-  for (let year = startYear; year <= endYear; year++) {
-    years.push(year);
-  }
-    const [employees , setEmployees] = useState([]);
-    const [errors , setErrors] = useState({})
-    const [formData , setFormData] = useState({
-      employee : "" ,
-      amountPaid  : "" ,
-      year : "" ,
-      month : '' ,
-      bankStatement : null
-    })
+  const [employees, setEmployees] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    employee: "",
+    amountPaid: "",
+    year: "",
+    month: '',
+    bankStatement: null
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get("https://vedic-backend-neon.vercel.app/api/employees");
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
 
-    const fetchEmployees = async () => {
-        try {
-          const response = await axios.get("https://vedic-backend-neon.vercel.app/api/employees");
-          setEmployees(response.data);
-        } catch (error) {
-          console.error("Error fetching employees:", error);
-        } finally {
-    
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const validateForm = () => {
+    const formErrors = {};
+    if (!formData.employee || formData.employee === "select employee") formErrors.employee = "Select employee";
+    if (!formData.amountPaid || formData.amountPaid <= 0) formErrors.amountPaid = "Amount paid is required";
+    if (!formData.year || formData.year === "select year") formErrors.year = "Please select year";
+    if (!formData.month || formData.month === "select month") formErrors.month = "Please select month";
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setIsSubmitting(true);
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        formDataToSend.append(key, formData[key]);
+      });
+
+      try {
+        const response = await axios.post('https://vedic-backend-neon.vercel.app/salaries/', formDataToSend);
+        if (response.status === 200) {
+          toast.success("Salary added successfully");
+          navigate("/admin-dashboard/salaries");
         }
-      };
-
-
-      useEffect(() => {
-        fetchEmployees();
-      } , [])
-
-    const validateForm = () => {
-        const formErrors = {};
-        if (!formData.employee || formData.employee === "select employee") formErrors.employee = "Select employee";
-        if (!formData.amountPaid || formData.amountPaid <= 0) formErrors.amountPaid = "amount paid is required ";
-        if (!formData.year || formData.year === "select year") formErrors.year = "Please select year";
-        if (!formData.month || formData.month === "select month") formErrors.month = "Please select month";  
-        setErrors(formErrors);
-        return Object.keys(formErrors).length === 0;
-      };
-
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log(formData)
-        if(validateForm()) {
-          const formDataToSend = new FormData();
-         
-          formDataToSend.append("employee" , formData["employee"])
-          formDataToSend.append("amountPaid" , formData["amountPaid"])
-          formDataToSend.append("year" , formData["year"])
-          formDataToSend.append("month" , formData["month"])
-          formDataToSend.append("bankStatement" , formData["bankStatement"]);
-    
-          
-          try {
-            const response = await axios.post(`https://vedic-backend-neon.vercel.app/salaries/`,formDataToSend );
-            if(response.status === 200) {
-              toast.success("Salary added successfully")
-                navigate("/admin-dashboard/salaries")
-            }
-          } catch (error) {
-            console.error("Error adding salary statement:", error.message);
-            toast.error("Error adding salary statement")
-          }
-    
-        }
+      } catch (error) {
+        toast.error("Error adding salary statement");
+      } finally {
+        setIsSubmitting(false);
       }
-    
+    }
+  };
 
-    const handleClear = () => {
-        setFormData({
-          ...formData ,
-          bankStatement : null
-        })
-      }
-
-      const handleChange = (e) => {
-        setFormData({
-          ...formData ,
-          [e.target.name] : e.target.value
-        })
-      }
-    
-      const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFormData({
-          ...formData ,
-          bankStatement : file
-        })
-      }
   return (
-    <div className='flex w-full h-full flex-col p-10'>
-            <div className='w-full flex '>
-            <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 transform hover:scale-105 active:scale-95"
-            >
-            <AiOutlineArrowLeft className="text-xl" />
-            Back
-            </button>
+    <motion.div 
+      className="min-h-screen bg-gray-50 p-4 md:p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
+        <div className="p-6">
+          <motion.h1 
+            className="text-2xl font-bold mb-8 text-gray-800"
+            initial={{ x: -20 }}
+            animate={{ x: 0 }}
+          >
+            Add Salary Statement
+          </motion.h1>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <motion.div 
+                variants={fadeIn}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-2"
+              >
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  {/* <UserIcon size={16} /> */}
+                  Employee
+                </label>
+                <select
+                  name="employee"
+                  value={formData.employee}
+                  onChange={(e) => setFormData({ ...formData, employee: e.target.value })}
+                  className={`w-full p-3 rounded-lg border ${errors.employee ? 'border-red-500' : 'border-gray-300'} 
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                >
+                  <option value="select employee">Select Employee</option>
+                  {employees.map((employee, index) => (
+                    <option key={index} value={employee._id}>
+                      {employee.firstName || employee?.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.employee && (
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.employee}
+                  </motion.p>
+                )}
+              </motion.div>
+
+              <motion.div 
+                variants={fadeIn}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-2"
+              >
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  {/* <BanknotesIcon size={16} /> */}
+                  Amount Paid
+                </label>
+                <TextField
+                  name="amountPaid"
+                  type="number"
+                  value={formData.amountPaid}
+                  onChange={(e) => setFormData({ ...formData, amountPaid: e.target.value })}
+                  error={!!errors.amountPaid}
+                  helperText={errors.amountPaid}
+                  className="w-full"
+                  InputProps={{
+                    className: 'rounded-lg'
+                  }}
+                />
+              </motion.div>
+
+              <motion.div 
+                variants={fadeIn}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-2"
+              >
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  {/* <CalendarIcon size={16} /> */}
+                  Month
+                </label>
+                <select
+                  name="month"
+                  value={formData.month}
+                  onChange={(e) => setFormData({ ...formData, month: e.target.value })}
+                  className={`w-full p-3 rounded-lg border ${errors.month ? 'border-red-500' : 'border-gray-300'} 
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                >
+                  <option value="select month">Select Month</option>
+                  {months.map((month, index) => (
+                    <option key={index} value={month}>{month}</option>
+                  ))}
+                </select>
+                {errors.month && (
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.month}
+                  </motion.p>
+                )}
+              </motion.div>
+
+              <motion.div 
+                variants={fadeIn}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-2"
+              >
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  {/* <CalendarIcon size={16} /> */}
+                  Year
+                </label>
+                <select
+                  name="year"
+                  value={formData.year}
+                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                  className={`w-full p-3 rounded-lg border ${errors.year ? 'border-red-500' : 'border-gray-300'} 
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                >
+                  <option value="select year">Select Year</option>
+                  {years.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+                {errors.year && (
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-red-500 text-xs mt-1"
+                  >
+                    {errors.year}
+                  </motion.p>
+                )}
+              </motion.div>
             </div>
 
-            <form onSubmit={handleSubmit} className='flex flex-col gap-5 p-5 bg-white rounded-xl shadow-xl  w-full max-w-[600px] mx-auto  '>
-                <div className='text-2xl font-bold text-center uppercase tracking-wider'>
-                    Add Your Salary and Bank Details
-                </div>
-                <div className='text-sm font-thin text-center  text-gray-600'>
-                    Submit Your Salary Information and Bank Statements
-                </div>
+            <motion.div 
+              variants={fadeIn}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="mt-6"
+            >
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                {/* <DocumentArrowUpIcon size={16} /> */}
+                Bank Statement
+              </label>
+              {!formData.bankStatement ? (
+                <motion.div 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="mt-2 p-8 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 cursor-pointer"
+                >
+                  <label className="w-full cursor-pointer">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                      {/* <DocumentArrowUpIcon size={48} className="text-blue-500" /> */}
+                      <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
+                      <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept=".jpg,.png,.jpeg"
+                      onChange={(e) => setFormData({ ...formData, bankStatement: e.target.files[0] })}
+                      className="hidden"
+                    />
+                  </label>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="mt-2"
+                >
+                  <div className="relative w-40 h-40 rounded-lg overflow-hidden">
+                    <img
+                      src={URL.createObjectURL(formData.bankStatement)}
+                      alt="Bank Statement"
+                      className="w-full h-full object-cover"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setFormData({ ...formData, bankStatement: null })}
+                      className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white"
+                    >
+                      <XCircleIcon size={20} />
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
 
+            <motion.div 
+              className="flex justify-end gap-4 mt-8"
+              variants={fadeIn}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <Link
+                to="/admin-dashboard/salaries"
+                className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                {/* <ArrowLeftIcon size={16} className="mr-2" /> */}
+                Cancel
+              </Link>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isSubmitting}
+                className={`flex items-center px-6 py-2 text-white bg-blue-500 rounded-lg 
+                  ${isSubmitting ? 'opacity-75 cursor-not-allowed' : 'hover:bg-blue-600'} 
+                  transition-colors`}
+              >
+                {isSubmitting ? (
+                  <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : (
+                  'Add Salary'
+                )}
+              </motion.button>
+            </motion.div>
+          </form>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
-
-                <div className='flex flex-col gap-2  w-full'>
-                <label htmlFor="employee">Employee </label>
-                <select name='employee' value={formData.employee} onChange={handleChange} className="w-full p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white focus:border-blue-400">
-                <option value="select employee">select employee</option>
-                {employees.map((employee, index) => (
-                    <>
-                    <option key={index} value={employee._id}>
-                        {employee.firstName ||  employee?.name}
-                    </option>
-                    </>
-                ))}
-                </select>
-                {errors.employee && (<span className='text-xs text-red-400'>{errors.employee}</span>)}
-                </div>
-
-                <label >Amount Paid </label>
-                <TextField
-                    label="Basic salary"
-                    name="amountPaid"
-                    type='number'
-                    value={formData.amountPaid}
-                    onChange={handleChange}
-                    error={!!errors.amountPaid}
-                    helperText={errors.amountPaid}
-                    className="rounded-md shadow-sm bg-gray-50"
-                    fullWidth
-                />
-
-                <div className='flex flex-col gap-2  w-full'>
-                <label htmlFor="month">Select Month:</label>
-                <select value={formData.month} onChange={handleChange} id="month" name="month" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white focus:border-blue-400">
-                    <option value="select month">select month</option>
-                    {months.map((month, index) => (
-                    <option key={index} value={month}>
-                        {month}
-                    </option>
-                    ))}
-                </select>
-                {errors.month && (<span className='text-xs text-red-400'>{errors.month}</span>)}
-
-                </div>
-
-                <div className='flex flex-col gap-2  w-full'>
-                <label htmlFor="year">Select Year:</label>
-                <select value={formData.year} onChange={handleChange} id="year" name="year"  className="p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white focus:border-blue-400">
-                <option value="select year">select year</option>
-                    {years.map(year => (
-                    <option key={year} value={year}>
-                        {year}
-                    </option>
-                    ))}
-                </select>
-                {errors.year && (<span className='text-xs text-red-400'>{errors.year}</span>)}
-
-                </div>
-
-                {!formData.bankStatement ? (
-                        <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Bank Statement</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                <label className="w-full h-full flex flex-col items-center justify-center">
-                                <span className="text-gray-500 flex gap-2 items-center">
-                                    <AiOutlineUpload /> Upload File
-                                </span>
-                                <input
-                                    type="file"
-                                    accept=".jpg,.png,.jpeg"
-                                    // onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
-                                    onChange={(e) => handleFileChange(e)}
-                                    className="hidden"
-                                />
-                                </label>
-                            </div>
-                            {errors.bankStatement && (<span className='text-xs text-red-400'>{errors.bankStatement}</span>)}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">bank statement</InputLabel>
-                        <div className="mt-2 p-4  h-36 w-36 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                            <img
-                            src={URL.createObjectURL(formData.bankStatement)}
-                            alt="Aadhar or Pan"
-                            className="object-cover"
-                            />
-                        </div>
-                        <button
-                            onClick={() => handleClear()}
-                            className="text-red-500 mt-2 flex items-center gap-2"
-                        >
-                            <AiOutlineDelete /> Clear Upload
-                        </button>
-                        </div>
-                    )}
-
-                <button type="submit" className="flex uppercase w-full  items-center justify-center text-xl whitespace-nowrap px-5  py-2 text-white bg-blue-500 hover:bg-blue-600">
-                {false ? <div className="w-[25px] h-[25px] rounded-full border-[2px] border-dotted border-gray-200 border-t-black animate-spin transition-all duration-200" /> : "add salary"}
-                </button>
-
-            </form>
-    </div>
-  )
-}
-
-export default AddSalariesStatements
+export default AddSalariesStatements;

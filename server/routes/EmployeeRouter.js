@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from "multer"
-import { addEmployee , getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
+import { addEmployee , filterEmployeesByStatus, getEmployee, getEmployees, updateEmployee } from "../controllers/EmployeeControllers.js";
 import { applyLeave, getLeaveHistory, getPendingLeaves, getLeaveBalance,deleteLeave} from "../controllers/LeaveController.js";
 const router = express.Router();
 
@@ -44,4 +44,5 @@ router.get('/leave-balance',auth,getLeaveBalance)
 
 router.delete('/leaves/:id',deleteLeave );
 
+router.get("/search" , filterEmployeesByStatus)
 export default router;

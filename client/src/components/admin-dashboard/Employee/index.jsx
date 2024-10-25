@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlineUserAdd , AiOutlineAlipay } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
-import { Edit, Trash, Eye } from "lucide-react";
+import { Edit, Trash, Eye, SearchCheck } from "lucide-react";
 import { useStore } from "../../../store";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
-
+import { Search, Upload, User, Users, Filter  } from 'lucide-react';
+import { Link } from "react-router-dom";
+import axios from "axios";
 const EmployeeTable = () => {
   const navigate = useNavigate();
+  const [status , setStatus] = useState("");
+  const [showFilters , setShowFilters ] = useState(false)
+  const [searchTerm , setSearchTerm] = useState("")
   const { isDarkMode, toggleDarkMode } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
@@ -41,8 +46,8 @@ const EmployeeTable = () => {
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = employees.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(employees.length / recordsPerPage);
+  const currentRecords = employees?.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(employees?.length / recordsPerPage);
 
   const getStatusColor = (isOnline) =>
     isOnline
@@ -69,27 +74,100 @@ const EmployeeTable = () => {
     return buttons;
   };
 
+  const handleSearchTerm = (e) => {
+    setCurrentPage(1);
+    setSearchTerm(e.target.value)
+  }
+
+  useEffect(() => {
+    if(searchTerm) {
+      const filteredEmployees = employees.filter((employee) => employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || employee.email.slice(0 , employee.email.lastIndexOf("@")).toLowerCase().includes(searchTerm.toLowerCase()) || employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) )
+      setEmployees(filteredEmployees)
+    }else {
+      fetchEmployees();
+    }
+  } , [searchTerm])
+
+  const filterData = async () => {
+
+    if(status) {
+        try {
+          const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
+          if(response.status === 200) {
+            setEmployees(response.data);
+          }
+
+        } catch (error) {
+          console.error("Error filtering employees:", error.message);
+          toast.error("Error filtering employees")
+        }
+    }else {
+      toast.error(error.message)
+    }
+
+  }
+  useEffect(() => {
+    filterData();
+  } , [status])
+
   return (
     <div
-      className={`min-h-screen py-8 px-4 transition-colors duration-300 ${
+      className={`min-h-screen p-8 transition-colors duration-300 ${
         isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
       }`}
-    >
+      >
+      <h1 className="text-3xl font-bold mb-10">Employee Management</h1>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Employee Management</h1>
-          <div className="flex items-center space-x-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleAddEmployee}
-              className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-300"
-            >
-              <AiOutlineUserAdd size={20} />
-              <span>Add Employee</span>
-            </motion.button>
-          </div>
-        </div>
+            <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => handleSearchTerm(e)}
+                            placeholder="Search Names"
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+                        />
+                        <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                    </div>
+                    <motion.button
+                        onClick={() => setShowFilters((prev) => !prev)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-4 py-2 rounded-lg bg-indigo-600 text-white transition duration-300"
+                    >
+                        <Filter className="h-5 w-5 inline-block mr-2" />
+                        Filters
+                    </motion.button>
+                </div>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
+                >
+                  <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/employees/add-employee"}>
+                    <AiOutlineUserAdd/> <span>add employee</span>
+                  </Link>
+                </motion.button>
+            </div>
+          {
+            showFilters && (
+                <div className="flex gap-5 p-5   items-center justify-center ">
+                  <form  className='flex w-full gap-5 flex-wrap' >
+                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
+                      <label htmlFor="month"> status:</label>
+                      <select value={status} onChange={(e) => setStatus(e.target.value)}  id="status" name="status" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                        <option value="select status">select status</option>
+                        <option value="online">online</option>
+                        <option value="offline">offline</option>
+                      </select>
+                    </div>
+                    </form>
+                </div>
+            )
+          }
+
+
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -154,7 +232,7 @@ const EmployeeTable = () => {
                               ) : (
                                 <div className="h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center">
                                   <span className="text-white font-bold">
-                                    {employee?.name?.charAt(0).toUpperCase()}
+                                    {employee?.firstName?.charAt(0).toUpperCase()}
                                   </span>
                                 </div>
                               )}
@@ -168,7 +246,7 @@ const EmployeeTable = () => {
                                     : "text-gray-900"
                                 }`}
                               >
-                                {employee.name}
+                                {employee.firstName}
                               </div>
                               <div
                                 className={`text-sm ${

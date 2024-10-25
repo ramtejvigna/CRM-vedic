@@ -19,8 +19,29 @@ export const addCustomerWithAssignment = async (req, res) => {
     try {
         console.log("Creating new customer with data:", req.body);
 
-        // Create new customer instance
+        // Get current month and year in MM-YYYY format
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const year = today.getFullYear();
+        const dateString = `${month}-${year}`;
+
+        // Get the number of customers added in the current month
+        const monthStart = new Date(year, today.getMonth(), 1); // First day of the current month
+        const monthEnd = new Date(year, today.getMonth() + 1, 1); // First day of the next month
+
+        const customersAddedThisMonth = await Customer.countDocuments({
+            createdDateTime: { $gte: monthStart, $lt: monthEnd }
+        });
+
+        // Increment the count for the customer being added this month
+        const customerCountForMonth = customersAddedThisMonth + 1;
+
+        // Generate the customerID in the format Month-Year-Count
+        const customerID = `${month}${year}${customerCountForMonth}`;
+
+        // Create a new customer instance with the generated customerID
         const newCustomer = new Customer({
+            customerID, // Add the generated customerID
             fatherName,
             motherName,
             email,
@@ -64,8 +85,9 @@ export const addCustomerWithAssignment = async (req, res) => {
     } catch (error) {
         console.error("Error adding customer:", error.message); // Log full error
         res.status(500).json({ error: "Error adding customer" });
-    }    
+    }
 };
+
 
 
 export const getCustomers = async (req, res) => {
@@ -73,26 +95,48 @@ export const getCustomers = async (req, res) => {
         // Fetch all customers
         const customers = await Customer.find();
 
-        // Fetch all employees
-        const employees = await Employee.find({}, 'name');
+        // Fetch all employees and retrieve only the 'firstName' field
+        const employees = await Employee.find({}, 'firstName');
 
-        // Create a map of employee IDs to names
-        const employeeMap = new Map(employees.map(emp => [emp._id.toString(), emp.name]));
+        // Log the employees fetched from the database
+        console.log("Employees Fetched:", employees);
 
-        // Add employee names to customer data
-        const customersWithEmployeeNames = customers.map(customer => ({
-            ...customer.toObject(),
-            assignedEmployeeName: customer.assignedEmployee
-                ? employeeMap.get(customer.assignedEmployee.toString()) || 'Unknown'
-                : 'Not Assigned'
-        }));
+        // Create a map for employee names using their _id as the key
+        const employeeMap = new Map(employees.map(emp => [
+            emp._id.toString(),  // Ensure _id is a string
+            `${emp.firstName}`  // Store the firstName
+        ]));
 
+        // Log the employee map
+        console.log("Employee Map:", employeeMap);
+
+        // Map customers to include assigned employee names
+        const customersWithEmployeeNames = customers.map(customer => {
+            const assignedEmployeeId = customer.assignedEmployee ? customer.assignedEmployee.toString() : null;
+            
+            // Log the assigned employee ID for each customer
+            console.log("Assigned Employee ID for Customer:", assignedEmployeeId);
+
+            const employeeName = assignedEmployeeId ? employeeMap.get(assignedEmployeeId) : 'Not Assigned';
+            
+            // Log the result of the employee map lookup
+            console.log("Mapped Employee Name:", employeeName || 'Unknown');
+
+            return {
+                ...customer.toObject(),
+                assignedEmployeeName: employeeName || 'Unknown'  // Use 'Unknown' if no employee found in the map
+            };
+        });
+
+        // Send the response with customers including employee names
         res.status(200).json(customersWithEmployeeNames);
     } catch (error) {
         console.error("Error fetching customers:", error);
         res.status(500).json({ error: "Error fetching customers" });
     }
 };
+
+    
 
 
 export const getCustomersBasedOnRequests = async (req, res) => {
@@ -162,6 +206,7 @@ export const getCustomerDetails = async (req, res) => {
     try {
         console.log(req.params);
         const { id } = req.params;
+        console.log(req.params)
 
         // Fetch the customer by fatherName
         const customer = await Customer.findById(id);

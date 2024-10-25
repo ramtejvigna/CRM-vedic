@@ -134,7 +134,6 @@ export const updateEmployee = async (req, res) => {
             employerName, jobTitle, startDate, endDate, reasonForLeaving,
             cardNumber, cardholderName, cvv, expiryDate } = req.body;
 
-        // Fetch the existing employee data
         const employee = await Employee.findById(id);
         if (!employee) {
             return res.status(404).json({ message: "Employee with provided ID does not exist" });
@@ -211,3 +210,23 @@ export const updateEmployee = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
+
+
+export const filterEmployeesByStatus = async (req ,res) => {
+    try {
+        const {status} = req.query;
+        const searchQuery = {}
+        if(status && status !== "select status"){
+            searchQuery.isOnline = (status === 'online')
+        }
+
+        const isOnline = status === "online";
+
+        const employees = await Employee.find(searchQuery);
+
+        return res.status(200).json(employees);
+    } catch (error) {
+        console.error('Error filtering employee:', error.message);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+}

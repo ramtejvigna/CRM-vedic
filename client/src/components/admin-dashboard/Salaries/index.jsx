@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../../store';
 import { AnimatePresence , motion } from 'framer-motion';
-import { Delete, Edit , Eye, Trash } from 'lucide-react';
+import { Delete, Edit , Eye, Plus, Trash } from 'lucide-react';
 import { TextField , InputLabel } from '@mui/material';
 import axios from 'axios';
 import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineDownload, AiOutlinePrinter} from "react-icons/ai"
@@ -188,7 +188,7 @@ function Salaries() {
 
   return (
     <div className='flex p-8 h-full w-full flex-col gap-5'>
-        <h1 className="text-4xl font-bold mb-20">Salary statements</h1>
+        <h1 className="text-4xl font-bold mb-10">Salaries</h1>
         
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
@@ -217,8 +217,8 @@ function Salaries() {
                     whileTap={{ scale: 0.95 }}
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
-                  <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/add-salaries"}>
-                    <AiOutlineAlipay/> <span>add salary statement</span>
+                  <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/salaries/add-salaries"}>
+                    <Plus/> <span>Add Salary</span>
                   </Link>
                 </motion.button>
             </div>
@@ -275,7 +275,7 @@ function Salaries() {
                           (header) => (
                             <th
                               key={header}
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                              className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${
                                 isDarkMode ? "text-gray-300" : "text-gray-700"
                               }`}
                             >
@@ -303,16 +303,16 @@ function Salaries() {
                                 isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
                               } transition-colors duration-150`}
                             >
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{index + 1}</span>
                               </td>                        
                               
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="text-sm">{statement.employee?.firstName}</span>
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
+                                <span className="text-sm capitalize">{statement.employee?.firstName}</span>
                               </td>
   
                               {/* Amount Paid Section */}
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <div className="text-sm font-medium">
                                   <div className="flex flex-col">
                                     <strong>{statement.amountPaid}</strong>
@@ -320,46 +320,46 @@ function Salaries() {
                                 </div>
                               </td>
   
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{statement.year}</span>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 text-center whitespace-nowrap">
                                 <span className="text-sm">{statement.month}</span>
                               </td>
   
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-6 py-4 whitespace-nowrap text-center">
                                 {statement?.bankStatement ? (
-                                  <span className="text-sm px-3 py-1.5 text-green-500 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
+                                  <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
                                     Paid
                                   </span>
                                 ) : (
-                                  <span className="text-sm px-3 py-1.5 text-red-500 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
+                                  <span className="text-sm px-2 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
                                     Pending
                                   </span>
                                 )}
                               </td>
   
   
-                              <td className="px-6  py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
+                              <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
                                 <button
                                   onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${statement.bankStatement}`)}
-                                  className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
+                                  className={`flex items-center justify-center w-1/2 transition-colors duration-300 ${
                                     isDarkMode
                                       ? "text-green-400 hover:text-green-200"
                                       : "text-green-600 hover:text-green-900"
                                   }`}
                                 >
-                                  <Eye size={18} /> {"VIEW PAYSLIP"}
+                                  <Eye size={18} />
                                 </button>
                                 <button
                                   onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
-                                  className={`mr-4 flex gap-3 transition-colors duration-300 ${
+                                  className={`transition-colors duration-300 ${
                                     isDarkMode
                                       ? "text-red-400 hover:text-red-200"
                                       : "text-red-600 hover:text-red-900"
                                   }`}
                                 >
-                                  <Trash size={18} /> {"DELETE"}
+                                  <Trash size={18} />
                                 </button>
                               </td>
                             </motion.tr>
@@ -455,7 +455,7 @@ function Salaries() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0 }}
                       transition={{ duration: 0.5, ease: "backInOut" }}
-                      className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[900px] shadow-xl h-full my-auto max-h-[700px] relative"
+                      className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
                     >
                       {/* Close button */}
                       <div className='flex absolute top-1 right-1 justify-end items-end '>

@@ -3,187 +3,187 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useStore } from "../../../store";
-import { AiOutlineArrowLeft, AiOutlineDelete, AiOutlineUpload } from "react-icons/ai"; // Import your icons
+import uploadImage from "../../../assets/upload3.jpg"; // Use the same upload image
+import axios from 'axios';
 
 const ADD_EXPENSE = "https://vedic-backend-neon.vercel.app/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
-  const { isDarkMode } = useStore();
-  const [expenseName, setExpenseName] = useState("");
-  const [amountSpent, setAmountSpent] = useState("");
-  const [bankStatement, setBankStatement] = useState(null);
-  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().split("T")[0]);
-  const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef(null);
-  const navigate = useNavigate();
+  const { isDarkMode } = useStore();
+  const [expenseName, setExpenseName] = useState("");
+  const [amountSpent, setAmountSpent] = useState("");
+  const [bankStatement, setBankStatement] = useState(null);
+  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().split("T")[0]);
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
+  const validateForm = () => {
+    const formErrors = {};
+    if (!expenseName) formErrors.expenseName = "Expense name is required";
+    if (!amountSpent || amountSpent <= 0) formErrors.amountSpent = "Amount spent is required";
+    if (!bankStatement) formErrors.bankStatement = "Bank statement is required";
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
+  };
 
-  const handleClear = () => {
-    setBankStatement(null);
-  };
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setBankStatement(file);
+  };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setBankStatement(file);
-    }
-  };
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!expenseName || !amountSpent || !bankStatement) {
-      toast.error("Please fill all fields!");
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      const formData = new FormData();
+      formData.append("expense_name", expenseName);
+      formData.append("amount_spent", amountSpent);
+      formData.append("date", expenseDate);
+      formData.append("bank_statement", bankStatement);
+      try {
+        setIsLoading(true);
+        const res = await axios.post(ADD_EXPENSE, formData);
+        if (res.status === 200) {
+          toast.success("Expense added successfully!");
+          navigate("/admin-dashboard/expenses");
+        }
+      } catch (error) {
+        console.error("Error adding expense:", error);
+        toast.error("Error adding expense!");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
-    const formData = new FormData();
-    formData.append("expense_name", expenseName);
-    formData.append("amount_spent", amountSpent);
-    formData.append("date", expenseDate);
-    formData.append("bank_statement", bankStatement);
+  return (
+    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
+      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-10">
+        <h1 className="text-3xl font-bold mb-6 text-center">Add Expense</h1>
 
-    try {
-      setIsLoading(true);
-      const res = await fetch(ADD_EXPENSE, {
-        method: "POST",
-        body: formData,
-      });
+        {/* Form Grid Layout */}
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
+          
+          {/* Expense Name */}
+          <div className="flex flex-col gap-3">
+            <label htmlFor="expenseName" className="uppercase text-xs tracking-wider font-semibold">Expense Name</label>
+            <input
+              type="text"
+              id="expenseName"
+              value={expenseName}
+              onChange={(e) => setExpenseName(e.target.value)}
+              className={`p-4 rounded-sm border ${errors.expenseName ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2`}
+              required
+            />
+            {errors.expenseName && <span className="text-xs text-red-400">{errors.expenseName}</span>}
+          </div>
 
-      if (!res.ok) throw new Error("Failed to add expense");
+          {/* Amount Spent */}
+          <div className="flex flex-col gap-3">
+            <label htmlFor="amountSpent" className="uppercase text-xs tracking-wider font-semibold">Amount Spent</label>
+            <input
+              type="number"
+              id="amountSpent"
+              value={amountSpent}
+              onChange={(e) => setAmountSpent(e.target.value)}
+              className={`p-4 rounded-sm border ${errors.amountSpent ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2`}
+              required
+            />
+            {errors.amountSpent && <span className="text-xs text-red-400">{errors.amountSpent}</span>}
+          </div>
 
-      const data = await res.json();
-      if (data.success) {
-        toast.success("Expense added successfully!");
-        navigate("/admin-dashboard/expenses");
-      } else {
-        toast.error("Failed to add expense!");
-      }
-    } catch (error) {
-      console.error("Error adding expense:", error);
-      toast.error("Error adding expense!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+          {/* Date */}
+          <div className="flex flex-col gap-3">
+            <label htmlFor="expenseDate" className="uppercase text-xs tracking-wider font-semibold">Date</label>
+            <input
+              type="date"
+              id="expenseDate"
+              value={expenseDate}
+              onChange={(e) => setExpenseDate(e.target.value)}
+              className="p-4 rounded-sm border border-gray-300 focus:outline-none focus:ring-2"
+            />
+          </div>
 
-  return (
-    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
-      <div className='w-full flex mb-4 justify-start'>
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transition duration-200 transform hover:scale-105 active:scale-95"
-          >
-            <AiOutlineArrowLeft className="text-xl" />
-            Back
-          </button>
-        </div>
-      <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6 text-center">Add Expense</h1>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-col space-y-4">
-              <div className="flex flex-col">
-                <label htmlFor="expenseName" className="text-sm font-medium mb-2">
-                  Expense Name
-                </label>
-                <input
-                  type="text"
-                  id="expenseName"
-                  value={expenseName}
-                  onChange={(e) => setExpenseName(e.target.value)}
-                  className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
+          {/* Bank Statement File Upload */}
+          <div className="col-span-2 flex flex-col gap-3">
+  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+    Bank Statement
+  </label>
+  {!bankStatement ? (
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      className="mt-2 p-8 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 cursor-pointer"
+    >
+      <label className="w-full cursor-pointer">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
+          <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG,PDF</p>
+        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept=".jpg,.png,.jpeg"
+          className="hidden"
+        />
+      </label>
+    </motion.div>
+  ) : (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="mt-2"
+    >
+      <div className="relative w-40 h-40 rounded-lg overflow-hidden">
+        <img
+          src={URL.createObjectURL(bankStatement)}
+          alt="Bank Statement"
+          className="w-full h-full object-cover"
+        />
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setBankStatement(null)}
+          className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white"
+        >
+          <XCircleIcon size={20} />
+        </motion.button>
+      </div>
+    </motion.div>
+  )}
+  {errors.bankStatement && <span className="text-xs text-red-400">{errors.bankStatement}</span>}
+</div>
 
-              <div className="flex flex-col">
-                <label htmlFor="amountSpent" className="text-sm font-medium mb-2">
-                  Amount Spent
-                </label>
-                <input
-                  type="number"
-                  id="amountSpent"
-                  value={amountSpent}
-                  onChange={(e) => setAmountSpent(e.target.value)}
-                  className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
 
-              <div className="flex flex-col">
-                <label htmlFor="expenseDate" className="text-sm font-medium mb-2">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="expenseDate"
-                  value={expenseDate}
-                  onChange={(e) => setExpenseDate(e.target.value)}
-                  className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label htmlFor="bankStatement" className="text-sm font-medium mb-2">
-                  Bank Statement
-                </label>
-                <div className="flex items-center space-x-4">
-                  <input
-                    type="file"
-                    id="bankStatement"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={handleUploadClick}
-                    className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                   <span className="text-gray-500 flex gap-2 items-center">
-                                    <AiOutlineUpload /> Upload File
-                                </span>
-                  </button>
-                  {bankStatement ? (
-                    <div className="flex flex-col">
-                      <div className="mt-2 p-4 h-36 w-36 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                        <img
-                          src={URL.createObjectURL(bankStatement)}
-                          alt="Bank Statement Preview"
-                          className="object-cover"
-                        />
-                      </div>
-                      <button
-                        onClick={handleClear}
-                        className="text-red-500 mt-2 flex items-center gap-2"
-                      >
-                        <AiOutlineDelete /> Clear Upload
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              className="flex items-center justify-center w-2/4 max-w-sm py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-200"
-              disabled={isLoading}
-            >
-              {isLoading ? "Adding..." : "Add Expense"}
-            </motion.button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+          {/* Submit Button */}
+          <div className="col-span-2 flex items-center justify-end gap-5">
+            <button
+              type="button"
+              onClick={() => navigate("/admin-dashboard/expenses")}
+              className="px-5 py-2 border border-red-500 text-red-500 hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className="px-5 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg"
+              disabled={isLoading}
+            >
+              {isLoading ? "Adding..." : "Add Expense"}
+            </motion.button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default AddExpense;

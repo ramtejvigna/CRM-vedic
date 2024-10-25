@@ -69,44 +69,6 @@ const AddEmployee = () => {
         const form = formData[formKeys[activeStep]];
         const formErrors = {};
 
-
-        // if (activeStep === 0) {
-        //     if (!form.firstName) formErrors.firstName = 'firstname  is required';
-        //     if (!form.email) formErrors.email = 'Email is required';
-        //     if (!form.lastName) formErrors.lastName = 'lastname is required';
-        //     if (!form.address) formErrors.address = 'Address is required';
-        //     if (!form.city) formErrors.city = 'city is required';
-        //     if(!(/^(?:7|8|9)\d{9}$/.test(form.phone))) formErrors.phone = "invalid number"
-        //     if (!form.state) formErrors.state = 'State is required';
-        //     if (!(/^[1-9][0-9]{5}$/.test(form.pincode))) formErrors.pincode = 'invalid pincode';
-        //     if (!form.country) formErrors.country = 'Country is required';
-        // }
-
-        if (activeStep === 1) {
-            if (!form.aadharOrPan) formErrors.aadharOrPan = 'Aadhar Card or Pan Card is required';
-            if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-            if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
-        }
-
-
-        if (activeStep === 2) {
-            if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
-            if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
-        }
-        if (activeStep === 3) {
-            if (!form.employerName) formErrors.employerName = 'employer Name is required';
-            if (!form.jobTitle) formErrors.jobTitle = 'job title is required';
-            if (!form.startDate) formErrors.startDate = 'date is required';
-            if (!form.endDate) formErrors.endDate = 'date is required';
-            if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'reason is required';
-        }
-
-        if (activeStep === 4) {
-            if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
-            if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
-            if (!form.cvv) formErrors.cvv = 'CVV is required';
-        }
             if (activeStep === 0) {
                 if (!form.firstName) formErrors.firstName = 'firstname  is required';
                 if (!form.email) formErrors.email = 'Email is required';
@@ -366,11 +328,11 @@ const AddEmployee = () => {
                     ) : (
                         <div className="flex flex-col">
                         <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
-                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg w-[600px] h-[500px] bg-gray-50 flex items-center justify-center">
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg w-40 h-40 bg-gray-50 flex items-center justify-center">
                             <img
                             src={URL.createObjectURL(formData.idDocuments.aadharOrPan)}
                             alt="Aadhar or Pan"
-                            className="w-96 h-96 object-cover"
+                            className=" object-cover"
                             />
                         </div>
                         <button
@@ -405,11 +367,11 @@ const AddEmployee = () => {
                     ) : (
                         <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 h-[500px] w-[600px] rounded-lg bg-gray-50 flex items-center justify-center">
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 h-40 w-40 rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                                 src={URL.createObjectURL(formData.idDocuments.passport)}
                                 alt="Passport or Driving License"
-                                className="w-96 h-96 object-cover"
+                                className=" object-cover"
                                 />
                             </div>
                             <button
@@ -464,11 +426,11 @@ const AddEmployee = () => {
                         ) : (
                             <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                            <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                                 src={URL.createObjectURL(formData.education.degrees)}
                                 alt="Degrees/Certificates"
-                                className=" h-64 object-cover"
+                                className=" object-cover"
                                 />
                             </div>
                             <button
@@ -503,11 +465,11 @@ const AddEmployee = () => {
                         ) : (
                             <div className="flex flex-col">
                             <InputLabel className="text-gray-700">Transcripts</InputLabel>
-                            <div className="mt-2 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                            <div className="mt-2 h-40 w-40 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                                 src={URL.createObjectURL(formData.education.transcripts)}
                                 alt="Transcripts"
-                                className="h-64 object-cover"
+                                className=" object-cover"
                                 />
                             </div>
                             <button

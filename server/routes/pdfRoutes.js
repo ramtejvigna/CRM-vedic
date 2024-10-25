@@ -11,4 +11,6 @@ router.post('/create-pdf', pdfController.sendDetails);
 router.post('/send-pdf-email', pdfController.sendPdfEmail);
 router.post('/send-pdf-whatsapp', pdfController.sendPdfWhatsApp);
 router.get('/generatedpdf', pdfController.getPdfsByCustomerId);
+
 export default router;
+
