@@ -37,7 +37,6 @@ const TaskManagement = () => {
   useEffect(() => {
     fetchTasks();
     fetchEmployees();
-    // 
 
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
