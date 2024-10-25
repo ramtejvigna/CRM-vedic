@@ -51,8 +51,8 @@ export const getBabyNames = async (req, res) => {
 };
 
 export const sendDetails = async (req, res) => {
-    const { names, customerId } = req.body;
-
+    const { names, customerId,additionalBabyNames } = req.body;
+    console.log(additionalBabyNames)
     if (!names || names.length === 0) {
         return res.status(400).json({ error: 'No baby names selected' });
     }
@@ -61,7 +61,6 @@ export const sendDetails = async (req, res) => {
         // Fetch the selected baby names from the database using the provided names
         const selectedNames = await babyNames.find({ name: { $in: names } });
 
-        console.log("Selected names from DB:", selectedNames);
 
         if (!selectedNames || selectedNames.length === 0) {
             return res.status(404).json({ error: 'Baby names not found' });
@@ -73,11 +72,11 @@ export const sendDetails = async (req, res) => {
         // Save the baby names' IDs and other PDF metadata in the PDF collection
         const newPdf = new PDF({
             babyNames: selectedNamesIds,  // Store baby names' IDs
+            additionalBabyNames:additionalBabyNames,
         });
 
         const savedPdf = await newPdf.save();
 
-        console.log("PDF saved:", savedPdf);
 
         // Store the PDF document ID in the customer's record
         // If 'pdfGenerated' array doesn't exist, it will be created
