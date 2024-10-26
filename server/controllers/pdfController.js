@@ -139,22 +139,26 @@ export const getPdfsByCustomerId = async (req, res) => {
 
 export const sendPdfEmail = async (req, res) => {
     const { email, base64Pdf, uniqueId } = req.body;
-  
     try {
       // Decode base64 to binary PDF content
       const pdfBuffer = Buffer.from(base64Pdf, 'base64');
-  
+      
+
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'Your Generated PDF',
         text: 'Here is your PDF document.',
-        attachments: [{
-          filename: `${uniqueId}.pdf`,
-          content: pdfBuffer,  // Pass the buffer as content
-          encoding: 'base64'   // Specify that the content is base64-encoded
-        }]
+        attachments: [
+          {
+            filename: `${uniqueId}.pdf`,
+            content: pdfBuffer, // Pass the buffer as content
+            contentType: 'application/pdf', // Ensure the MIME type is correct
+            encoding: 'base64' // Specify base64 encoding explicitly
+          },
+        ],
       };
+      
   
       // Send the email with the attachment
       await transporter.sendMail(mailOptions);
