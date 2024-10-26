@@ -9,6 +9,8 @@ import {
 
 const router = express.Router();
 
+
+// Routes
 router.post('/', addExpense);
 
 router.get('/', getAllExpenses);
