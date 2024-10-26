@@ -74,17 +74,16 @@ const ViewEmployee = () => {
         </div>
     ) : (
         <div className='flex flex-col w-full  h-full'>
-            <div className="flex items-center justify-between p-5 ">
-
-                <div className="flex gap-4">
-                    <Button onClick={() => navigate('/admin-dashboard/employees')} className="border border-black text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+            <div className="flex items-center justify-between">
+                <div className="flex">
+                    <Button onClick={() => navigate('/admin-dashboard/employees')} className=" text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
                        <FaArrowLeft/>
                     </Button>
                 </div>
             </div>
 
          <div className='flex flex-wrap p-2 gap-3 rounded-xl'>
-            <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 mt-6">
+            <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 ">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Personal Details</h2>
 
                 <div className="border-t border-gray-200">

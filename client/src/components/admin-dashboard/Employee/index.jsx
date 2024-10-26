@@ -152,11 +152,11 @@ const EmployeeTable = () => {
             </div>
           {
             showFilters && (
-                <div className="flex gap-5 p-5   items-center justify-center ">
-                  <form  className='flex w-full gap-5 flex-wrap' >
-                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
-                      <label htmlFor="month"> status:</label>
-                      <select value={status} onChange={(e) => setStatus(e.target.value)}  id="status" name="status" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                <div className="flex py-3">
+                  <form  className='flex w-full flex-wrap' >
+                    <div className='flex gap-x-3  min-w-[250px]'>
+                      <label htmlFor="month" className="capitalize tracking-wider"> status :</label>
+                      <select value={status} onChange={(e) => setStatus(e.target.value)}  id="status" name="status" className="transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white ">
                         <option value="select status">select status</option>
                         <option value="online">online</option>
                         <option value="offline">offline</option>

@@ -230,11 +230,11 @@ const SalaryStatementComponent = ({ bankStatement }) => {
             </div>
           {
             showFilters && (
-                <div className="flex gap-5   items-center justify-center ">
-                  <form  className='flex w-full gap-5 flex-wrap' >
-                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
-                      <label htmlFor="month"> Month:</label>
-                      <select value={filteringMonth} onChange={(e) => setFilteringMonth(e.target.value)} id="month" name="month" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                <div className="flex py-3   ">
+                  <form  className='flex w-full   flex-wrap' >
+                    <div className='flex gap-x-5  items-center  min-w-[250px]'>
+                      <label htmlFor="month"> Month :</label>
+                      <select value={filteringMonth} onChange={(e) => setFilteringMonth(e.target.value)} id="month" name="month" className="  transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white">
                         <option value="select month">select month</option>
                         {months.map((month, index) => (
                           <option key={index} value={month}>
@@ -244,9 +244,9 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                       </select>
                     </div>
 
-                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
-                      <label htmlFor="year"> Year:</label>
-                      <select value={filteringYear} onChange={(e) => setFilteringYear(e.target.value)} id="year" name="year"  className="p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                    <div className='flex gap-x-5 items-center justify-center   min-w-[250px]'>
+                      <label htmlFor="year"> Year :</label>
+                      <select value={filteringYear} onChange={(e) => setFilteringYear(e.target.value)} id="year" name="year"  className="transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white">
                       <option value="select year">select year</option>
                         {years.map(year => (
                           <option key={year} value={year}>
@@ -286,7 +286,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                               (header) => (
                                 <th
                                   key={header}
-                                  className={`px-6 py-3 text-center text-xs font-medium capitalize tracking-wider ${
+                                  className={`px-6 py-3  text-xs font-medium capitalize tracking-wider ${
                                     isDarkMode ? "text-gray-300" : "text-gray-700"
                                   }`}
                                 >
@@ -314,16 +314,16 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                                     isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
                                   } transition-colors duration-150`}
                                 >
-                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                  <td className="px-6 py-4  whitespace-nowrap">
                                     <span className="text-sm">{index + 1}</span>
                                   </td>                        
                                   
-                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                  <td className="px-6 py-4  whitespace-nowrap">
                                     <span className="text-sm capitalize">{statement.employee?.firstName}</span>
                                   </td>
       
                                   {/* Amount Paid Section */}
-                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                  <td className="px-6 py-4  whitespace-nowrap">
                                     <div className="text-sm font-medium">
                                       <div className="flex flex-col">
                                         <strong>{statement.amountPaid}</strong>
@@ -331,7 +331,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                                     </div>
                                   </td>
       
-                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                  <td className="px-6 py-4  whitespace-nowrap">
                                     <span className="text-sm">{statement.year}</span>
                                   </td>
 
@@ -352,7 +352,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                                   </td>
       
       
-                                  <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
+                                  <td className="px-6  py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
                                     <button
                                       onClick={() =>{ setImage(statement?.bankStatement) , console.log(statement?.bankStatement)}}
                                       className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
