@@ -150,14 +150,26 @@ export const getCustomersBasedOnRequests = async (req, res) => {
             return res.status(404).json({ error: "Employee not found" });
         }
 
-        // Categorize customers based on payment status and PDF generation
+        // Categorize and sort customers based on payment status and time
         const customers = employee.customers;
-        const newRequests = customers.filter(customer => customer.customerStatus === 'newRequests');
-        const inProgress = customers.filter(customer => customer.customerStatus === 'inProgress');
-        const completed = customers.filter(customer => customer.customerStatus === 'completed');
-        const rejected = customers.filter(customer => customer.customerStatus === 'rejected');
+        
+        const newRequests = customers
+            .filter(customer => customer.customerStatus === 'newRequests')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const inProgress = customers
+            .filter(customer => customer.customerStatus === 'inProgress')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const completed = customers
+            .filter(customer => customer.customerStatus === 'completed')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const rejected = customers
+            .filter(customer => customer.customerStatus === 'rejected')
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Return the categorized customers
+        // Return the categorized and sorted customers
         res.status(200).json({
             newRequests,
             inProgress,
@@ -167,7 +179,7 @@ export const getCustomersBasedOnRequests = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "Error fetching customers for employee" });
     }
-}
+};
 
 export const getCustomerData = async (req, res) => {
     const { id } = req.params;
