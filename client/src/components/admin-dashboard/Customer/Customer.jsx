@@ -28,7 +28,6 @@ const Customer = () => {
     const [loading, setLoading] = useState(true);
     const [pdfsLoading, setPdfsLoading] = useState(false);
     const [feedback, setFeedback] = useState('');
-    const navigate = useNavigate();
     const customerId = customerDetails?._id;
     const iframeRef = useRef(null);
     const [pdfUrl, setPdfUrl] = useState(null);
@@ -184,69 +183,68 @@ const Customer = () => {
     }
 
     return (
-        <div className="min-h-screen p-4 sm:p-8">
-            <div className="flex items-center justify-between p-5 ">
+        <>
+            <div className="min-h-screen p-4 sm:p-8">
+                <div className="flex items-center justify-between p-5 ">
 
-                <div className="flex gap-4">
-                    <Button onClick={() => navigate('/admin-dashboard/customers')} className="border bg-white text-blue-500  px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-                        <FaArrowLeft/>
-                    </Button>
-                </div>
-                </div>
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Personal Information Card */}
-                <div className="bg-gray-100 rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col justify-between">
-                    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Personal Information</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Father's Name</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.fatherName || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Mother's Name</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.motherName || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Email</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.email || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">WhatsApp Number</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.whatsappNumber || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Baby's Gender</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.babyGender || "N/A"}</span>
-                        </div>
+                    <div className="flex gap-4">
+                        <Button onClick={() => navigate('/admin-dashboard/customers')} className="border bg-white text-blue-500  px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+                            <FaArrowLeft />
+                        </Button>
                     </div>
                 </div>
-            ) : (
-                <div className="flex-grow">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Personal Information Card */}
+                    <div className="bg-gray-100 rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col justify-between">
+                        <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Personal Information</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-semibold text-gray-600">Father's Name</span>
+                                <span className="text-lg font-medium text-gray-900">{customerDetails.fatherName || "N/A"}</span>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-semibold text-gray-600">Mother's Name</span>
+                                <span className="text-lg font-medium text-gray-900">{customerDetails.motherName || "N/A"}</span>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-semibold text-gray-600">Email</span>
+                                <span className="text-lg font-medium text-gray-900">{customerDetails.email || "N/A"}</span>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-semibold text-gray-600">WhatsApp Number</span>
+                                <span className="text-lg font-medium text-gray-900">{customerDetails.whatsappNumber || "N/A"}</span>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-semibold text-gray-600">Baby's Gender</span>
+                                <span className="text-lg font-medium text-gray-900">{customerDetails.babyGender || "N/A"}</span>
+                            </div>
+                        </div>
+                    </div>
+                    ) : (
+                    <div className="flex-grow">
+                        <div className="grid grid-cols-1 gap-2">
+                            <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                        </div>
+                    </div>
+
+                    {/* Divider */}
+                    <hr className="my-6 border-gray-300" />
+
+                    {/* Astrological Details */}
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
                     <div className="grid grid-cols-1 gap-2">
-                        <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
-                        <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
-                        <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
-                        <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                        <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
+                        <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
+                        <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
+                        <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
+                        <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
+                        <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
                     </div>
                 </div>
-            )}
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-300" />
-
-            {/* Astrological Details */}
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
-            <div className="grid grid-cols-1 gap-2">
-                <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
-                <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
-                <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
-                <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
-                <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
-                <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
             </div>
-        </div>
-    </div>
-</div>
 
 
 
@@ -409,7 +407,8 @@ const Customer = () => {
                     />
                 )}
             </div>
-        </div>
+
+        </>
     );
 };
 
