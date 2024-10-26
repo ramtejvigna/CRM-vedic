@@ -228,6 +228,7 @@ const Customer = () => {
                             <p className="text-gray-600">No employee assigned.</p>
                         )}
                     </div>
+                    
 
                     {/* Payment Details & Astrological Details Card */}
                     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
