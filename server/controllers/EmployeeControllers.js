@@ -92,7 +92,7 @@ export const addEmployee = async (req, res) => {
 // @access public
 export const getEmployees = async (req ,res) => {
     try {
-        const employees = await Employee.find().populate("customers" , "fatherName motherName");
+        const employees = await Employee.find().populate("customers" , "fatherName motherName").sort({createdAt : -1});
         return res.status(200).json({employees});
     } catch (error) {
         return res.status(500).send("Internal server error");
