@@ -13,6 +13,7 @@ import {AiOutlineAlipay} from "react-icons/ai"
 import noImage from "../../../assets/noimage.jpg"
 import noData from "../../../assets/nodata.jpg"
 function Salaries() {
+  const [isLoading , setIsLoading] = useState(false);
   const [showFilters , setShowFilters] = useState(false);
   const [showDeleteCard , setShowDeleteCard] = useState(false);
   const [selectedEventId , setSelectedEventId] = useState(null);
@@ -43,8 +44,9 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await axios.get("https://vedic-backend-neon.vercel.app/salaries/");
-      setSalaryStatements(response.data);
+      const response = await fetch("http://localhost:3000/salaries/");
+      const data = await response.json()
+      setSalaryStatements(data);
     } catch (error) {
       console.error("Error fetching employees:", error);
     } finally {
@@ -61,7 +63,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`https://vedic-backend-neon.vercel.app/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`http://localhost:3000/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
@@ -82,14 +84,15 @@ function Salaries() {
 
     if(filterData || filteringMonth) {
         try {
+          setIsLoading(true);
           const response = await axios.get(`https://vedic-backend-neon.vercel.app/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
           if(response.status === 200) {
             setSalaryStatements(response.data);
+            setIsLoading(false)
           }
 
         } catch (error) {
-          console.error("Error filtering statements:", error.message);
-          toast.error("Error filtering statement")
+          setIsLoading(false);
         }
     }else {
       toast.error("Please select year and month")
@@ -124,29 +127,49 @@ function Salaries() {
     return buttons;
   };
   
-  const downloadImage =  async (url) => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Network response was not ok');
+  const downloadImage = (base64String) => {
+    const link = document.createElement('a');
+    link.href = `data:image/jpeg;base64,${base64String}`;
+    link.download = 'bank_statement.jpg'; // Name of the downloaded file
+    link.click();
+};
   
-      const blob = await response.blob();
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = url.split('/').pop();
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link); // Clean up
-    } catch (error) {
-      console.error('Error downloading the image:', error);
-      toast.error(error.message)
-    }
-  };
+  
+const printImage = (base64String) => {
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+      <html>
+          <head>
+              <title>Print Image</title>
+          </head>
+          <body>
+              <img src="data:image/jpeg;base64,${base64String}" style="max-width:100%;"/>
+          </body>
+      </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+};
 
-  const printImage = (imageUrl) => {
-    const newWindow = window.open('', '_blank'); // Opens a new blank window
-    newWindow.document.write(`<img src="${imageUrl}" onload="window.print();window.close()" />`); // Writes the image into the window and triggers print on load
-    newWindow.document.close(); // Closes the document
-  };
+const SalaryStatementComponent = ({ bankStatement }) => {
+  return (
+      <div>
+          <h2>Bank Statement</h2>
+          {bankStatement && (
+              <div>
+                  <img 
+                      src={`data:image/jpeg;base64,${bankStatement}`} 
+                      alt="Bank Statement" 
+                      style={{ maxWidth: '100%', height: 'auto' }} 
+                  />
+                  <button onClick={() => downloadImage(bankStatement)}>Download Image</button>
+                  <button onClick={() => printImage(bankStatement)}>Print Image</button>
+              </div>
+          )}
+      </div>
+  );
+};
+
 
   useEffect(() => {
     filterData();
@@ -155,11 +178,18 @@ function Salaries() {
   useEffect(() => {
     if(searchTerm) {
       const filteredData = salaryStatements.filter((statement) => (statement.employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || statement.employee.lastName.toLowerCase().includes(searchTerm.toLowerCase())) )
-      setSalaryStatements(filteredData)
+      setSalaryStatements(filteredData);
     }else {
       fetchSalries();
     }
   } , [searchTerm]);
+
+
+  useEffect(() => {
+    console.log(image)
+     
+  } , [image])
+
 
 
   return (
@@ -198,169 +228,163 @@ function Salaries() {
                   </Link>
                 </motion.button>
             </div>
-          
-           {showFilters && (
-            <div className="flex gap-5 items-center justify-start">
-              <form className='flex w-full gap-5 flex-wrap'>
-                <div className='flex gap-2 items-center min-w-[150px]'>
-                  <label htmlFor="month" className="mr-2">Month:</label>
-                  <select 
-                    value={filteringMonth} 
-                    onChange={(e) => setFilteringMonth(e.target.value)} 
-                    id="month" 
-                    name="month" 
-                    className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
-                  >
-                    <option value="select month">select month</option>
-                    {months.map((month, index) => (
-                      <option key={index} value={month}>
-                        {month}
-                      </option>
-                    ))}
-                  </select>
+          {
+            showFilters && (
+                <div className="flex gap-5   items-center justify-center ">
+                  <form  className='flex w-full gap-5 flex-wrap' >
+                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
+                      <label htmlFor="month"> Month:</label>
+                      <select value={filteringMonth} onChange={(e) => setFilteringMonth(e.target.value)} id="month" name="month" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                        <option value="select month">select month</option>
+                        {months.map((month, index) => (
+                          <option key={index} value={month}>
+                            {month}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
+                      <label htmlFor="year"> Year:</label>
+                      <select value={filteringYear} onChange={(e) => setFilteringYear(e.target.value)} id="year" name="year"  className="p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                      <option value="select year">select year</option>
+                        {years.map(year => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </form>
                 </div>
-          
-                <div className='flex gap-2 items-center min-w-[150px]'>
-                  <label htmlFor="year" className="mr-2">Year:</label>
-                  <select 
-                    value={filteringYear} 
-                    onChange={(e) => setFilteringYear(e.target.value)} 
-                    id="year" 
-                    name="year"  
-                    className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
-                  >
-                    <option value="select year">select year</option>
-                    {years.map(year => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </form>
+            )
+          }
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <div className="flex flex-1">
+              <div className="overflow-x-auto w-full">
+                {currentRecords.length === 0 ? (
+                      <div className='h-full w-full flex flex-col gap-5 items-center justify-center'>
+                          <span className='font-bold tracking-wider text-2xl'>No data found</span>
+                          <div className='h-72 w-72'> 
+                            <img src={noData} className='object-cover' alt="no data" />
+                          </div>
+                      </div>       
+                ) : (
+                      <table className="w-full">
+                        <thead
+                          className={`${
+                            isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                          }`}
+                        >
+                          <tr>
+                            {["s no", "Employee name" , "Amount paid" , "year", "month" , "status" , "Actions"].map(
+                              (header) => (
+                                <th
+                                  key={header}
+                                  className={`px-6 py-3 text-center text-xs font-medium capitalize tracking-wider ${
+                                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                                  }`}
+                                >
+                                  {header}
+                                </th>
+                              )
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody
+                          className={`divide-y ${
+                            isDarkMode ? "divide-gray-700" : "divide-gray-200"
+                          }`}
+                        >
+                          <AnimatePresence>
+                            { 
+                              currentRecords.map((statement, index) =>  (
+                                <motion.tr
+                                  key={index}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -20 }}
+                                  transition={{ duration: 0.3 }}
+                                  className={`${
+                                    isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
+                                  } transition-colors duration-150`}
+                                >
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <span className="text-sm">{index + 1}</span>
+                                  </td>                        
+                                  
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <span className="text-sm capitalize">{statement.employee?.firstName}</span>
+                                  </td>
+      
+                                  {/* Amount Paid Section */}
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <div className="text-sm font-medium">
+                                      <div className="flex flex-col">
+                                        <strong>{statement.amountPaid}</strong>
+                                      </div>
+                                    </div>
+                                  </td>
+      
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <span className="text-sm">{statement.year}</span>
+                                  </td>
+
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="text-sm">{statement.month}</span>
+                                  </td>
+      
+                                  <td className="px-6 py-4 whitespace-nowrap ">
+                                    {statement?.bankStatement ? (
+                                      <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
+                                        Paid
+                                      </span>
+                                    ) : (
+                                      <span className="text-sm px-2 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
+                                        Pending
+                                      </span>
+                                    )}
+                                  </td>
+      
+      
+                                  <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
+                                    <button
+                                      onClick={() =>{ setImage(statement?.bankStatement) , console.log(statement?.bankStatement)}}
+                                      className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
+                                        isDarkMode
+                                          ? "text-green-400 hover:text-green-200"
+                                          : "text-green-600 hover:text-green-900"
+                                      }`}
+                                    >
+                                      <Eye size={18} />
+                                    </button>
+                                    <button
+                                      onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
+                                      className={`transition-colors duration-300 ${
+                                        isDarkMode
+                                          ? "text-red-400 hover:text-red-200"
+                                          : "text-red-600 hover:text-red-900"
+                                      }`}
+                                    >
+                                      <Trash size={18} />
+                                    </button>
+                                  </td>
+                                </motion.tr>
+                              ))
+                            }
+                          </AnimatePresence>
+                        </tbody>
+                      </table>
+                )}
+                    </div>
             </div>
           )}
-          
-          
 
-        <div className="flex flex-1">
-          <div className="overflow-x-auto w-full">
-            {currentRecords.length === 0 ? (
-                  <div className='h-full w-full flex flex-col gap-5 items-center justify-center'>
-                      <span className='font-bold tracking-wider text-2xl'>No data found</span>
-                      <div className='h-72 w-72'> 
-                        <img src={noData} className='object-cover' alt="no data" />
-                      </div>
-                  </div>       
-            ) : (
-                  <table className="w-full">
-                    <thead
-                      className={`${
-                        isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                      }`}
-                    >
-                      <tr>
-                        {["s no", "Employee name" , "Amount paid" , "year", "month" , "status" , "Actions"].map(
-                          (header) => (
-                            <th
-                              key={header}
-                              className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${
-                                isDarkMode ? "text-gray-300" : "text-gray-700"
-                              }`}
-                            >
-                              {header}
-                            </th>
-                          )
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody
-                      className={`divide-y ${
-                        isDarkMode ? "divide-gray-700" : "divide-gray-200"
-                      }`}
-                    >
-                      <AnimatePresence>
-                        { 
-                          currentRecords.map((statement, index) =>  (
-                            <motion.tr
-                              key={index}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              transition={{ duration: 0.3 }}
-                              className={`${
-                                isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
-                              } transition-colors duration-150`}
-                            >
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <span className="text-sm">{index + 1}</span>
-                              </td>                        
-                              
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <span className="text-sm capitalize">{statement.employee?.firstName}</span>
-                              </td>
-  
-                              {/* Amount Paid Section */}
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <div className="text-sm font-medium">
-                                  <div className="flex flex-col">
-                                    <strong>{statement.amountPaid}</strong>
-                                  </div>
-                                </div>
-                              </td>
-  
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <span className="text-sm">{statement.year}</span>
-                              </td>
-
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="text-sm">{statement.month}</span>
-                              </td>
-  
-                              <td className="px-6 py-4 whitespace-nowrap ">
-                                {statement?.bankStatement ? (
-                                  <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
-                                    Paid
-                                  </span>
-                                ) : (
-                                  <span className="text-sm px-2 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
-                                    Pending
-                                  </span>
-                                )}
-                              </td>
-  
-  
-                              <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
-                                <button
-                                  onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${statement.bankStatement}`)}
-                                  className={`flex items-center justify-center w-1/2 transition-colors duration-300 ${
-                                    isDarkMode
-                                      ? "text-green-400 hover:text-green-200"
-                                      : "text-green-600 hover:text-green-900"
-                                  }`}
-                                >
-                                  <Eye size={18} />
-                                </button>
-                                <button
-                                  onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
-                                  className={`transition-colors duration-300 ${
-                                    isDarkMode
-                                      ? "text-red-400 hover:text-red-200"
-                                      : "text-red-600 hover:text-red-900"
-                                  }`}
-                                >
-                                  <Trash size={18} />
-                                </button>
-                              </td>
-                            </motion.tr>
-                          ))
-                        }
-                      </AnimatePresence>
-                    </tbody>
-                  </table>
-            )}
-                </div>
-        </div>
 
         <div
               className={`px-4 py-3 flex items-center justify-between border-t sm:px-6`}
@@ -477,9 +501,12 @@ function Salaries() {
 
                       {/* Iframe Container */}
                       <div className='flex items-center justify-center w-full h-[90%]'>
-                        <iframe 
-                          src={image} 
-                          className="w-full image-iframe  h-full object-fill" // Ensures image scales within the iframe
+                        <iframe
+                          src={`data:image/jpeg;base64,${image}`}  
+                          height={"100%"}
+                          width={"100%"}
+                          className='object-cover'
+                          // Ensures image scales within the iframe
                         />
                         {/* <img src={image} className='w-full h-full object-cover' alt="displayed" /> */}
                       </div>

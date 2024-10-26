@@ -146,7 +146,7 @@ const EmployeeTable = () => {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/employees/add-employee"}>
-                    <AiOutlineUserAdd/> <span>add employee</span>
+                    <AiOutlineUserAdd/> <span className="">Add Employee</span>
                   </Link>
                 </motion.button>
             </div>
@@ -166,8 +166,6 @@ const EmployeeTable = () => {
                 </div>
             )
           }
-
-
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -191,7 +189,7 @@ const EmployeeTable = () => {
                       (header) => (
                         <th
                           key={header}
-                          className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                          className={`px-6 py-3 text-left text-xs font-medium capitalize tracking-wider ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
                           }`}
                         >

@@ -43,29 +43,33 @@ const employeeSchema = new mongoose.Schema({
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
+
     aadharOrPan : {type : String} ,
     passport : {type : String} ,
     ssn : {type : String},
     degrees : {type : String } ,
     transcripts : {type : String },
+
     employerName : {type : String } ,
     jobTitle : {type : String} ,
     startDate: { type: Date },
     endDate: { type: Date },
     reasonForLeaving : {type : String } ,
+
     cardNumber : {type : String} ,
-    cardHolderName : {type : String } ,
+    cardholderName : {type : String } ,
     cvv : {type : String} ,
     expiryDate : {type : Date} ,
+
     isOnline :  {type : Boolean , default : false},
     leaveBalance: { type: Number, default: 15 },
-    lastLeaveReset: { type: Date, default: new Date() },    // others
+    lastLeaveReset: { type: Date, default: new Date() },
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
     lastLeaveAcceptedDate: { type: Date, default: null },
 
     isAdmin: { type: Boolean, default: false }
-});
+} ,  {timestamps : true});
 
 export const Employee = mongoose.model('Employee', employeeSchema);
 

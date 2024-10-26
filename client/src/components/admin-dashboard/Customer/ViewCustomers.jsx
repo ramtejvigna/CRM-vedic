@@ -103,7 +103,7 @@ const CustomerDetails = () => {
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
-    setPage(0); // Reset to first page when rows per page changes
+    setPage(0);
   };
 
   if (isLoading) {
@@ -176,7 +176,7 @@ const CustomerDetails = () => {
             className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
           >
             <option value="All">All</option>
-            <option value="inProgress">Inprogress</option>
+            <option value="inProgress">In progress</option>
             <option value="completed">Completed</option>
             <option value="newRequests">New Requests</option>
             <option value="rejected">Rejected</option>
@@ -293,7 +293,7 @@ const CustomerDetails = () => {
     {row.customerStatus === "inProgress" && (
       <>
         <Clock className="w-4 h-4 mr-1" />
-        Inprogress
+        In Progress
       </>
     )}
     {row.customerStatus === "completed" && (
