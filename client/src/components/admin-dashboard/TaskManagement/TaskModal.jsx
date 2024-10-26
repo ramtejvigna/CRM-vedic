@@ -193,7 +193,7 @@ const TaskModal = ({
                             <button
                               type="submit"
                               disabled={isAddingComment}
-                              className="justify-center items-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="justify-center items-center px-4 py-2 rounded-xl bg-blue-500 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {isAddingComment ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -304,9 +304,9 @@ const TaskModal = ({
                           </button>
                           <button
                             type="submit"
-                            className="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                            className="inline-flex items-center px-1 py-1 rounded-2xl bg-blue-500 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                           >
-                            <Send size={16} className="mr-2" />
+                            <Send size={14} className="mr-2" />
                             {selectedTask ? "Update Task" : "Create Task"}
                           </button>
                         </div>
