@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AiOutlineUserAdd , AiOutlineAlipay } from "react-icons/ai";
+import { AiOutlineUserAdd } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
-import { Edit, Trash, Eye, SearchCheck } from "lucide-react";
+import { Edit, Eye, Search, Filter } from "lucide-react";
 import { useStore } from "../../../store";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
-import { Search, Upload, User, Users, Filter  } from 'lucide-react';
 import { Link } from "react-router-dom";
 import axios from "axios";
+
 const EmployeeTable = () => {
   const navigate = useNavigate();
-  const [status , setStatus] = useState("");
-  const [showFilters , setShowFilters ] = useState(false)
-  const [searchTerm , setSearchTerm] = useState("")
+  const [status, setStatus] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { isDarkMode, toggleDarkMode } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     fetchEmployees();
@@ -30,7 +30,6 @@ const EmployeeTable = () => {
       const res = await fetch(GET_ALL_EMPLOYEES);
       if (!res.ok) throw new Error("Failed to fetch employees");
       const data = await res.json();
-      console.log(data.employees)
       setEmployees(data.employees);
     } catch (error) {
       toast.error("Error fetching employees!");
@@ -42,80 +41,60 @@ const EmployeeTable = () => {
   const handleAddEmployee = () => navigate("add-employee");
   const handleEdit = (id) => navigate(`edit-employee/${id}`);
   const handleView = (id) => navigate(`view-employee/${id}`);
-  const handleDelete = (id) => navigate(`delete-employee/${id}`);
 
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = employees?.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(employees?.length / recordsPerPage);
+  const filteredData = employees.filter((employee) => {
+    const statusMatch = status === "" || employee.status === status;
+    const searchMatch =
+      employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.slice(0, employee.email.lastIndexOf("@")).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.lastName.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return statusMatch && searchMatch;
+  });
+
+  const paginatedData = filteredData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+  const handleSearchTerm = (e) => {
+    setPage(0);
+    setSearchTerm(e.target.value);
+  };
+
+  const handleStatusChange = (e) => {
+    setPage(0);
+    setStatus(e.target.value);
+  };
+
+  const handleChangePage = (newPage) => setPage(newPage);
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(Number(event.target.value));
+    setPage(0);
+  };
 
   const getStatusColor = (isOnline) =>
     isOnline
       ? `${isDarkMode ? "bg-green-800 text-green-100" : "bg-green-100 text-green-800"}`
       : `${isDarkMode ? "bg-red-800 text-red-100" : "bg-red-100 text-red-800"}`;
 
-  const renderPaginationButtons = () => {
-    const buttons = [];
-    for (let i = 1; i <= totalPages; i++) {
-      buttons.push(
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i)}
-          className={`relative inline-flex items-center px-4 py-2 border ${
-            isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
-          } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-            currentPage === i ? "bg-blue-500 text-white" : ""
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return buttons;
-  };
-
-  const handleSearchTerm = (e) => {
-    setCurrentPage(1);
-    setSearchTerm(e.target.value)
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
-
-  useEffect(() => {
-    if(searchTerm) {
-      const filteredEmployees = employees.filter((employee) => employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || employee.email.slice(0 , employee.email.lastIndexOf("@")).toLowerCase().includes(searchTerm.toLowerCase()) || employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) )
-      setEmployees(filteredEmployees)
-    }else {
-      fetchEmployees();
-    }
-  } , [searchTerm])
-
-  const filterData = async () => {
-
-    if(status) {
-        try {
-          const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
-          if(response.status === 200) {
-            setEmployees(response.data);
-          }
-
-        } catch (error) {
-          console.error("Error filtering employees:", error.message);
-          toast.error("Error filtering employees")
-        }
-    }else {
-      toast.error(error.message)
-    }
-
-  }
-  useEffect(() => {
-    filterData();
-  } , [status])
 
   return (
     <div
       className={`min-h-screen p-8 transition-colors duration-300 ${
         isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
       }`}
-      >
+    >
       <h1 className="text-3xl font-bold mb-10">Employee Management</h1>
       <div className="max-w-7xl mx-auto">
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
@@ -146,17 +125,17 @@ const EmployeeTable = () => {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/employees/add-employee"}>
-                    <AiOutlineUserAdd/> <span>add employee</span>
+                    <AiOutlineUserAdd/> <span className="">Add Employee</span>
                   </Link>
                 </motion.button>
             </div>
           {
             showFilters && (
-                <div className="flex gap-5 p-5   items-center justify-center ">
-                  <form  className='flex w-full gap-5 flex-wrap' >
-                    <div className='flex gap-5 items-center justify-center   min-w-[250px]'>
-                      <label htmlFor="month"> status:</label>
-                      <select value={status} onChange={(e) => setStatus(e.target.value)}  id="status" name="status" className=" p-2 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white  gap-5">
+                <div className="flex py-3">
+                  <form  className='flex w-full flex-wrap' >
+                    <div className='flex gap-x-3  min-w-[250px]'>
+                      <label htmlFor="month" className="capitalize tracking-wider"> status :</label>
+                      <select value={status} onChange={(e) => setStatus(e.target.value)}  id="status" name="status" className="transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white ">
                         <option value="select status">select status</option>
                         <option value="online">online</option>
                         <option value="offline">offline</option>
@@ -166,8 +145,6 @@ const EmployeeTable = () => {
                 </div>
             )
           }
-
-
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -187,11 +164,11 @@ const EmployeeTable = () => {
                   }`}
                 >
                   <tr>
-                    {["Employee", "phone" , "Status", "Actions"].map(
+                    {["Employee", "Phone", "Status", "Actions"].map(
                       (header) => (
                         <th
                           key={header}
-                          className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                          className={`px-6 py-3 text-left text-xs font-medium capitalize tracking-wider ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
                           }`}
                         >
@@ -207,7 +184,7 @@ const EmployeeTable = () => {
                   }`}
                 >
                   <AnimatePresence>
-                    {currentRecords.map((employee) => (
+                    {paginatedData.map((employee) => (
                       <motion.tr
                         key={employee._id}
                         initial={{ opacity: 0, y: 20 }}
@@ -237,7 +214,6 @@ const EmployeeTable = () => {
                                 </div>
                               )}
                             </div>
-
                             <div className="ml-4">
                               <div
                                 className={`text-sm font-medium ${
@@ -276,7 +252,6 @@ const EmployeeTable = () => {
                             {employee.isOnline ? "Online" : "Offline"}
                           </span>
                         </td>
-
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleEdit(employee._id)}
@@ -297,18 +272,7 @@ const EmployeeTable = () => {
                             }`}
                           >
                             <Eye size={18} />
-                            {/* <MessageCircle size={18} /> */}
                           </button>
-                          {/* <button
-                            onClick={() => handleDelete(employee._id)}
-                            className={`transition-colors duration-300 ${
-                              isDarkMode
-                                ? "text-red-400 hover:text-red-200"
-                                : "text-red-600 hover:text-red-900"
-                            }`}
-                          >
-                            <Trash size={18} />
-                          </button> */}
                         </td>
                       </motion.tr>
                     ))}
@@ -323,15 +287,15 @@ const EmployeeTable = () => {
             >
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  onClick={() => handleChangePage(page - 1)}
+                  disabled={page === 0}
                   className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   Previous
                 </button>
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => handleChangePage(page + 1)}
+                  disabled={page >= totalPages - 1}
                   className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   Next
@@ -340,7 +304,10 @@ const EmployeeTable = () => {
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
-                    Showing {indexOfFirstRecord + 1} to {indexOfLastRecord} of {employees.length} results
+                    Showing {page * rowsPerPage + 1} to {Math.min(
+                      (page + 1) * rowsPerPage,
+                      filteredData.length
+                    )} of {filteredData.length} results
                   </p>
                 </div>
                 <div>
@@ -349,18 +316,33 @@ const EmployeeTable = () => {
                     aria-label="Pagination"
                   >
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
+                      onClick={() => handleChangePage(page - 1)}
+                      disabled={page === 0}
                       className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${
                         isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
                       } text-sm font-medium text-gray-500 hover:bg-gray-50`}
                     >
                       Previous
                     </button>
-                    {renderPaginationButtons()}
+                    {Array.from(
+                      { length: totalPages },
+                      (_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleChangePage(i)}
+                          className={`relative inline-flex items-center px-4 py-2 border ${
+                            isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                          } text-sm font-medium ${
+                            page === i ? "text-indigo-600" : "text-gray-500"
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      )
+                    )}
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
+                      onClick={() => handleChangePage(page + 1)}
+                      disabled={page >= totalPages - 1}
                       className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
                         isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
                       } text-sm font-medium text-gray-500 hover:bg-gray-50`}

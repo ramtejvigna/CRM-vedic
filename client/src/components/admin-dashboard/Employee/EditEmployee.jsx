@@ -266,7 +266,7 @@ const EditEmployee = () => {
         switch (activeStep) {
             case 0:
                 return (
-                    <div className="space-y-8 p-4 sm:p-10 bg-white shadow-lg rounded-lg">
+                    <div className="space-y-8 p-4 sm:p-5">
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -370,7 +370,7 @@ const EditEmployee = () => {
 
             case 1:
                 return (
-                    <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
+                    <div className="p-4 sm:p-5 space-y-8">
                     <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
                     {/* Aadhar or PAN section */}
@@ -399,7 +399,7 @@ const EditEmployee = () => {
                         <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
                             <img
-                            src={( typeof formData.idDocuments.aadharOrPan === "string" ? `https://vedic-backend-neon.vercel.app/${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan))}
+                            src={typeof formData.idDocuments.aadharOrPan === "string" ? `data:image/jpeg;base64,${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan)} 
                             alt="Aadhar or Pan"
                             className="object-cover"
                             />
@@ -440,8 +440,8 @@ const EditEmployee = () => {
                             <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
                             <div className="mt-2 h-40 w-40 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
-                                src={( typeof formData.idDocuments.passport === "string" ? `https://vedic-backend-neon.vercel.app/${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport))}
-                                alt="Passport or Driving License"
+                            src={typeof formData.idDocuments.passport === "string" ? `data:image/jpeg;base64,${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport)} 
+                            alt="Passport or Driving License"
                                 className="object-cover"
                                 />
                             </div>
@@ -470,7 +470,7 @@ const EditEmployee = () => {
 
             case 2:
                 return (
-                    <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
+                    <div className="p-4 sm:p-5space-y-8">
                     <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
 
                     {/* Degrees/Certificates Section */}
@@ -500,7 +500,7 @@ const EditEmployee = () => {
                         <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
-                            src={( typeof formData.education.degrees === "string" ? `https://vedic-backend-neon.vercel.app/${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees))}
+                            src={typeof formData.education.degrees === "string" ? `data:image/jpeg;base64,${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees)} 
                             alt="Degrees/Certificates"
                             className="object-cover"
                             />
@@ -540,7 +540,7 @@ const EditEmployee = () => {
                         <InputLabel className="text-gray-700">Transcripts</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
-                            src={( typeof formData.education.transcripts === "string" ? `https://vedic-backend-neon.vercel.app/${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts))}
+                            src={typeof formData.education.transcripts === "string" ? `data:image/jpeg;base64,${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts)} 
                             alt="Transcripts"
                             className="object-cover"
                             />
@@ -558,7 +558,7 @@ const EditEmployee = () => {
 
             case 3:
                 return (
-                    <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
+                    <div className="space-y-6 p-4 sm:p-5">
                         <h2 className="text-lg font-semibold text-gray-700">Previous Employment Details</h2>
                         <TextField
                             label="Previous Employer Name"
@@ -708,46 +708,49 @@ const EditEmployee = () => {
                         </Step>
                     ))}
                 </Stepper>
-                <div className="flex-1 xl:px-32">
+                <div className="flex-1 mx-auto w-full p-5 flex flex-col justify-between   bg-white shadow-lg rounded-l">
                     {renderForm()}
-                </div>
-                <Box className="flex p-2 justify-between">
-                    <Button
-                        disabled={activeStep === 0}
-                        color="inherit"
-                        className="mr-1"
-                        sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black" }}
-                        onClick={handleBack}
-                    >
-                        {"< "}Previous
-                    </Button>
-                    {activeStep === steps.length - 1 ? (
+                    <Box className="flex p-2 justify-between">
                         <Button
-                            sx={{ border: "1px solid blue", backgroundColor: "green", color: "white", padding: "6px 15px", fontWeight: "700" }}
-                            onClick={handleSubmit}
+                            disabled={activeStep === 0}
+                            color="inherit"
+                            className="mr-1"
+                            sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black" }}
+                            onClick={handleBack}
                         >
-                            Finish
+                        <span className='capitalize'>Previous</span>
+                            
                         </Button>
-                    ) : (
-                        <div className='flex gap-10'>
+                        {activeStep === steps.length - 1 ? (
                             <Button
-                                sx={{ border: "1px solid red", color: "red", padding: "6px 15px", fontWeight: "400" }}
-                                onClick={() => navigate("/admin-dashboard/employees")}
-                                className='hover:bg-red-600 hover:text-white'
+                                sx={{ border: "1px solid blue", backgroundColor: "green", color: "white", padding: "6px 15px", fontWeight: "700" }}
+                                onClick={handleSubmit}
                             >
-                                CANCEL EDIT
+                                <span className='capitalize'>Finish</span>
+                                
                             </Button>
-                            <Button
-                                sx={{ border: "1px solid blue", backgroundColor: "blue", color: "white", padding: "6px 15px", fontWeight: "700" }}
-                                onClick={handleNext}
-                            >
-                                next {" >"}
-                            </Button>
-                        </div>
-                    )
+                        ) : (
+                            <div className='flex gap-10 capitalize'>
+                                <Button
+                                    sx={{ border: "1px solid red", color: "red", padding: "6px 15px", fontWeight: "400" }}
+                                    onClick={() => navigate("/admin-dashboard/employees")}
+                                    className='hover:bg-red-600 hover:text-white capitalize'
+                                >
+                                    <span className='capitalize'>cancel</span>
+                                </Button>
+                                <Button
+                                    sx={{ border: "1px solid blue", backgroundColor: "#3B82F6", color: "white", padding: "6px 15px", fontWeight: "700" }}
+                                    onClick={handleNext}
+                                >
+                                    <span className='capitalize'>next</span>
+                                
+                                </Button>
+                            </div>
+                        )
 
-                    }
-                </Box>
+                        }
+                    </Box>
+                </div>
             </Box>
         </div>
     );

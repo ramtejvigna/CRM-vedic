@@ -4,6 +4,9 @@ import { CircularProgress, Box } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { generatePdf } from './pdfDisplayComponent';
 import PDFViewer from './PDFviewer';
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 import {
     Edit,
     FileText,
@@ -26,7 +29,7 @@ const Customer = () => {
     const [loading, setLoading] = useState(true);
     const [pdfsLoading, setPdfsLoading] = useState(false);
     const [feedback, setFeedback] = useState('');
-
+    const navigate = useNavigate();
     const customerId = customerDetails?._id;
     const iframeRef = useRef(null);
     const [pdfUrl, setPdfUrl] = useState(null);
@@ -183,99 +186,95 @@ const Customer = () => {
 
     return (
         <div className="min-h-screen p-4 sm:p-8">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Personal Information Card */}
-                <div className="bg-gray-100 rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col justify-between">
-                    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Personal Information</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Father's Name</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.fatherName || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Mother's Name</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.motherName || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Email</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.email || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">WhatsApp Number</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.whatsappNumber || "N/A"}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Baby's Gender</span>
-                            <span className="text-lg font-medium text-gray-900">{customerDetails.babyGender || "N/A"}</span>
-                        </div>
-                    </div>
+
+            <div className="max-w-7xl mx-auto mb-6">
+                <div className="flex items-center mb-6">
+                    <button
+                        onClick={() => navigate(-1)} // Navigate back
+                        className="flex items-center text-gray-900 hover:text-blue-500"
+                    >
+                        <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+                    </button>
                 </div>
 
-                {/* Payment Details Card */}
-                <div className="bg-gray-100 rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-                    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Payment Details</h2>
-                    <div className="flex-grow">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {/* Personal Information & Assigned Employee Card */}
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+                        {/* Personal Information */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Personal Information</h2>
                         <div className="grid grid-cols-1 gap-2">
-                            <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                            <p className="text-gray-600"><strong>CustomerID:</strong> {customerDetails.customerID || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Father Name:</strong> {customerDetails.fatherName || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Mother Name:</strong> {customerDetails.motherName || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Email Id:</strong> {customerDetails.email || "N/A"}</p>
+                            <p className="text-gray-600"><strong>WhatsApp Number:</strong> {customerDetails.whatsappNumber || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
+                        </div>
+
+                        {/* Divider */}
+                        <hr className="my-3 border-gray-300" />
+                        <p className="text-gray-600"><strong>Requested On:</strong> {customerDetails.createdDateTime || "N/A"}</p>
+                        <hr className="my-3 border-gray-300" />
+
+                        {/* Assigned Employee */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
+                        {customerDetails.assignedEmployee ? (
+                            <div className="text-gray-600">
+                                <p><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
+                                <p><strong>Email Id:</strong> {customerDetails.assignedEmployee.email}</p>
+                                <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
+                            </div>
+                        ) : (
+                            <p className="text-gray-600">No employee assigned.</p>
+                        )}
+                    </div>
+                    
+
+                    {/* Payment Details & Astrological Details Card */}
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+                        {/* Payment Details */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Payment Details</h2>
+                        {customerDetails?.customerStatus === "newRequests" ? (
+                            <div className="flex-grow flex items-center justify-center">
+                                <p className="text-center">Payment details not verified yet.</p>
+                            </div>
+                        ) : customerDetails?.customerStatus === "rejected" ? (
+                            <div className="flex-grow flex items-center justify-center">
+                                <p className="text-red-600 text-center font-bold">Payment Status: Rejected</p>
+                            </div>
+                        ) : (
+                            <div className="flex-grow">
+                                <div className="grid grid-cols-1 gap-2">
+                                    <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
+                                    <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
+                                    <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
+                                    <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Divider */}
+                        <hr className="my-6 border-gray-300" />
+
+                        {/* Astrological Details */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
+                        <div className="grid grid-cols-1 gap-2">
+                            <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
+                            <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
+                            <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
+                            <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
+                            <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
+                            <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
                         </div>
                     </div>
                 </div>
-
-                {/* Employee Assigned Card */}
-                <div className="bg-gray-100 rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-                    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Assigned Employee</h2>
-                    {customerDetails.assignedEmployee ? (
-                        <div className="text-gray-600">
-                            <p><strong>Name:</strong> {customerDetails.assignedEmployee.name}</p>
-                            <p><strong>Email:</strong> {customerDetails.assignedEmployee.email}</p>
-                            <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
-                        </div>
-                    ) : (
-                        <p className="text-gray-600">No employee assigned.</p>
-                    )}
-                </div>
-
-                {/* Astrological Details Card */}
-                <div className="bg-gray-100 rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-                    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Astrological Details</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Zodiac Sign</span>
-                            <span className="text-lg font-medium text-gray-900">Leo</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Nakshatra</span>
-                            <span className="text-lg font-medium text-gray-900">Ashwini</span>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Gemstone</span>
-                            <span className="text-lg font-medium text-gray-900">Ruby</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Lucky Metal</span>
-                            <span className="text-lg font-medium text-gray-900">Gold</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Numerology</span>
-                            <span className="text-lg font-medium text-gray-900">3</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-sm font-semibold text-gray-600">Preferred Starting Letter</span>
-                            <span className="text-lg font-medium text-gray-900">A</span>
-                        </div>
-                    </div>
-
-                </div>
-
-
             </div>
+
+
+
             <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div className="flex w-full items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Generated PDFs</h2>
+                    <h2 className="text-xl font-bold   text-gray-800 dark:text-white">Generated PDFs</h2>
                     <div className="flex items-center space-x-2">
                         <Eye className="h-4 w-4 text-gray-500" />
                         <span className="text-sm text-gray-600 dark:text-gray-400">{pdfs.length} PDFs Generated</span>
@@ -294,16 +293,16 @@ const Customer = () => {
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
                                         SNo.
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Generated Time/Date
+                                    <th className="px-6 py-4 text-left text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
+                                        Generated On
                                     </th>
-                                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-center text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-right text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
                                         Actions
                                     </th>
                                 </tr>

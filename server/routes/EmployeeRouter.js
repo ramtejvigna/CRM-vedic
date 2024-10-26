@@ -5,22 +5,9 @@ import { applyLeave, getLeaveHistory, getPendingLeaves, getLeaveBalance,deleteLe
 const router = express.Router();
 
 import { auth } from "../middleware/auth.js";
-const storage = multer.diskStorage({
-    destination : (req , file , cb) => {
-        cb(null , 'uploads/')
-    },
-    filename: (req, file, cb) => {
-        const username = req.body.username; 
-        const date = Date.now();
-        const fieldName = file.fieldname; 
-        const fileExtension = file.originalname.substring(file.originalname.lastIndexOf('.')); 
 
-        cb(null, `${username}_${date}_${fieldName}${fileExtension}`);
-    }
-    
-})
 
-const uploads = multer({storage});
+const uploads = multer({limits : {fileSize : 1 * 1024 * 1024}});
 
 router.post('/add-employee' , uploads.fields([
     {name : "passport" , maxCount : 1} , 

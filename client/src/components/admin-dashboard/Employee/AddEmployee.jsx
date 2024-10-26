@@ -67,49 +67,80 @@ const AddEmployee = () => {
     const validateForm = () => {
         const form = formData[formKeys[activeStep]];
         const formErrors = {};
-
-            if (activeStep === 0) {
-                if (!form.firstName) formErrors.firstName = 'firstname  is required';
-                if (!form.email) formErrors.email = 'Email is required';
-                if (!form.lastName) formErrors.lastName = 'lastname is required';
-                if (!form.address) formErrors.address = 'Address is required';
-                if (!form.city) formErrors.city = 'city is required';
-                if (!form.phone) formErrors.phone = 'Phone number is required';
-                if(isNaN(form.phone) ) formErrors.phone = "only digits are allowed"
-                if(form.phone.length !== 10) formErrors.phone = "Enter 10 digit phone number";
-                if (!form.state) formErrors.state = 'State is required';
-                if (!form.pincode) formErrors.pincode = 'Pincode is required';
-                if (!form.country) formErrors.country = 'Country is required';
+    
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+        const phoneRegex = /^[679]\d{9}$/; 
+        const ssnRegex = /^\d{3}-\d{2}-\d{4}$/; 
+        const cvvRegex = /^\d{3}$/; 
+    
+        if (activeStep === 0) {
+            if (!form.firstName) formErrors.firstName = 'First name is required';
+            if (!form.email) {
+                formErrors.email = 'Email is required';
+            } else if (!emailRegex.test(form.email)) {
+                formErrors.email = 'Invalid email format';
             }
-
-            if (activeStep === 1) {
-                if (!form.aadharOrPan) formErrors.aadharOrPan = 'Aadhar Card or Pan Card is required';
-                if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-                if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
+            if (!form.lastName) formErrors.lastName = 'Last name is required';
+            if (!form.address) formErrors.address = 'Address is required';
+            if (!form.city) formErrors.city = 'City is required';
+            if (!form.phone) {
+                formErrors.phone = 'Phone number is required';
+            } else if (!phoneRegex.test(form.phone)) {
+                formErrors.phone = 'Enter a valid 10-digit phone number';
             }
-            if (activeStep === 2) {
-                if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
-                if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
+            if (!form.state) formErrors.state = 'State is required';
+            if (!form.pincode) formErrors.pincode = 'Pincode is required';
+            if (!form.country) formErrors.country = 'Country is required';
+        }
+    
+        if (activeStep === 1) {
+            if (!form.aadharOrPan) {
+                formErrors.aadharOrPan = 'Aadhar Card or PAN Card is required';
             }
-
-            if (activeStep === 3) {
-                if (!form.employerName) formErrors.employerName = 'employer Name is required';
-                if (!form.jobTitle) formErrors.jobTitle = 'job title is required';
-                if (!form.startDate) formErrors.startDate = 'date is required';
-                if (!form.endDate) formErrors.endDate = 'date is required';
-                if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'reason is required';
+            if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
+            if (!form.ssn) {
+                formErrors.ssn = 'Social Security Number is required';
+            } else if (!ssnRegex.test(form.ssn)) {
+                formErrors.ssn = 'Invalid SSN format. Use XXX-XX-XXXX';
             }
-
-            if (activeStep === 4) {
-                if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-                if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
-                if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
-                if (!form.cvv) formErrors.cvv = 'CVV is required';
+        }
+    
+        if (activeStep === 2) {
+            if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
+            if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
+        }
+    
+        if (activeStep === 3) {
+            if (!form.employerName) formErrors.employerName = 'Employer Name is required';
+            if (!form.jobTitle) formErrors.jobTitle = 'Job title is required';
+            if (!form.startDate) {
+                formErrors.startDate = 'Start date is required';
+            } 
+            if (!form.endDate) {
+                formErrors.endDate = 'End date is required';
             }
-
+            if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'Reason for leaving is required';
+        }
+    
+        if (activeStep === 4) {
+            if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
+            if (!form.cardNumber) {
+                formErrors.cardNumber = 'Card Number is required';
+            } 
+            if (!form.expiryDate) {
+                formErrors.expiryDate = 'Expiry Date is required';
+            } 
+            if (!form.cvv) {
+                formErrors.cvv = 'CVV is required';
+            } else if (!cvvRegex.test(form.cvv)) {
+                formErrors.cvv = 'Invalid CVV format. Use 3 digits';
+            }
+        }
+    
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
+    
 
 
     const handleFileChange = (e, section, field) => {
@@ -195,7 +226,7 @@ const AddEmployee = () => {
         switch (activeStep) {
             case 0:
                 return (
-                    <div className="space-y-8 p-4 sm:p-10 bg-white shadow-lg rounded-lg">
+                    <div className="space-y-8 p-2 sm:p-5 ">
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -304,7 +335,7 @@ const AddEmployee = () => {
 
             case 1:
                 return (
-                    <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
+                    <div className="p-2 sm:p-5  space-y-8">
                     <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
                     {/* Aadhar or PAN section */}
@@ -404,7 +435,7 @@ const AddEmployee = () => {
 
                 case 2:
                     return (
-                        <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
+                        <div className="p-2 sm:p-5  space-y-8">
                         <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
 
                         {/* Degrees/Certificates Section */}
@@ -492,7 +523,7 @@ const AddEmployee = () => {
 
                 case 3:
                     return (
-                        <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
+                        <div className="space-y-6 p-2 sm:p-5">
                             <h2 className="text-lg font-semibold text-gray-700">Previous Employment Details</h2>
                             <TextField
                                 label="Previous Employer Name"
@@ -559,7 +590,7 @@ const AddEmployee = () => {
 
                 case 4:
                     return (
-                        <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
+                        <div className="space-y-6 p-2 sm:p-5">
                             <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
                             <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
 
@@ -636,9 +667,8 @@ const AddEmployee = () => {
                             </Step>
                         ))}
                     </Stepper>
-                    <div className="flex-1 xl:px-32">
+                    <div className="flex-1 mx-auto w-full p-5 flex flex-col justify-between   bg-white shadow-lg rounded-lg">
                         {renderForm()}
-                    </div>
                     <Box className="flex p-2 justify-between">
                         <Button
                             disabled={activeStep === 0}
@@ -647,7 +677,7 @@ const AddEmployee = () => {
                             sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black" }}
                             onClick={handleBack}
                         >
-                            {"< "}Previous
+                            Previous
                         </Button>
                         {activeStep === steps.length - 1 ? (
                             <Button
@@ -666,16 +696,17 @@ const AddEmployee = () => {
                                     cancel
                                 </Button>
                                 <Button
-                                    sx={{ border: "1px solid blue", backgroundColor: "blue", color: "white", padding: "6px 15px", fontWeight: "700" }}
+                                    sx={{ border: "1px solid blue", backgroundColor: "#3B82F6", color: "white", padding: "6px 15px", fontWeight: "700" }}
                                     onClick={handleNext}
                                 >
-                                    next {" >"}
+                                    next
                                 </Button>
                             </div>
                         )
 
                         }
                     </Box>
+                    </div>
                 </Box>
             </div>
         );

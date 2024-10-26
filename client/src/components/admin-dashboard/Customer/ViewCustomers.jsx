@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useStore } from "../../../store";
 import { motion, AnimatePresence } from "framer-motion";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
-import { ChevronLeft, ChevronRight, Filter, Eye, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Clock,XCircle,Filter, Eye, Search } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -103,7 +103,7 @@ const CustomerDetails = () => {
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
-    setPage(0); // Reset to first page when rows per page changes
+    setPage(0);
   };
 
   if (isLoading) {
@@ -120,13 +120,17 @@ const CustomerDetails = () => {
       <div className="flex flex-col mb-4">
   <h1 className="text-4xl font-bold mb-8">Customer Details</h1>
   <div className="flex items-center space-x-4 mt-8"> {/* Added mt-2 for margin-top */}
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearch}
-      placeholder="Search..."
-      className="border rounded-lg px-4 py-2"
-    />
+  <div className="relative w-full" style={{ width: '22%' }}>
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={handleSearch}
+    placeholder="Search..."
+    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+  />
+  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+</div>
+
     <button
       onClick={() => setShowFilters(!showFilters)}
       className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-300"
@@ -172,7 +176,7 @@ const CustomerDetails = () => {
             className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
           >
             <option value="All">All</option>
-            <option value="inProgress">Inprogress</option>
+            <option value="inProgress">In progress</option>
             <option value="completed">Completed</option>
             <option value="newRequests">New Requests</option>
             <option value="rejected">Rejected</option>
@@ -211,18 +215,18 @@ const CustomerDetails = () => {
             <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
               <tr>
                 {[
-                  "S:no",
-                  "Customer_Id",
+                  "S.no",
+                  "Customer Id",
                   "Father Name",
                   "WhatsApp Number",
-                  "Baby's Gender",
-                  "Assigned Employee",
-                  "Status",
+                  "Baby Gender",
+                  "EmployeeAssigned",
+                  "Work Status",
                   "Actions",
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    className="px-4 py-3 text-left text-xm font-medium  tracking-wider"
                   >
                     {header}
                   </th>
@@ -264,7 +268,7 @@ const CustomerDetails = () => {
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span
                        className={`
-                        px-2 py-1 rounded-full text-sm font-medium inline-flex leading-5 font-semibold
+                        px-2 py-1 rounded-full text-sm inline-flex leading-5 font-semibold
                         ${row.customerStatus === "newRequests" 
                           ? "text-yellow-600 bg-yellow-100" 
                           : ""}
@@ -272,7 +276,7 @@ const CustomerDetails = () => {
                           ? "text-gray-900 bg-gray-100" 
                           : ""}
                         ${row.customerStatus === "completed" 
-                          ? "text-green-500 bg-green-100" 
+                          ? " text-green-500 bg-green-100" 
                           : ""}
                         ${row.customerStatus === "rejected" 
                           ? "text-red-800 bg-red-100" 
@@ -280,20 +284,40 @@ const CustomerDetails = () => {
                       `}
                       
                       >
-                        {row.customerStatus === "newRequests" && "New Requests"}
-                        {row.customerStatus === "inProgress" && "Inprogress"}
-                        {row.customerStatus === "completed" && "Completed"}
-                        {row.customerStatus === "rejected" && "Rejected"}
+                        {row.customerStatus === "newRequests" && (
+      <>
+        <AlertCircle className="w-4 h-4 mr-1" />
+        New Requests
+      </>
+    )}
+    {row.customerStatus === "inProgress" && (
+      <>
+        <Clock className="w-4 h-4 mr-1" />
+        In Progress
+      </>
+    )}
+    {row.customerStatus === "completed" && (
+      <>
+        <CheckCircle className="w-4 h-4 mr-1" />
+        Completed
+      </>
+    )}
+    {row.customerStatus === "rejected" && (
+      <>
+        <XCircle className="w-4 h-4 mr-1" />
+        Rejected
+      </>
+    )}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <button
-                        className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        onClick={() => navigate(`${row._id}`)}
-                      >
-                        <Eye size={18} className="mr-2" />
-                        View
-                      </button>
+                    <button
+  className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+  onClick={() => navigate(`${row._id}`)}
+>
+  <Eye size={18} className="mr-2 text-blue-600" />
+</button>
+
                     </td>
                   </motion.tr>
                 ))}

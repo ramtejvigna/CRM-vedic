@@ -1,23 +1,18 @@
-// routes/expenseRoutes.js
 import express from 'express';
 import { 
   addExpense, 
   getAllExpenses, 
-  getExpenseById, 
+  getExpenseFile,
   updateExpense, 
-  deleteExpense,
-  checkFile,serveFile 
+  deleteExpense
 } from '../controllers/ExpensesController.js';
 
 const router = express.Router();
 
-// Routes
 router.post('/', addExpense);
-router.get('/getAllExpenses', getAllExpenses);
-router.get('/:id', getExpenseById);
+router.get('/', getAllExpenses);
+router.get('/file/:id', getExpenseFile);
 router.put('/:id', updateExpense);
 router.delete('/deleteExpense/:id', deleteExpense);
-router.get('/file/:filename', serveFile);
-router.get('/check-file/:filename', checkFile)
 
 export default router;

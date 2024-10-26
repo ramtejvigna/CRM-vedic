@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { Plus, Send } from "lucide-react";
 import { useStore } from "../../../store"; // Custom hook for dark mode
 import { CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
-import { SnackbarProvider, useSnackbar } from "notistack";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import TaskList from "./TaskList";
 import TaskModal from "./TaskModal";
 
@@ -29,7 +30,6 @@ const TaskManagement = () => {
   const [taskToDelete, setTaskToDelete] = useState(null);
   const { isDarkMode } = useStore();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const { enqueueSnackbar } = useSnackbar();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [tasksPerPage] = useState(5);
@@ -54,7 +54,7 @@ const TaskManagement = () => {
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      enqueueSnackbar("Failed to fetch tasks", { variant: "error" });
+      toast.error("Failed to fetch tasks");
     } finally {
       setIsLoadingTasks(false);
     }
@@ -67,7 +67,7 @@ const TaskManagement = () => {
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
-      enqueueSnackbar("Failed to fetch employees", { variant: "error" });
+      toast.error("Failed to fetch employees");
     } finally {
       setIsLoadingEmployees(false);
     }
@@ -125,16 +125,16 @@ const TaskManagement = () => {
           `https://vedic-backend-neon.vercel.app/api/tasks/${selectedTask._id}`,
           newTask
         );
-        enqueueSnackbar("Task updated successfully", { variant: "success" });
+        toast.success("Task updated successfully");
       } else {
         await axios.post("https://vedic-backend-neon.vercel.app/api/tasks", newTask);
-        enqueueSnackbar("Task created successfully", { variant: "success" });
+        toast.success("Task created successfully");
       }
       fetchTasks(currentPage);
       handleCloseModal();
     } catch (error) {
       console.error("Error saving task:", error);
-      enqueueSnackbar("Failed to save task", { variant: "error" });
+      toast.error("Failed to save task");
     }
   };
 
@@ -147,10 +147,10 @@ const TaskManagement = () => {
     try {
       await axios.delete(`https://vedic-backend-neon.vercel.app/api/tasks/${taskToDelete}`);
       fetchTasks(currentPage);
-      enqueueSnackbar("Task deleted successfully", { variant: "success" });
+      toast.success("Task deleted successfully");
     } catch (error) {
       console.error("Error deleting task:", error);
-      enqueueSnackbar("Failed to delete task", { variant: "error" });
+      toast.error("Failed to delete task");
     } finally {
       setIsDeleteModalOpen(false);
       setTaskToDelete(null);
@@ -172,9 +172,9 @@ const TaskManagement = () => {
         ],
       }));
       setNewComment("");
-      enqueueSnackbar("Comment added successfully", { variant: "success" });
+      toast.success("Comment added successfully");
     } catch (error) {
-      enqueueSnackbar("Error adding comment", { variant: "error" });
+      toast.error("Error adding comment");
     } finally {
       setIsAddingComment(false);
     }
@@ -183,11 +183,11 @@ const TaskManagement = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
-        return isDarkMode ? "text-green-400" : "text-green-600";
+        return isDarkMode ? "text-green-400" : "text-slate-100 bg-green-500";
       case "In Progress":
-        return isDarkMode ? "text-yellow-400" : "text-yellow-600";
+        return isDarkMode ? "text-yellow-400" : "text-slate-100 bg-yellow-500";
       default:
-        return isDarkMode ? "text-red-400" : "text-red-600";
+        return isDarkMode ? "text-red-400" : "text-slate-100 bg-red-500";
     }
   };
 
@@ -197,6 +197,7 @@ const TaskManagement = () => {
         isDarkMode ? "dark bg-gray-900" : ""
       }`}
     >
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold dark:text-white">

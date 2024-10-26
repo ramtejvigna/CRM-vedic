@@ -19,6 +19,8 @@ const TaskList = ({
 }) => {
   const indexOfLastRecord = currentPage * tasksPerPage;
   const indexOfFirstRecord = indexOfLastRecord - tasksPerPage;
+  const currentTasks = tasks.slice(indexOfFirstRecord, indexOfLastRecord);
+
   const renderPaginationButtons = () => {
     const buttons = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -46,7 +48,7 @@ const TaskList = ({
     <div>
       {isMobile ? (
         <div className="space-y-4">
-          {tasks.map((task) => (
+          {currentTasks.map((task) => (
             <TaskCard
               key={task._id}
               task={task}
@@ -61,32 +63,32 @@ const TaskList = ({
           <table className="w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
                   S.No
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                  Task Title
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
+                  Task Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
                   Assigned To
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                  Start Time
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
+                  Assigned on
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                  End Time
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
+                  Deadline
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               <AnimatePresence>
-                {tasks.map((task, index) => (
+                {currentTasks.map((task, index) => (
                   <motion.tr
                     key={task._id}
                     initial={{ opacity: 0 }}
@@ -184,7 +186,7 @@ const TaskList = ({
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing {indexOfFirstRecord + 1} to {indexOfLastRecord} of {tasks.length} results
+                  Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, tasks.length)} of {tasks.length} results
                 </p>
               </div>
               <div>

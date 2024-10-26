@@ -104,17 +104,13 @@ export const deleteTask = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text } = req.body.newComment;
-    console.log('in add comment');
-    console.log(req.body);
-    console.log(req.user);
+    const { text } = req.body;
 
     // Find the employee by id
-    const employee = await Employee.findById(req.user);
+    const employee = await Employee.findById(id);
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
-
 
     const createdBy = employee.firstName
     console.log(createdBy)
@@ -164,11 +160,29 @@ export const addCommentAdmin = async (req,res)=> {
 }
 
 export const getEmployeeTasks = async (req, res) => {
-  const employeeId  = req.user;
+  const employeeId = req.user;
+  const { page = 1, limit = 5, status } = req.query;
 
   try {
-    const tasks = await Task.find({ assignedTo: employeeId }).sort({ startTime: -1 });
-    res.json(tasks);
+    const query = { assignedTo: employeeId };
+    if (status) {
+      query.status = status;
+    }
+
+    const tasks = await Task.find(query)
+      .sort({ startTime: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalTasks = await Task.countDocuments(query);
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    res.json({
+      tasks,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
