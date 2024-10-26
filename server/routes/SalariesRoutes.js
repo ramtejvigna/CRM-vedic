@@ -1,26 +1,19 @@
-import { Router } from "express";
-import {createSalaryStatement, deleteSalaryStatement, filterSalariesByYearAndMonth, getAllSalaryStatements, updateSalaryStatement} from "../controllers/SalaryControllers.js"
-import multer from "multer"
-const storage = multer.diskStorage({
-    destination : (req , file , cb) => {
-        cb(null , 'uploads/salaries')
-    },
-    filename: (req, file, cb) => {
-        const userId = req.body.employee; 
-        const date = Date.now();
-        const fileExtension = file.originalname.substring(file.originalname.lastIndexOf('.')); 
+import express from 'express';
+import { 
+  addExpense, 
+  getAllExpenses, 
+  getExpenseFile,
+  updateExpense, 
+  deleteExpense
+} from '../controllers/ExpensesController.js';
 
-        cb(null, `${userId}_${date}_salaries${fileExtension}`);
-    }
-    
-})
-const router = Router() ;
-const uploads = multer({storage})
+const router = express.Router();
 
-router.post("/" , uploads.single("bankStatement") , createSalaryStatement )
-router.get("/"  , getAllSalaryStatements )
-router.put("/"  , updateSalaryStatement )
-router.delete("/delete/:id"  , deleteSalaryStatement )
-router.get("/search" , filterSalariesByYearAndMonth)
+// Change the route to match the frontend URL
+router.post('/', addExpense);  // This will match /api/expenses when properly mounted
+router.get('/', getAllExpenses);
+router.get('/file/:id', getExpenseFile);
+router.put('/:id', updateExpense);
+router.delete('/deleteExpense/:id', deleteExpense);
 
-export default router
+export default router;

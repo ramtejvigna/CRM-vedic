@@ -215,18 +215,18 @@ const CustomerDetails = () => {
             <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
               <tr>
                 {[
-                  "S:no",
-                  "Customer_Id",
+                  "S.no",
+                  "Customer Id",
                   "Father Name",
                   "WhatsApp Number",
-                  "Baby's Gender",
-                  "Assigned Employee",
-                  "Status",
+                  "Baby Gender",
+                  "EmployeeAssigned",
+                  "Work Status",
                   "Actions",
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    className="px-4 py-3 text-left text-xm font-medium  tracking-wider"
                   >
                     {header}
                   </th>

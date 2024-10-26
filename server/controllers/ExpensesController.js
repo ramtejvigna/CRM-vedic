@@ -2,6 +2,7 @@
 import Expense from '../models/Expenses.js';
 import path from 'path';
 import fs from 'fs';
+
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
@@ -9,13 +10,26 @@ const __dirname = dirname(__filename);
 // Get all expenses
 export const getAllExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find();
+    const expenses = await Expense.find().select('-bank_statement'); // Exclude base64 data from list view
     res.status(200).json({ expenses });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch expenses' });
+    res.status(500).json({ message: error.message });
   }
 };
-
+export const getExpenseFile = async (req, res) => {
+  try {
+    const expense = await Expense.findById(req.params.id);
+    if (!expense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+    res.json({ 
+      bank_statement: expense.bank_statement,
+      file_type: expense.file_type 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // Get a specific expense by ID
 export const getExpenseById = async (req, res) => {
   const { id } = req.params;
@@ -30,20 +44,39 @@ export const getExpenseById = async (req, res) => {
 
 // Add new expense
 export const addExpense = async (req, res) => {
-  const { expense_name, amount_spent, date } = req.body;
-  const bank_statement = req.file ? req.file.filename : null;
   try {
-    const newExpense = new Expense({
+    const { expense_name, amount, date, bank_statement, file_type } = req.body;
+
+    if (!expense_name || !amount || !date || !bank_statement || !file_type) {
+      return res.status(400).json({
+        message: "Missing required fields",
+      });
+    }
+
+    const expense = await Expense.create({
       expense_name,
-      amount: amount_spent,
-      date,
-      bank_statement
+      amount: parseFloat(amount),
+      date: new Date(date),
+      bank_statement,
+      file_type
     });
-    await newExpense.save();
-    res.status(201).json({ success: true, expense: newExpense });
+
+    res.status(201).json({
+      message: "Expense added successfully",
+      expense: {
+        id: expense._id,
+        expense_name: expense.expense_name,
+        amount: expense.amount,
+        date: expense.date
+      }
+    });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to add expense' });
+    console.error("Error adding expense:", error);
+    res.status(500).json({
+      message: "Failed to add expense",
+      error: error.message
+    });
   }
 };
 
@@ -93,34 +126,4 @@ export const deleteExpense = async (req, res) => {
       error: error.message 
     });
   }
-};
-
-// Check if file exists
-export const checkFile = (req, res) => {
-  const filePath = path.join(__dirname, '..', 'uploads', 'bank_statements', req.params.filename);
-  fs.access(filePath, fs.constants.F_OK, (err) => {
-    if (err) {
-      res.status(404).json({
-        exists: false,
-        error: err.message,
-        checkedPath: filePath
-      });
-    } else {
-      res.json({
-        exists: true,
-        path: filePath
-      });
-    }
-  });
-};
-export const serveFile = (req, res) => {
-  const filePath = path.join(__dirname, '..', 'uploads', 'bank_statements', req.params.filename);
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).json({
-        success: false,
-        message: 'File not found'
-      });
-    }
-  });
 };

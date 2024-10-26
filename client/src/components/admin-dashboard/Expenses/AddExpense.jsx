@@ -3,9 +3,9 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useStore } from "../../../store";
-import uploadImage from "../../../assets/upload3.jpg"; // Use the same upload image
 import axios from 'axios';
-import { XCircleIcon, ArrowLeft } from 'lucide-react'; // Import the back arrow icon
+import { XCircleIcon, ArrowLeft } from 'lucide-react';
+
 const ADD_EXPENSE = "http://localhost:3000/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
@@ -30,8 +30,29 @@ const AddExpense = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setBankStatement(file);
-  };
+    if (file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+            toast.error("Only JPG, PNG, and PDF files are allowed.");
+            setBankStatement(null);
+            return;
+        }
+
+        // Set the file object directly to state instead of a base64 string
+        setBankStatement(file); // Store the file object for URL creation
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            // You could also use this base64 string if needed for other purposes
+            const base64String = reader.result; // This is the base64 string
+            // Do something with base64String if needed
+        };
+
+        reader.readAsDataURL(file); // Convert file to base64 (if needed)
+    }
+};
+
+  
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -41,37 +62,43 @@ const AddExpense = () => {
     e.preventDefault();
   
     if (validateForm()) {
-      const formData = new FormData();
-      formData.append("expense_name", expenseName);
-      formData.append("amount_spent", amountSpent);
-      formData.append("date", expenseDate);
-      formData.append("bank_statement", bankStatement);
-  
       try {
-        console.log("Submitting form...");
         setIsLoading(true);
-        const res = await axios.post(ADD_EXPENSE, formData);
+        
+        // Convert file to base64
+        const base64String = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(bankStatement);
+          reader.onload = () => resolve(reader.result.split(',')[1]); // Remove data:image/jpeg;base64, prefix
+          reader.onerror = error => reject(error);
+        });
   
-        console.log("Response from server:", res); // Log the response
-        if (res.status === 200 || res.status === 201) {
+        const expenseData = {
+          expense_name: expenseName,
+          amount: parseFloat(amountSpent),
+          date: expenseDate,
+          bank_statement: base64String,
+          file_type: bankStatement.type
+        };
+  
+        const response = await axios.post(ADD_EXPENSE, expenseData, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+  
+        if (response.data) {
           toast.success("Expense added successfully!");
-  
-          // Delay navigation to allow toast to show
-          setTimeout(() => {
-            navigate("/admin-dashboard/expenses");
-          }, 1500);
+          navigate("/admin-dashboard/expenses");
         }
       } catch (error) {
-        console.error("Error adding expense:", error); // Log error details
-        toast.error("Error adding expense!");
+        console.error("Error:", error);
+        toast.error(error.response?.data?.message || "Failed to add expense");
       } finally {
         setIsLoading(false);
       }
     }
   };
-  
-  
-
   return (
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-10">
@@ -129,8 +156,8 @@ const AddExpense = () => {
             />
           </div>
 
-          {/* Bank Statement File Upload */}
-          <div className="col-span-2 flex flex-col gap-3">
+         {/* Bank Statement File Upload */}
+<div className="col-span-2 flex flex-col gap-3">
   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
     Bank Statement
   </label>
@@ -143,13 +170,13 @@ const AddExpense = () => {
       <label className="w-full cursor-pointer">
         <div className="flex flex-col items-center justify-center gap-4">
           <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
-          <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG,PDF</p>
+          <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG, PDF</p>
         </div>
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept=".jpg,.png,.jpeg"
+          accept=".jpg,.png,.jpeg,.pdf"
           className="hidden"
         />
       </label>
@@ -161,11 +188,17 @@ const AddExpense = () => {
       className="mt-2"
     >
       <div className="relative w-40 h-40 rounded-lg overflow-hidden">
-        <img
-          src={URL.createObjectURL(bankStatement)}
-          alt="Bank Statement"
-          className="w-full h-full object-cover"
-        />
+        {bankStatement.type === 'application/pdf' ? (
+          <div className="flex items-center justify-center h-full bg-gray-200">
+            <p className="text-sm">PDF uploaded</p>
+          </div>
+        ) : (
+          <img
+            src={URL.createObjectURL(bankStatement)}
+            alt="Bank Statement"
+            className="w-full h-full object-cover"
+          />
+        )}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}

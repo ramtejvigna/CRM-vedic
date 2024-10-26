@@ -72,7 +72,7 @@ const AddSalariesStatements = () => {
           navigate("/admin-dashboard/salaries");
         }
       } catch (error) {
-        toast.error("Error adding salary statement");
+        toast.error(error.message);
       } finally {
         setIsSubmitting(false);
       }

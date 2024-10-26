@@ -186,91 +186,94 @@ const Customer = () => {
 
     return (
         <div className="min-h-screen p-4 sm:p-8">
-             <div className="flex items-center mb-6">
-          <button 
-            onClick={() => navigate(-1)} // Navigate back
-            className="flex items-center text-gray-600 hover:text-blue-500"
-          >
-            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-           
-          </button>
-        </div>
-           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-  {/* Personal Information & Assigned Employee Card */}
- 
-  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-    {/* Personal Information */}
-    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Personal Information</h2>
-<div className="grid grid-cols-1 gap-2">
-<p className="text-gray-600"><strong>CustomerID:</strong> {customerDetails.customerID || "N/A"}</p>
-  <p className="text-gray-600"><strong>Father's Name:</strong> {customerDetails.fatherName || "N/A"}</p>
-  <p className="text-gray-600"><strong>Mother's Name:</strong> {customerDetails.motherName || "N/A"}</p>
-  <p className="text-gray-600"><strong>Email:</strong> {customerDetails.email || "N/A"}</p>
-  <p className="text-gray-600"><strong>WhatsApp Number:</strong> {customerDetails.whatsappNumber || "N/A"}</p>
-  <p className="text-gray-600"><strong>Baby's Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
-</div>
+             
+             <div className="max-w-7xl mx-auto mb-6">
+    <div className="flex items-center mb-6">
+        <button 
+            onClick={() => navigate(-1)} // Navigate back
+            className="flex items-center text-gray-900 hover:text-blue-500"
+        >
+            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+        </button>
+    </div>
 
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Personal Information & Assigned Employee Card */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+            {/* Personal Information */}
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Personal Information</h2>
+            <div className="grid grid-cols-1 gap-2">
+                <p className="text-gray-600"><strong>CustomerID:</strong> {customerDetails.customerID || "N/A"}</p>
+                <p className="text-gray-600"><strong>Father Name:</strong> {customerDetails.fatherName || "N/A"}</p>
+                <p className="text-gray-600"><strong>Mother Name:</strong> {customerDetails.motherName || "N/A"}</p>
+                <p className="text-gray-600"><strong>Email Id:</strong> {customerDetails.email || "N/A"}</p>
+                <p className="text-gray-600"><strong>WhatsApp Number:</strong> {customerDetails.whatsappNumber || "N/A"}</p>
+                <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
+            </div>
 
-    {/* Divider */}
-    <hr className="my-6 border-gray-300" />
+            {/* Divider */}
+            <hr className="my-3 border-gray-300" />
+            <p className="text-gray-600"><strong>Requested On:</strong> {customerDetails.createdDateTime || "N/A"}</p>
+            <hr className="my-3 border-gray-300" />
 
-    {/* Assigned Employee */}
-    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Assigned Employee</h2>
-    {customerDetails.assignedEmployee ? (
-      <div className="text-gray-600">
-        <p><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
-        <p><strong>Email:</strong> {customerDetails.assignedEmployee.email}</p>
-        <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
-      </div>
-    ) : (
-      <p className="text-gray-600">No employee assigned.</p>
-    )}
-  </div>
-
-  {/* Payment Details & Astrological Details Card */}
-  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-    {/* Payment Details */}
-    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Payment Details</h2>
-    {customerDetails?.customerStatus === "newRequests" ? (
-      <div className="flex-grow flex items-center justify-center">
-        <p className=" text-center">Payment details not verified yet.</p>
-      </div>
-    ) : customerDetails?.customerStatus === "rejected" ? (
-      <div className="flex-grow flex items-center justify-center">
-        <p className="text-red-600 text-center font-bold">Payment Status: Rejected</p>
-      </div>
-    ) : (
-      <div className="flex-grow">
-        <div className="grid grid-cols-1 gap-2">
-          <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
-          <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
-          <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
-          <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+            {/* Assigned Employee */}
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
+            {customerDetails.assignedEmployee ? (
+                <div className="text-gray-600">
+                    <p><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
+                    <p><strong>Email Id:</strong> {customerDetails.assignedEmployee.email}</p>
+                    <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
+                </div>
+            ) : (
+                <p className="text-gray-600">No employee assigned.</p>
+            )}
         </div>
-      </div>
-    )}
 
-    {/* Divider */}
-    <hr className="my-6 border-gray-300" />
+        {/* Payment Details & Astrological Details Card */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+            {/* Payment Details */}
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Payment Details</h2>
+            {customerDetails?.customerStatus === "newRequests" ? (
+                <div className="flex-grow flex items-center justify-center">
+                    <p className="text-center">Payment details not verified yet.</p>
+                </div>
+            ) : customerDetails?.customerStatus === "rejected" ? (
+                <div className="flex-grow flex items-center justify-center">
+                    <p className="text-red-600 text-center font-bold">Payment Status: Rejected</p>
+                </div>
+            ) : (
+                <div className="flex-grow">
+                    <div className="grid grid-cols-1 gap-2">
+                        <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
+                        <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
+                        <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
+                        <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                    </div>
+                </div>
+            )}
 
-    {/* Astrological Details */}
-    <h2 className="text-xl uppercase font-bold text-gray-800 mb-4">Astrological Details</h2>
-<div className="grid grid-cols-1 gap-2">
-  <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
-  <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
-  <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
-  <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
-  <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
-  <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
+            {/* Divider */}
+            <hr className="my-6 border-gray-300" />
+
+            {/* Astrological Details */}
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
+            <div className="grid grid-cols-1 gap-2">
+                <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
+                <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
+                <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
+                <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
+                <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
+                <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
+            </div>
+        </div>
+    </div>
 </div>
 
-  </div>
-</div>
 
 
             <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div className="flex w-full items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold  uppercase text-gray-800 dark:text-white">Generated PDFs</h2>
+                    <h2 className="text-xl font-bold   text-gray-800 dark:text-white">Generated PDFs</h2>
                     <div className="flex items-center space-x-2">
                         <Eye className="h-4 w-4 text-gray-500" />
                         <span className="text-sm text-gray-600 dark:text-gray-400">{pdfs.length} PDFs Generated</span>
@@ -289,16 +292,16 @@ const Customer = () => {
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
                                         SNo.
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Generated Time/Date
+                                    <th className="px-6 py-4 text-left text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
+                                        Generated On
                                     </th>
-                                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-center text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-right text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
                                         Actions
                                     </th>
                                 </tr>

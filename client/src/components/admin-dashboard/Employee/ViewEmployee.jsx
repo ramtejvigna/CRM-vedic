@@ -25,6 +25,7 @@ const ViewEmployee = () => {
                 const data = await res.json();
                 setIsLoading(false);
                 setEmployee(data.employee)
+                console.log(data.employee)
             } catch (error) {
                 toast.error(error.message);
             }

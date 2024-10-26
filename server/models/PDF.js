@@ -6,6 +6,12 @@ const PdfSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     whatsappStatus: { type: Boolean, default: false },
     mailStatus: { type: Boolean, default: false },
+    additionalBabyNames: [
+        {
+            name: { type: String, required: true },
+            meaning: { type: String, required: true }
+        }
+    ],
 });
 
 const NameSchema = new mongoose.Schema({

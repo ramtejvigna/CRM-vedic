@@ -72,101 +72,182 @@ const printImage = () => {
   printWindow.print();
 };
 // Payslip Modal Component
-const PayslipModal = ({ fileUrl, onClose }) => {
-  const isPdf = fileUrl.toLowerCase().endsWith('.pdf');
-  const isImage = /\.(jpeg|jpg|png|gif)$/.test(fileUrl.toLowerCase());
+const PayslipModal = ({ expense, onClose }) => {
+  const [fileData, setFileData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(fileUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': isPdf ? 'application/pdf' : 'image/*',
-        },
-      });
+  useEffect(() => {
+    let isMounted = true;
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+    const fetchFileData = async () => {
+      if (!expense) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expense}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.success || !data.bank_statement) {
+          throw new Error('No file data received');
+        }
+
+        if (isMounted) {
+          setFileData({
+            file_type: data.file_type || 'application/pdf',
+            bank_statement: data.bank_statement
+          });
+        }
+      } catch (error) {
+        console.error('File fetch error:', error);
+        if (isMounted) {
+          setError(error.message);
+          toast.error("Error loading file: " + error.message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
+    };
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('download', isPdf ? 'payslip.pdf' : 'payslip.png');
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading the file:', error);
-      toast.error('Error downloading the file.');
+    fetchFileData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [expense]);
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600">Loading file...</p>
+        </div>
+      );
     }
+
+    if (error) {
+      return (
+        <div className="text-red-500 text-center p-4">
+          <p>Error loading file:</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      );
+    }
+
+    if (!fileData?.bank_statement) {
+      return (
+        <div className="text-gray-500 text-center p-4">
+          No file available
+        </div>
+      );
+    }
+
+    const base64String = fileData.bank_statement;
+    const fileType = fileData.file_type;
+
+    if (fileType.includes('pdf')) {
+      return (
+        <iframe
+          src={`data:${fileType};base64,${base64String}`}
+          className="w-full h-full border-none"
+          title="Payslip PDF"
+        />
+      );
+    }
+
+    // For images
+    return (
+      <img
+        src={`data:${fileType};base64,${base64String}`}
+        alt="Payslip"
+        className="max-w-full max-h-full object-contain"
+        onError={() => {
+          setError('Failed to load image');
+          toast.error('Failed to load image');
+        }}
+      />
+    );
+  };
+
+  const handleDownload = () => {
+    if (!fileData) return;
+
+    const link = document.createElement('a');
+    link.href = `data:${fileData.file_type};base64,${fileData.bank_statement}`;
+    link.download = 'payslip';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Payslip</title>
+          <style>
+            body {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+            }
+            img, embed {
+              max-width: 100%;
+              height: auto;
+            }
+          </style>
+        </head>
+        <body>
+          ${
+            fileData.file_type.includes('pdf')
+              ? `<embed src="data:${fileData.file_type};base64,${fileData.bank_statement}" width="100%" height="100%">`
+              : `<img src="data:${fileData.file_type};base64,${fileData.bank_statement}" alt="Payslip">`
+          }
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
   };
 
   return (
-    <div className="fixed z-50 inset-0 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-[800px] relative p-0 shadow-xl rounded-lg overflow-hidden"
+        className="bg-white w-full max-w-[800px] h-[90vh] relative rounded-lg overflow-hidden shadow-xl"
       >
-        {/* Header with increased height and margins */}
-        <div className="bg-black text-white p-4 flex justify-between items-center" style={{ minHeight: '80px', marginTop: '20px', marginLeft: '40px', marginRight: '40px' }}>
-          <h3 className="text-lg font-semibold">Payslip</h3>
-          <div className="flex space-x-2">
-            <button
-              onClick={handleDownload}
-              className="flex items-center justify-center p-2 text-white  rounded-md transition-all"
-            >
-              <AiOutlineDownload size={24} />
-            </button>
-            <button
-              onClick={printImage}
-              className="flex items-center justify-center p-2 text-white  rounded-md transition-all"
-            >
-              <AiOutlinePrinter size={24} />
-            </button>
-          </div>
-        </div>
-
-        {/* Iframe and Image Container with scrollbar */}
-        <div className="flex items-center justify-center w-full h-[70vh] p-6 overflow-auto">
-          {isPdf ? (
-            <iframe
-              src={fileUrl}
-              className="w-full h-full border rounded-md"
-              title="Payslip PDF"
-              style={{ minHeight: '100%', maxHeight: '100%', overflow: 'auto' }} // Added overflow auto for iframe
-            />
-          ) : isImage ? (
-            <img
-              src={fileUrl}
-              alt="Payslip"
-              className="max-w-full max-h-full object-contain border rounded-md"
-              style={{ maxHeight: '100%', overflowY: 'auto' }} // Maintain max height and allow overflow
-            />
-          ) : (
-            <p>Unsupported file type</p>
-          )}
-        </div>
-
-        {/* Cancel Button positioned outside of the header */}
-        <div className="absolute top-1 right-1">
+        {/* Header */}
+        <div className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
+          <h3 className="text-xl font-semibold">Bank Statement </h3>
           <button
             onClick={onClose}
-            className="flex items-center justify-center p-0 text-gray-500 hover:text-red-500 transition-colors"
+            className="p-2 hover:bg-gray-700 rounded-full transition-colors"
           >
             <AiOutlineClose size={24} />
           </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex items-center justify-center w-full h-[calc(90vh-4rem)] p-6 bg-gray-50">
+          {renderContent()}
         </div>
       </motion.div>
     </div>
   );
 };
-
 
 // Main ViewExpenses Component
 const ViewExpenses = () => {
@@ -180,12 +261,13 @@ const ViewExpenses = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
-  const [payslipModalOpen, setPayslipModalOpen] = useState(false);
   const [payslipUrl, setPayslipUrl] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5); // State for rows per page
-
+  const [expenseToView, setExpenseToView] = useState(null);
+  const [payslipModalOpen, setPayslipModalOpen] = useState(false);
+  
   
   const totalExpenses = filteredExpenses.length;
   const totalPages = Math.ceil(totalExpenses / rowsPerPage); // Total pages based on filtered expenses
@@ -308,30 +390,38 @@ const ViewExpenses = () => {
     }
   };
 
-  const handlePayslip = (id) => {
-    const expense = filteredExpenses.find((exp) => exp._id === id);
-    if (expense && expense.bank_statement) {
-      const fileUrl = `https://vedic-backend-neon.vercel.app/api/expenses/file/${expense.bank_statement}`;
-      
-      fetch(`https://vedic-backend-neon.vercel.app/api/expenses/check-file/${expense.bank_statement}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.exists) {
-            setPayslipUrl(fileUrl);
-            setPayslipModalOpen(true);
-          } else {
-            toast.error("File not found on server");
-          }
-        })
-        .catch(error => {
-          console.error('Error checking file:', error);
-          toast.error("Error accessing file");
-        });
-    } else {
+  const handlePayslip = (expense) => {
+    if (!expense) {
       toast.info("No bank statement available for this expense");
+      return;
     }
+    setExpenseToView(expense); // Set the expense ID
+    setPayslipModalOpen(true);
   };
-    
+  
+  // Update the modal rendering
+  {payslipModalOpen && (
+    <PayslipModal
+      expense={expenseToView}
+      onClose={() => {
+        setPayslipModalOpen(false);
+        setExpenseToView(null);
+      }}
+    />
+  )}
+  
+  
+  // Update the modal rendering in ViewExpenses
+  {payslipModalOpen && (
+    <PayslipModal
+      expenseId={expenseToView}
+      onClose={() => {
+        setPayslipModalOpen(false);
+        setExpenseToView(null);
+      }}
+    />
+  )}
+  
 
   const handleAddExpense = () => navigate("add-expense");
   const handleEdit = (id) => navigate(`edit-expense/${id}`);
@@ -358,20 +448,25 @@ const ViewExpenses = () => {
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${
       isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
     }`}>
-      <AnimatePresence>
-        <DeleteModal
-          isOpen={deleteModalOpen}
-          onClose={() => {
-            setDeleteModalOpen(false);
-            setExpenseToDelete(null);
-          }}
-          onConfirm={handleDelete}
-        />
+     <AnimatePresence>
+        {deleteModalOpen && (
+          <DeleteModal
+            isOpen={deleteModalOpen}
+            onClose={() => {
+              setDeleteModalOpen(false);
+              setExpenseToDelete(null);
+            }}
+            onConfirm={handleDelete}
+          />
+        )}
 
-        {payslipModalOpen && (
+        {payslipModalOpen && expenseToView && (
           <PayslipModal
-            fileUrl={payslipUrl}
-            onClose={() => setPayslipModalOpen(false)}
+            expenseId={expenseToView}
+            onClose={() => {
+              setPayslipModalOpen(false);
+              setExpenseToView(null);
+            }}
           />
         )}
       </AnimatePresence>
@@ -390,7 +485,7 @@ const ViewExpenses = () => {
             <div className="relative w-full" style={{ width: '60%' }}>
   <input
     type="text"
-    placeholder="Search expenses..."
+    placeholder="Search expense..."
     value={searchTerm}
     onChange={(e) => setSearchTerm(e.target.value)}
     className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
@@ -478,8 +573,8 @@ const ViewExpenses = () => {
               <table className="w-full">
                 <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
                   <tr>
-                    {["Serial No", "Expense Name", "Amount", "Date", "Actions"].map((header) => (
-                      <th key={header} className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                    {["S.No", "Expense Name", "Amount", "Date", "Actions"].map((header) => (
+                      <th key={header} className={`px-6 py-3 text-left text-xm font-medium  tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                         {header}
                       </th>
                     ))}
@@ -499,16 +594,16 @@ const ViewExpenses = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center">
                           
-                          <button
-                            onClick={() => handlePayslip(expense._id)}
-                            className={`mr-7 flex gap-2 transition-colors duration-300 ${
-                              isDarkMode
-                                ? "text-green-400 hover:text-green-200"
-                                : "text-green-600 hover:text-green-900"
-                            }`}
-                          >
-                            <Eye size={18} /> 
-                          </button>
+                        <button
+  onClick={() => handlePayslip(expense._id)}
+  className={`mr-7 flex gap-2 transition-colors duration-300 ${
+    isDarkMode
+      ? "text-green-400 hover:text-green-200"
+      : "text-green-600 hover:text-green-900"
+  }`}
+>
+  <Eye size={18} /> 
+</button>
                           <button
                             onClick={() => initiateDelete(expense._id)}
                             className={`mr-3 flex gap-2 transition-colors duration-300 ${

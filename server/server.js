@@ -28,7 +28,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // middlewares
 app.use(cors());
-app.use(express.json({limit : '100mb'}));
+app.use(express.json({limit : '50mb'}));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // 

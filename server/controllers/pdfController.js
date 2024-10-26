@@ -51,8 +51,8 @@ export const getBabyNames = async (req, res) => {
 };
 
 export const sendDetails = async (req, res) => {
-    const { names, customerId } = req.body;
-
+    const { names, customerId,additionalBabyNames } = req.body;
+    console.log(additionalBabyNames)
     if (!names || names.length === 0) {
         return res.status(400).json({ error: 'No baby names selected' });
     }
@@ -61,7 +61,6 @@ export const sendDetails = async (req, res) => {
         // Fetch the selected baby names from the database using the provided names
         const selectedNames = await babyNames.find({ name: { $in: names } });
 
-        console.log("Selected names from DB:", selectedNames);
 
         if (!selectedNames || selectedNames.length === 0) {
             return res.status(404).json({ error: 'Baby names not found' });
@@ -73,11 +72,11 @@ export const sendDetails = async (req, res) => {
         // Save the baby names' IDs and other PDF metadata in the PDF collection
         const newPdf = new PDF({
             babyNames: selectedNamesIds,  // Store baby names' IDs
+            additionalBabyNames:additionalBabyNames,
         });
 
         const savedPdf = await newPdf.save();
 
-        console.log("PDF saved:", savedPdf);
 
         // Store the PDF document ID in the customer's record
         // If 'pdfGenerated' array doesn't exist, it will be created
@@ -140,40 +139,45 @@ export const getPdfsByCustomerId = async (req, res) => {
 
 export const sendPdfEmail = async (req, res) => {
     const { email, base64Pdf, uniqueId } = req.body;
-
-    const mailOptions = {
+  
+    try {
+      // Decode base64 to binary PDF content
+      const pdfBuffer = Buffer.from(base64Pdf, 'base64');
+  
+      const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'Your Generated PDF',
         text: 'Here is your PDF document.',
         attachments: [{
-            filename: `${uniqueId}.pdf`,
-            content: base64Pdf,
-            encoding: 'base64'
+          filename: `${uniqueId}.pdf`,
+          content: pdfBuffer,  // Pass the buffer as content
+          encoding: 'base64'   // Specify that the content is base64-encoded
         }]
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        
-        // Find the PDF document and update the mailStatus
-        const updatedPdf = await PDF.findByIdAndUpdate(
-            uniqueId,
-            { mailStatus: true },
-            { new: true } // Return the updated document
-        );
-
-        // Check if the document was found and updated
-        if (!updatedPdf) {
-            return res.status(404).json({ error: 'PDF document not found' });
-        }
-
-        res.status(200).json({ message: 'Email sent successfully' });
+      };
+  
+      // Send the email with the attachment
+      await transporter.sendMail(mailOptions);
+  
+      // Update the mailStatus of the PDF document in the database
+      const updatedPdf = await PDF.findByIdAndUpdate(
+        uniqueId,
+        { mailStatus: true },
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedPdf) {
+        return res.status(404).json({ error: 'PDF document not found' });
+      }
+  
+      res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ error: 'Failed to send email' });
+      console.error('Error sending email:', error);
+      res.status(500).json({ error: 'Failed to send email' });
     }
-};
+  };
+  
+
 
 
 export const sendPdfWhatsApp = async (req, res) => {
