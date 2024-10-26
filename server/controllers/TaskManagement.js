@@ -104,10 +104,12 @@ export const deleteTask = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text } = req.body;
-
+    const { text } = req.body.newComment;
+    console.log(id)
+    console.log(text)
+    console.log(req.body)
     // Find the employee by id
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findById(req.user);
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
