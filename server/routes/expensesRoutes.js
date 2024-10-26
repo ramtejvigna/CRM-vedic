@@ -16,6 +16,6 @@ router.get('/', getAllExpenses);
 router.get('/file/:id', getExpenseFile);
 router.put('/:id', updateExpense);
 router.delete('/deleteExpense/:id', deleteExpense);
-router.get('/:id/', getExpenseWithBankStatement);
+// router.get('/:id/', getExpenseWithBankStatement);
 
 export default router;

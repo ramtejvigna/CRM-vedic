@@ -43,7 +43,7 @@ export const getExpenseById = async (req, res) => {
   }
 };
 
-const addExpense = async (req, res) => {
+export const addExpense = async (req, res) => {
   try {
     const { expense_name, amount, date } = req.body;
     let bank_statement = '';
