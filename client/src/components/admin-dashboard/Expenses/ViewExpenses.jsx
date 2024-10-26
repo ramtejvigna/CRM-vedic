@@ -143,10 +143,16 @@ const ViewExpenses = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5); // State for rows per page
 
   const recordsPerPage = 5;
+  
+
   const currentYear = new Date().getFullYear();
-  const startYear = 2000;
-  const endYear = currentYear + 10;
-  const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
+  const startYear = 2010;
+  const endYear = currentYear;
+  const years = [];
+  
+  for (let year = endYear; year >= startYear; year--) {
+    years.push(year);
+  }
 
   useEffect(() => {
     fetchExpenses();

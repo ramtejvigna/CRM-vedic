@@ -19,8 +19,29 @@ export const addCustomerWithAssignment = async (req, res) => {
     try {
         console.log("Creating new customer with data:", req.body);
 
-        // Create new customer instance
+        // Get current month and year in MM-YYYY format
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const year = today.getFullYear();
+        const dateString = `${month}-${year}`;
+
+        // Get the number of customers added in the current month
+        const monthStart = new Date(year, today.getMonth(), 1); // First day of the current month
+        const monthEnd = new Date(year, today.getMonth() + 1, 1); // First day of the next month
+
+        const customersAddedThisMonth = await Customer.countDocuments({
+            createdDateTime: { $gte: monthStart, $lt: monthEnd }
+        });
+
+        // Increment the count for the customer being added this month
+        const customerCountForMonth = customersAddedThisMonth + 1;
+
+        // Generate the customerID in the format Month-Year-Count
+        const customerID = `${month}${year}${customerCountForMonth}`;
+
+        // Create a new customer instance with the generated customerID
         const newCustomer = new Customer({
+            customerID, // Add the generated customerID
             fatherName,
             motherName,
             email,
@@ -64,8 +85,10 @@ export const addCustomerWithAssignment = async (req, res) => {
     } catch (error) {
         console.error("Error adding customer:", error.message); // Log full error
         res.status(500).json({ error: "Error adding customer" });
-    }    
+    }
 };
+
+
 
 export const getCustomers = async (req, res) => {
     try {
@@ -181,10 +204,12 @@ export const getCustomerData = async (req, res) => {
 // Assuming you have an endpoint to get customer details
 export const getCustomerDetails = async (req, res) => {
     try {
-        const { fatherName } = req.params;
+        console.log(req.params);
+        const { id } = req.params;
+        console.log(req.params)
 
         // Fetch the customer by fatherName
-        const customer = await Customer.findOne({ fatherName });
+        const customer = await Customer.findById(id);
 
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
@@ -205,6 +230,7 @@ export const getCustomerDetails = async (req, res) => {
         res.status(500).json({ error: "Error fetching customer details" });
     }
 };
+
 export const getCustomerPdfs = async (req, res) => {
     try {
         // Find the customer by father's name

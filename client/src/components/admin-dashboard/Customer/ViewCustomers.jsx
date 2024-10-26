@@ -65,7 +65,7 @@ const CustomerDetails = () => {
   const filteredData = customers.filter((row) => {
     const genderMatch = filteredGender === "All" || row.babyGender === filteredGender;
     const statusMatch = filteredStatus === "All" || row.customerStatus === filteredStatus;
-    const employeeMatch = filteredAssignedEmployee === "All" || row.assignedEmployee === filteredAssignedEmployee;
+    const employeeMatch = filteredAssignedEmployee === "All" || row.assignedEmployeeName === filteredAssignedEmployee;
     const searchMatch =
       row.fatherName?.toLowerCase().includes(searchTerm) ||
       row.customerId?.toLowerCase().includes(searchTerm) ||
@@ -77,7 +77,11 @@ const CustomerDetails = () => {
     return genderMatch && statusMatch && employeeMatch && searchMatch;
   });
 
-  const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedData = filteredData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+  
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const handleGenderChange = (event) => {
@@ -179,18 +183,18 @@ const CustomerDetails = () => {
             Assigned Employee
           </label>
           <select
-            id="assignedEmployee"
-            value={filteredAssignedEmployee}
-            onChange={handleAssignedEmployeeChange}
-            className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
-          >
-            <option value="All">All Employees</option>
-            {employees.map((employee) => (
-              <option key={employee.id} value={employee.firstName} className="text-black">
-                {employee.firstName} 
-              </option>
-            ))}
-          </select>
+  id="assignedEmployee"
+  value={filteredAssignedEmployee}
+  onChange={handleAssignedEmployeeChange}
+  className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
+>
+  <option value="All">All Employees</option>
+  {employees.map((employee) => (
+    <option key={employee.id} value={employee.firstName}>
+      {employee.firstName}
+    </option>
+  ))}
+</select>
         </div>
       </div>
     </motion.div>
@@ -208,9 +212,8 @@ const CustomerDetails = () => {
               <tr>
                 {[
                   "S:no",
-
-                  "Father Name",
                   "Customer_Id",
+                  "Father Name",
                   "WhatsApp Number",
                   "Baby's Gender",
                   "Assigned Employee",
@@ -239,12 +242,14 @@ const CustomerDetails = () => {
                   >
                     <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
+                     {row.customerID
+}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {row.fatherName}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                     123
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    
+               <td className="px-4 py-3 whitespace-nowrap">
                       {row.whatsappNumber}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -282,14 +287,13 @@ const CustomerDetails = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                    <button
-  className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-transparent hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-  onClick={() => navigate(`${row.fatherName}`)}
->
-  <Eye size={18} className="mr-2 text-blue-600" /> {/* Eye icon with blue text color */}
-  
-</button>
-
+                      <button
+                        className="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        onClick={() => navigate(`${row._id}`)}
+                      >
+                        <Eye size={18} className="mr-2" />
+                        View
+                      </button>
                     </td>
                   </motion.tr>
                 ))}

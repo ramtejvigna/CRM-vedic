@@ -12,7 +12,9 @@ import ViewEmployee from "./Employee/ViewEmployee";
 import AddExpense from "./Expenses/AddExpense.jsx";
 import Leaves from "./Leaves";
 import AddSalariesStatements from "./Salaries/AddSalariesStatements";
-
+// import { VoiceRecognition } from "./VoiceRecognition.jsx";
+import VoiceRecognition from './Voice2.jsx'
+// import {VoiceRecognition} from './VoiceRecognition.jsx'
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
 
@@ -37,7 +39,7 @@ const AdminDashboard = () => {
             ))}
             <Route path="employees/add-employee" element={<AddEmployee />} />
             <Route path="employees/edit-employee/:id" element={<EditEmployee />} />
-            <Route path="customers/:fatherName" element={<Customer />} /> {/* Ensure correct import */}
+            <Route path="customers/:id" element={<Customer />} /> {/* Ensure correct import */}
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
             <Route path="/expenses/add-expense" element={<AddExpense />} />
@@ -46,6 +48,7 @@ const AdminDashboard = () => {
             <Route path="/" element={<Navigate to="/home" />} />
           </Routes>
         </div>
+        <VoiceRecognition/>
       </div>
     </div>
   );

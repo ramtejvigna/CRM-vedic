@@ -92,7 +92,7 @@ const EmployeeTable = () => {
 
     if(status) {
         try {
-          const response = await axios.get(`http://localhost:3000/api/employees/search?status=${status}`);
+          const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
           if(response.status === 200) {
             setEmployees(response.data);
           }
@@ -146,7 +146,7 @@ const EmployeeTable = () => {
                     className="bg-blue-500 flex gap-2 items-center justify-center text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <Link className='flex gap-2 items-center justify-center' to={"/admin-dashboard/employees/add-employee"}>
-                    <AiOutlineAlipay/> <span>add employee</span>
+                    <AiOutlineUserAdd/> <span className="">Add Employee</span>
                   </Link>
                 </motion.button>
             </div>

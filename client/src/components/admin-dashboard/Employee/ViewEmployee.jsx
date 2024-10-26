@@ -3,16 +3,16 @@ import { HOST , GET_EMPLOYEE_BY_ID } from '../../../utils/constants'
 import { toast } from "react-toastify"
 import { useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Card, Button, Box } from '@mui/material';
-import { GiCrossMark, GiMailbox } from "react-icons/gi"
+import { GiCrossMark } from "react-icons/gi"
 import {format} from "date-fns"
-import {AnimatePresence, motion} from "framer-motion"
-import { AiOutlineMessage } from 'react-icons/ai';
-import { Calendar, ClipboardList, ClipboardListIcon, Clock, MailIcon, Phone, User, Workflow, WorkflowIcon } from 'lucide-react';
-import { AiOutlineClose , AiOutlineDownload , AiOutlinePrinter } from 'react-icons/ai';
-import { useStore } from '../../../store';
+import {motion} from "framer-motion"
+import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineDownload, AiOutlinePrinter} from "react-icons/ai"
+
+import { ArrowBigLeft, ArrowLeftFromLineIcon , AlignLeft, ArrowLeftToLine } from 'lucide-react';
+import { TbArrowBigLeftLineFilled } from 'react-icons/tb';
+import { FaArrowLeft } from 'react-icons/fa';
 const ViewEmployee = () => {
     const navigate = useNavigate();
-    const {isDarkMode} = useStore()
     const [image, setImage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [employee, setEmployee] = useState({});
@@ -40,28 +40,32 @@ const ViewEmployee = () => {
         getEmployee();
     }, [id]);
 
+      
     const downloadImage = (base64String) => {
         const link = document.createElement('a');
         link.href = `data:image/jpeg;base64,${base64String}`;
         link.download = 'document.jpg'; // Name of the downloaded file
         link.click();
     };
-      
-      
+    useEffect(() => {
+        console.log(image)
+    } , image)
+    
+    
     const printImage = (base64String) => {
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
-          <html>
-              <head>
-                  <title>Print Image</title>
-              </head>
-              <body>
-                  <img src="data:image/jpeg;base64,${base64String}" style="max-width:100%;"/>
-              </body>
-          </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print Image</title>
+            </head>
+            <body>
+                <img src="data:image/jpeg;base64,${base64String}" style="max-width:100%;"/>
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
     };
 
     return isLoading ? (
@@ -69,252 +73,163 @@ const ViewEmployee = () => {
             <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
         </div>
     ) : (
-        <div className='w-full h-full'>
-            <Card className="flex items-center justify-between p-5 rounded-xl shadow-md border">
+        <div className='flex flex-col w-full  h-full'>
+            <div className="flex items-center justify-between p-5 ">
+
                 <div className="flex gap-4">
                     <Button onClick={() => navigate('/admin-dashboard/employees')} className="border border-black text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-                        <span className="text-lg">{"<"}</span> Back
+                       <FaArrowLeft/>
                     </Button>
-                    <Button onClick={() => navigate(`/admin-dashboard/employees/edit-employee/${employee._id}`)} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-                        Edit Employee
-                    </Button>
+                </div>
+            </div>
+
+         <div className='flex flex-wrap p-2 gap-3 rounded-xl'>
+            <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 mt-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">Personal Details</h2>
+
+                <div className="border-t border-gray-200">
+                    <dl>
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">First Name</dt>
+                            <dd className="text-gray-900 font-medium flex-1">{employee?.firstName}</dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Last Name</dt>
+                            <dd className="text-gray-900 font-medium flex-1">{employee?.lastName}</dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Email</dt>
+                            <dd className="text-gray-900 font-medium flex-1">{employee?.email}</dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Phone</dt>
+                            <dd className="text-gray-900 font-medium flex-1">{employee?.phone}</dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Address</dt>
+                            <dd className="text-gray-900 font-medium flex-1">
+                            {employee?.address + " , " + employee?.city + " , " + employee?.pincode}
+                            </dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Location</dt>
+                            <dd className="text-gray-900 font-medium flex-1">
+                            {employee?.state + " , " + employee?.country}
+                            </dd>
+                        </div>
+                    </dl>
                 </div>
             </Card>
 
-            <div className="flex flex-wrap justify-center  h-full w-full">
-                <div className="flex p-5 gap-5 basis-auto  flex-1 flex-col border ">
-                    <Card className='flex relative flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
-                        {employee?.isOnline ? (
-                                    <span className="absolute top-2 right-2 bg-opacity-10 py-1 rounded-lg px-4 bg-green-100 text-green-800">
-                                        online
-                                    </span>
-                                ) : (
-                                    <span className="absolute top-2 right-2 bg-opacity-10 py-1 rounded-lg px-4 bg-red-500 text-red-500">
-                                        offline
-                                    </span>
-                        )}
-                        <div className='flex flex-col gap-3 items-center'>
-                            <div className="flex-shrink-0 h-36 w-36">
-                              {employee?.avatar ? (
-                                <img
-                                  className="h-36 w-36 object-cover rounded-full"
-                                  src={employee.avatar}
-                                  alt={employee.firstName}
-                                />
-                              ) : (
-                                <div className="h-36 w-36 rounded-full bg-blue-500 flex items-center justify-center">
-                                  <span className="text-white text-7xl font-bold">
-                                    {employee?.firstName?.charAt(0).toUpperCase()}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            <div className='flex flex-col gap-3'>
-                                <span className='text-blue-500 text-3xl font-bold'>{employee?.firstName + " " + employee?.lastName}</span>
-                            </div>
-                        </div>
-                        <div className="flex-1 flex p-6 flex-col gap-3">
-                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><MailIcon className='h-4 w-4'/>{employee?.email}</span>
-                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><Phone className='h-4 w-4'/>{employee?.phone}</span>
-                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><User className='h-4 w-4'/> customers assigned : {employee?.customers?.length}</span>
-                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><ClipboardListIcon className='h-4 w-4'/> tasks assigned : {employee?.assignedTasks ? employee?.assignedTasks?.length : "0"}</span>
-                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><Calendar  className='h-4 w-4'/>remaining leave days : {employee.leaveBalance}</span>
-                        </div>
-                    </Card>
+            <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 mt-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Employment Details</h2>
 
-                    <Card className="flex flex-col flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4 flex items-center">
-                             Document Wallet
-                        </h3>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2  gap-6">
-                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
-                                {employee?.aadharOrPan ? (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
-                                        uploaded
-                                    </span>
-                                ) : (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
-                                        Pending
-                                    </span>
-                                )}
-                                <div className="text-4xl">🆔</div>
-                                <h4 className="mt-2 font-semibold text-gray-800">Id Proof</h4>
-                                <p className="text-gray-500 text-sm">Last updated: {employee?.lastUpdated ?  format(employee?.lastUpdated, "mm , d yyyy" ) : "Not yet updated"} </p>
-                                
-                                <div className="mt-4 flex space-x-2">
-                                    <button onClick={() => setImage(employee?.aadharOrPan)} className="text-blue-600 hover:underline">View</button>
-                                    <button onClick={() => downloadImage(employee?.aadharOrPan)} className="text-blue-600 hover:underline">Download</button>
-                                </div>
-                            </div>
-
-                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
-                                {employee?.passport ? (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
-                                        uploaded
-                                    </span>
-                                ) : (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
-                                        Pending
-                                    </span>
-                                )}
-                                <div className="text-4xl">🌐</div>
-                                <h4 className="mt-2 font-semibold text-gray-800">Passport</h4>
-                                <p className="text-gray-500 text-sm">Lat updated: {employee?.lastUpdated ?  format(employee?.lastUpdated, "mm , d yyyy" ) : "Not yet updated"} </p>
-                                
-                                <div className="mt-4 flex space-x-2">
-                                    <button onClick={() => setImage(employee?.passport)} className="text-blue-600 hover:underline">View</button>
-                                    <button onClick={() => downloadImage(employee?.aadharOrPan)} className="text-blue-600 hover:underline">Download</button>
-                                </div>
-                            </div>
-                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
-                                {employee?.degrees ? (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
-                                        uploaded
-                                    </span>
-                                ) : (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
-                                        Pending
-                                    </span>
-                                )}
-                                <div className="text-4xl">🎓</div>
-                                <h4 className="mt-2 font-semibold text-gray-800">Degree</h4>
-                                <p className="text-gray-500 text-sm">Uploaded: { isNaN(new Date(employee?.updatedAt)) ? "Invalid Date" :  format( new Date(employee?.expiryDate) , "MM/dd/yyyy") }</p>
-                                
-                                <div className="mt-4 flex space-x-2">
-                                    <button onClick={() => setImage(employee?.degrees)} className="text-blue-600 hover:underline">View</button>
-                                    <button onClick={() => downloadImage(employee?.degrees)} className="text-blue-600 hover:underline">Download</button>
-                                </div>
-                            </div>
-                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
-                                {employee?.transcripts ? (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
-                                        uploaded
-                                    </span>
-                                ) : (
-                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
-                                        Pending
-                                    </span>
-                                )}
-                                <div className="text-4xl">📄</div>
-                                <h4 className="mt-2 font-semibold text-gray-800">Transcripts</h4>
-                                <p className="text-gray-500 text-sm">Uploaded: Dec 20, 2023</p>
-                                
-                                <div className="mt-4 flex space-x-2">
-                                    <button onClick={() => setImage(employee?.transcripts)} className="text-blue-600 hover:underline">View</button>
-                                    <button onClick={() => downloadImage(employee?.transcripts)}  className="text-blue-600 hover:underline">Download</button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </Card>
-
-
+            <div className="border-t border-gray-200">
+                <dl >
+                <div className="py-2 flex">
+                    <dt className="text-gray-500 w-1/3">Employer Name</dt>
+                    <dd className="text-gray-900 font-medium flex-1">{employee?.employerName}</dd>
                 </div>
 
-
-                <div className="flex sm:p-5  gap-5 flex-col border b">
-                    <Card className='flex flex-col flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
-                        <h1 className='text-xl font-semibold text-gray-800 mb-4'>Personal Details</h1>
-                        <table border="1" className=' '>
-                            <tr>
-                                <th className='border border-black text-xl p-2'>Firstname</th>
-                                <td className='border border-black text-xl p-2'>{employee?.firstName }</td>
-                            </tr>
-                            <tr>
-                                <th className='border border-black text-xl p-2'>Lastname</th>
-                                <td className='border border-black text-xl p-2'>{employee?.lastName}</td>
-                            </tr>
-                            <tr>
-                                <th className='border border-black  p-2'>Address</th>
-                                <td className='border border-black  p-2'>{employee?.address + " , " + employee?.city }</td>
-                            </tr>
-                            <tr>
-                                <th className='border border-black  p-3'>Location</th>
-                                <td className='border border-black  p-3'>{employee?.state + " , " + employee?.country}</td>
-                            </tr>
-                            <tr>
-                                <th className='border border-black  p-2'>Pincode</th>
-                                <td className='border border-black  p-2'>{employee?.pincode}</td>
-                            </tr>
-                        </table>
-                    </Card>
-
-
-
-
-                        <Card class=" bg-white shadow-md rounded-lg overflow-hidden p-6 mt-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Fianancial Details</h2>
-
-                            <div class="border-t border-gray-200">
-                                <dl class="divide-y divide-gray-200">
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Card Holder Name</dt>
-                                        <dd class="text-gray-900 font-medium">{employee?.cardholderName || "Not mentioned"}</dd>
-                                    </div>
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Card Number</dt>
-                                        <dd class="text-gray-900 font-medium">{employee?.cardNumber}</dd>
-                                    </div>
-
-
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Exipry Date</dt>
-                                        <dd class="text-gray-900 font-medium">{ isNaN(new Date(employee?.expiryDate)) ? "Invalid Date" :  format( new Date(employee?.expiryDate) , "MM/dd/yyyy") }</dd>
-                                    </div>
-
-
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">cvv</dt>
-                                        <dd class="text-gray-900 font-medium">{employee?.cvv}</dd>
-                                    </div>
-                                </dl>
-                            </div>
-                        </Card>
-
-                        <Card class=" bg-white shadow-md rounded-lg overflow-hidden p-6 mt-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Employment Details</h2>
-
-                            <div class="border-t border-gray-200">
-                                <dl class="divide-y divide-gray-200">
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Employer Name</dt>
-                                        <dd class="text-gray-900 font-medium">{employee?.employerName}</dd>
-                                    </div>
-
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Job Title</dt>
-                                        <dd class="text-gray-900 font-medium">{employee?.jobTitle}</dd>
-                                    </div>
-
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Start Date</dt>
-                                        <dd class="text-gray-900 font-medium">{ isNaN(new Date(employee?.startDate)) ? "Invalid Date" :  format( new Date(employee?.startDate) , "MM/dd/yyyy") }</dd>
-                                    </div>
-
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">End Date</dt>
-                                        <dd class="text-gray-900 font-medium">{ isNaN(new Date(employee?.endDate)) ? "Invalid Date" :  format( new Date(employee?.endDate) , "MM/dd/yyyy") }</dd>
-                                    </div>
-
-                                    <div class="py-2 flex justify-between">
-                                        <dt class="text-gray-500">Reason for Leaving</dt>
-                                        <dd class="text-gray-900 font-medium">{employee?.reasonForLeaving}</dd>
-                                    </div>
-                                </dl>
-                            </div>
-                        </Card>
-
-
-
-
+                <div className="py-2 flex">
+                    <dt className="text-gray-500 w-1/3">Job Title</dt>
+                    <dd className="text-gray-900 font-medium flex-1">{employee?.jobTitle}</dd>
                 </div>
 
+                <div className="py-2 flex">
+                    <dt className="text-gray-500 w-1/3">Start Date</dt>
+                    <dd className="text-gray-900 font-medium flex-1">
+                    {isNaN(new Date(employee?.startDate)) ? "Invalid Date" : format(new Date(employee?.startDate), "MM/dd/yyyy")}
+                    </dd>
+                </div>
+
+                <div className="py-2 flex">
+                    <dt className="text-gray-500 w-1/3">End Date</dt>
+                    <dd className="text-gray-900 font-medium flex-1">
+                    {isNaN(new Date(employee?.endDate)) ? "Invalid Date" : format(new Date(employee?.endDate), "MM/dd/yyyy")}
+                    </dd>
+                </div>
+
+                <div className="py-2 flex">
+                    <dt className="text-gray-500 w-1/3">Reason for Leaving</dt>
+                    <dd className="text-gray-900 font-medium flex-1">{employee?.reasonForLeaving}</dd>
+                </div>
+                </dl>
+            </div>
+            </Card>
 
             </div>
 
+            <div className='flex flex-wrap p-6 gap-5 '>
+                <Card className="flex-1 basis-auto  flex flex-col gap-6 p-6 bg-white rounded-xl  border border-gray-200">
+                    <h1 className="text-xl  font-semibold text-gray-700 mb-4">Document</h1>
 
-            {/* Image Box */}
+                    <div className='flex flex-col p-2'>
+                        <div className="rounded-md  flex p-3 items-center justify-between">
+                            <span className=''>Aadhar card</span>
+                            <button onClick={() => setImage(`${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                                view
+                            </button>
+                        </div>
+                        <div className="rounded-md  flex p-3 items-center justify-between">
+                            <span>passport</span>
+                            <button onClick={() => setImage(`${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                                view
+                            </button>
+                        </div>
+                        <div className="rounded-md  flex p-3 items-center justify-between">
+                            <span>degrees</span>
+                            <button onClick={() => setImage(`${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                                view
+                            </button>
+                        </div>
+                        <div className="rounded-md  flex p-3 items-center justify-between">
+                            <span>transcripts</span>
+                            <button onClick={() => setImage(`${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                                view
+                            </button>
+                        </div>
+                    </div>
+                    
+                </Card>
+                <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Financial Details</h2>
+
+                    <div className="border-t border-gray-200">
+                        <dl >
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Cardholder Name</dt>
+                            <dd className="text-gray-900 font-medium flex-1">
+                            {employee?.cardholderName !== undefined ? employee.cardholderName : "Not mentioned"}
+                            </dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Card Number</dt>
+                            <dd className="text-gray-900 font-medium flex-1">{employee?.cardNumber}</dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">Expiry Date</dt>
+                            <dd className="text-gray-900 font-medium flex-1">
+                            {isNaN(new Date(employee?.expiryDate)) ? "Invalid Date" : format(new Date(employee.expiryDate), "MM/dd/yyyy")}
+                            </dd>
+                        </div>
+
+                        <div className="py-2 flex">
+                            <dt className="text-gray-500 w-1/3">CVV</dt>
+                            <dd className="text-gray-900 font-medium flex-1">{employee?.cvv}</dd>
+                        </div>
+                        </dl>
+                    </div>
+                    </Card>
+
+            </div>
             {
                 image && (
                     <div className="fixed z-[1000] top-0 left-0 right-0 bottom-0 bg-black/20 backdrop-blur-md flex items-center justify-center overflow-scroll scrollbar-hide">
@@ -361,7 +276,6 @@ const ViewEmployee = () => {
                                 className='object-cover'
                             // Ensures image scales within the iframe
                             />
-                            {/* <img src={image} className='w-full h-full object-cover' alt="displayed" /> */}
                         </div>
                         </motion.div>
                 </div>

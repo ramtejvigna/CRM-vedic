@@ -17,7 +17,6 @@ const TaskList = ({
   fetchTasks,
   isDarkMode,
 }) => {
-  console.log(tasks)
   const indexOfLastRecord = currentPage * tasksPerPage;
   const indexOfFirstRecord = indexOfLastRecord - tasksPerPage;
   const renderPaginationButtons = () => {

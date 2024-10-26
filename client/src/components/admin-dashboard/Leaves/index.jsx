@@ -413,7 +413,7 @@ const Leaves = () => {
                     onClick={async () => {
                       try {
                         await axios.put(
-                          `http://localhost:3000/admin/leaves/${selectedLeave._id}`,
+                          `https://vedic-backend-neon.vercel.app/admin/leaves/${selectedLeave._id}`,
                           {
                             status: confirmationAction,
                             adminComments: "",
