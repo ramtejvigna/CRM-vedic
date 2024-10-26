@@ -103,7 +103,7 @@ const CustomerDetails = () => {
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
-    setPage(0); // Reset to first page when rows per page changes
+    setPage(0);
   };
 
   if (isLoading) {

@@ -165,32 +165,32 @@ const ViewEmployee = () => {
 
             </div>
 
-            <div className='flex flex-wrap p-6 gap-5 '>
+            <div className='flex flex-wrap p-2 gap-3 '>
                 <Card className="flex-1 basis-auto  flex flex-col gap-6 p-6 bg-white rounded-xl  border border-gray-200">
-                    <h1 className="text-xl  font-semibold text-gray-700 mb-4">Document</h1>
+                    <h1 className="text-xl  font-semibold text-gray-700 ">Document</h1>
 
-                    <div className='flex flex-col p-2'>
-                        <div className="rounded-md  flex p-3 items-center justify-between">
-                            <span className=''>Aadhar card</span>
-                            <button onClick={() => setImage(`${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                    <div className='flex flex-col border-t p-2'>
+                        <div className="py-2 flex justify-between items-center">
+                            <span className='text-gray-500 w-1/3"'>Aadhar</span>
+                            <button onClick={() => setImage(`${employee?.aadharOrPan}`)} className='bg-blue-500 px-3  text-white rounded-lg'>
+                                View
+                            </button>
+                        </div>
+                        <div className="py-2 flex justify-between items-center">
+                            <span className="text-gray-500 w-1/3">Passport</span>
+                            <button onClick={() => setImage(`${employee?.passport}`)} className='bg-blue-500 px-3  text-white rounded-lg'>
                                 view
                             </button>
                         </div>
-                        <div className="rounded-md  flex p-3 items-center justify-between">
-                            <span>passport</span>
-                            <button onClick={() => setImage(`${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <div className="py-2 flex justify-between items-center">
+                            <span className="text-gray-500 w-1/3">Degrees</span>
+                            <button onClick={() => setImage(`${employee?.degrees}`)} className='bg-blue-500 px-3 text-white rounded-lg'>
                                 view
                             </button>
                         </div>
-                        <div className="rounded-md  flex p-3 items-center justify-between">
-                            <span>degrees</span>
-                            <button onClick={() => setImage(`${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                                view
-                            </button>
-                        </div>
-                        <div className="rounded-md  flex p-3 items-center justify-between">
-                            <span>transcripts</span>
-                            <button onClick={() => setImage(`${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
+                        <div className="py-2 flex justify-between items-center">
+                            <span className="text-gray-500 w-1/3">Transcripts</span>
+                            <button onClick={() => setImage(`${employee?.transcripts}`)} className='bg-blue-500 px-3 text-white rounded-lg'>
                                 view
                             </button>
                         </div>

@@ -13,6 +13,7 @@ import {AiOutlineAlipay} from "react-icons/ai"
 import noImage from "../../../assets/noimage.jpg"
 import noData from "../../../assets/nodata.jpg"
 function Salaries() {
+  const [isLoading , setIsLoading] = useState(false);
   const [showFilters , setShowFilters] = useState(false);
   const [showDeleteCard , setShowDeleteCard] = useState(false);
   const [selectedEventId , setSelectedEventId] = useState(null);
@@ -83,14 +84,15 @@ function Salaries() {
 
     if(filterData || filteringMonth) {
         try {
+          setIsLoading(true);
           const response = await axios.get(`https://vedic-backend-neon.vercel.app/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
           if(response.status === 200) {
             setSalaryStatements(response.data);
+            setIsLoading(false)
           }
 
         } catch (error) {
-          console.error("Error filtering statements:", error.message);
-          toast.error("Error filtering statement")
+          setIsLoading(false);
         }
     }else {
       toast.error("Please select year and month")
@@ -176,11 +178,12 @@ const SalaryStatementComponent = ({ bankStatement }) => {
   useEffect(() => {
     if(searchTerm) {
       const filteredData = salaryStatements.filter((statement) => (statement.employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || statement.employee.lastName.toLowerCase().includes(searchTerm.toLowerCase())) )
-      setSalaryStatements(filteredData)
+      setSalaryStatements(filteredData);
     }else {
       fetchSalries();
     }
   } , [searchTerm]);
+
 
   useEffect(() => {
     console.log(image)
@@ -257,124 +260,131 @@ const SalaryStatementComponent = ({ bankStatement }) => {
             )
           }
 
-        <div className="flex flex-1">
-          <div className="overflow-x-auto w-full">
-            {currentRecords.length === 0 ? (
-                  <div className='h-full w-full flex flex-col gap-5 items-center justify-center'>
-                      <span className='font-bold tracking-wider text-2xl'>No data found</span>
-                      <div className='h-72 w-72'> 
-                        <img src={noData} className='object-cover' alt="no data" />
-                      </div>
-                  </div>       
-            ) : (
-                  <table className="w-full">
-                    <thead
-                      className={`${
-                        isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                      }`}
-                    >
-                      <tr>
-                        {["s no", "Employee name" , "Amount paid" , "year", "month" , "status" , "Actions"].map(
-                          (header) => (
-                            <th
-                              key={header}
-                              className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${
-                                isDarkMode ? "text-gray-300" : "text-gray-700"
-                              }`}
-                            >
-                              {header}
-                            </th>
-                          )
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody
-                      className={`divide-y ${
-                        isDarkMode ? "divide-gray-700" : "divide-gray-200"
-                      }`}
-                    >
-                      <AnimatePresence>
-                        { 
-                          currentRecords.map((statement, index) =>  (
-                            <motion.tr
-                              key={index}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              transition={{ duration: 0.3 }}
-                              className={`${
-                                isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
-                              } transition-colors duration-150`}
-                            >
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <span className="text-sm">{index + 1}</span>
-                              </td>                        
-                              
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <span className="text-sm capitalize">{statement.employee?.firstName}</span>
-                              </td>
-  
-                              {/* Amount Paid Section */}
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <div className="text-sm font-medium">
-                                  <div className="flex flex-col">
-                                    <strong>{statement.amountPaid}</strong>
-                                  </div>
-                                </div>
-                              </td>
-  
-                              <td className="px-6 py-4 text-center whitespace-nowrap">
-                                <span className="text-sm">{statement.year}</span>
-                              </td>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <div className="flex flex-1">
+              <div className="overflow-x-auto w-full">
+                {currentRecords.length === 0 ? (
+                      <div className='h-full w-full flex flex-col gap-5 items-center justify-center'>
+                          <span className='font-bold tracking-wider text-2xl'>No data found</span>
+                          <div className='h-72 w-72'> 
+                            <img src={noData} className='object-cover' alt="no data" />
+                          </div>
+                      </div>       
+                ) : (
+                      <table className="w-full">
+                        <thead
+                          className={`${
+                            isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                          }`}
+                        >
+                          <tr>
+                            {["s no", "Employee name" , "Amount paid" , "year", "month" , "status" , "Actions"].map(
+                              (header) => (
+                                <th
+                                  key={header}
+                                  className={`px-6 py-3 text-center text-xs font-medium capitalize tracking-wider ${
+                                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                                  }`}
+                                >
+                                  {header}
+                                </th>
+                              )
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody
+                          className={`divide-y ${
+                            isDarkMode ? "divide-gray-700" : "divide-gray-200"
+                          }`}
+                        >
+                          <AnimatePresence>
+                            { 
+                              currentRecords.map((statement, index) =>  (
+                                <motion.tr
+                                  key={index}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -20 }}
+                                  transition={{ duration: 0.3 }}
+                                  className={`${
+                                    isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"
+                                  } transition-colors duration-150`}
+                                >
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <span className="text-sm">{index + 1}</span>
+                                  </td>                        
+                                  
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <span className="text-sm capitalize">{statement.employee?.firstName}</span>
+                                  </td>
+      
+                                  {/* Amount Paid Section */}
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <div className="text-sm font-medium">
+                                      <div className="flex flex-col">
+                                        <strong>{statement.amountPaid}</strong>
+                                      </div>
+                                    </div>
+                                  </td>
+      
+                                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                                    <span className="text-sm">{statement.year}</span>
+                                  </td>
 
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="text-sm">{statement.month}</span>
-                              </td>
-  
-                              <td className="px-6 py-4 whitespace-nowrap ">
-                                {statement?.bankStatement ? (
-                                  <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
-                                    Paid
-                                  </span>
-                                ) : (
-                                  <span className="text-sm px-2 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
-                                    Pending
-                                  </span>
-                                )}
-                              </td>
-  
-  
-                              <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
-                                <button
-                                  onClick={() =>{ setImage(statement?.bankStatement) , console.log(statement?.bankStatement)}}
-                                  className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
-                                    isDarkMode
-                                      ? "text-green-400 hover:text-green-200"
-                                      : "text-green-600 hover:text-green-900"
-                                  }`}
-                                >
-                                  <Eye size={18} />
-                                </button>
-                                <button
-                                  onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
-                                  className={`transition-colors duration-300 ${
-                                    isDarkMode
-                                      ? "text-red-400 hover:text-red-200"
-                                      : "text-red-600 hover:text-red-900"
-                                  }`}
-                                >
-                                  <Trash size={18} />
-                                </button>
-                              </td>
-                            </motion.tr>
-                          ))
-                        }
-                      </AnimatePresence>
-                    </tbody>
-                  </table>
-            )}
-                </div>
-        </div>
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="text-sm">{statement.month}</span>
+                                  </td>
+      
+                                  <td className="px-6 py-4 whitespace-nowrap ">
+                                    {statement?.bankStatement ? (
+                                      <span className="text-sm px-2 py-1.5 text-green-800 bg-green-100 font-semibold tracking-wide  rounded-full  transition-all duration-200  ">
+                                        Paid
+                                      </span>
+                                    ) : (
+                                      <span className="text-sm px-2 py-1.5 text-red-800 bg-red-100 font-semibold tracking-wide rounded-full  transition-all duration-200  ">
+                                        Pending
+                                      </span>
+                                    )}
+                                  </td>
+      
+      
+                                  <td className="px-6 text-center py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
+                                    <button
+                                      onClick={() =>{ setImage(statement?.bankStatement) , console.log(statement?.bankStatement)}}
+                                      className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
+                                        isDarkMode
+                                          ? "text-green-400 hover:text-green-200"
+                                          : "text-green-600 hover:text-green-900"
+                                      }`}
+                                    >
+                                      <Eye size={18} />
+                                    </button>
+                                    <button
+                                      onClick={() => {setSelectedEventId(statement._id) ; setShowDeleteCard(true)}}
+                                      className={`transition-colors duration-300 ${
+                                        isDarkMode
+                                          ? "text-red-400 hover:text-red-200"
+                                          : "text-red-600 hover:text-red-900"
+                                      }`}
+                                    >
+                                      <Trash size={18} />
+                                    </button>
+                                  </td>
+                                </motion.tr>
+                              ))
+                            }
+                          </AnimatePresence>
+                        </tbody>
+                      </table>
+                )}
+                    </div>
+            </div>
+          )}
+
 
         <div
               className={`px-4 py-3 flex items-center justify-between border-t sm:px-6`}
