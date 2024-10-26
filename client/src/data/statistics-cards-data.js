@@ -1,14 +1,14 @@
 import {
-    BanknotesIcon,
-    UserPlusIcon,
-    UsersIcon,
-    ChartBarIcon,
+    CurrencyDollarIcon,  // More specific to revenue
+    UsersIcon,           // Keep this for customers
+    DocumentIcon,        // Better for PDFs
+    BriefcaseIcon,      // More relevant for employees
 } from "@heroicons/react/24/solid";
 
 export const statisticsCardsData = [
     {
         color: "gray",
-        icon: BanknotesIcon,
+        icon: CurrencyDollarIcon,  // Changed from BanknotesIcon
         title: "Today's Revenue",
         value: "$53k",
         footer: {
@@ -19,7 +19,7 @@ export const statisticsCardsData = [
     },
     {
         color: "gray",
-        icon: UsersIcon,
+        icon: UsersIcon,  // Kept the same as it's already appropriate
         title: "Today's customers",
         value: "2,300",
         footer: {
@@ -30,7 +30,7 @@ export const statisticsCardsData = [
     },
     {
         color: "gray",
-        icon: UserPlusIcon,
+        icon: DocumentIcon,  // Changed from UserPlusIcon
         title: "PDFs generated Today",
         value: "3,462",
         footer: {
@@ -41,7 +41,7 @@ export const statisticsCardsData = [
     },
     {
         color: "gray",
-        icon: ChartBarIcon,
+        icon: BriefcaseIcon,  // Changed from ChartBarIcon
         title: "Total Emloyees",
         value: "$103,430",
         footer: {

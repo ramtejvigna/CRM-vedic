@@ -8,10 +8,10 @@ import {
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  BanknotesIcon,
-  UserPlusIcon,
+  CurrencyRupeeIcon,
   UsersIcon,
-  ChartBarIcon,
+  DocumentTextIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/solid";
 
 import PropTypes from "prop-types";
@@ -76,7 +76,7 @@ export function Statistics() {
   const statisticsCardsData = [
     {
       color: "bg-[#303030]",
-      icon: <BanknotesIcon className="h-8 w-8 text-white" />,
+      icon: <CurrencyRupeeIcon className="h-8 w-8 text-white" />,
       title: "Today's Revenue",
       value: statistics.revenue,
       footer: (
@@ -98,7 +98,7 @@ export function Statistics() {
     },
     {
       color: "bg-green-500",
-      icon: <UserPlusIcon className="h-8 w-8 text-white" />,
+      icon: <DocumentTextIcon className="h-8 w-8 text-white" />,
       title: "PDFs generated Today",
       value: statistics.pdfsGeneratedToday,
       footer: (
@@ -109,7 +109,7 @@ export function Statistics() {
     },
     {
       color: "bg-pink-500",
-      icon: <ChartBarIcon className="h-8 w-8 text-white" />,
+      icon: <ClipboardDocumentListIcon className="h-8 w-8 text-white" />,
       title: "Total Employees",
       value: statistics.totalEmployees,
       footer: (
