@@ -37,7 +37,7 @@ const AddEmployee = () => {
     });
 
     const handleNext = () => {
-        if (true) {
+        if (validateForm()) {
             setActiveStep((prev) => prev + 1);
         } else {
             console.log("form errors")
