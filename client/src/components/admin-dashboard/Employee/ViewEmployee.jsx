@@ -82,7 +82,7 @@ const ViewEmployee = () => {
                 </div>
             </div>
 
-         <div className='flex flex-wrap p-2 gap-3 rounded-xl'>
+         <div className='flex flex-wrap   p-2 gap-3 rounded-xl'>
             <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 ">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Personal Details</h2>
 
@@ -125,41 +125,41 @@ const ViewEmployee = () => {
                 </div>
             </Card>
 
-            <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 mt-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Employment Details</h2>
+            <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">Employment Details</h2>
 
-            <div className="border-t border-gray-200">
-                <dl >
-                <div className="py-2 flex">
-                    <dt className="text-gray-500 w-1/3">Employer Name</dt>
-                    <dd className="text-gray-900 font-medium flex-1">{employee?.employerName}</dd>
-                </div>
+                <div className="border-t border-gray-200">
+                    <dl >
+                    <div className="py-2 flex">
+                        <dt className="text-gray-500 w-1/3">Employer Name</dt>
+                        <dd className="text-gray-900 font-medium flex-1">{employee?.employerName}</dd>
+                    </div>
 
-                <div className="py-2 flex">
-                    <dt className="text-gray-500 w-1/3">Job Title</dt>
-                    <dd className="text-gray-900 font-medium flex-1">{employee?.jobTitle}</dd>
-                </div>
+                    <div className="py-2 flex">
+                        <dt className="text-gray-500 w-1/3">Job Title</dt>
+                        <dd className="text-gray-900 font-medium flex-1">{employee?.jobTitle}</dd>
+                    </div>
 
-                <div className="py-2 flex">
-                    <dt className="text-gray-500 w-1/3">Start Date</dt>
-                    <dd className="text-gray-900 font-medium flex-1">
-                    {isNaN(new Date(employee?.startDate)) ? "Invalid Date" : format(new Date(employee?.startDate), "MM/dd/yyyy")}
-                    </dd>
-                </div>
+                    <div className="py-2 flex">
+                        <dt className="text-gray-500 w-1/3">Start Date</dt>
+                        <dd className="text-gray-900 font-medium flex-1">
+                        {isNaN(new Date(employee?.startDate)) ? "Invalid Date" : format(new Date(employee?.startDate), "MM/dd/yyyy")}
+                        </dd>
+                    </div>
 
-                <div className="py-2 flex">
-                    <dt className="text-gray-500 w-1/3">End Date</dt>
-                    <dd className="text-gray-900 font-medium flex-1">
-                    {isNaN(new Date(employee?.endDate)) ? "Invalid Date" : format(new Date(employee?.endDate), "MM/dd/yyyy")}
-                    </dd>
-                </div>
+                    <div className="py-2 flex">
+                        <dt className="text-gray-500 w-1/3">End Date</dt>
+                        <dd className="text-gray-900 font-medium flex-1">
+                        {isNaN(new Date(employee?.endDate)) ? "Invalid Date" : format(new Date(employee?.endDate), "MM/dd/yyyy")}
+                        </dd>
+                    </div>
 
-                <div className="py-2 flex">
-                    <dt className="text-gray-500 w-1/3">Reason for Leaving</dt>
-                    <dd className="text-gray-900 font-medium flex-1">{employee?.reasonForLeaving}</dd>
+                    <div className="py-2 flex">
+                        <dt className="text-gray-500 w-1/3">Reason for Leaving</dt>
+                        <dd className="text-gray-900 font-medium flex-1">{employee?.reasonForLeaving}</dd>
+                    </div>
+                    </dl>
                 </div>
-                </dl>
-            </div>
             </Card>
 
             </div>
@@ -171,26 +171,26 @@ const ViewEmployee = () => {
                     <div className='flex flex-col border-t p-2'>
                         <div className="py-2 flex justify-between items-center">
                             <span className='text-gray-500 w-1/3"'>Aadhar</span>
-                            <button onClick={() => setImage(`${employee?.aadharOrPan}`)} className='bg-blue-500 px-3  text-white rounded-lg'>
+                            <button onClick={() => setImage({doc : `${employee?.aadharOrPan}` , name : "aadhar" })} className='bg-blue-500 px-3  text-white rounded-lg'>
                                 View
                             </button>
                         </div>
                         <div className="py-2 flex justify-between items-center">
                             <span className="text-gray-500 w-1/3">Passport</span>
-                            <button onClick={() => setImage(`${employee?.passport}`)} className='bg-blue-500 px-3  text-white rounded-lg'>
-                                view
+                            <button onClick={() => setImage({doc : `${employee?.passport}` , name : "passport"})} className='bg-blue-500 px-3  text-white rounded-lg'>
+                                View
                             </button>
                         </div>
                         <div className="py-2 flex justify-between items-center">
                             <span className="text-gray-500 w-1/3">Degrees</span>
-                            <button onClick={() => setImage(`${employee?.degrees}`)} className='bg-blue-500 px-3 text-white rounded-lg'>
-                                view
+                            <button onClick={() => setImage({doc : `${employee?.degrees}` , name : "degree"})} className='bg-blue-500 px-3 text-white rounded-lg'>
+                                View
                             </button>
                         </div>
                         <div className="py-2 flex justify-between items-center">
                             <span className="text-gray-500 w-1/3">Transcripts</span>
-                            <button onClick={() => setImage(`${employee?.transcripts}`)} className='bg-blue-500 px-3 text-white rounded-lg'>
-                                view
+                            <button onClick={() => setImage({doc : `${employee?.transcripts}` , name : "transcripts"})} className='bg-blue-500 px-3 text-white rounded-lg'>
+                                View
                             </button>
                         </div>
                     </div>
@@ -232,12 +232,12 @@ const ViewEmployee = () => {
             {
                 image && (
                     <div className="fixed z-[1000] top-0 left-0 right-0 bottom-0 bg-black/20 backdrop-blur-md flex items-center justify-center overflow-scroll scrollbar-hide">
-                        <motion.div 
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0 }}
-                        transition={{ duration: 0.5, ease: "backInOut" }}
-                        className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0 }}
+                            transition={{ duration: 0.5, ease: "backInOut" }}
+                            className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
                         >
                         {/* Close button */}
                         <div className='flex absolute top-1 right-1 justify-end items-end '>
@@ -247,11 +247,11 @@ const ViewEmployee = () => {
                         {/* Download and Print Buttons */}
                         <div className='w-full p-5 flex items-center justify-between bg-black'>
                             <div className='p-2'>
-                            <span className='text-xl text-white tracking-wider capitalize'>Bank statement</span>
+                            <span className='text-xl text-white tracking-wider capitalize'>{image.name}</span>
                             </div>
                             <div>
                             <button
-                                onClick={() => downloadImage(image)} 
+                                onClick={() => downloadImage(image?.doc)} 
                                 className="px-4 py-2 text-white font-semibold rounded-md transition-all"
                             >
                                 <AiOutlineDownload className='text-xl' />
@@ -270,14 +270,14 @@ const ViewEmployee = () => {
                         {/* Iframe Container */}
                         <div className='flex items-center overflow-scroll justify-center w-full h-[90%]'>
                             <img
-                                src={`data:image/jpeg;base64,${image}`}  
+                                src={`data:image/jpeg;base64,${image?.doc}`}  
                                 height={"100%"}
                                 className='object-cover'
                             // Ensures image scales within the iframe
                             />
                         </div>
                         </motion.div>
-                </div>
+                    </div>
                 )
             }
         </div>
