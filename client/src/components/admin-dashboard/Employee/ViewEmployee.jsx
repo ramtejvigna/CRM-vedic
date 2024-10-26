@@ -74,14 +74,22 @@ const ViewEmployee = () => {
         </div>
     ) : (
         <div className='flex flex-col w-full  h-full'>
-            <div className="flex items-center justify-between p-5 ">
-
-                <div className="flex gap-4">
-                    <Button onClick={() => navigate('/admin-dashboard/employees')} className="border border-black text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-                       <FaArrowLeft/>
-                    </Button>
-                </div>
-            </div>
+          <div className="flex items-center justify-between p-5">
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex gap-4"
+        >
+          <Button
+            onClick={() => navigate('/admin-dashboard/employees')}
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg shadow-md transition-colors"
+          >
+            <FaArrowLeft size={22} />
+            
+          </Button>
+        </motion.div>
+      </div>
 
          <div className='flex flex-wrap p-2 gap-3 rounded-xl'>
             <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 mt-6">
