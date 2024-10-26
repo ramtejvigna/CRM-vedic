@@ -113,7 +113,7 @@ const EmployeeTable = () => {
   return (
     <div
       className={`min-h-screen p-8 transition-colors duration-300 ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+        isDarkMode ? "bg-gray-900 text-white" : "text-gray-900"
       }`}
       >
       <h1 className="text-3xl font-bold mb-10">Employee Management</h1>
