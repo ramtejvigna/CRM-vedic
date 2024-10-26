@@ -138,46 +138,80 @@ const EditEmployee = () => {
     const validateForm = () => {
         const form = formData[formKeys[activeStep]];
         const formErrors = {};
-
-
+    
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+        const phoneRegex = /^[679]\d{9}$/; 
+        const ssnRegex = /^\d{3}\d{2}\d{4}$/; 
+        const cvvRegex = /^\d{3}$/; 
+        const cardNumberRegex = /^\d{16}$/;
+    
         if (activeStep === 0) {
-            if (!form.firstName) formErrors.firstName = 'firstname  is required';
-            if (!form.email) formErrors.email = 'Email is required';
-            if (!form.lastName) formErrors.lastName = 'lastname is required';
+            if (!form.firstName) formErrors.firstName = 'First name is required';
+            if (!form.email) {
+                formErrors.email = 'Email is required';
+            } else if (!emailRegex.test(form.email)) {
+                formErrors.email = 'Invalid email format';
+            }
+            if (!form.lastName) formErrors.lastName = 'Last name is required';
             if (!form.address) formErrors.address = 'Address is required';
-            if (!form.city) formErrors.city = 'city is required';
-            if(!(/^(?:7|8|9)\d{9}$/.test(form.phone))) formErrors.phone = "invalid number"
+            if (!form.city) formErrors.city = 'City is required';
+            if (!form.phone) {
+                formErrors.phone = 'Phone number is required';
+            } else if (!phoneRegex.test(form.phone)) {
+                formErrors.phone = 'Enter a valid 10-digit phone number';
+            }
             if (!form.state) formErrors.state = 'State is required';
-            if (!(/^[1-9][0-9]{5}$/.test(form.pincode))) formErrors.pincode = 'invalid pincode';
+            if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
         }
-
+    
         if (activeStep === 1) {
-            if (!form.aadharOrPan) formErrors.aadharOrPan = 'Aadhar Card or Pan Card is required';
+            if (!form.aadharOrPan) {
+                formErrors.aadharOrPan = 'Aadhar Card or PAN Card is required';
+            }
             if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-            if (!form.ssn) formErrors.ssn = 'Social Security Number is required';
+            if (!form.ssn) {
+                formErrors.ssn = 'Social Security Number is required';
+            } else if (!ssnRegex.test(form.ssn)) {
+                formErrors.ssn = 'Invalid SSN format. Use XXX XX XXXX';
+            }
         }
-
-
+    
         if (activeStep === 2) {
             if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
             if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
         }
+    
         if (activeStep === 3) {
-            if (!form.employerName) formErrors.employerName = 'employer Name is required';
-            if (!form.jobTitle) formErrors.jobTitle = 'job title is required';
-            if (!form.startDate) formErrors.startDate = 'date is required';
-            if (!form.endDate) formErrors.endDate = 'date is required';
-            if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'reason is required';
+            if (!form.employerName) formErrors.employerName = 'Employer Name is required';
+            if (!form.jobTitle) formErrors.jobTitle = 'Job title is required';
+            if (!form.startDate) {
+                formErrors.startDate = 'Start date is required';
+            } 
+            if (!form.endDate) {
+                formErrors.endDate = 'End date is required';
+            }
+            if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'Reason for leaving is required';
         }
-
+    
         if (activeStep === 4) {
             if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            if (!form.cardNumber) formErrors.cardNumber = 'Card Number is required';
-            if (!form.expiryDate) formErrors.expiryDate = 'Expiry Date is required';
-            if (!form.cvv) formErrors.cvv = 'CVV is required';
+            if (!form.cardNumber) {
+                formErrors.cardNumber = 'Card Number is required';
+            } 
+            if (!cardNumberRegex.test(form.cardNumber)) {
+                formErrors.cardNumber = 'Invalid Card Number. Use 16 digits ';
+            } 
+            if (!form.expiryDate) {
+                formErrors.expiryDate = 'Expiry Date is required';
+            } 
+            if (!form.cvv) {
+                formErrors.cvv = 'CVV is required';
+            } else if (!cvvRegex.test(form.cvv)) {
+                formErrors.cvv = 'Invalid CVV format. Use 3 digits';
+            }
         }
-
+    
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
@@ -207,54 +241,57 @@ const EditEmployee = () => {
 
     const handleSubmit = async (e) => { 
         e.preventDefault();
-        const formDataToSend = new FormData();
-
-        formDataToSend.append("id" , id);
-        // personale info
-        Object.keys(formData.personalInfo).forEach((key) => {
-            formDataToSend.append(key , formData.personalInfo[key])
-        })
-
-        // idDocuments
-        formDataToSend.append("aadharOrPan" , formData.idDocuments.aadharOrPan);
-        formDataToSend.append("passport" , formData.idDocuments.passport);
-        formDataToSend.append("ssn" , formData.idDocuments.ssn);
-
-
-        // degree and transcripts
-        formDataToSend.append('degrees' , formData.education.degrees);
-        formDataToSend.append('transcripts',formData.education.transcripts);
-        
-        // previous employements
-        Object.keys(formData.employment).forEach((key) => {
-            formDataToSend.append(key , formData.employment[key])
-        })
-
-        // payment details
-        Object.keys(formData.paymentDetails).forEach((key) => {
-            formDataToSend.append(key , formData.paymentDetails[key])
-        })
-
-        
-        try {   
-            setIsLoading(true);
-            const res = await fetch(`${UPDATE_EMPLOYEE}`, {
-                method: "PUT",
-                body: formDataToSend
-            });
-
-            if (!res.ok) {
-                throw new Error("NetWork issue");
+        if(validateForm()) {
+            const formDataToSend = new FormData();
+    
+            formDataToSend.append("id" , id);
+            // personale info
+            Object.keys(formData.personalInfo).forEach((key) => {
+                formDataToSend.append(key , formData.personalInfo[key])
+            })
+    
+            // idDocuments
+            formDataToSend.append("aadharOrPan" , formData.idDocuments.aadharOrPan);
+            formDataToSend.append("passport" , formData.idDocuments.passport);
+            formDataToSend.append("ssn" , formData.idDocuments.ssn);
+    
+    
+            // degree and transcripts
+            formDataToSend.append('degrees' , formData.education.degrees);
+            formDataToSend.append('transcripts',formData.education.transcripts);
+            
+            // previous employements
+            Object.keys(formData.employment).forEach((key) => {
+                formDataToSend.append(key , formData.employment[key])
+            })
+    
+            // payment details
+            Object.keys(formData.paymentDetails).forEach((key) => {
+                formDataToSend.append(key , formData.paymentDetails[key])
+            })
+    
+            
+            try {   
+                setIsLoading(true);
+                const res = await fetch(`${UPDATE_EMPLOYEE}`, {
+                    method: "PUT",
+                    body: formDataToSend
+                });
+    
+                if (!res.ok) {
+                    throw new Error("NetWork issue");
+                }
+                
+                const data = await res.json();
+                setIsLoading(false);
+                
+                toast.success("employee details updated");
+                navigate('/admin-dashboard/employees')
+            } catch (error) {
+                toast.error(error.message);
+                navigate('/admin-dashboard/employees')
             }
-            
-            const data = await res.json();
-            setIsLoading(false);
-            
-            toast.success("employee details updated");
-            navigate('/admin-dashboard/employees')
-        } catch (error) {
-            toast.error(error.message);
-            navigate('/admin-dashboard/employees')
+
         }
 
     }
@@ -269,19 +306,22 @@ const EditEmployee = () => {
                     <div className="space-y-8 p-4 sm:p-5">
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <TextField
-                                className="flex-1"
-                                label="firstname"
-                                name="firstName"
-                                value={formData.personalInfo.firstName}
-                                onChange={handleChange}
-                                error={!!errors.firstName}
-                                helperText={errors.firstName}
+                            <div>
+                                <TextField
+                                    className="flex-1"
+                                    label="First Name"
+                                    name="firstName"
+                                    value={formData.personalInfo.firstName}
+                                    onChange={handleChange}
+                                    error={!!errors.firstName}
+                                    helperText={errors.firstName}
 
-                            />
+                                />
+                                <div className=''></div>        
+                            </div>
                             <TextField
                                 className="flex-1"
-                                label="lastname"
+                                label="Last Name"
                                 name="lastName"
                                 value={formData.personalInfo.lastName}
                                 onChange={handleChange}
@@ -463,7 +503,7 @@ const EditEmployee = () => {
                         className="rounded-md shadow-sm bg-gray-50"
                         fullWidth
                         error={!!errors.ssn}
-                        helperText={errors.snn}
+                        helperText={errors.ssn }
                     />
                     </div>
                 );
@@ -579,7 +619,7 @@ const EditEmployee = () => {
                         <div className="grid gap-2">
                              <label 
                                 htmlFor="startDate" 
-                                 className="block text-sm font-medium "
+                                 className="block capitalize text-sm font-medium "
                             >
                                 start date
                             </label>
@@ -588,7 +628,7 @@ const EditEmployee = () => {
                                 type='date'
                                 value={formData.employment.startDate}
                                 onChange={handleChange}
-                                className="rounded-md shadow-sm bg-gray-50"
+                                className="rounded-md capitalize shadow-sm bg-gray-50"
                                 fullWidth
                             />
 
@@ -596,7 +636,7 @@ const EditEmployee = () => {
                         <div className="grid gap-2">
                              <label 
                                 htmlFor="endDate" 
-                                 className="block text-sm font-medium "
+                                 className="block capitalize text-sm font-medium "
                             >
                                 end date
 
@@ -666,6 +706,7 @@ const EditEmployee = () => {
                                     helperText={errors.expiryDate}
                                     className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
                                 />
+
                             </div>
                             <div className="grid gap-2">
                                 <label 

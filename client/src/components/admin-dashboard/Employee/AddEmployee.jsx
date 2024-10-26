@@ -4,7 +4,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField, InputLabel } from '@mui/material';
+import { TextField, InputLabel, Typography } from '@mui/material';
 import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
 import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
@@ -70,8 +70,9 @@ const AddEmployee = () => {
     
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
         const phoneRegex = /^[679]\d{9}$/; 
-        const ssnRegex = /^\d{3}-\d{2}-\d{4}$/; 
+        const ssnRegex = /^\d{3}\d{2}\d{4}$/; 
         const cvvRegex = /^\d{3}$/; 
+        const cardNumberRegex = /^\d{16}$/;
     
         if (activeStep === 0) {
             if (!form.firstName) formErrors.firstName = 'First name is required';
@@ -101,7 +102,7 @@ const AddEmployee = () => {
             if (!form.ssn) {
                 formErrors.ssn = 'Social Security Number is required';
             } else if (!ssnRegex.test(form.ssn)) {
-                formErrors.ssn = 'Invalid SSN format. Use XXX-XX-XXXX';
+                formErrors.ssn = 'Invalid SSN format. Use XXX XX XXXX';
             }
         }
     
@@ -127,6 +128,9 @@ const AddEmployee = () => {
             if (!form.cardNumber) {
                 formErrors.cardNumber = 'Card Number is required';
             } 
+            if (!cardNumberRegex.test(form.cardNumber)) {
+                formErrors.cardNumber = 'Invalid Card Number. Use 16 digits ';
+            } 
             if (!form.expiryDate) {
                 formErrors.expiryDate = 'Expiry Date is required';
             } 
@@ -140,7 +144,6 @@ const AddEmployee = () => {
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
-    
 
 
     const handleFileChange = (e, section, field) => {
@@ -168,52 +171,55 @@ const AddEmployee = () => {
 
     const handleSubmit = async (e) => { 
         e.preventDefault();
-        const formDataToSend = new FormData();
-
-        // personale info
-        Object.keys(formData.personalInfo).forEach((key) => {
-            formDataToSend.append(key , formData.personalInfo[key])
-        })
-
-        // idDocuments
-        formDataToSend.append("aadharOrPan" , formData.idDocuments.aadharOrPan);
-        formDataToSend.append("passport" , formData.idDocuments.passport);
-        formDataToSend.append("ssn" , formData.idDocuments.ssn);
-
-
-        // degree and transcripts
-        formDataToSend.append('degrees' , formData.education.degrees);
-        formDataToSend.append('transcripts',formData.education.transcripts);
-        
-        // previous employements
-        Object.keys(formData.employment).forEach((key) => {
-            formDataToSend.append(key , formData.employment[key])
-        })
-
-        // payment details
-        Object.keys(formData.paymentDetails).forEach((key) => {
-            formDataToSend.append(key , formData.paymentDetails[key])
-        })
-
-        
-        try {   
-            setIsLoading(true);
-            const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
-                method: "POST",
-                body: formDataToSend
-            });
-
-            if (!res.ok) {
-                throw new Error("NetWork issue");
+        if(validateForm()) {
+            const formDataToSend = new FormData();
+    
+            // personale info
+            Object.keys(formData.personalInfo).forEach((key) => {
+                formDataToSend.append(key , formData.personalInfo[key])
+            })
+    
+            // idDocuments
+            formDataToSend.append("aadharOrPan" , formData.idDocuments.aadharOrPan);
+            formDataToSend.append("passport" , formData.idDocuments.passport);
+            formDataToSend.append("ssn" , formData.idDocuments.ssn);
+    
+    
+            // degree and transcripts
+            formDataToSend.append('degrees' , formData.education.degrees);
+            formDataToSend.append('transcripts',formData.education.transcripts);
+            
+            // previous employements
+            Object.keys(formData.employment).forEach((key) => {
+                formDataToSend.append(key , formData.employment[key])
+            })
+    
+            // payment details
+            Object.keys(formData.paymentDetails).forEach((key) => {
+                formDataToSend.append(key , formData.paymentDetails[key])
+            })
+    
+            
+            try {   
+                setIsLoading(true);
+                const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
+                    method: "POST",
+                    body: formDataToSend
+                });
+    
+                if (!res.ok) {
+                    throw new Error("NetWork issue");
+                }
+    
+                const data = await res.json();
+                setIsLoading(false);
+    
+                toast.success("employee created");
+                navigate('/admin-dashboard/employees')
+            } catch (error) {
+                toast.error(error.message);
             }
 
-            const data = await res.json();
-            setIsLoading(false);
-
-            toast.success("employee created");
-            navigate('/admin-dashboard/employees')
-        } catch (error) {
-            toast.error(error.message);
         }
 
 
@@ -231,7 +237,11 @@ const AddEmployee = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
                                 className="flex-1"
-                                label="firstname"
+                                label={
+                                    <Typography>
+                                      First Name<span style={{ color: 'red' }}> *</span>
+                                    </Typography>
+                                  }
                                 name="firstName"
                                 value={formData.personalInfo.firstName}
                                 onChange={handleChange}
@@ -240,7 +250,11 @@ const AddEmployee = () => {
                             />
                             <TextField
                                 className="flex-1"
-                                label="lastname"
+                                label={
+                                    <Typography>
+                                      Last Name<span style={{ color: 'red' }}> *</span>
+                                    </Typography>
+                                  }
                                 name="lastName"
                                 value={formData.personalInfo.lastName}
                                 onChange={handleChange}
@@ -253,7 +267,11 @@ const AddEmployee = () => {
                         <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
-                                label="Phone Number"
+                                label={
+                                    <>
+                                      First Name<span className='text-red-500 border border-black w-fit'> *</span>
+                                    </>
+                                  }
                                 name="phone"
                                 value={formData.personalInfo.phone}
                                 onChange={handleChange}
@@ -310,6 +328,7 @@ const AddEmployee = () => {
                                 error={!!errors.state}
                                 helperText={errors.state}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
                             />
                             <TextField
                                 label="Pincode"
@@ -544,7 +563,7 @@ const AddEmployee = () => {
                             <div className="grid gap-2">
                                  <label 
                                     htmlFor="startDate" 
-                                     className="block text-sm font-medium "
+                                     className="block text-sm capitalize font-medium "
                                 >
                                     start date
                                 </label>
@@ -561,7 +580,7 @@ const AddEmployee = () => {
                             <div className="grid gap-2">
                                  <label 
                                     htmlFor="endDate" 
-                                     className="block text-sm font-medium "
+                                     className="block capitalize text-sm font-medium "
                                 >
                                     end date
 
