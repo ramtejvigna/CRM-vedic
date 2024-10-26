@@ -6,7 +6,7 @@ import { useStore } from "../../../store";
 import axios from 'axios';
 import { XCircleIcon, ArrowLeft } from 'lucide-react';
 
-const ADD_EXPENSE = "http://localhost:3000/api/expenses"; // Define your API URL here
+const ADD_EXPENSE = "https://vedic-backend-neon.vercel.app/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
   const { isDarkMode } = useStore();
