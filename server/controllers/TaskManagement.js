@@ -164,11 +164,29 @@ export const addCommentAdmin = async (req,res)=> {
 }
 
 export const getEmployeeTasks = async (req, res) => {
-  const employeeId  = req.user;
+  const employeeId = req.user;
+  const { page = 1, limit = 5, status } = req.query;
 
   try {
-    const tasks = await Task.find({ assignedTo: employeeId }).sort({ startTime: -1 });
-    res.json(tasks);
+    const query = { assignedTo: employeeId };
+    if (status) {
+      query.status = status;
+    }
+
+    const tasks = await Task.find(query)
+      .sort({ startTime: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalTasks = await Task.countDocuments(query);
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    res.json({
+      tasks,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
