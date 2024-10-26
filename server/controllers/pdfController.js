@@ -151,8 +151,8 @@ export const sendPdfEmail = async (req, res) => {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: 'Your Generated PDF',
-            text: 'Here is your PDF document.',
+            subject: '🎉 A Special Collection of Baby Names for You!',
+            text: 'Hello,\n\nWe’re delighted to share this collection of baby names, thoughtfully prepared for you. In the attached PDF, you’ll find names with their meanings, crafted to help you choose a truly special name for your little one.\n\nIf you have any questions or need further assistance, feel free to get in touch!\n\nWarm regards,\nThe Team',
             attachments: [
                 {
                     filename: `${uniqueId}.pdf`,
@@ -187,6 +187,7 @@ export const sendPdfEmail = async (req, res) => {
         res.status(500).json({ error: 'Failed to send email' });
     }
 };
+
 
 
 
