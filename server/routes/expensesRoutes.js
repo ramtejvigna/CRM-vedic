@@ -10,9 +10,12 @@ import {
 const router = express.Router();
 
 router.post('/', addExpense);
+router.post('/:id', addExpense);
+
 router.get('/', getAllExpenses);
 router.get('/file/:id', getExpenseFile);
 router.put('/:id', updateExpense);
 router.delete('/deleteExpense/:id', deleteExpense);
+router.get('/:id/', getExpenseWithBankStatement);
 
 export default router;

@@ -211,10 +211,12 @@ const Customer = () => {
                             <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
                         </div>
 
-                        {/* Divider */}
-                        <hr className="my-3 border-gray-300" />
-                        <p className="text-gray-600"><strong>Requested On:</strong> {customerDetails.createdDateTime || "N/A"}</p>
-                        <hr className="my-3 border-gray-300" />
+            {/* Divider */}
+            <hr className="my-3 border-gray-300" />
+            <p className="text-gray-600">
+  <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
+</p>
+            <hr className="my-3 border-gray-300" />
 
                         {/* Assigned Employee */}
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>

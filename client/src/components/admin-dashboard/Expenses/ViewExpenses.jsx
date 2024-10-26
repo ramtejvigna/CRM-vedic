@@ -42,162 +42,92 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
     </div>
   );
 };
-const PayslipModal = ({ expense, onClose }) => {
-  const [bankStatement, setBankStatement] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBankStatement = async () => {
-      if (!expense) return;
-      
-      try {
-        setIsLoading(true);
-        // Using direct fetch without JSON parsing first
-        const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expense}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'image/jpeg, application/pdf, */*'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch bank statement');
-        }
-
-        // Get the content type from response headers
-        const contentType = response.headers.get('content-type');
-        
-        // Convert response to base64
-        const blob = await response.blob();
-        const reader = new FileReader();
-        
-        reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
-          setBankStatement({
-            data: base64data,
-            fileType: contentType || 'image/jpeg'
-          });
-          setIsLoading(false);
-        };
-        
-        reader.readAsDataURL(blob);
-
-      } catch (error) {
-        console.error('Error:', error);
-        toast.error('Failed to load bank statement');
-        setIsLoading(false);
-      }
-    };
-
-    fetchBankStatement();
-  }, [expense]);
+const PayslipModal = ({ isOpen, onClose, payslipData }) => {
+  if (!isOpen) return null;
 
   const handleDownload = () => {
-    if (!bankStatement?.data) return;
-    
-    const link = document.createElement('a');
-    link.href = `data:${bankStatement.fileType};base64,${bankStatement.data}`;
-    link.download = 'bank_statement';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const link = document.createElement('a');
+      link.href = `data:image/jpeg;base64,${payslipData}`;
+      link.download = 'payslip.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download payslip");
+    }
   };
 
   const handlePrint = () => {
-    if (!bankStatement?.data) return;
-    
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Bank Statement</title>
-          <style>
-            body {
-              margin: 0;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-            }
-            img {
-              max-width: 100%;
-              height: auto;
-            }
-          </style>
-        </head>
-        <body>
-          <img src="data:${bankStatement.fileType};base64,${bankStatement.data}" alt="Bank Statement">
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+    try {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head><title>Print Payslip</title></head>
+          <body>
+            <img src="data:image/jpeg;base64,${payslipData}" style="width: 100%; height: auto;"/>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    } catch (error) {
+      console.error("Print error:", error);
+      toast.error("Failed to print payslip");
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" 
-        onClick={onClose} 
-      />
-      
+    <div className="fixed z-[1000] top-0 left-0 right-0 bottom-0 bg-black/20 backdrop-blur-md flex items-center justify-center overflow-scroll scrollbar-hide">
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-4xl h-[90vh] relative rounded-lg overflow-hidden shadow-xl"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0 }}
+        transition={{ duration: 0.5, ease: "backInOut" }}
+        className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
       >
-        {/* Header */}
-        <div className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-semibold">Bank Statement</h3>
-          <div className="flex items-center space-x-4">
-            {bankStatement?.data && (
-              <>
-                <button
-                  onClick={handleDownload}
-                  className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-                  title="Download"
-                >
-                  <AiOutlineDownload size={24} />
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-                  title="Print"
-                >
-                  <AiOutlinePrinter size={24} />
-                </button>
-              </>
-            )}
+        <div className="flex absolute top-1 right-1 justify-end items-end">
+          <AiOutlineClose 
+            className="text-xl cursor-pointer" 
+            onClick={onClose} 
+          />
+        </div>
+
+        <div className="w-full p-5 flex items-center justify-between bg-black">
+          <div className="p-2">
+            <span className="text-xl text-white tracking-wider capitalize">
+              Bank statement
+            </span>
+          </div>
+          <div className="flex gap-2">
             <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-              title="Close"
+              onClick={handleDownload}
+              className="px-4 py-2 text-white font-semibold rounded-md transition-all hover:bg-gray-800"
             >
-              <AiOutlineClose size={24} />
+              <AiOutlineDownload className="text-xl" />
+            </button>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 text-white font-semibold rounded-md transition-all hover:bg-gray-800"
+            >
+              <AiOutlinePrinter className="text-xl" />
             </button>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="w-full h-[calc(90vh-4rem)] overflow-auto bg-gray-50 flex items-center justify-center p-6">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-              <p className="mt-4 text-gray-600">Loading bank statement...</p>
-            </div>
-          ) : bankStatement?.data ? (
-            <img
-              src={`data:${bankStatement.fileType};base64,${bankStatement.data}`}
-              alt="Bank Statement"
-              className="max-w-full h-auto object-contain"
-              onError={() => toast.error('Failed to load bank statement image')}
-            />
-          ) : (
-            <div className="text-gray-500 text-center">
-              No bank statement available
-            </div>
-          )}
+        <div className="flex items-center justify-center w-full h-[90%]">
+        <iframe
+    src={payslipData ? `data:image/jpeg;base64,${payslipData}` : ''}
+    height="100%"
+    width="100%"
+    className="object-cover"
+    title="payslip"
+></iframe>
+{!payslipData && (
+    <div className="text-center text-gray-500">No valid payslip available for this expense.</div>
+)}
         </div>
       </motion.div>
     </div>
@@ -222,7 +152,7 @@ const ViewExpenses = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5); // State for rows per page
   const [expenseToView, setExpenseToView] = useState(null);
   const [payslipModalOpen, setPayslipModalOpen] = useState(false);
-  
+  const [selectedPayslip, setSelectedPayslip] = useState(null);  
   
   const totalExpenses = filteredExpenses.length;
   const totalPages = Math.ceil(totalExpenses / rowsPerPage); // Total pages based on filtered expenses
@@ -245,8 +175,16 @@ const ViewExpenses = () => {
   ];
 
   useEffect(() => {
-    fetchExpenses(); // Ensure fetchExpenses is defined and implemented
-  }, []);
+    const fetchExpenses = async () => {
+        const response = await fetch('/api/expenses'); // Adjust API endpoint as needed
+        const data = await response.json();
+        console.log("Fetched Expenses:", data.expenses); // Log fetched data
+        setExpenses(data.expenses);
+    };
+
+    fetchExpenses();
+}, []);
+
 
   useEffect(() => {
     handleFilterAndSearch(); // Ensure this function is defined and implemented
@@ -261,6 +199,7 @@ const ViewExpenses = () => {
         throw new Error(errorData.message || "Failed to fetch expenses");
       }
       const data = await res.json();
+      console.log("Fetched Expenses:", data.expenses); // Log the fetched expenses
       setExpenses(data.expenses);
       setFilteredExpenses(data.expenses);
     } catch (error) {
@@ -270,7 +209,51 @@ const ViewExpenses = () => {
       setIsLoading(false);
     }
   };
+  
+  const handlePayslip = (expenseId) => {
+    // Log the incoming expenseId
+    console.log("Expense ID:", expenseId);
+    
+    // Find the expense
+    const expense = expenses.find((exp) => exp._id === expenseId);
+    
+    // Log the entire expense object
+    console.log("Selected expense:", expense); 
+  
+    // Check the value of the bank_statement property
+    if (expense) {
+        console.log("Bank Statement:", expense.bank_statement); // Log bank_statement directly
+      
+        // Ensure bank_statement exists and is a valid base64 string
+        if (typeof expense.bank_statement === "string" && expense.bank_statement) {
+            setSelectedPayslip(expense.bank_statement); // Set the payslip to view
+            setPayslipModalOpen(true); // Open the modal
+        } else {
+            toast.error("No valid payslip available for this expense"); // Show error if no valid payslip
+        }
+    } else {
+        toast.error("Expense not found"); // Show error if the expense is not found
+    }
+};
 
+  
+  
+  // new code
+  // Inside your modal or wherever you want to display the payslip
+  {payslipModalOpen && (
+    <div className="modal">
+        <h2>Expense Payslip</h2>
+        {selectedPayslip && (
+            <img
+                src={`data:${file_type};base64,${selectedPayslip}`}
+                alt="Expense Payslip"
+                style={{ maxWidth: '100%', maxHeight: '400px' }}
+            />
+        )}
+        <button onClick={() => setPayslipModalOpen(false)}>Close</button>
+    </div>
+)}
+  
   const handleFilterAndSearch = () => {
     let filtered = [...expenses];
 
@@ -345,37 +328,6 @@ const ViewExpenses = () => {
     }
   };
 
-  const handlePayslip = (expense) => {
-    if (!expense) {
-      toast.info("No bank statement available for this expense");
-      return;
-    }
-    setExpenseToView(expense); // Set the expense ID
-    setPayslipModalOpen(true);
-  };
-  
-  // Update the modal rendering
-  {payslipModalOpen && (
-    <PayslipModal
-      expense={expenseToView}
-      onClose={() => {
-        setPayslipModalOpen(false);
-        setExpenseToView(null);
-      }}
-    />
-  )}
-  
-  
-  // Update the modal rendering in ViewExpenses
-  {payslipModalOpen && (
-    <PayslipModal
-      expenseId={expenseToView}
-      onClose={() => {
-        setPayslipModalOpen(false);
-        setExpenseToView(null);
-      }}
-    />
-  )}
   
 
   const handleAddExpense = () => navigate("add-expense");
@@ -415,13 +367,14 @@ const ViewExpenses = () => {
           />
         )}
 
-        {payslipModalOpen && expenseToView && (
+{payslipModalOpen && (
           <PayslipModal
-            expenseId={expenseToView}
+            isOpen={payslipModalOpen}
             onClose={() => {
               setPayslipModalOpen(false);
-              setExpenseToView(null);
+              setSelectedPayslip(null);
             }}
+            payslipData={selectedPayslip}
           />
         )}
       </AnimatePresence>
@@ -550,15 +503,15 @@ const ViewExpenses = () => {
                         <div className="flex items-center">
                           
                         <button
-  onClick={() => handlePayslip(expense._id)}
-  className={`mr-7 flex gap-2 transition-colors duration-300 ${
-    isDarkMode
-      ? "text-green-400 hover:text-green-200"
-      : "text-green-600 hover:text-green-900"
-  }`}
->
-  <Eye size={18} /> 
-</button>
+        onClick={() => handlePayslip(expense._id)}
+        className={`mr-7 flex gap-2 transition-colors duration-300 ${
+          isDarkMode
+            ? "text-green-400 hover:text-green-200"
+            : "text-green-600 hover:text-green-900"
+        }`}
+      >
+        <Eye size={18} />
+      </button>
                           <button
                             onClick={() => initiateDelete(expense._id)}
                             className={`mr-3 flex gap-2 transition-colors duration-300 ${
