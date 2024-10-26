@@ -186,30 +186,30 @@ const Customer = () => {
 
     return (
         <div className="min-h-screen p-4 sm:p-8">
-             
-             <div className="max-w-7xl mx-auto mb-6">
-    <div className="flex items-center mb-6">
-        <button 
-            onClick={() => navigate(-1)} // Navigate back
-            className="flex items-center text-gray-900 hover:text-blue-500"
-        >
-            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-        </button>
-    </div>
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Personal Information & Assigned Employee Card */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-            {/* Personal Information */}
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Personal Information</h2>
-            <div className="grid grid-cols-1 gap-2">
-                <p className="text-gray-600"><strong>CustomerID:</strong> {customerDetails.customerID || "N/A"}</p>
-                <p className="text-gray-600"><strong>Father Name:</strong> {customerDetails.fatherName || "N/A"}</p>
-                <p className="text-gray-600"><strong>Mother Name:</strong> {customerDetails.motherName || "N/A"}</p>
-                <p className="text-gray-600"><strong>Email Id:</strong> {customerDetails.email || "N/A"}</p>
-                <p className="text-gray-600"><strong>WhatsApp Number:</strong> {customerDetails.whatsappNumber || "N/A"}</p>
-                <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
-            </div>
+            <div className="max-w-7xl mx-auto mb-6">
+                <div className="flex items-center mb-6">
+                    <button
+                        onClick={() => navigate(-1)} // Navigate back
+                        className="flex items-center text-gray-900 hover:text-blue-500"
+                    >
+                        <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {/* Personal Information & Assigned Employee Card */}
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+                        {/* Personal Information */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Personal Information</h2>
+                        <div className="grid grid-cols-1 gap-2">
+                            <p className="text-gray-600"><strong>CustomerID:</strong> {customerDetails.customerID || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Father Name:</strong> {customerDetails.fatherName || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Mother Name:</strong> {customerDetails.motherName || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Email Id:</strong> {customerDetails.email || "N/A"}</p>
+                            <p className="text-gray-600"><strong>WhatsApp Number:</strong> {customerDetails.whatsappNumber || "N/A"}</p>
+                            <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
+                        </div>
 
             {/* Divider */}
             <hr className="my-3 border-gray-300" />
@@ -218,58 +218,59 @@ const Customer = () => {
 </p>
             <hr className="my-3 border-gray-300" />
 
-            {/* Assigned Employee */}
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
-            {customerDetails.assignedEmployee ? (
-                <div className="text-gray-600">
-                    <p><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
-                    <p><strong>Email Id:</strong> {customerDetails.assignedEmployee.email}</p>
-                    <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
-                </div>
-            ) : (
-                <p className="text-gray-600">No employee assigned.</p>
-            )}
-        </div>
+                        {/* Assigned Employee */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
+                        {customerDetails.assignedEmployee ? (
+                            <div className="text-gray-600">
+                                <p><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
+                                <p><strong>Email Id:</strong> {customerDetails.assignedEmployee.email}</p>
+                                <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
+                            </div>
+                        ) : (
+                            <p className="text-gray-600">No employee assigned.</p>
+                        )}
+                    </div>
+                    
 
-        {/* Payment Details & Astrological Details Card */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-            {/* Payment Details */}
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Payment Details</h2>
-            {customerDetails?.customerStatus === "newRequests" ? (
-                <div className="flex-grow flex items-center justify-center">
-                    <p className="text-center">Payment details not verified yet.</p>
-                </div>
-            ) : customerDetails?.customerStatus === "rejected" ? (
-                <div className="flex-grow flex items-center justify-center">
-                    <p className="text-red-600 text-center font-bold">Payment Status: Rejected</p>
-                </div>
-            ) : (
-                <div className="flex-grow">
-                    <div className="grid grid-cols-1 gap-2">
-                        <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
-                        <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
-                        <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
-                        <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                    {/* Payment Details & Astrological Details Card */}
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+                        {/* Payment Details */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Payment Details</h2>
+                        {customerDetails?.customerStatus === "newRequests" ? (
+                            <div className="flex-grow flex items-center justify-center">
+                                <p className="text-center">Payment details not verified yet.</p>
+                            </div>
+                        ) : customerDetails?.customerStatus === "rejected" ? (
+                            <div className="flex-grow flex items-center justify-center">
+                                <p className="text-red-600 text-center font-bold">Payment Status: Rejected</p>
+                            </div>
+                        ) : (
+                            <div className="flex-grow">
+                                <div className="grid grid-cols-1 gap-2">
+                                    <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
+                                    <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
+                                    <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
+                                    <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Divider */}
+                        <hr className="my-6 border-gray-300" />
+
+                        {/* Astrological Details */}
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
+                        <div className="grid grid-cols-1 gap-2">
+                            <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
+                            <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
+                            <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
+                            <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
+                            <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
+                            <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
+                        </div>
                     </div>
                 </div>
-            )}
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-300" />
-
-            {/* Astrological Details */}
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
-            <div className="grid grid-cols-1 gap-2">
-                <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
-                <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
-                <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
-                <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
-                <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
-                <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
             </div>
-        </div>
-    </div>
-</div>
 
 
 

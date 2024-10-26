@@ -126,7 +126,7 @@ const PayslipModal = ({ isOpen, onClose, payslipData }) => {
     title="payslip"
 ></iframe>
 {!payslipData && (
-    <div className="text-center text-gray-500">No valid payslip available for this expense.</div>
+    <div className="text-center text-gray-500">No valid payslip available for this expense.....</div>
 )}
         </div>
       </motion.div>
@@ -482,7 +482,7 @@ const ViewExpenses = () => {
                 <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
                   <tr>
                     {["S.No", "Expense Name", "Amount", "Date", "Actions"].map((header) => (
-                      <th key={header} className={`px-6 py-3 text-left text-xm font-medium  tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                      <th key={header} className={`px-6 py-3 text-left text-xs font-medium  tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                         {header}
                       </th>
                     ))}
@@ -491,12 +491,12 @@ const ViewExpenses = () => {
                 <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}>
                   {currentRecords.map((expense, index) => (
                     <tr key={expense._id} className={`${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"} transition-colors duration-150`}>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 text-sm whitespace-nowrap">
                         {indexOfFirstRecord + index + 1}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">{expense.expense_name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{expense.amount}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 text-sm whitespace-nowrap">{expense.expense_name}</td>
+                      <td className="px-6 py-4 text-sm whitespace-nowrap">{expense.amount}</td>
+                      <td className="px-6 py-4 text-smwhitespace-nowrap">
                         {new Date(expense.date).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
