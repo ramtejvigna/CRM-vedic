@@ -153,7 +153,7 @@ export const sendPdfEmail = async (req, res) => {
           {
             filename: `${uniqueId}.pdf`,
             content: pdfBuffer, // Pass the buffer as content
-            contentType: 'application/pdf', // Ensure the MIME type is correct
+            contentType: 'application/pdf', // Ensure the MIME type is 
             encoding: 'base64' // Specify base64 encoding explicitly
           },
         ],
