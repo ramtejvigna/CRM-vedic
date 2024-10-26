@@ -92,13 +92,16 @@ const EmployeeTable = () => {
 
     if(status) {
         try {
+          setIsLoading(true)
           const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
           if(response.status === 200) {
             setEmployees(response.data);
+            setIsLoading(false)
           }
-
+          
         } catch (error) {
           console.error("Error filtering employees:", error.message);
+          setIsLoading(false)
           toast.error("Error filtering employees")
         }
     }else {

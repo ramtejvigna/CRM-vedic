@@ -185,10 +185,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
   } , [searchTerm]);
 
 
-  useEffect(() => {
-    console.log(image)
-     
-  } , [image])
+
 
 
 
@@ -479,7 +476,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                       {/* Download and Print Buttons */}
                       <div className='w-full p-5 flex items-center justify-between bg-black'>
                         <div className='p-2'>
-                          <span className='text-xl text-white tracking-wider capitalize'>Bank statement</span>
+                          <span className='text-xl text-white tracking-wider capitalize'>Salary statement</span>
                         </div>
                         <div>
                           <button
