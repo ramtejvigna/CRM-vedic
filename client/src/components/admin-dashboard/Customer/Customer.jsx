@@ -213,7 +213,9 @@ const Customer = () => {
 
             {/* Divider */}
             <hr className="my-3 border-gray-300" />
-            <p className="text-gray-600"><strong>Requested On:</strong> {customerDetails.createdDateTime || "N/A"}</p>
+            <p className="text-gray-600">
+  <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
+</p>
             <hr className="my-3 border-gray-300" />
 
             {/* Assigned Employee */}

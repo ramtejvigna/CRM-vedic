@@ -16,6 +16,7 @@ export const getAllExpenses = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const getExpenseFile = async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
@@ -42,23 +43,23 @@ export const getExpenseById = async (req, res) => {
   }
 };
 
-// Add new expense
-export const addExpense = async (req, res) => {
+const addExpense = async (req, res) => {
   try {
-    const { expense_name, amount, date, bank_statement, file_type } = req.body;
+    const { expense_name, amount, date } = req.body;
+    let bank_statement = '';
+    let file_type = '';
 
-    if (!expense_name || !amount || !date || !bank_statement || !file_type) {
-      return res.status(400).json({
-        message: "Missing required fields",
-      });
+    if (req.file) {
+      bank_statement = req.file.buffer.toString('base64'); // Convert file to base64 string
+      file_type = req.file.mimetype; // Get the file MIME type
     }
 
     const expense = await Expense.create({
       expense_name,
       amount: parseFloat(amount),
       date: new Date(date),
-      bank_statement,
-      file_type
+      bank_statement, // Ensure this is populated
+      file_type, // Ensure this is populated
     });
 
     res.status(201).json({
@@ -67,18 +68,18 @@ export const addExpense = async (req, res) => {
         id: expense._id,
         expense_name: expense.expense_name,
         amount: expense.amount,
-        date: expense.date
-      }
+        date: expense.date,
+      },
     });
-
   } catch (error) {
     console.error("Error adding expense:", error);
     res.status(500).json({
       message: "Failed to add expense",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
 
 // Update expense
 export const updateExpense = async (req, res) => {
