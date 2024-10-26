@@ -25,17 +25,24 @@ const Leaves = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
   const [pendingCount, setPendingCount] = useState(0);
+ 
 
-  // Fetch leaves logic remains the same
+
   const fetchLeaves = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`https://vedic-backend-neon.vercel.app/admin/${activeTab}-leaves`, {
-        params: { ...filters, page, rowsPerPage },
+        params: {
+          ...filters,
+          page,
+          rowsPerPage,
+        },
       });
       setLeaves(response.data.leaves);
-      if (activeTab === 'pending') {
-        setPendingCount(response.data.totalLeaves);
+      if(activeTab === 'pending')
+      {
+        setPendingCount(response.data.totalLeaves)
+
       }
     } catch (error) {
       console.error(error);
@@ -44,6 +51,33 @@ const Leaves = () => {
     }
   };
 
+  useEffect(() => {
+    fetchLeaves();
+  }, [activeTab, filters, page, rowsPerPage]);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  console.log(pendingCount)
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value,
+    });
+  };
+
+  const handleFilterDateChange = (name, date) => {
+    setFilters({
+      ...filters,
+      [name]: date,
+    });
+  };
   useEffect(() => {
     fetchLeaves();
   }, [activeTab, filters, page, rowsPerPage]);
@@ -107,6 +141,7 @@ const Leaves = () => {
         </motion.button>
       </motion.div>
 
+
       <div className="mb-8">
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-2">
@@ -153,10 +188,98 @@ const Leaves = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="overflow-hidden"
           >
-            {/* Filter content remains the same */}
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Date Range
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={filters.startDate || ""}
+                      onChange={(e) =>
+                        handleFilterDateChange("startDate", e.target.value)
+                      }
+                      className="pl-10 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="relative flex-1">
+                    <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={filters.endDate || ""}
+                      onChange={(e) =>
+                        handleFilterDateChange("endDate", e.target.value)
+                      }
+                      className="pl-10 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block ml-[30px] text-sm font-medium text-gray-700">
+                  Leave Type
+                </label>
+                <div className="relative w-[300px] ml-[30px]">
+                  <select
+                    name="leaveType"
+                    value={filters.leaveType}
+                    onChange={handleFilterChange}
+                    className="w-full p-2 border rounded-lg appearance-none pl-4 pr-10 focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Types</option>
+                    <option value="Loss of pay">Loss of Pay</option>
+                    <option value="Sick">Sick</option>
+                    <option value="Privileged">Privileged</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-3 w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="relative">
+                  <select
+                    name="status"
+                    value={filters.status}
+                    onChange={handleFilterChange}
+                    className="w-full p-2 border rounded-lg appearance-none pl-4 pr-10 focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-3 w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Search Employee
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="employee"
+                    value={filters.employee}
+                    onChange={handleFilterChange}
+                    placeholder="Enter employee name..."
+                    className="w-full p-2 pl-10 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
