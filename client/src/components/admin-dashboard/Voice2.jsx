@@ -61,7 +61,7 @@ export const VoiceRecognition = () => {
             navigate('/admin-dashboard/employees/edit-employee');
             speak('Opened edit employee page');
         } else if (command.includes('view employee') || command.includes('employee details') || command.includes('employee view') || command.includes('employee info')) {
-            navigate('/admin-dashboard/employees/view-employee');
+            navigate('/admin-dashboard/employees');
             speak('Opened view employee page');
         } else if (command.includes('tasks') || command.includes('task management') || command.includes('manage tasks') || command.includes('task list') || command.includes('task view')) {
             navigate('/admin-dashboard/tasks');
@@ -81,10 +81,7 @@ export const VoiceRecognition = () => {
         } else if (command.includes('baby') || command.includes('baby database') || command.includes('baby names') || command.includes('names') || command.includes('baby')) {
             navigate('/admin-dashboard/babyDatabase');
             speak('Opened baby database page');
-        } else {
-            navigate('/admin-dashboard/home');
-            speak('Command not recognized. Please try again.');
-        }
+        } 
         setIsListening(false);
     };
 

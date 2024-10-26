@@ -7,21 +7,21 @@ export const createSalaryStatement = async (req, res) => {
     try {
         const { employee, year, month, amountPaid } = req.body;
 
-        
         if (!employee || !year || !month || !amountPaid) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-
-
-        const filePath = req.file ? req.file.path.replace(/\\/g, '/') : "";
+        let bankStatement = ''
+        if(req.file) {
+            bankStatement = req.file.buffer.toString('base64')
+        }
 
         const newSalaryStatement = await Salaries.create({
             employee,
             year,
             month,
             amountPaid,
-            bankStatement: filePath
+            bankStatement
         });
 
         return res.status(200).json({
@@ -48,11 +48,7 @@ export const updateSalaryStatement = async (req, res) => {
         }
 
         if (req.file) {
-            const oldFilePath = salaryStatement.bankStatement;
-            if (oldFilePath && fs.existsSync(path.resolve(oldFilePath))) {
-                fs.unlinkSync(path.resolve(oldFilePath)); // Delete the old file
-            }
-            salaryStatement.bankStatement = req.file.path.replace(/\\/g, '/'); // Update with the new file path
+            let newBase64 = req.file.bankStatement.buffer.toString('base64');
         }
 
         salaryStatement.basicSalary = basicSalary;
@@ -91,11 +87,6 @@ export const deleteSalaryStatement = async (req, res) => {
         const salaryStatement = await Salaries.findById(id);
         if (!salaryStatement) {
             return res.status(404).json({ message: "Salary statement not found." });
-        }
-
-        const filePath = salaryStatement.bankStatement;
-        if (filePath && fs.existsSync(path.resolve(filePath))) {
-            fs.unlinkSync(path.resolve(filePath)); 
         }
 
         await Salaries.deleteOne({ _id: id });

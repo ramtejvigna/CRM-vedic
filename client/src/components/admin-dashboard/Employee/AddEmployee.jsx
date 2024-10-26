@@ -195,7 +195,7 @@ const AddEmployee = () => {
         switch (activeStep) {
             case 0:
                 return (
-                    <div className="space-y-8 p-4 sm:p-10 bg-white shadow-lg rounded-lg">
+                    <div className="space-y-8 p-2 sm:p-5 ">
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -304,7 +304,7 @@ const AddEmployee = () => {
 
             case 1:
                 return (
-                    <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
+                    <div className="p-2 sm:p-5  space-y-8">
                     <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
                     {/* Aadhar or PAN section */}
@@ -404,7 +404,7 @@ const AddEmployee = () => {
 
                 case 2:
                     return (
-                        <div className="p-6 sm:p-10 bg-white shadow-lg rounded-lg space-y-8">
+                        <div className="p-2 sm:p-5  space-y-8">
                         <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
 
                         {/* Degrees/Certificates Section */}
@@ -492,7 +492,7 @@ const AddEmployee = () => {
 
                 case 3:
                     return (
-                        <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
+                        <div className="space-y-6 p-2 sm:p-5">
                             <h2 className="text-lg font-semibold text-gray-700">Previous Employment Details</h2>
                             <TextField
                                 label="Previous Employer Name"
@@ -559,7 +559,7 @@ const AddEmployee = () => {
 
                 case 4:
                     return (
-                        <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
+                        <div className="space-y-6 p-2 sm:p-5">
                             <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
                             <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
 
@@ -636,9 +636,8 @@ const AddEmployee = () => {
                             </Step>
                         ))}
                     </Stepper>
-                    <div className="flex-1 xl:px-32">
+                    <div className="flex-1 mx-auto w-full p-5 flex flex-col justify-between   bg-white shadow-lg rounded-lg">
                         {renderForm()}
-                    </div>
                     <Box className="flex p-2 justify-between">
                         <Button
                             disabled={activeStep === 0}
@@ -647,7 +646,7 @@ const AddEmployee = () => {
                             sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black" }}
                             onClick={handleBack}
                         >
-                            {"< "}Previous
+                            Previous
                         </Button>
                         {activeStep === steps.length - 1 ? (
                             <Button
@@ -666,16 +665,17 @@ const AddEmployee = () => {
                                     cancel
                                 </Button>
                                 <Button
-                                    sx={{ border: "1px solid blue", backgroundColor: "blue", color: "white", padding: "6px 15px", fontWeight: "700" }}
+                                    sx={{ border: "1px solid blue", backgroundColor: "#3B82F6", color: "white", padding: "6px 15px", fontWeight: "700" }}
                                     onClick={handleNext}
                                 >
-                                    next {" >"}
+                                    next
                                 </Button>
                             </div>
                         )
 
                         }
                     </Box>
+                    </div>
                 </Box>
             </div>
         );
