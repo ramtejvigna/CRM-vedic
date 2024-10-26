@@ -42,177 +42,91 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
     </div>
   );
 };
-const printImage = () => {
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>Print Image</title>
-        <style>
-          body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: white;
-          }
-          img {
-            max-width: 100%;
-            height: auto;
-          }
-        </style>
-      </head>
-      <body>
-        <img src="${image}" alt="Image to print" />
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
-  printWindow.print();
-};
-// Payslip Modal Component
 const PayslipModal = ({ expense, onClose }) => {
-  const [fileData, setFileData] = useState(null);
+  const [bankStatement, setBankStatement] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchFileData = async () => {
+    const fetchBankStatement = async () => {
       if (!expense) return;
       
       try {
         setIsLoading(true);
-        const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expense}`);
+        // Using direct fetch without JSON parsing first
+        const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expense}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'image/jpeg, application/pdf, */*'
+          }
+        });
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch file: ${response.statusText}`);
+          throw new Error('Failed to fetch bank statement');
         }
 
-        const data = await response.json();
+        // Get the content type from response headers
+        const contentType = response.headers.get('content-type');
         
-        if (!data.success || !data.bank_statement) {
-          throw new Error('No file data received');
-        }
-
-        if (isMounted) {
-          setFileData({
-            file_type: data.file_type || 'application/pdf',
-            bank_statement: data.bank_statement
+        // Convert response to base64
+        const blob = await response.blob();
+        const reader = new FileReader();
+        
+        reader.onloadend = () => {
+          const base64data = reader.result.split(',')[1];
+          setBankStatement({
+            data: base64data,
+            fileType: contentType || 'image/jpeg'
           });
-        }
-      } catch (error) {
-        console.error('File fetch error:', error);
-        if (isMounted) {
-          setError(error.message);
-          toast.error("Error loading file: " + error.message);
-        }
-      } finally {
-        if (isMounted) {
           setIsLoading(false);
-        }
+        };
+        
+        reader.readAsDataURL(blob);
+
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('Failed to load bank statement');
+        setIsLoading(false);
       }
     };
 
-    fetchFileData();
-
-    return () => {
-      isMounted = false;
-    };
+    fetchBankStatement();
   }, [expense]);
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-gray-600">Loading file...</p>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="text-red-500 text-center p-4">
-          <p>Error loading file:</p>
-          <p className="text-sm">{error}</p>
-        </div>
-      );
-    }
-
-    if (!fileData?.bank_statement) {
-      return (
-        <div className="text-gray-500 text-center p-4">
-          No file available
-        </div>
-      );
-    }
-
-    const base64String = fileData.bank_statement;
-    const fileType = fileData.file_type;
-
-    if (fileType.includes('pdf')) {
-      return (
-        <iframe
-          src={`data:${fileType};base64,${base64String}`}
-          className="w-full h-full border-none"
-          title="Payslip PDF"
-        />
-      );
-    }
-
-    // For images
-    return (
-      <img
-        src={`data:${fileType};base64,${base64String}`}
-        alt="Payslip"
-        className="max-w-full max-h-full object-contain"
-        onError={() => {
-          setError('Failed to load image');
-          toast.error('Failed to load image');
-        }}
-      />
-    );
-  };
 
   const handleDownload = () => {
-    if (!fileData) return;
-
+    if (!bankStatement?.data) return;
+    
     const link = document.createElement('a');
-    link.href = `data:${fileData.file_type};base64,${fileData.bank_statement}`;
-    link.download = 'payslip';
+    link.href = `data:${bankStatement.fileType};base64,${bankStatement.data}`;
+    link.download = 'bank_statement';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handlePrint = () => {
+    if (!bankStatement?.data) return;
+    
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html>
         <head>
-          <title>Print Payslip</title>
+          <title>Print Bank Statement</title>
           <style>
             body {
+              margin: 0;
               display: flex;
               justify-content: center;
               align-items: center;
-              height: 100vh;
-              margin: 0;
+              min-height: 100vh;
             }
-            img, embed {
+            img {
               max-width: 100%;
               height: auto;
             }
           </style>
         </head>
         <body>
-          ${
-            fileData.file_type.includes('pdf')
-              ? `<embed src="data:${fileData.file_type};base64,${fileData.bank_statement}" width="100%" height="100%">`
-              : `<img src="data:${fileData.file_type};base64,${fileData.bank_statement}" alt="Payslip">`
-          }
+          <img src="data:${bankStatement.fileType};base64,${bankStatement.data}" alt="Bank Statement">
         </body>
       </html>
     `);
@@ -222,27 +136,68 @@ const PayslipModal = ({ expense, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={onClose} />
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" 
+        onClick={onClose} 
+      />
+      
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white w-full max-w-[800px] h-[90vh] relative rounded-lg overflow-hidden shadow-xl"
+        className="bg-white w-full max-w-4xl h-[90vh] relative rounded-lg overflow-hidden shadow-xl"
       >
         {/* Header */}
         <div className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
-          <h3 className="text-xl font-semibold">Bank Statement </h3>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-          >
-            <AiOutlineClose size={24} />
-          </button>
+          <h3 className="text-xl font-semibold">Bank Statement</h3>
+          <div className="flex items-center space-x-4">
+            {bankStatement?.data && (
+              <>
+                <button
+                  onClick={handleDownload}
+                  className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+                  title="Download"
+                >
+                  <AiOutlineDownload size={24} />
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+                  title="Print"
+                >
+                  <AiOutlinePrinter size={24} />
+                </button>
+              </>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+              title="Close"
+            >
+              <AiOutlineClose size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex items-center justify-center w-full h-[calc(90vh-4rem)] p-6 bg-gray-50">
-          {renderContent()}
+        <div className="w-full h-[calc(90vh-4rem)] overflow-auto bg-gray-50 flex items-center justify-center p-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <p className="mt-4 text-gray-600">Loading bank statement...</p>
+            </div>
+          ) : bankStatement?.data ? (
+            <img
+              src={`data:${bankStatement.fileType};base64,${bankStatement.data}`}
+              alt="Bank Statement"
+              className="max-w-full h-auto object-contain"
+              onError={() => toast.error('Failed to load bank statement image')}
+            />
+          ) : (
+            <div className="text-gray-500 text-center">
+              No bank statement available
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
@@ -300,7 +255,7 @@ const ViewExpenses = () => {
   const fetchExpenses = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("https://vedic-backend-neon.vercel.app/api/expenses/getAllExpenses");
+      const res = await fetch("https://vedic-backend-neon.vercel.app/api/expenses");
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to fetch expenses");
