@@ -37,15 +37,16 @@ const Customer = () => {
     const [showViewer, setShowViewer] = useState(false); // State to control PDF viewer visibility
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [expandedRow, setExpandedRow] = useState(null);
+    const [mailUrl, setMailUrl] = useState(null);
+    const [pdfId, setPdfId] = useState(null);
 
-
-    const handleActionClick = (action, pdf) => {
+    const handleActionClick = async (action, pdf) => {
         setActiveDropdown(null);
         if (action === 'view') {
-            handleShowPdf(pdf.babyNames, pdf._id)
+            handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
         } else if (action === 'mail') {
-            handleSetPdfUrl(pdf.babyNames);
-            handleSendMail(pdfUrl, pdf._id, customerDetails.email);
+            await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
+            setPdfId(pdf._id);
         } else if (action === 'whatsapp') {
 
         } else if (action === 'feedback') {
@@ -82,7 +83,6 @@ const Customer = () => {
             const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`);
             if (response.data.length > 0) {
                 setPdfs(response.data);
-                console.log(response.data);
             }
             setPdfsLoading(false);
         } catch (error) {
@@ -95,16 +95,29 @@ const Customer = () => {
             fetchPdfs();
         }
     }, [customerId]);
-    const handleSetPdfUrl = async (babyNames) => {
-        const generatedPdfUrl = await generatePdf(babyNames);
-        setPdfUrl(generatedPdfUrl);
-    }
-    const handleShowPdf = async (babyNames, _id) => {
-        const generatedPdfUrl = await generatePdf(babyNames); // Call the generatePdf function
+    const handleSetPdfUrl = async (babyNames, additionalBabyNames) => {
+        try {
+            const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
+            setMailUrl(generatedPdfUrl);
+        } catch (error) {
+            console.error("Error generating PDF URL:", error);
+            alert("Error generating PDF URL");
+        }
+    };
+
+    // Watch for changes to mailUrl and pdfId and send mail if both are available
+    useEffect(() => {
+        if (mailUrl && pdfId) {
+            handleSendMail(mailUrl, pdfId, customerDetails.email);
+        }
+    }, [mailUrl, pdfId]);
+
+    const handleShowPdf = async (babyNames, additionalBabyNames) => {
+        const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames); // Call the generatePdf function
         setPdfUrl(generatedPdfUrl); // Set the URL state
-        setEnabledRow(_id);
         setShowViewer(true);
     };
+
 
     const handleClose = () => {
         setShowViewer(false); // Hide the PDF viewer
@@ -123,24 +136,42 @@ const Customer = () => {
         link.click();
     };
 
-    const handleSendMail = async (pdfUrl, uniqueId, email) => {
-        if (!email || !pdfUrl) {
-            alert("Provide a valid email and ensure the PDF is generated.");
-            return;
-        }
 
-        try {
-            await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-email", {
-                email,
-                pdfUrl,
-                uniqueId,
+    const blobToBase64 = (blob) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(",")[1]); // Get base64 content without the data type prefix
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
+    const handleSendMail = async (pdfUrl, uniqueId, email) => {
+        if (!email) {
+            alert("Provide a valid email");
+            return;
+          }
+        
+          try {
+            const response = await fetch(pdfUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const pdfBlob = await response.blob(); // Convert the response to a Blob
+                    const base64Pdf = await blobToBase64(pdfBlob);
+            
+            await axios.post("http://localhost:3000/api/send-pdf-email", {
+              email,
+              base64Pdf,
+              uniqueId,
             });
+        
             alert("PDF sent to email");
-        } catch (error) {
+          } catch (error) {
             console.error("Error sending PDF to email", error);
             alert("Error sending email");
-        }
-    };
+          }
+        };
 
     const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
         if (!phoneNumber || !pdfUrl || !uniqueId) {
