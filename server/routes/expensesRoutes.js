@@ -10,7 +10,6 @@ import {
 const router = express.Router();
 
 router.post('/', addExpense);
-router.post('/:id', addExpense);
 
 router.get('/', getAllExpenses);
 router.get('/file/:id', getExpenseFile);
