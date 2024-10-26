@@ -66,7 +66,6 @@ const Leaves = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    console.log(name)
     setFilters({
       ...filters,
       [name]: value,
@@ -264,7 +263,7 @@ const Leaves = () => {
                 </div>
               </div>
 
-              {/* <div className="space-y-2">
+              <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Search Employee
                 </label>
@@ -279,7 +278,7 @@ const Leaves = () => {
                     className="w-full p-2 pl-10 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-              </div> */}
+              </div>
             </div>
           </motion.div>
         )}

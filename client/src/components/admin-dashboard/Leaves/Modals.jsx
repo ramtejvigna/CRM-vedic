@@ -319,7 +319,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, action, isDarkMode }) =
 
                   <div className="space-y-6 mt-4">
                     <p className="text-lg text-gray-700 dark:text-gray-300">
-                      Are you sure you want to {action?.toLowerCase() === 'approved' ? 'approve' : 'reject'} this leave request?
+                      Are you sure you want to {action?.toLowerCase()} this leave request?
                     </p>
 
                     <div className="flex justify-end space-x-4">
