@@ -44,7 +44,7 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await fetch("http://localhost:3000/salaries/");
+      const response = await fetch("https://vedic-backend-neon.vercel.app/salaries/");
       const data = await response.json()
       setSalaryStatements(data);
     } catch (error) {
@@ -63,7 +63,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`http://localhost:3000/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`https://vedic-backend-neon.vercel.app/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
