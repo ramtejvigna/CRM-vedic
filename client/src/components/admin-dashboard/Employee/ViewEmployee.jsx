@@ -3,10 +3,16 @@ import { HOST , GET_EMPLOYEE_BY_ID } from '../../../utils/constants'
 import { toast } from "react-toastify"
 import { useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Card, Button, Box } from '@mui/material';
-import { GiCrossMark } from "react-icons/gi"
-
+import { GiCrossMark, GiMailbox } from "react-icons/gi"
+import {format} from "date-fns"
+import {AnimatePresence, motion} from "framer-motion"
+import { AiOutlineMessage } from 'react-icons/ai';
+import { Calendar, ClipboardList, ClipboardListIcon, Clock, MailIcon, Phone, User, Workflow, WorkflowIcon } from 'lucide-react';
+import { AiOutlineClose , AiOutlineDownload , AiOutlinePrinter } from 'react-icons/ai';
+import { useStore } from '../../../store';
 const ViewEmployee = () => {
     const navigate = useNavigate();
+    const {isDarkMode} = useStore()
     const [image, setImage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [employee, setEmployee] = useState({});
@@ -34,211 +40,331 @@ const ViewEmployee = () => {
         getEmployee();
     }, [id]);
 
+    const downloadImage = (base64String) => {
+        const link = document.createElement('a');
+        link.href = `data:image/jpeg;base64,${base64String}`;
+        link.download = 'document.jpg'; // Name of the downloaded file
+        link.click();
+    };
+      
+      
+    const printImage = (base64String) => {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+          <html>
+              <head>
+                  <title>Print Image</title>
+              </head>
+              <body>
+                  <img src="data:image/jpeg;base64,${base64String}" style="max-width:100%;"/>
+              </body>
+          </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    };
+
     return isLoading ? (
         <div className='h-full flex items-center justify-center'>
             <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
         </div>
     ) : (
-        <div className='flex flex-col w-full gap-5 h-full'>
+        <div className='w-full h-full'>
             <Card className="flex items-center justify-between p-5 rounded-xl shadow-md border">
-                <div className='flex gap-5 items-center justify-between '>
-                    <Avatar>
-                        {employee.avatar ? (
-                            <img src={employee.avatar} alt={employee.name} />
-                        ) : (
-                            <span className='text-3xl font-bold tracking-wide'>{employee?.firstName?.charAt(0).toUpperCase()}</span>
-                        )}
-                    </Avatar>
-                    <span className='text-3xl font-bold tracking-wide'>{employee?.firstName || "xxxxxxx"}</span>
-                </div>
                 <div className="flex gap-4">
-                    <Button onClick={() => navigate(`/admin-dashboard/employees/edit-employee/${employee._id}`)} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+                    <Button onClick={() => navigate('/admin-dashboard/employees')} className="border border-black text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+                        <span className="text-lg">{"<"}</span> Back
+                    </Button>
+                    <Button onClick={() => navigate(`/admin-dashboard/employees/edit-employee/${employee._id}`)} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
                         Edit Employee
                     </Button>
-                    <Button onClick={() => navigate('/admin-dashboard/employees')} className="border border-black text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-                        Back <span className="text-lg">{">"}</span>
-                    </Button>
                 </div>
             </Card>
 
-        <Card className='flex flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
-            <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
-                <h1 className="text-xl uppercase font-bold text-gray-800">Personal Information</h1>
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                {/* first */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>first name</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.firstName || 'N/A'}</span>
-                </div>
-                {/* Name */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>last name</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.lastName || 'N/A'}</span>
-                </div>
-                {/* Email */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>Email</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.email || 'N/A'}</span>
-                </div>
-                {/* Phone */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>Phone</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.phone || 'N/A'}</span>
-                </div>
-                </div>
-            </Box>
-            <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
-                <h1 className="text-xl uppercase font-bold text-gray-800">Address</h1>
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                {/* State */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>State</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.state || 'N/A'}</span>
-                </div>
-                {/* City */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>City</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.city || 'N/A'}</span>
-                </div>
-                {/* Country */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>Country</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.country || 'N/A'}</span>
-                </div>
-                {/* Pincode */}
-                <div className="flex flex-col gap-2">
-                    <span className='text-sm font-semibold text-gray-600'>Pincode</span>
-                    <span className='text-lg font-medium text-gray-900'>{employee?.pincode || 'N/A'}</span>
-                </div>
-                </div>
-            </Box>
-            <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-100 rounded-xl shadow-lg border border-gray-300">
-                <h1 className="text2xl uppercase font-bold text-gray-700 mb-4">previous employement details</h1>
-                
-                <div className='grid grid-cols-1 sm:grid-cols-2  gap-4'>
-                    <div className="flex flex-col gap-1">
-                        <span className='text-sm font-semibold text-gray-500'>employeer name</span>
-                        <span className='text-xl font-medium text-gray-800'>{employee?.employerName || 'N/A'}</span>
-                    </div>
-                    {/* city */}
-                    <div className="flex flex-col gap-1">
-                        <span className='text-sm font-semibold text-gray-500'>job title</span>
-                        <span className='text-xl font-medium text-gray-800'>{employee?.jobTitle || 'N/A'}</span>
-                    </div>
-                    {/* country */}
-                    <div className="flex flex-col gap-1">
-                        <span className='text-sm font-semibold text-gray-500'>start date</span>
-                        <span className='text-xl font-medium text-gray-800'>
-                            {employee?.startDate ? `${new Date(employee?.startDate).getDate()}/${new Date(employee?.startDate).getMonth()}/${new Date(employee?.startDate).getFullYear()} ` :  'N/A'}
-                            </span>
-                        </div>
-                        {/* End Date */}
-                        <div className="flex flex-col gap-1">
-                            <span className='text-sm font-semibold text-gray-500'>End Date</span>
-                            <span className='text-xl font-medium text-gray-800'>
-                                {employee.endDate ? `${new Date(employee.endDate).getDate()}/${new Date(employee.endDate).getMonth()}/${new Date(employee.endDate).getFullYear()} ` : 'N/A'}
-                            </span>
-                        </div>
-                        {/* Reason for Leaving */}
-                        <div className="flex flex-col gap-1">
-                            <span className='text-sm font-semibold text-gray-500'>Reason for Leaving</span>
-                            <span className='text-xl font-medium text-gray-800'>
-                                {employee.reasonForLeaving}
-                            </span>
-                        </div>
-                    </div>
-                </Box>
-            </Card>
-
-            <Card className='flex flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg border'>
-                <Box className="flex-1 basis-[400px] flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
-                    <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Employee Details</h1>
-
-                <div className='flex flex-col p-2'>
-                    <div className="rounded-md border flex p-3 items-center justify-between">
-                        <span className=''>Aadhar card</span>
-                        <button onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${employee?.aadharOrPan}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                            view
-                        </button>
-                    </div>
-                    <div className="rounded-md border flex p-3 items-center justify-between">
-                        <span>passport</span>
-                        <button onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${employee?.passport}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                            view
-                        </button>
-                    </div>
-                    <div className="rounded-md border flex p-3 items-center justify-between">
-                        <span>degrees</span>
-                        <button onClick={() => setImage((prev) => prev = `https://vedic-backend-neon.vercel.app/${employee?.degrees}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                            view
-                        </button>
-                    </div>
-                    <div className="rounded-md border flex p-3 items-center justify-between">
-                        <span>transcripts</span>
-                        <button onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${employee?.transcripts}`)} className='bg-blue-400 px-3 p-1 text-white rounded-lg'>
-                            view
-                        </button>
-                    </div>
-                </div>
-                
-            </Box>
-            <Box className="flex-1 basis-[400px] item-center flex flex-col gap-6 p-6 bg-gray-50 rounded-xl shadow-md border border-gray-200">
-                <h1 className="text-xl uppercase font-bold text-gray-700 mb-4">Financial details</h1>
-                <div className='flex items-center justify-center h-full'>
-                    <div className="w-[80%] basis-[350px] sm:basis-[500px] h-[90%] p-10 justify-center bg-black text-white rounded-lg  shadow-xl relative">
-                        {/* Cardholder and Card Number */}
-                        <div className="flex flex-col gap-4">
-                        <div>
-                            <span className="block text-sm font-light text-gray-300">Cardholder</span>
-                            <span className="block text-lg font-semibold">{employee?.cardholderName ? employee?.cardholderName  : "xxxxx"}</span>
-                        </div>
-                        <div>
-                            <span className="block text-sm font-light text-gray-300">Card Number</span>
-                            <span className="block text-xl font-semibold tracking-widest">{employee?.cardNumber ? employee?.cardNumber  : "xxx xxx xxx"} </span>
-                        </div>
-                        </div>
-
-                            {/* CVV and Expiry Date */}
-                            <div className="flex justify-between mt-8">
-                                <div>
-                                    <span className="block text-sm font-light text-gray-300">Expiry Date</span>
-                                    <span className="block text-lg font-semibold">{employee.expiryDate ? `${new Date(employee.expiryDate).getDate()} / ${new Date(employee.expiryDate).getMonth()}` : "--/--"}</span>
-                                </div>
-                                <div>
-                                    <span className="block text-sm font-light text-gray-300">CVV</span>
-                                    <span className="block text-lg font-semibold">{employee.cvv ? employee.cvv : 'xxx'}</span>
-                                </div>
-                            </div>
-
-                            {/* Card Logo */}
-                            <div className="absolute top-4 right-6">
+            <div className="flex flex-wrap justify-center  h-full w-full">
+                <div className="flex p-5 gap-5 basis-auto  flex-1 flex-col border ">
+                    <Card className='flex relative flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
+                        {employee?.isOnline ? (
+                                    <span className="absolute top-2 right-2 bg-opacity-10 py-1 rounded-lg px-4 bg-green-100 text-green-800">
+                                        online
+                                    </span>
+                                ) : (
+                                    <span className="absolute top-2 right-2 bg-opacity-10 py-1 rounded-lg px-4 bg-red-500 text-red-500">
+                                        offline
+                                    </span>
+                        )}
+                        <div className='flex flex-col gap-3 items-center'>
+                            <div className="flex-shrink-0 h-36 w-36">
+                              {employee?.avatar ? (
                                 <img
-                                    className="w-16"
-                                    src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
-                                    alt="Card Logo"
+                                  className="h-36 w-36 object-cover rounded-full"
+                                  src={employee.avatar}
+                                  alt={employee.firstName}
                                 />
+                              ) : (
+                                <div className="h-36 w-36 rounded-full bg-blue-500 flex items-center justify-center">
+                                  <span className="text-white text-7xl font-bold">
+                                    {employee?.firstName?.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className='flex flex-col gap-3'>
+                                <span className='text-blue-500 text-3xl font-bold'>{employee?.firstName + " " + employee?.lastName}</span>
                             </div>
                         </div>
-                    </div>
-                </Box>
-            </Card>
+                        <div className="flex-1 flex p-6 flex-col gap-3">
+                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><MailIcon className='h-4 w-4'/>{employee?.email}</span>
+                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><Phone className='h-4 w-4'/>{employee?.phone}</span>
+                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><User className='h-4 w-4'/> customers assigned : {employee?.customers?.length}</span>
+                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><ClipboardListIcon className='h-4 w-4'/> tasks assigned : {employee?.assignedTasks ? employee?.assignedTasks?.length : "0"}</span>
+                            <span className=' text-gray-500 flex gap-2 items-center flex-wrap' ><Calendar  className='h-4 w-4'/>remaining leave days : {employee.leaveBalance}</span>
+                        </div>
+                    </Card>
+
+                    <Card className="flex flex-col flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center">
+                             Document Wallet
+                        </h3>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2  gap-6">
+                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
+                                {employee?.aadharOrPan ? (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
+                                        uploaded
+                                    </span>
+                                ) : (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
+                                        Pending
+                                    </span>
+                                )}
+                                <div className="text-4xl">🆔</div>
+                                <h4 className="mt-2 font-semibold text-gray-800">Id Proof</h4>
+                                <p className="text-gray-500 text-sm">Last updated: {employee?.lastUpdated ?  format(employee?.lastUpdated, "mm , d yyyy" ) : "Not yet updated"} </p>
+                                
+                                <div className="mt-4 flex space-x-2">
+                                    <button onClick={() => setImage(employee?.aadharOrPan)} className="text-blue-600 hover:underline">View</button>
+                                    <button onClick={() => downloadImage(employee?.aadharOrPan)} className="text-blue-600 hover:underline">Download</button>
+                                </div>
+                            </div>
+
+                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
+                                {employee?.passport ? (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
+                                        uploaded
+                                    </span>
+                                ) : (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
+                                        Pending
+                                    </span>
+                                )}
+                                <div className="text-4xl">🌐</div>
+                                <h4 className="mt-2 font-semibold text-gray-800">Passport</h4>
+                                <p className="text-gray-500 text-sm">Lat updated: {employee?.lastUpdated ?  format(employee?.lastUpdated, "mm , d yyyy" ) : "Not yet updated"} </p>
+                                
+                                <div className="mt-4 flex space-x-2">
+                                    <button onClick={() => setImage(employee?.passport)} className="text-blue-600 hover:underline">View</button>
+                                    <button onClick={() => downloadImage(employee?.aadharOrPan)} className="text-blue-600 hover:underline">Download</button>
+                                </div>
+                            </div>
+                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
+                                {employee?.degrees ? (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
+                                        uploaded
+                                    </span>
+                                ) : (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
+                                        Pending
+                                    </span>
+                                )}
+                                <div className="text-4xl">🎓</div>
+                                <h4 className="mt-2 font-semibold text-gray-800">Degree</h4>
+                                <p className="text-gray-500 text-sm">Uploaded: { isNaN(new Date(employee?.updatedAt)) ? "Invalid Date" :  format( new Date(employee?.expiryDate) , "MM/dd/yyyy") }</p>
+                                
+                                <div className="mt-4 flex space-x-2">
+                                    <button onClick={() => setImage(employee?.degrees)} className="text-blue-600 hover:underline">View</button>
+                                    <button onClick={() => downloadImage(employee?.degrees)} className="text-blue-600 hover:underline">Download</button>
+                                </div>
+                            </div>
+                            <div className="relative p-4 border rounded-lg bg-white shadow hover:shadow-lg transition-shadow">
+                                {employee?.transcripts ? (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-green-500 text-white">
+                                        uploaded
+                                    </span>
+                                ) : (
+                                    <span className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-yellow-500 text-white">
+                                        Pending
+                                    </span>
+                                )}
+                                <div className="text-4xl">📄</div>
+                                <h4 className="mt-2 font-semibold text-gray-800">Transcripts</h4>
+                                <p className="text-gray-500 text-sm">Uploaded: Dec 20, 2023</p>
+                                
+                                <div className="mt-4 flex space-x-2">
+                                    <button onClick={() => setImage(employee?.transcripts)} className="text-blue-600 hover:underline">View</button>
+                                    <button onClick={() => downloadImage(employee?.transcripts)}  className="text-blue-600 hover:underline">Download</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </Card>
+
+
+                </div>
+
+
+                <div className="flex sm:p-5  gap-5 flex-col border b">
+                    <Card className='flex flex-col flex-wrap p-6 gap-5 bg-white rounded-xl shadow-lg'>
+                        <h1 className='text-xl font-semibold text-gray-800 mb-4'>Personal Details</h1>
+                        <table border="1" className=' '>
+                            <tr>
+                                <th className='border border-black text-xl p-2'>Firstname</th>
+                                <td className='border border-black text-xl p-2'>{employee?.firstName }</td>
+                            </tr>
+                            <tr>
+                                <th className='border border-black text-xl p-2'>Lastname</th>
+                                <td className='border border-black text-xl p-2'>{employee?.lastName}</td>
+                            </tr>
+                            <tr>
+                                <th className='border border-black  p-2'>Address</th>
+                                <td className='border border-black  p-2'>{employee?.address + " , " + employee?.city }</td>
+                            </tr>
+                            <tr>
+                                <th className='border border-black  p-3'>Location</th>
+                                <td className='border border-black  p-3'>{employee?.state + " , " + employee?.country}</td>
+                            </tr>
+                            <tr>
+                                <th className='border border-black  p-2'>Pincode</th>
+                                <td className='border border-black  p-2'>{employee?.pincode}</td>
+                            </tr>
+                        </table>
+                    </Card>
+
+
+
+
+                        <Card class=" bg-white shadow-md rounded-lg overflow-hidden p-6 mt-6">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Fianancial Details</h2>
+
+                            <div class="border-t border-gray-200">
+                                <dl class="divide-y divide-gray-200">
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Card Holder Name</dt>
+                                        <dd class="text-gray-900 font-medium">{employee?.cardholderName || "Not mentioned"}</dd>
+                                    </div>
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Card Number</dt>
+                                        <dd class="text-gray-900 font-medium">{employee?.cardNumber}</dd>
+                                    </div>
+
+
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Exipry Date</dt>
+                                        <dd class="text-gray-900 font-medium">{ isNaN(new Date(employee?.expiryDate)) ? "Invalid Date" :  format( new Date(employee?.expiryDate) , "MM/dd/yyyy") }</dd>
+                                    </div>
+
+
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">cvv</dt>
+                                        <dd class="text-gray-900 font-medium">{employee?.cvv}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </Card>
+
+                        <Card class=" bg-white shadow-md rounded-lg overflow-hidden p-6 mt-6">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Employment Details</h2>
+
+                            <div class="border-t border-gray-200">
+                                <dl class="divide-y divide-gray-200">
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Employer Name</dt>
+                                        <dd class="text-gray-900 font-medium">{employee?.employerName}</dd>
+                                    </div>
+
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Job Title</dt>
+                                        <dd class="text-gray-900 font-medium">{employee?.jobTitle}</dd>
+                                    </div>
+
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Start Date</dt>
+                                        <dd class="text-gray-900 font-medium">{ isNaN(new Date(employee?.startDate)) ? "Invalid Date" :  format( new Date(employee?.startDate) , "MM/dd/yyyy") }</dd>
+                                    </div>
+
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">End Date</dt>
+                                        <dd class="text-gray-900 font-medium">{ isNaN(new Date(employee?.endDate)) ? "Invalid Date" :  format( new Date(employee?.endDate) , "MM/dd/yyyy") }</dd>
+                                    </div>
+
+                                    <div class="py-2 flex justify-between">
+                                        <dt class="text-gray-500">Reason for Leaving</dt>
+                                        <dd class="text-gray-900 font-medium">{employee?.reasonForLeaving}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </Card>
+
+
+
+
+                </div>
+
+
+            </div>
+
+
             {/* Image Box */}
             {
                 image && (
-                    <div className="fixed z-[1000] top-0 left-0 right-0 bottom-0 bg-black/80 backdrop-blur-md
-                                    flex flex-col items-center justify-center overflow-scroll scrollbar-hide">
-                        <img
-                            className='object-cover rounded-lg shadow-lg border border-gray-200 mb-4'
-                            src={image}
-                            alt="Document Image"
-                        />
-                        <button
-                            onClick={() => setImage(null)}
-                            className='rounded-full text-white w-[50px] h-[50px] p-4 flex items-center justify-center bg-gray-700'
+                    <div className="fixed z-[1000] top-0 left-0 right-0 bottom-0 bg-black/20 backdrop-blur-md flex items-center justify-center overflow-scroll scrollbar-hide">
+                        <motion.div 
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ duration: 0.5, ease: "backInOut" }}
+                        className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
                         >
-                            <span className='text-2xl'>x</span>
-                        </button>
-                    </div>
+                        {/* Close button */}
+                        <div className='flex absolute top-1 right-1 justify-end items-end '>
+                            <AiOutlineClose className='text-xl cursor-pointer' onClick={() => setImage(null)} />
+                        </div>
+
+                        {/* Download and Print Buttons */}
+                        <div className='w-full p-5 flex items-center justify-between bg-black'>
+                            <div className='p-2'>
+                            <span className='text-xl text-white tracking-wider capitalize'>Bank statement</span>
+                            </div>
+                            <div>
+                            <button
+                                onClick={() => downloadImage(image)} 
+                                className="px-4 py-2 text-white font-semibold rounded-md transition-all"
+                            >
+                                <AiOutlineDownload className='text-xl' />
+                            </button>
+
+                            {/* Print Button */}
+                            <button
+                                onClick={() => printImage()} 
+                                className="px-4 py-2 text-white font-semibold rounded-md transition-all"
+                            >
+                                <AiOutlinePrinter className='text-xl' />
+                            </button>
+                            </div>
+                        </div>
+
+                        {/* Iframe Container */}
+                        <div className='flex items-center overflow-scroll justify-center w-full h-[90%]'>
+                            <img
+                                src={`data:image/jpeg;base64,${image}`}  
+                                height={"100%"}
+                                className='object-cover'
+                            // Ensures image scales within the iframe
+                            />
+                            {/* <img src={image} className='w-full h-full object-cover' alt="displayed" /> */}
+                        </div>
+                        </motion.div>
+                </div>
                 )
             }
         </div>

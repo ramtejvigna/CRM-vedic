@@ -43,8 +43,9 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await axios.get("https://vedic-backend-neon.vercel.app/salaries/");
-      setSalaryStatements(response.data);
+      const response = await fetch("http://localhost:3000/salaries/");
+      const data = await response.json()
+      setSalaryStatements(data);
     } catch (error) {
       console.error("Error fetching employees:", error);
     } finally {
@@ -61,7 +62,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`https://vedic-backend-neon.vercel.app/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`http://localhost:3000/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
@@ -124,53 +125,49 @@ function Salaries() {
     return buttons;
   };
   
-  const downloadImage =  async (url) => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Network response was not ok');
+  const downloadImage = (base64String) => {
+    const link = document.createElement('a');
+    link.href = `data:image/jpeg;base64,${base64String}`;
+    link.download = 'bank_statement.jpg'; // Name of the downloaded file
+    link.click();
+};
   
-      const blob = await response.blob();
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = url.split('/').pop();
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link); // Clean up
-    } catch (error) {
-      console.error('Error downloading the image:', error);
-      toast.error(error.message)
-    }
-  };
-
-  const printImage = () => {
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
+  
+const printImage = (base64String) => {
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
       <html>
-        <head>
-          <title>Print Image</title>
-          <style>
-            body {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-              margin: 0;
-              background-color: white;
-            }
-            img {
-              max-width: 100%;
-              height: auto;
-            }
-          </style>
-        </head>
-        <body>
-          <img src="${image}" alt="Image to print" />
-        </body>
+          <head>
+              <title>Print Image</title>
+          </head>
+          <body>
+              <img src="data:image/jpeg;base64,${base64String}" style="max-width:100%;"/>
+          </body>
       </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-  };
+  `);
+  printWindow.document.close();
+  printWindow.print();
+};
+
+const SalaryStatementComponent = ({ bankStatement }) => {
+  return (
+      <div>
+          <h2>Bank Statement</h2>
+          {bankStatement && (
+              <div>
+                  <img 
+                      src={`data:image/jpeg;base64,${bankStatement}`} 
+                      alt="Bank Statement" 
+                      style={{ maxWidth: '100%', height: 'auto' }} 
+                  />
+                  <button onClick={() => downloadImage(bankStatement)}>Download Image</button>
+                  <button onClick={() => printImage(bankStatement)}>Print Image</button>
+              </div>
+          )}
+      </div>
+  );
+};
+
 
   useEffect(() => {
     filterData();
@@ -184,6 +181,12 @@ function Salaries() {
       fetchSalries();
     }
   } , [searchTerm]);
+
+  useEffect(() => {
+    console.log(image)
+     
+  } , [image])
+
 
 
   return (
@@ -343,7 +346,7 @@ function Salaries() {
   
                               <td className="px-6  py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
                                 <button
-                                  onClick={() => setImage(`https://vedic-backend-neon.vercel.app/${statement.bankStatement}`)}
+                                  onClick={() =>{ setImage(statement?.bankStatement) , console.log(statement?.bankStatement)}}
                                   className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
                                     isDarkMode
                                       ? "text-green-400 hover:text-green-200"
@@ -488,9 +491,12 @@ function Salaries() {
 
                       {/* Iframe Container */}
                       <div className='flex items-center justify-center w-full h-[90%]'>
-                        <iframe 
-                          src={image} 
-                          className="w-full image-iframe  h-full object-fill" // Ensures image scales within the iframe
+                        <iframe
+                          src={`data:image/jpeg;base64,${image}`}  
+                          height={"100%"}
+                          width={"100%"}
+                          className='object-cover'
+                          // Ensures image scales within the iframe
                         />
                         {/* <img src={image} className='w-full h-full object-cover' alt="displayed" /> */}
                       </div>
