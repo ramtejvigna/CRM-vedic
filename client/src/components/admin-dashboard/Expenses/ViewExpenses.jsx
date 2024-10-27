@@ -89,9 +89,9 @@ const PayslipModal = ({ isOpen, onClose, payslipData }) => {
         className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
       >
         <div className="flex absolute top-1 right-1 justify-end items-end">
-          <AiOutlineClose 
-            className="text-xl cursor-pointer" 
-            onClick={onClose} 
+          <AiOutlineClose
+            className="text-xl cursor-pointer"
+            onClick={onClose}
           />
         </div>
 
@@ -118,16 +118,16 @@ const PayslipModal = ({ isOpen, onClose, payslipData }) => {
         </div>
 
         <div className="flex items-center justify-center w-full h-[90%]">
-        <iframe
-    src={payslipData ? `data:image/jpeg;base64,${payslipData}` : ''}
-    height="100%"
-    width="100%"
-    className="object-cover"
-    title="payslip"
-></iframe>
-{!payslipData && (
-    <div className="text-center text-gray-500">No valid payslip available for this expense.</div>
-)}
+          <iframe
+            src={payslipData ? `data:image/jpeg;base64,${payslipData}` : ''}
+            height="100%"
+            width="100%"
+            className="object-cover"
+            title="payslip"
+          ></iframe>
+          {!payslipData && (
+            <div className="text-center text-gray-500">No valid payslip available for this expense.</div>
+          )}
         </div>
       </motion.div>
     </div>
@@ -152,8 +152,8 @@ const ViewExpenses = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5); // State for rows per page
   const [expenseToView, setExpenseToView] = useState(null);
   const [payslipModalOpen, setPayslipModalOpen] = useState(false);
-  const [selectedPayslip, setSelectedPayslip] = useState(null);  
-  
+  const [selectedPayslip, setSelectedPayslip] = useState(null);
+
   const totalExpenses = filteredExpenses.length;
   const totalPages = Math.ceil(totalExpenses / rowsPerPage); // Total pages based on filtered expenses
   const indexOfLastRecord = currentPage * rowsPerPage; // Index of the last record on the current page
@@ -176,14 +176,14 @@ const ViewExpenses = () => {
 
   useEffect(() => {
     const fetchExpenses = async () => {
-        const response = await fetch('/api/expenses'); // Adjust API endpoint as needed
-        const data = await response.json();
-        console.log("Fetched Expenses:", data.expenses); // Log fetched data
-        setExpenses(data.expenses);
+      const response = await fetch('https://vedic-backend-neon.vercel.app/api/expenses'); // Adjust API endpoint as needed
+      const data = await response.json();
+      console.log("Fetched Expenses:", data.expenses); // Log fetched data
+      setExpenses(data.expenses);
     };
 
     fetchExpenses();
-}, []);
+  }, []);
 
 
   useEffect(() => {
@@ -209,51 +209,53 @@ const ViewExpenses = () => {
       setIsLoading(false);
     }
   };
-  
+
   const handlePayslip = (expenseId) => {
     // Log the incoming expenseId
     console.log("Expense ID:", expenseId);
-    
+
     // Find the expense
     const expense = expenses.find((exp) => exp._id === expenseId);
-    
+
     // Log the entire expense object
-    console.log("Selected expense:", expense); 
-  
+    console.log("Selected expense:", expense);
+
     // Check the value of the bank_statement property
     if (expense) {
-        console.log("Bank Statement:", expense.bank_statement); // Log bank_statement directly
-      
-        // Ensure bank_statement exists and is a valid base64 string
-        if (typeof expense.bank_statement === "string" && expense.bank_statement) {
-            setSelectedPayslip(expense.bank_statement); // Set the payslip to view
-            setPayslipModalOpen(true); // Open the modal
-        } else {
-            toast.error("No valid payslip available for this expense"); // Show error if no valid payslip
-        }
-    } else {
-        toast.error("Expense not found"); // Show error if the expense is not found
-    }
-};
+      console.log("Bank Statement:", expense.bank_statement); // Log bank_statement directly
 
-  
-  
+      // Ensure bank_statement exists and is a valid base64 string
+      if (typeof expense.bank_statement === "string" && expense.bank_statement) {
+        setSelectedPayslip(expense.bank_statement); // Set the payslip to view
+        setPayslipModalOpen(true); // Open the modal
+      } else {
+        toast.error("No valid payslip available for this expense"); // Show error if no valid payslip
+      }
+    } else {
+      toast.error("Expense not found"); // Show error if the expense is not found
+    }
+  };
+
+
+
   // new code
   // Inside your modal or wherever you want to display the payslip
-  {payslipModalOpen && (
-    <div className="modal">
+  {
+    payslipModalOpen && (
+      <div className="modal">
         <h2>Expense Payslip</h2>
         {selectedPayslip && (
-            <img
-                src={`data:${file_type};base64,${selectedPayslip}`}
-                alt="Expense Payslip"
-                style={{ maxWidth: '100%', maxHeight: '400px' }}
-            />
+          <img
+            src={`data:${file_type};base64,${selectedPayslip}`}
+            alt="Expense Payslip"
+            style={{ maxWidth: '100%', maxHeight: '400px' }}
+          />
         )}
         <button onClick={() => setPayslipModalOpen(false)}>Close</button>
-    </div>
-)}
-  
+      </div>
+    )
+  }
+
   const handleFilterAndSearch = () => {
     let filtered = [...expenses];
 
@@ -270,7 +272,7 @@ const ViewExpenses = () => {
     if (selectedMonth || selectedYear) {
       filtered = filtered.filter((expense) => {
         const expenseDate = new Date(expense.date);
-        
+
         // Get month (0-11) and convert selected month to same format
         const expenseMonth = months[expenseDate.getMonth()]; // Get month name
         const expenseYear = expenseDate.getFullYear().toString();
@@ -305,7 +307,7 @@ const ViewExpenses = () => {
           },
         }
       );
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to delete expense");
@@ -328,7 +330,7 @@ const ViewExpenses = () => {
     }
   };
 
-  
+
 
   const handleAddExpense = () => navigate("add-expense");
   const handleEdit = (id) => navigate(`edit-expense/${id}`);
@@ -340,9 +342,8 @@ const ViewExpenses = () => {
         <button
           key={i}
           onClick={() => setCurrentPage(i)}
-          className={`relative inline-flex items-center px-2 py-2 border ${
-            currentPage === i ? (isDarkMode ? "bg-gray-700" : "bg-gray-200") : (isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white")
-          } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+          className={`relative inline-flex items-center px-2 py-2 border ${currentPage === i ? (isDarkMode ? "bg-gray-700" : "bg-gray-200") : (isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white")
+            } text-sm font-medium text-gray-500 hover:bg-gray-50`}
         >
           {i}
         </button>
@@ -352,10 +353,9 @@ const ViewExpenses = () => {
   };
 
   return (
-    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${
-      isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-    }`}>
-     <AnimatePresence>
+    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+      }`}>
+      <AnimatePresence>
         {deleteModalOpen && (
           <DeleteModal
             isOpen={deleteModalOpen}
@@ -367,7 +367,7 @@ const ViewExpenses = () => {
           />
         )}
 
-{payslipModalOpen && (
+        {payslipModalOpen && (
           <PayslipModal
             isOpen={payslipModalOpen}
             onClose={() => {
@@ -383,34 +383,34 @@ const ViewExpenses = () => {
         <div className="mb-8 w-full">
           <div className="flex flex-col space-y-4">
             {/* Search Bar */}
-           
+
             <h1 className="text-4xl font-bold mb-8">Expenses</h1>
 
             <div className="flex justify-between items-center">
 
-            <div className="flex items-center space-x-2"> 
-          
-            <div className="relative w-full" style={{ width: '60%' }}>
-  <input
-    type="text"
-    placeholder="Search expense..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
-  />
-  <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-</div>
+              <div className="flex items-center space-x-2">
 
-  <motion.button
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    onClick={() => setShowFilters(!showFilters)}
-    className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-300 flex items-center space-x-2"
-  >
-    <Filter size={13} />
-    <span>Filters</span>
-  </motion.button>
-</div>
+                <div className="relative w-full" style={{ width: '60%' }}>
+                  <input
+                    type="text"
+                    placeholder="Search expense..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+                  />
+                  <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-300 flex items-center space-x-2"
+                >
+                  <Filter size={13} />
+                  <span>Filters</span>
+                </motion.button>
+              </div>
 
 
 
@@ -425,48 +425,48 @@ const ViewExpenses = () => {
             </div>
 
             {showFilters && (
-      <div className="flex gap-5 items-center justify-start">
-        <form className='flex w-full gap-5 flex-wrap'>
-          <div className='flex gap-2 items-center min-w-[150px]'>
-            <label htmlFor="month" className="mr-2">Month:</label>
-            <select 
-              value={selectedMonth} 
-              onChange={(e) => setSelectedMonth(e.target.value)} 
-              id="month" 
-              name="month" 
-              className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
-            >
-              <option value="">select month</option>
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
-          </div>
-      
-          <div className='flex gap-2 items-center min-w-[150px]'>
-            <label htmlFor="year" className="mr-2">Year:</label>
-            <select 
-              value={selectedYear} 
-              onChange={(e) => setSelectedYear(e.target.value)} 
-              id="year" 
-              name="year"  
-              className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
-            >
-              <option value="">select year</option>
-              {years.map(year => (
-                <option key={year} value={year.toString()}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </form>
-      </div>
-    )}
+              <div className="flex gap-5 items-center justify-start">
+                <form className='flex w-full gap-5 flex-wrap'>
+                  <div className='flex gap-2 items-center min-w-[150px]'>
+                    <label htmlFor="month" className="mr-2">Month:</label>
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      id="month"
+                      name="month"
+                      className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+                    >
+                      <option value="">select month</option>
+                      {months.map((month) => (
+                        <option key={month} value={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-          
+                  <div className='flex gap-2 items-center min-w-[150px]'>
+                    <label htmlFor="year" className="mr-2">Year:</label>
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      id="year"
+                      name="year"
+                      className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+                    >
+                      <option value="">select year</option>
+                      {years.map(year => (
+                        <option key={year} value={year.toString()}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </form>
+              </div>
+            )}
+
+
 
           </div>
         </div>
@@ -501,26 +501,24 @@ const ViewExpenses = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center">
-                          
-                        <button
-        onClick={() => handlePayslip(expense._id)}
-        className={`mr-7 flex gap-2 transition-colors duration-300 ${
-          isDarkMode
-            ? "text-green-400 hover:text-green-200"
-            : "text-green-600 hover:text-green-900"
-        }`}
-      >
-        <Eye size={18} />
-      </button>
+
+                          <button
+                            onClick={() => handlePayslip(expense._id)}
+                            className={`mr-7 flex gap-2 transition-colors duration-300 ${isDarkMode
+                                ? "text-green-400 hover:text-green-200"
+                                : "text-green-600 hover:text-green-900"
+                              }`}
+                          >
+                            <Eye size={18} />
+                          </button>
                           <button
                             onClick={() => initiateDelete(expense._id)}
-                            className={`mr-3 flex gap-2 transition-colors duration-300 ${
-                              isDarkMode
+                            className={`mr-3 flex gap-2 transition-colors duration-300 ${isDarkMode
                                 ? "text-red-400 hover:text-red-200"
                                 : "text-red-600 hover:text-red-900"
-                            }`}
+                              }`}
                           >
-                            <Trash size={18} /> 
+                            <Trash size={18} />
                           </button>
                         </div>
                       </td>
@@ -529,68 +527,66 @@ const ViewExpenses = () => {
                 </tbody>
               </table>
               <div className="mt-4 flex items-center justify-between">
-  {/* Rows per page dropdown on the left */}
-  <div className="flex items-center">
-    <span className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Rows per page:</span>
-    <select
-      className={`ml-2 p-1 border rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
-      value={rowsPerPage}
-      onChange={(e) => setRowsPerPage(Number(e.target.value))} // Handle rows per page change
-    >
-      <option value={5}>6</option>
-      <option value={10}>10</option>
-      <option value={15}>15</option>
-    </select>
-  </div>
+                {/* Rows per page dropdown on the left */}
+                <div className="flex items-center">
+                  <span className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Rows per page:</span>
+                  <select
+                    className={`ml-2 p-1 border rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
+                    value={rowsPerPage}
+                    onChange={(e) => setRowsPerPage(Number(e.target.value))} // Handle rows per page change
+                  >
+                    <option value={5}>6</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                  </select>
+                </div>
 
-  {/* Pagination controls on the right */}
-  <div className={`px-4 py-3 flex items-center justify-between border-t sm:px-6`}>
-        <div className="flex-1 flex justify-between sm:hidden">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Next
-          </button>
-        </div>
-        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-         
-          <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${
-                  isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
-                } text-sm font-medium text-gray-500 hover:bg-gray-50`}
-              >
-                Previous
-              </button>
-              {renderPaginationButtons()}
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
-                  isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
-                } text-sm font-medium text-gray-500 hover:bg-gray-50`}
-              >
-                Next
-              </button>
-            </nav>
-          </div>
-        </div>
-        </div>
-</div>
+                {/* Pagination controls on the right */}
+                <div className={`px-4 py-3 flex items-center justify-between border-t sm:px-6`}>
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
 
-             
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                          disabled={currentPage === 1}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                            } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+                        >
+                          Previous
+                        </button>
+                        {renderPaginationButtons()}
+                        <button
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                          disabled={currentPage === totalPages}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+                            } text-sm font-medium text-gray-500 hover:bg-gray-50`}
+                        >
+                          Next
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
             </div>
           </div>
         )}
