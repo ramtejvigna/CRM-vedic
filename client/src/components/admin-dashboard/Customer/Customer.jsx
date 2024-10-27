@@ -139,39 +139,39 @@ const Customer = () => {
 
     const blobToBase64 = (blob) => {
         return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(",")[1]); // Get base64 content without the data type prefix
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(",")[1]); // Get base64 content without the data type prefix
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
         });
-      };
+    };
 
     const handleSendMail = async (pdfUrl, uniqueId, email) => {
         if (!email) {
             alert("Provide a valid email");
             return;
-          }
-        
-          try {
+        }
+
+        try {
             const response = await fetch(pdfUrl);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const pdfBlob = await response.blob(); // Convert the response to a Blob
-                    const base64Pdf = await blobToBase64(pdfBlob);
-            
-            await axios.post("http://localhost:3000/api/send-pdf-email", {
-              email,
-              base64Pdf,
-              uniqueId,
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const pdfBlob = await response.blob(); // Convert the response to a Blob
+            const base64Pdf = await blobToBase64(pdfBlob);
+
+            await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-email", {
+                email,
+                base64Pdf,
+                uniqueId,
             });
-        
+
             alert("PDF sent to email");
-          } catch (error) {
+        } catch (error) {
             console.error("Error sending PDF to email", error);
             alert("Error sending email");
-          }
-        };
+        }
+    };
 
     const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
         if (!phoneNumber || !pdfUrl || !uniqueId) {
@@ -242,12 +242,12 @@ const Customer = () => {
                             <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
                         </div>
 
-            {/* Divider */}
-            <hr className="my-3 border-gray-300" />
-            <p className="text-gray-600">
-  <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
-</p>
-            <hr className="my-3 border-gray-300" />
+                        {/* Divider */}
+                        <hr className="my-3 border-gray-300" />
+                        <p className="text-gray-600">
+                            <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
+                        </p>
+                        <hr className="my-3 border-gray-300" />
 
                         {/* Assigned Employee */}
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
@@ -261,7 +261,7 @@ const Customer = () => {
                             <p className="text-gray-600">No employee assigned.</p>
                         )}
                     </div>
-                    
+
 
                     {/* Payment Details & Astrological Details Card */}
                     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
