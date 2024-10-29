@@ -44,7 +44,7 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await fetch("http://localhost:3000/salaries/");
+      const response = await fetch("https://vedic-backend-neon.vercel.app/salaries/");
       const data = await response.json()
       setSalaryStatements(data);
     } catch (error) {
@@ -63,7 +63,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`http://localhost:3000/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`https://vedic-backend-neon.vercel.app/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
@@ -185,10 +185,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
   } , [searchTerm]);
 
 
-  useEffect(() => {
-    console.log(image)
-     
-  } , [image])
+
 
 
 
@@ -481,7 +478,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                       {/* Download and Print Buttons */}
                       <div className='w-full p-5 flex items-center justify-between bg-black'>
                         <div className='p-2'>
-                          <span className='text-xl text-white tracking-wider capitalize'>Bank statement</span>
+                          <span className='text-xl text-white tracking-wider capitalize'>Salary statement</span>
                         </div>
                         <div>
                           <button

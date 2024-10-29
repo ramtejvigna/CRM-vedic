@@ -4,19 +4,16 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField, InputLabel } from '@mui/material';
+import { TextField, InputLabel, Typography } from '@mui/material';
 import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
 import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
-
 import { ADD_EMPLOYEE_ROUTE } from '../../../utils/constants';
-
-
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
 const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'paymentDetails']
 
-
 const AddEmployee = () => {
+
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
     const [errors, setErrors] = useState({});
@@ -39,7 +36,6 @@ const AddEmployee = () => {
         paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: '' },
     });
 
-
     const handleNext = () => {
         if (validateForm()) {
             setActiveStep((prev) => prev + 1);
@@ -51,7 +47,6 @@ const AddEmployee = () => {
     const handleBack = () => {
         setActiveStep((prev) => prev - 1);
     };
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -67,12 +62,13 @@ const AddEmployee = () => {
     const validateForm = () => {
         const form = formData[formKeys[activeStep]];
         const formErrors = {};
-    
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-        const phoneRegex = /^[679]\d{9}$/; 
-        const ssnRegex = /^\d{3}-\d{2}-\d{4}$/; 
-        const cvvRegex = /^\d{3}$/; 
-    
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[679]\d{9}$/;
+        const ssnRegex = /^\d{3}\d{2}\d{4}$/;
+        const cvvRegex = /^\d{3}$/;
+        const cardNumberRegex = /^\d{16}$/;
+
         if (activeStep === 0) {
             if (!form.firstName) formErrors.firstName = 'First name is required';
             if (!form.email) {
@@ -92,7 +88,7 @@ const AddEmployee = () => {
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
         }
-    
+
         if (activeStep === 1) {
             if (!form.aadharOrPan) {
                 formErrors.aadharOrPan = 'Aadhar Card or PAN Card is required';
@@ -101,47 +97,48 @@ const AddEmployee = () => {
             if (!form.ssn) {
                 formErrors.ssn = 'Social Security Number is required';
             } else if (!ssnRegex.test(form.ssn)) {
-                formErrors.ssn = 'Invalid SSN format. Use XXX-XX-XXXX';
+                formErrors.ssn = 'Invalid SSN format. Use XXX XX XXXX';
             }
         }
-    
+
         if (activeStep === 2) {
             if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
             if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
         }
-    
+
         if (activeStep === 3) {
             if (!form.employerName) formErrors.employerName = 'Employer Name is required';
             if (!form.jobTitle) formErrors.jobTitle = 'Job title is required';
             if (!form.startDate) {
                 formErrors.startDate = 'Start date is required';
-            } 
+            }
             if (!form.endDate) {
                 formErrors.endDate = 'End date is required';
             }
             if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'Reason for leaving is required';
         }
-    
+
         if (activeStep === 4) {
             if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
             if (!form.cardNumber) {
                 formErrors.cardNumber = 'Card Number is required';
-            } 
+            }
+            if (!cardNumberRegex.test(form.cardNumber)) {
+                formErrors.cardNumber = 'Invalid Card Number. Use 16 digits ';
+            }
             if (!form.expiryDate) {
                 formErrors.expiryDate = 'Expiry Date is required';
-            } 
+            }
             if (!form.cvv) {
                 formErrors.cvv = 'CVV is required';
             } else if (!cvvRegex.test(form.cvv)) {
                 formErrors.cvv = 'Invalid CVV format. Use 3 digits';
             }
         }
-    
+
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
-    
-
 
     const handleFileChange = (e, section, field) => {
         const file = e.target.files[0];
@@ -154,73 +151,66 @@ const AddEmployee = () => {
         })
     }
 
-    const handleFileClear = (section , field) => {
+    const handleFileClear = (section, field) => {
         setFormData({
-            ...formData ,
-            [section] : {
-                ...formData[section] ,
-                [field] : null
+            ...formData,
+            [section]: {
+                ...formData[section],
+                [field]: null
             }
         })
     }
 
-
-
-    const handleSubmit = async (e) => { 
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const formDataToSend = new FormData();
+        if (validateForm()) {
+            const formDataToSend = new FormData();
 
-        // personale info
-        Object.keys(formData.personalInfo).forEach((key) => {
-            formDataToSend.append(key , formData.personalInfo[key])
-        })
+            // personale info
+            Object.keys(formData.personalInfo).forEach((key) => {
+                formDataToSend.append(key, formData.personalInfo[key])
+            })
 
-        // idDocuments
-        formDataToSend.append("aadharOrPan" , formData.idDocuments.aadharOrPan);
-        formDataToSend.append("passport" , formData.idDocuments.passport);
-        formDataToSend.append("ssn" , formData.idDocuments.ssn);
+            // idDocuments
+            formDataToSend.append("aadharOrPan", formData.idDocuments.aadharOrPan);
+            formDataToSend.append("passport", formData.idDocuments.passport);
+            formDataToSend.append("ssn", formData.idDocuments.ssn);
 
+            // degree and transcripts
+            formDataToSend.append('degrees', formData.education.degrees);
+            formDataToSend.append('transcripts', formData.education.transcripts);
 
-        // degree and transcripts
-        formDataToSend.append('degrees' , formData.education.degrees);
-        formDataToSend.append('transcripts',formData.education.transcripts);
-        
-        // previous employements
-        Object.keys(formData.employment).forEach((key) => {
-            formDataToSend.append(key , formData.employment[key])
-        })
+            // previous employements
+            Object.keys(formData.employment).forEach((key) => {
+                formDataToSend.append(key, formData.employment[key])
+            })
 
-        // payment details
-        Object.keys(formData.paymentDetails).forEach((key) => {
-            formDataToSend.append(key , formData.paymentDetails[key])
-        })
+            // payment details
+            Object.keys(formData.paymentDetails).forEach((key) => {
+                formDataToSend.append(key, formData.paymentDetails[key])
+            })
 
-        
-        try {   
-            setIsLoading(true);
-            const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
-                method: "POST",
-                body: formDataToSend
-            });
+            try {
+                setIsLoading(true);
+                const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
+                    method: "POST",
+                    body: formDataToSend
+                });
 
-            if (!res.ok) {
-                throw new Error("NetWork issue");
+                if (!res.ok) {
+                    throw new Error("NetWork issue");
+                }
+
+                const data = await res.json();
+                setIsLoading(false);
+
+                toast.success("employee created");
+                navigate('/admin-dashboard/employees')
+            } catch (error) {
+                toast.error(error.message);
             }
-
-            const data = await res.json();
-            setIsLoading(false);
-
-            toast.success("employee created");
-            navigate('/admin-dashboard/employees')
-        } catch (error) {
-            toast.error(error.message);
         }
-
-
     }
-    
-    
-
 
     const renderForm = () => {
         switch (activeStep) {
@@ -231,29 +221,40 @@ const AddEmployee = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
                                 className="flex-1"
-                                label="firstname"
+                                label={"First Name"}
                                 name="firstName"
                                 value={formData.personalInfo.firstName}
                                 onChange={handleChange}
                                 error={!!errors.firstName}
                                 helperText={errors.firstName}
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
                                 className="flex-1"
-                                label="lastname"
+                                label={"Last Name"}
                                 name="lastName"
                                 value={formData.personalInfo.lastName}
                                 onChange={handleChange}
                                 error={!!errors.lastName}
                                 helperText={errors.lastName}
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                         </div>
 
-                        
                         <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
-                                label="Phone Number"
+                                label={"Phone"}
                                 name="phone"
                                 value={formData.personalInfo.phone}
                                 onChange={handleChange}
@@ -261,26 +262,38 @@ const AddEmployee = () => {
                                 helperText={errors.phone}
                                 inputProps={{
                                     maxLength: 10,
-                                    inputMode: 'numeric', 
-                                    pattern: '[0-9]*' 
+                                    inputMode: 'numeric',
+                                    pattern: '[0-9]*'
                                 }}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="Email"
+                                label={"Email"}
                                 name="email"
                                 value={formData.personalInfo.email}
                                 onChange={handleChange}
                                 error={!!errors.email}
                                 helperText={errors.email}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                         </div>
 
                         <h3 className="text-lg font-semibold text-gray-700">Address</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
-                                label="Address"
+                                label={"Address"}
                                 name="address"
                                 value={formData.personalInfo.address}
                                 onChange={handleChange}
@@ -288,9 +301,15 @@ const AddEmployee = () => {
                                 helperText={errors.address}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="City"
+                                label={"City"}
                                 name="city"
                                 value={formData.personalInfo.city}
                                 onChange={handleChange}
@@ -298,36 +317,59 @@ const AddEmployee = () => {
                                 helperText={errors.city}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
-
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <TextField
-                                label="State"
+                                label={"State"}
                                 name="state"
                                 value={formData.personalInfo.state}
                                 onChange={handleChange}
                                 error={!!errors.state}
                                 helperText={errors.state}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="Pincode"
+                                label={"Pincode"}
                                 name="pincode"
                                 value={formData.personalInfo.pincode}
                                 onChange={handleChange}
                                 error={!!errors.pincode}
                                 helperText={errors.pincode}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="Country"
+                                label='Country'
                                 name="country"
                                 value={formData.personalInfo.country}
                                 onChange={handleChange}
                                 error={!!errors.country}
                                 helperText={errors.country}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
+                                  required
                             />
                         </div>
                     </div>
@@ -336,12 +378,12 @@ const AddEmployee = () => {
             case 1:
                 return (
                     <div className="p-2 sm:p-5  space-y-8">
-                    <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
+                        <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
                     {/* Aadhar or PAN section */}
                     {!formData.idDocuments.aadharOrPan ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
+                        <InputLabel className="text-gray-700">Aadhar or Pan <span className='text-red-500'>*</span> </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex gap-2 items-center">
@@ -361,7 +403,7 @@ const AddEmployee = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
+                        <InputLabel className="text-gray-700">Aadhar or Pan  <span className='text-red-500'>*</span></InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg w-40 h-40 bg-gray-50 flex items-center justify-center">
                             <img
                             src={URL.createObjectURL(formData.idDocuments.aadharOrPan)}
@@ -381,7 +423,7 @@ const AddEmployee = () => {
                     {/* Passport or Driving License section */}
                     {!formData.idDocuments.passport ? (
                         <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Passport </InputLabel>
+                            <InputLabel className="text-gray-700">Passport  <span className='text-red-500'>*</span> </InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                 <label className="w-full h-full flex flex-col items-center justify-center">
                                 <span className="text-gray-500 flex gap-2 items-center">
@@ -397,11 +439,11 @@ const AddEmployee = () => {
                                 />
                                 </label>
                             </div>
-                            {errors.passport ? <span className='text-xs text-red-500'>passport or driving liscense is required</span> : ""}
+                            {errors.passport ? <span className='text-xs text-red-500'>passport  is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
+                            <InputLabel className="text-gray-700">Passport  <span className='text-red-500'>*</span></InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300 h-40 w-40 rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                                 src={URL.createObjectURL(formData.idDocuments.passport)}
@@ -420,7 +462,7 @@ const AddEmployee = () => {
 
                     {/* Social Security Number input */}
                     <TextField
-                        label="Social Security Number"
+                        label={"Social Security Number"}
                         name="ssn"
                         value={formData.idDocuments.ssn}
                         onChange={handleChange}
@@ -428,20 +470,25 @@ const AddEmployee = () => {
                         fullWidth
                         error={!!errors.ssn}
                         helperText={errors.snn}
+                        required
+                        InputLabelProps={{
+                            sx: {
+                              '& .MuiInputLabel-asterisk': { color: 'red' },
+                            },
+                          }}
                     />
                     </div>
+                );
 
-                    );
-
-                case 2:
-                    return (
-                        <div className="p-2 sm:p-5  space-y-8">
+            case 2:
+                return (
+                    <div className="p-2 sm:p-5  space-y-8">
                         <h2 className="text-lg font-semibold text-gray-700">Educational Qualifications</h2>
 
                         {/* Degrees/Certificates Section */}
                         {!formData.education.degrees ? (
                             <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
+                            <InputLabel className="text-gray-700">Degrees Certificates <span className='text-red-500'>*</span> </InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                 <label className="w-full h-full flex flex-col items-center justify-center">
                                 <span className="text-gray-500 flex items-center gap-2">
@@ -461,7 +508,7 @@ const AddEmployee = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
+                            <InputLabel className="text-gray-700">Degrees Certificate <span className='text-red-500'>*</span></InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                                 src={URL.createObjectURL(formData.education.degrees)}
@@ -481,7 +528,7 @@ const AddEmployee = () => {
                         {/* Transcripts Section */}
                         {!formData.education.transcripts ? (
                             <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
+                            <InputLabel className="text-gray-700">Upload Transcripts <span className='text-red-500'>*</span></InputLabel>
                             <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                                 <label className="w-full h-full flex flex-col items-center justify-center">
                                 <span className="text-gray-500 flex items-center gap-2">
@@ -501,7 +548,7 @@ const AddEmployee = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Transcripts</InputLabel>
+                            <InputLabel className="text-gray-700">Transcripts <span className='text-red-500'>*</span></InputLabel>
                             <div className="mt-2 h-40 w-40 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                                 src={URL.createObjectURL(formData.education.transcripts)}
@@ -517,9 +564,8 @@ const AddEmployee = () => {
                             </button>
                             </div>
                         )}
-                        </div>
-
-                    );
+                    </div>
+                );
 
                 case 3:
                     return (
@@ -532,6 +578,12 @@ const AddEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <TextField
                                 label="Job Title"
@@ -540,13 +592,19 @@ const AddEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <div className="grid gap-2">
                                  <label 
                                     htmlFor="startDate" 
-                                     className="block text-sm font-medium "
+                                     className="block text-sm capitalize font-medium "
                                 >
-                                    start date
+                                    start date <span className='text-red-500'>*</span>
                                 </label>
                                 <TextField
                                     name="startDate"
@@ -555,15 +613,16 @@ const AddEmployee = () => {
                                     onChange={handleChange}
                                     className="rounded-md shadow-sm bg-gray-50"
                                     fullWidth
+
                                 />
 
                             </div>
                             <div className="grid gap-2">
                                  <label 
                                     htmlFor="endDate" 
-                                     className="block text-sm font-medium "
+                                     className="block capitalize text-sm font-medium "
                                 >
-                                    end date
+                                    end date <span className='text-red-500'>*</span>
 
                                 </label>
                                 <TextField
@@ -573,6 +632,12 @@ const AddEmployee = () => {
                                     onChange={handleChange}
                                     className="rounded-md shadow-sm bg-gray-50"
                                     fullWidth
+                                    required
+                                    InputLabelProps={{
+                                        sx: {
+                                            '& .MuiInputLabel-asterisk': { color: 'red' },
+                                        },
+                                    }}
                                 />
 
 
@@ -584,15 +649,21 @@ const AddEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                         </div>
                     );
 
-                case 4:
-                    return (
-                        <div className="space-y-6 p-2 sm:p-5">
-                            <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
-                            <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
+            case 4:
+                return (
+                    <div className="space-y-6 p-2 sm:p-5">
+                        <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
+                        <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
 
                             <TextField
                                 label="Cardholder Name"
@@ -601,6 +672,12 @@ const AddEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <TextField
                                 label="Card Number"
@@ -609,6 +686,12 @@ const AddEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="grid gap-2">
@@ -616,12 +699,11 @@ const AddEmployee = () => {
                                         htmlFor="expiryDate" 
                                         className="block text-sm font-medium text-gray-500"
                                     >
-                                        expiry date
+                                        expiry date <span className='text-red-500'>*</span>
                                     </label>
                                     <TextField
                                         id="expiryDate"
                                         name="expiryDate"
-                                        
                                         type='date'
                                         value={formData.paymentDetails.expiryDate}
                                         onChange={handleChange}
@@ -633,7 +715,7 @@ const AddEmployee = () => {
                                         htmlFor="cvv" 
                                         className="block text-sm font-medium opacity-0"
                                     >
-                                        cvv
+                                        cvv <span className='text-red-500'>*</span>
                                     </label>
                                     <TextField
                                         label="CVV"
@@ -641,6 +723,12 @@ const AddEmployee = () => {
                                         value={formData.paymentDetails.cvv}
                                         onChange={handleChange}
                                         className="rounded-md shadow-sm bg-gray-50"
+                                        required
+                                        InputLabelProps={{
+                                            sx: {
+                                                '& .MuiInputLabel-asterisk': { color: 'red' },
+                                            },
+                                        }}
                                     />
                                 </div>
 
@@ -648,27 +736,27 @@ const AddEmployee = () => {
                         </div>
                     );
 
-                default:
-                    return null;
-            }
-        };
+            default:
+                return null;
+        }
+    };
 
-        return isLoading ? (
-            <div className='h-full flex items-center justify-center'>
-                <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
-            </div>
-        ) : (
-            <div className="h-full p-5 ">
-                <Box className="flex flex-col  h-full p-5 ">
-                    <Stepper activeStep={activeStep} className="p-10 w-full">
-                        {steps.map((label, index) => (
-                            <Step className='' key={label}>
-                                <StepLabel><span className="hidden xl:block  text-center  tracking-wider">{label}</span></StepLabel>
-                            </Step>
-                        ))}
-                    </Stepper>
-                    <div className="flex-1 mx-auto w-full p-5 flex flex-col justify-between   bg-white shadow-lg rounded-lg">
-                        {renderForm()}
+    return isLoading ? (
+        <div className='h-full flex items-center justify-center'>
+            <div className="w-10 h-10 border-gray-500 border-t-black border-[3px] animate-spin rounded-full" />
+        </div>
+    ) : (
+        <div className="h-full p-5 ">
+            <Box className="flex flex-col  h-full p-5 ">
+                <Stepper activeStep={activeStep} className="p-10 w-full">
+                    {steps.map((label, index) => (
+                        <Step className='' key={label}>
+                            <StepLabel><span className="hidden xl:block  text-center  tracking-wider">{label}</span></StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+                <div className="flex-1 mx-auto w-full p-5 flex flex-col justify-between   bg-white shadow-lg rounded-lg">
+                    {renderForm()}
                     <Box className="flex p-2 justify-between">
                         <Button
                             disabled={activeStep === 0}
@@ -703,16 +791,12 @@ const AddEmployee = () => {
                                 </Button>
                             </div>
                         )
-
                         }
                     </Box>
-                    </div>
-                </Box>
-            </div>
-        );
+                </div>
+            </Box>
+        </div>
+    );
 };
-
-
-
 
 export default AddEmployee;

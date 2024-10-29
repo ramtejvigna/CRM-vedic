@@ -38,7 +38,6 @@ const Customer = () => {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [expandedRow, setExpandedRow] = useState(null);
 
-
     const handleActionClick = (action, pdf) => {
         setActiveDropdown(null);
         if (action === 'view') {
@@ -70,7 +69,6 @@ const Customer = () => {
                 setLoading(false);
             }
         };
-
 
         getCustomerDetails(id);
 
@@ -247,7 +245,9 @@ const Customer = () => {
                         ) : (
                             <div className="flex-grow">
                                 <div className="grid grid-cols-1 gap-2">
-                                    <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
+                                <p className="text-gray-600">
+  <strong>Payment Date:</strong> {customerDetails?.paymentDate ? new Date(customerDetails.paymentDate).toLocaleDateString() : "N/A"}
+</p>
                                     <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
                                     <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
                                     <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
@@ -271,7 +271,6 @@ const Customer = () => {
                     </div>
                 </div>
             </div>
-
 
 
             <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">
