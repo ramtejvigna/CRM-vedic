@@ -3,6 +3,7 @@ import http from 'http';
 import { connectToMongoDB } from './db.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import fileUpload from 'express-fileupload';
 import employeeRoutes from './routes/EmployeeRouter.js';
 import dotenv from 'dotenv';
 import taskRoutes from './routes/TaskRoutes.js';
@@ -36,6 +37,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 ///
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(fileUpload());
 
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)

@@ -76,25 +76,40 @@ const BabyDatabase = () => {
 
     // Handle CSV upload
     const handleCsvUpload = async (event) => {
+        const file = event.target.files[0];
+
+        // Ensure a file is selected and is of type CSV
+        if (!file || file.type !== "text/csv") {
+            toast.error("Please upload a valid CSV file.", {
+                toastId: 'invalid-file-type'
+            });
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('csv', event.target.files[0]);
+        formData.append('csv', file);
+
         try {
+            // Send the POST request with the formData
             await axios.post("https://vedic-backend-neon.vercel.app/uploadCsvNames", formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+
+            // Fetch updated data and notify the user
             fetchBabyNames();
             toast.success("File uploaded successfully!", {
-                onClose: () => { }, // Empty callback to prevent undefined error
+                onClose: () => { },
                 toastId: 'upload-success'
             });
         } catch (err) {
-            console.error(err);
+            console.error("File upload error:", err);
             toast.error("Failed to upload the file", {
-                onClose: () => { }, // Empty callback to prevent undefined error
+                onClose: () => { },
                 toastId: 'upload-error'
             });
         }
     };
+
 
     // Handle editing
     const startEdit = (baby) => {
