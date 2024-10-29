@@ -168,7 +168,7 @@ const AddExpense = () => {
     >
       <label className="w-full cursor-pointer">
         <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
+          <p className="text-sm font-medium text-gray-600">Click here to upload file</p>
           <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG, PDF</p>
         </div>
         <input

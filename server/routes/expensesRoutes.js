@@ -3,7 +3,6 @@ import {
   addExpense, 
   getAllExpenses, 
   getExpenseFile,
-  updateExpense, 
   deleteExpense
 } from '../controllers/ExpensesController.js';
 

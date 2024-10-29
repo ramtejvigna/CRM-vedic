@@ -49,9 +49,24 @@ const PayslipModal = ({ isOpen, onClose, payslipData, fileType }) => {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html>
-        <head><title>Print Payslip</title></head>
+        <head>
+          <title>Print Payslip</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              background-color: white;
+            }
+            img {
+              display: block;
+              margin: 0 auto;
+              max-width: 100%;
+              height: auto;
+            }
+          </style>
+        </head>
         <body>
-          <img src="data:${fileType};base64,${payslipData}" style="width: 100%; height: auto;"/>
+          <img src="data:${fileType};base64,${payslipData}" />
         </body>
       </html>
     `);
@@ -61,30 +76,43 @@ const PayslipModal = ({ isOpen, onClose, payslipData, fileType }) => {
 
   return (
     <div className="fixed z-[1000] top-0 left-0 right-0 bottom-0 bg-black/20 backdrop-blur-md flex items-center justify-center">
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0 }}
-        transition={{ duration: 0.5, ease: "backInOut" }}
-        className="bg-white w-full p-7 max-h-[750px] max-w-[800px] shadow-xl h-full relative"
-      >
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0 }}
+      transition={{ duration: 0.5, ease: "backInOut" }}
+      className="bg-white p-7 mx-auto w-[700px] h-[700px] shadow-xl relative"
+    >
         <div className="flex absolute top-1 right-1">
           <AiOutlineClose className="text-xl cursor-pointer" onClick={onClose} />
         </div>
-        <div className="flex items-center justify-between bg-black p-2 h-16">
-          <span className="text-xl text-white">Bank Statement</span>
-          <div className="flex gap-2">
-            <button onClick={handleDownload} className="px-4 py-2 text-white font-semibold rounded-md transition-all hover:bg-gray-800"><AiOutlineDownload /></button>
-            <button onClick={handlePrint} className="px-4 py-2 text-white font-semibold rounded-md transition-all hover:bg-gray-800"><AiOutlinePrinter /></button>
-          </div>
-        </div>
-        <div className="flex items-center justify-center w-full h-[90%]">
-          <img src={`data:${fileType};base64,${payslipData}`} alt="Payslip" className="object-cover w-full h-full" />
+        <div className="flex items-center justify-between bg-black p-4"> {/* Changed p-2 to p-4 */}
+  <span className="text-xl text-white">Bank Statement</span>
+  <div className="flex gap-2">
+    <button onClick={handleDownload} className="px-4 py-2 text-white font-semibold rounded-md transition-all hover:bg-gray-800">
+      <AiOutlineDownload />
+    </button>
+    <button onClick={handlePrint} className="px-4 py-2 text-white font-semibold rounded-md transition-all hover:bg-gray-800">
+      <AiOutlinePrinter />
+    </button>
+  </div>
+</div>
+
+        <div className="flex items-center justify-center">
+          <img
+            src={`data:${fileType};base64,${payslipData}`}
+            alt="Payslip"
+            style={{
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
         </div>
       </motion.div>
     </div>
   );
 };
+
 
 // Main ViewExpenses Component
 const ViewExpenses = () => {
