@@ -274,7 +274,7 @@ const TaskModal = ({
 
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                           <DateTimePicker
-                            label="End Time"
+                            label="Deadline"
                             value={newTask.endTime}
                             onChange={handleDateChange}
                             renderInput={(params) => (

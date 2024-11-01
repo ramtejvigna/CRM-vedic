@@ -89,9 +89,9 @@ const PayslipModal = ({ isOpen, onClose, payslipData }) => {
         className="bg-white w-full overflow-scroll scrollbar-hide p-7 mx-auto max-w-[800px] shadow-xl h-full my-auto max-h-[600px] relative"
       >
         <div className="flex absolute top-1 right-1 justify-end items-end">
-          <AiOutlineClose
-            className="text-xl cursor-pointer"
-            onClick={onClose}
+          <AiOutlineClose 
+            className="text-xl cursor-pointer" 
+            onClick={onClose} 
           />
         </div>
 
@@ -118,16 +118,16 @@ const PayslipModal = ({ isOpen, onClose, payslipData }) => {
         </div>
 
         <div className="flex items-center justify-center w-full h-[90%]">
-          <iframe
-            src={payslipData ? `data:image/jpeg;base64,${payslipData}` : ''}
-            height="100%"
-            width="100%"
-            className="object-cover"
-            title="payslip"
-          ></iframe>
-          {!payslipData && (
-            <div className="text-center text-gray-500">No valid payslip available for this expense.</div>
-          )}
+        <iframe
+    src={payslipData ? `data:image/jpeg;base64,${payslipData}` : ''}
+    height="100%"
+    width="100%"
+    className="object-cover"
+    title="payslip"
+></iframe>
+{!payslipData && (
+    <div className="text-center text-gray-500">No valid payslip available for this expense.</div>
+)}
         </div>
       </motion.div>
     </div>
@@ -152,8 +152,8 @@ const ViewExpenses = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5); // State for rows per page
   const [expenseToView, setExpenseToView] = useState(null);
   const [payslipModalOpen, setPayslipModalOpen] = useState(false);
-  const [selectedPayslip, setSelectedPayslip] = useState(null);
-
+  const [selectedPayslip, setSelectedPayslip] = useState(null);  
+  
   const totalExpenses = filteredExpenses.length;
   const totalPages = Math.ceil(totalExpenses / rowsPerPage); // Total pages based on filtered expenses
   const indexOfLastRecord = currentPage * rowsPerPage; // Index of the last record on the current page
@@ -176,14 +176,14 @@ const ViewExpenses = () => {
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      const response = await fetch('https://vedic-backend-neon.vercel.app/api/expenses'); // Adjust API endpoint as needed
-      const data = await response.json();
-      console.log("Fetched Expenses:", data.expenses); // Log fetched data
-      setExpenses(data.expenses);
+        const response = await fetch('/api/expenses'); // Adjust API endpoint as needed
+        const data = await response.json();
+        console.log("Fetched Expenses:", data.expenses); // Log fetched data
+        setExpenses(data.expenses);
     };
 
     fetchExpenses();
-  }, []);
+}, []);
 
 
   useEffect(() => {
@@ -209,53 +209,51 @@ const ViewExpenses = () => {
       setIsLoading(false);
     }
   };
-
+  
   const handlePayslip = (expenseId) => {
     // Log the incoming expenseId
     console.log("Expense ID:", expenseId);
-
+    
     // Find the expense
     const expense = expenses.find((exp) => exp._id === expenseId);
-
+    
     // Log the entire expense object
-    console.log("Selected expense:", expense);
-
+    console.log("Selected expense:", expense); 
+  
     // Check the value of the bank_statement property
     if (expense) {
-      console.log("Bank Statement:", expense.bank_statement); // Log bank_statement directly
-
-      // Ensure bank_statement exists and is a valid base64 string
-      if (typeof expense.bank_statement === "string" && expense.bank_statement) {
-        setSelectedPayslip(expense.bank_statement); // Set the payslip to view
-        setPayslipModalOpen(true); // Open the modal
-      } else {
-        toast.error("No valid payslip available for this expense"); // Show error if no valid payslip
-      }
+        console.log("Bank Statement:", expense.bank_statement); // Log bank_statement directly
+      
+        // Ensure bank_statement exists and is a valid base64 string
+        if (typeof expense.bank_statement === "string" && expense.bank_statement) {
+            setSelectedPayslip(expense.bank_statement); // Set the payslip to view
+            setPayslipModalOpen(true); // Open the modal
+        } else {
+            toast.error("No valid payslip available for this expense"); // Show error if no valid payslip
+        }
     } else {
-      toast.error("Expense not found"); // Show error if the expense is not found
+        toast.error("Expense not found"); // Show error if the expense is not found
     }
-  };
+};
 
-
-
+  
+  
   // new code
   // Inside your modal or wherever you want to display the payslip
-  {
-    payslipModalOpen && (
-      <div className="modal">
+  {payslipModalOpen && (
+    <div className="modal">
         <h2>Expense Payslip</h2>
         {selectedPayslip && (
-          <img
-            src={`data:${file_type};base64,${selectedPayslip}`}
-            alt="Expense Payslip"
-            style={{ maxWidth: '100%', maxHeight: '400px' }}
-          />
+            <img
+                src={`data:${file_type};base64,${selectedPayslip}`}
+                alt="Expense Payslip"
+                style={{ maxWidth: '100%', maxHeight: '400px' }}
+            />
         )}
         <button onClick={() => setPayslipModalOpen(false)}>Close</button>
-      </div>
-    )
-  }
-
+    </div>
+)}
+  
   const handleFilterAndSearch = () => {
     let filtered = [...expenses];
 
@@ -330,7 +328,7 @@ const ViewExpenses = () => {
     }
   };
 
-
+  
 
   const handleAddExpense = () => navigate("add-expense");
   const handleEdit = (id) => navigate(`edit-expense/${id}`);
@@ -367,7 +365,7 @@ const ViewExpenses = () => {
           />
         )}
 
-        {payslipModalOpen && (
+{payslipModalOpen && (
           <PayslipModal
             isOpen={payslipModalOpen}
             onClose={() => {
@@ -501,16 +499,17 @@ const ViewExpenses = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center">
-
-                          <button
-                            onClick={() => handlePayslip(expense._id)}
-                            className={`mr-7 flex gap-2 transition-colors duration-300 ${isDarkMode
-                                ? "text-green-400 hover:text-green-200"
-                                : "text-green-600 hover:text-green-900"
-                              }`}
-                          >
-                            <Eye size={18} />
-                          </button>
+                          
+                        <button
+        onClick={() => handlePayslip(expense._id)}
+        className={`mr-7 flex gap-2 transition-colors duration-300 ${
+          isDarkMode
+            ? "text-green-400 hover:text-green-200"
+            : "text-green-600 hover:text-green-900"
+        }`}
+      >
+        <Eye size={18} />
+      </button>
                           <button
                             onClick={() => initiateDelete(expense._id)}
                             className={`mr-3 flex gap-2 transition-colors duration-300 ${isDarkMode

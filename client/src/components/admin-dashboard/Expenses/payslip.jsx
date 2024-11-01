@@ -13,7 +13,7 @@ const PayslipModal = ({ expenseId, onClose }) => {
   const fetchBankStatement = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expenseId}`);
+      const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/${expenseId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch bank statement');
