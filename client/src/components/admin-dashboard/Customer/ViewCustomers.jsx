@@ -226,7 +226,7 @@ const CustomerDetails = () => {
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-4 py-3 text-left text-xm font-medium  tracking-wider"
+                    className="px-4 py-3 text-left text-xs font-medium  tracking-wider"
                   >
                     {header}
                   </th>
@@ -244,23 +244,23 @@ const CustomerDetails = () => {
                     className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
                       } transition-colors duration-150`}
                   >
-                    <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">{index + 1}</td>
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
                      {row.customerID
 }
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
                       {row.fatherName}
                     </td>
                     
-               <td className="px-4 py-3 whitespace-nowrap">
+               <td className="px-4 py-3 text-sm whitespace-nowrap">
                       {row.whatsappNumber}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
                       {row.babyGender}
                     </td>
                     
-<td className="px-4 py-3 whitespace-nowrap">
+<td className="px-4 py-3 text-sm  whitespace-nowrap">
     {row.assignedEmployeeName || 'Not Assigned'}
 </td>
 
@@ -270,16 +270,16 @@ const CustomerDetails = () => {
                        className={`
                         px-2 py-1 rounded-full text-sm inline-flex leading-5 font-semibold
                         ${row.customerStatus === "newRequests" 
-                          ? "text-yellow-600 bg-yellow-100" 
+                          ? "text-yellow-600 text-sm  bg-yellow-100" 
                           : ""}
                         ${row.customerStatus === "inProgress" 
-                          ? "text-gray-900 bg-gray-100" 
+                          ? "text-gray-900 text-sm text-sm bg-gray-100" 
                           : ""}
                         ${row.customerStatus === "completed" 
-                          ? " text-green-500 bg-green-100" 
+                          ? " text-green-500 text-sm bg-green-100" 
                           : ""}
                         ${row.customerStatus === "rejected" 
-                          ? "text-red-800 bg-red-100" 
+                          ? "text-red-800 text-sm  bg-red-100" 
                           : ""}
                       `}
                       

@@ -16,7 +16,6 @@ export const getAllExpenses = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const getExpenseFile = async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
@@ -43,66 +42,30 @@ export const getExpenseById = async (req, res) => {
   }
 };
 
+
+// Add new expense
 export const addExpense = async (req, res) => {
   try {
-    const { expense_name, amount, date } = req.body;
-    let bank_statement = '';
-    let file_type = '';
+    const { expense_name, amount, date, bank_statement, file_type } = req.body;
 
-    if (req.file) {
-      bank_statement = req.file.buffer.toString('base64'); // Convert file to base64 string
-      file_type = req.file.mimetype; // Get the file MIME type
-    }
-
-    const expense = await Expense.create({
+    const expense = new Expense({
       expense_name,
-      amount: parseFloat(amount),
+      amount,
       date: new Date(date),
-      bank_statement, // Ensure this is populated
-      file_type, // Ensure this is populated
+      bank_statement,
+      file_type,
     });
 
-    res.status(201).json({
-      message: "Expense added successfully",
-      expense: {
-        id: expense._id,
-        expense_name: expense.expense_name,
-        amount: expense.amount,
-        date: expense.date,
-      },
-    });
+    await expense.save();
+
+    res.status(201).json({ message: 'Expense added successfully', expense });
   } catch (error) {
-    console.error("Error adding expense:", error);
-    res.status(500).json({
-      message: "Failed to add expense",
-      error: error.message,
-    });
+    console.error('Error adding expense:', error);
+    res.status(500).json({ message: 'Failed to add expense', error: error.message });
   }
 };
 
 
-// Update expense
-export const updateExpense = async (req, res) => {
-  const { id } = req.params;
-  const { expense_name, amount, date } = req.body;
-  const bank_statement = req.file ? req.file.filename : null;
-  
-  try {
-    const updateData = { expense_name, amount, date };
-    if (bank_statement) {
-      updateData.bank_statement = bank_statement;
-    }
-    
-    const updatedExpense = await Expense.findByIdAndUpdate(id, updateData, { new: true });
-    if (!updatedExpense) {
-      return res.status(404).json({ message: 'Expense not found' });
-    }
-    res.status(200).json({ success: true, expense: updatedExpense });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to update expense' });
-  }
-};
 
 // Delete expense
 export const deleteExpense = async (req, res) => {

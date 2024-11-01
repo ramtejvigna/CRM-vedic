@@ -37,16 +37,14 @@ const Customer = () => {
     const [showViewer, setShowViewer] = useState(false); // State to control PDF viewer visibility
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [expandedRow, setExpandedRow] = useState(null);
-    const [mailUrl, setMailUrl] = useState(null);
-    const [pdfId, setPdfId] = useState(null);
 
-    const handleActionClick = async (action, pdf) => {
+    const handleActionClick = (action, pdf) => {
         setActiveDropdown(null);
         if (action === 'view') {
-            handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
+            handleShowPdf(pdf.babyNames, pdf._id)
         } else if (action === 'mail') {
-            await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
-            setPdfId(pdf._id);
+            handleSetPdfUrl(pdf.babyNames);
+            handleSendMail(pdfUrl, pdf._id, customerDetails.email);
         } else if (action === 'whatsapp') {
 
         } else if (action === 'feedback') {
@@ -72,7 +70,6 @@ const Customer = () => {
             }
         };
 
-
         getCustomerDetails(id);
 
     }, [id]);
@@ -83,6 +80,7 @@ const Customer = () => {
             const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`);
             if (response.data.length > 0) {
                 setPdfs(response.data);
+                console.log(response.data);
             }
             setPdfsLoading(false);
         } catch (error) {
@@ -95,29 +93,16 @@ const Customer = () => {
             fetchPdfs();
         }
     }, [customerId]);
-    const handleSetPdfUrl = async (babyNames, additionalBabyNames) => {
-        try {
-            const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
-            setMailUrl(generatedPdfUrl);
-        } catch (error) {
-            console.error("Error generating PDF URL:", error);
-            alert("Error generating PDF URL");
-        }
-    };
-
-    // Watch for changes to mailUrl and pdfId and send mail if both are available
-    useEffect(() => {
-        if (mailUrl && pdfId) {
-            handleSendMail(mailUrl, pdfId, customerDetails.email);
-        }
-    }, [mailUrl, pdfId]);
-
-    const handleShowPdf = async (babyNames, additionalBabyNames) => {
-        const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames); // Call the generatePdf function
+    const handleSetPdfUrl = async (babyNames) => {
+        const generatedPdfUrl = await generatePdf(babyNames);
+        setPdfUrl(generatedPdfUrl);
+    }
+    const handleShowPdf = async (babyNames, _id) => {
+        const generatedPdfUrl = await generatePdf(babyNames); // Call the generatePdf function
         setPdfUrl(generatedPdfUrl); // Set the URL state
+        setEnabledRow(_id);
         setShowViewer(true);
     };
-
 
     const handleClose = () => {
         setShowViewer(false); // Hide the PDF viewer
@@ -136,36 +121,18 @@ const Customer = () => {
         link.click();
     };
 
-
-    const blobToBase64 = (blob) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(",")[1]); // Get base64 content without the data type prefix
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    };
-
     const handleSendMail = async (pdfUrl, uniqueId, email) => {
-        if (!email) {
-            alert("Provide a valid email");
+        if (!email || !pdfUrl) {
+            alert("Provide a valid email and ensure the PDF is generated.");
             return;
         }
 
         try {
-            const response = await fetch(pdfUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const pdfBlob = await response.blob(); // Convert the response to a Blob
-            const base64Pdf = await blobToBase64(pdfBlob);
-
             await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-email", {
                 email,
-                base64Pdf,
+                pdfUrl,
                 uniqueId,
             });
-
             alert("PDF sent to email");
         } catch (error) {
             console.error("Error sending PDF to email", error);
@@ -242,12 +209,12 @@ const Customer = () => {
                             <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
                         </div>
 
-                        {/* Divider */}
-                        <hr className="my-3 border-gray-300" />
-                        <p className="text-gray-600">
-                            <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
-                        </p>
-                        <hr className="my-3 border-gray-300" />
+            {/* Divider */}
+            <hr className="my-3 border-gray-300" />
+            <p className="text-gray-600">
+  <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
+</p>
+            <hr className="my-3 border-gray-300" />
 
                         {/* Assigned Employee */}
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
@@ -261,7 +228,7 @@ const Customer = () => {
                             <p className="text-gray-600">No employee assigned.</p>
                         )}
                     </div>
-
+                    
 
                     {/* Payment Details & Astrological Details Card */}
                     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
@@ -278,9 +245,11 @@ const Customer = () => {
                         ) : (
                             <div className="flex-grow">
                                 <div className="grid grid-cols-1 gap-2">
-                                    <p className="text-gray-600"><strong>Payment Date:</strong> {customerDetails?.paymentDate || "N/A"}</p>
+                                <p className="text-gray-600">
+  <strong>Payment Date:</strong> {customerDetails?.paymentDate ? new Date(customerDetails.paymentDate).toLocaleDateString() : "N/A"}
+</p>
                                     <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
-                                    {/* <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p> */}
+                                    <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
                                     <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
                                 </div>
                             </div>
@@ -302,7 +271,6 @@ const Customer = () => {
                     </div>
                 </div>
             </div>
-
 
 
             <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">

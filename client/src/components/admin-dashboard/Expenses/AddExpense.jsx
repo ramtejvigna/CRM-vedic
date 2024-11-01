@@ -6,7 +6,6 @@ import { useStore } from "../../../store";
 import axios from 'axios';
 import { XCircleIcon, ArrowLeft } from 'lucide-react';
 
-const ADD_EXPENSE = "https://vedic-backend-neon.vercel.app/api/expenses"; // Define your API URL here
 
 const AddExpense = () => {
   const { isDarkMode } = useStore();
@@ -81,7 +80,7 @@ const AddExpense = () => {
           file_type: bankStatement.type
         };
   
-        const response = await axios.post(ADD_EXPENSE, expenseData, {
+        const response = await axios.post("http://localhost:3000/api/expenses", expenseData, {
           headers: {
             'Content-Type': 'application/json',
           }
@@ -169,7 +168,7 @@ const AddExpense = () => {
     >
       <label className="w-full cursor-pointer">
         <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
+          <p className="text-sm font-medium text-gray-600">Click here to upload file</p>
           <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG, PDF</p>
         </div>
         <input

@@ -278,20 +278,22 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                             isDarkMode ? "bg-gray-700" : "bg-gray-200"
                           }`}
                         >
-                          <tr>
-                            {["s no", "Employee name" , "Amount paid" , "year", "month" , "status" , "Actions"].map(
-                              (header) => (
-                                <th
-                                  key={header}
-                                  className={`px-6 py-3  text-xs font-medium capitalize tracking-wider ${
-                                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                                  }`}
-                                >
-                                  {header}
-                                </th>
-                              )
-                            )}
-                          </tr>
+                         <tr>
+  {["s no", "Employee name", "Amount paid", "year", "month", "status", "Actions"].map((header) => (
+    <th
+      key={header}
+      className={`px-6 py-1 text-xs font-medium capitalize tracking-wider ${
+        isDarkMode ? "text-gray-300" : "text-gray-700"
+      }`}
+      style={{
+        textAlign: "left", // Ensures the text aligns to the left
+      }}
+    >
+      {header}
+    </th>
+  ))}
+</tr>
+
                         </thead>
                         <tbody
                           className={`divide-y ${
