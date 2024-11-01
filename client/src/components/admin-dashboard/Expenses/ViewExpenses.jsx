@@ -158,7 +158,7 @@ const ViewExpenses = () => {
     const fetchExpenses = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/expenses');
+        const response = await fetch('https://vedic-backend-neon.vercel.app/api/expenses');
         const data = await response.json();
         setExpenses(data.expenses);
         setFilteredExpenses(data.expenses);
@@ -177,7 +177,7 @@ const ViewExpenses = () => {
 
   const handlePayslip = async (expenseId) => {
     try {
-      const response = await fetch(`/api/expenses/file/${expenseId}`);
+      const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expenseId}`);
       if (!response.ok) throw new Error("Failed to fetch payslip");
       const data = await response.json();
       if (data.bank_statement) {
@@ -285,9 +285,7 @@ const ViewExpenses = () => {
   };
 
   return (
-    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${
-      isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-    }`}>
+    <div className={`min-h-screen py-8 px-4`}>
      <AnimatePresence>
         {deleteModalOpen && (
           <DeleteModal
@@ -368,7 +366,7 @@ const ViewExpenses = () => {
               name="month" 
               className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
             >
-              <option value="">select month</option>
+              <option value="">Select Month</option>
               {months.map((month) => (
                 <option key={month} value={month}>
                   {month}
@@ -386,7 +384,7 @@ const ViewExpenses = () => {
               name="year"  
               className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
             >
-              <option value="">select year</option>
+              <option value="">Select Year</option>
               {years.map(year => (
                 <option key={year} value={year.toString()}>
                   {year}
