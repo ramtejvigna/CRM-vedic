@@ -85,7 +85,7 @@ function Salaries() {
     if(filterData || filteringMonth) {
         try {
           setIsLoading(true);
-          const response = await axios.get(`${HOST}/api/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
+          const response = await axios.get(`${HOST}/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
           if(response.status === 200) {
             setSalaryStatements(response.data);
             setIsLoading(false)

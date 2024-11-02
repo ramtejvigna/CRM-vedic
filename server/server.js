@@ -48,7 +48,7 @@ app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
 app.use('/', dashboardRoutes);
 app.use('/admin', adminNotifications)
-app.use('/api/salaries' , salaryRoutes)
+app.use('/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
 app.use('/api/expenses', expensesRoutes);     // Expenses routes
 
