@@ -80,7 +80,7 @@ const AddExpense = () => {
           file_type: bankStatement.type
         };
   
-        const response = await axios.post("http://localhost:3000/api/expenses", expenseData, {
+        const response = await axios.post("https://vedic-backend-neon.vercel.app/api/expenses", expenseData, {
           headers: {
             'Content-Type': 'application/json',
           }
