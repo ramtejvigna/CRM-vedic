@@ -66,7 +66,7 @@ const AddSalariesStatements = () => {
       });
 
       try {
-        const response = await axios.post('https://vedic-backend-neon.vercel.app/salaries/', formDataToSend);
+        const response = await axios.post('http://localhost:3000/salaries/', formDataToSend);
         if (response.status === 200) {
           toast.success("Salary added successfully");
           navigate("/admin-dashboard/salaries");

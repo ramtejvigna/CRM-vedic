@@ -63,7 +63,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`http://localhost:3000/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`${HOST}/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
