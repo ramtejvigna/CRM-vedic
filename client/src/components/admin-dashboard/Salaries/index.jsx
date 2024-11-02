@@ -5,7 +5,7 @@ import { Delete, Edit , Eye, Plus, Trash } from 'lucide-react';
 import { TextField , InputLabel } from '@mui/material';
 import axios from 'axios';
 import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineDownload, AiOutlinePrinter} from "react-icons/ai"
-import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
+import { ADD_SALARY_STATEMENT, GET_ALL_SALARIES, HOST } from '../../../utils/constants';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { Search, Upload, User, Users, Filter  } from 'lucide-react';
@@ -44,7 +44,7 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await fetch("https://vedic-backend-neon.vercel.app/salaries/");
+      const response = await fetch(GET_ALL_SALARIES);
       const data = await response.json()
       setSalaryStatements(data);
     } catch (error) {
@@ -85,7 +85,7 @@ function Salaries() {
     if(filterData || filteringMonth) {
         try {
           setIsLoading(true);
-          const response = await axios.get(`https://vedic-backend-neon.vercel.app/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
+          const response = await axios.get(`${HOST}/api/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
           if(response.status === 200) {
             setSalaryStatements(response.data);
             setIsLoading(false)
@@ -117,7 +117,7 @@ function Salaries() {
           className={`relative inline-flex items-center px-4 py-2 border ${
             isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
           } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-            currentPage === i ? "bg-blue-500 text-white" : ""
+            currentPage === i ? "bg-blue-500 text-black" : ""
           }`}
         >
           {i}

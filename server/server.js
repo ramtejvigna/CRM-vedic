@@ -37,7 +37,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 ///
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(fileUpload());
+
 
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
@@ -49,10 +49,10 @@ app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
 app.use('/', dashboardRoutes);
 app.use('/admin', adminNotifications)
-app.use('/salaries' , salaryRoutes)
+app.use('/api/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
 app.use('/api/expenses', expensesRoutes);     // Expenses routes
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
