@@ -1,7 +1,4 @@
-
-
 export const HOST = "https://vedic-backend-neon.vercel.app"
-
 
 export const EMPLOYEE_ROUTE = `${HOST}/api/employees`;
 export const ADD_EMPLOYEE_ROUTE = `${EMPLOYEE_ROUTE}/add-employee`;
