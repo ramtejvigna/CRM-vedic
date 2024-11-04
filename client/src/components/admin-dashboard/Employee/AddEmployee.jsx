@@ -4,7 +4,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField, InputLabel, Typography } from '@mui/material';
+import { TextField, InputLabel, Typography , Select  , MenuItem} from '@mui/material';
 import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
 import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
@@ -22,6 +22,7 @@ const AddEmployee = () => {
         personalInfo: {
             firstName: '',
             lastName: '',
+            role : '' , 
             phone: '',
             email: '',
             city: '',
@@ -64,7 +65,7 @@ const AddEmployee = () => {
         const formErrors = {};
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[679]\d{9}$/;
+        const phoneRegex = /^[6789]\d{9}$/;
         const ssnRegex = /^\d{3}\d{2}\d{4}$/;
         const cvvRegex = /^\d{3}$/;
         const cardNumberRegex = /^\d{16}$/;
@@ -87,6 +88,7 @@ const AddEmployee = () => {
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
+            if (!form.role) formErrors.role = 'role of employee is required';
         }
 
         if (activeStep === 1) {
@@ -135,7 +137,7 @@ const AddEmployee = () => {
                 formErrors.cvv = 'Invalid CVV format. Use 3 digits';
             }
         }
-
+        // console.log(formErrors)
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
@@ -217,6 +219,26 @@ const AddEmployee = () => {
             case 0:
                 return (
                     <div className="space-y-8 p-2 sm:p-5 ">
+                        <h2 className="text-lg font-semibold text-gray-700">Employee Role Designation</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className='w-full'>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={formData.personalInfo.role}
+                                    onChange={handleChange}
+                                    className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                >
+                                    <option value="">Select Employee Role</option>
+                                    <option value="Junior Employee">Junior Employee</option>
+                                    <option value="Senior Employee">Senior Employee</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                                {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
+ 
+                            </div>
+
+                        </div>
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -584,6 +606,8 @@ const AddEmployee = () => {
                                         '& .MuiInputLabel-asterisk': { color: 'red' },
                                     },
                                 }}
+                                error={!!errors.employerName}
+                                helperText={errors.employerName}
                             />
                             <TextField
                                 label="Job Title"
@@ -598,6 +622,8 @@ const AddEmployee = () => {
                                         '& .MuiInputLabel-asterisk': { color: 'red' },
                                     },
                                 }}
+                                error={!!errors.jobTitle}
+                                helperText={errors.jobTitle}
                             />
                             <div className="grid gap-2">
                                  <label 
@@ -613,6 +639,8 @@ const AddEmployee = () => {
                                     onChange={handleChange}
                                     className="rounded-md shadow-sm bg-gray-50"
                                     fullWidth
+                                    error={!!errors.startDate}
+                                    helperText={errors.startDate}
 
                                 />
 
@@ -633,6 +661,8 @@ const AddEmployee = () => {
                                     className="rounded-md shadow-sm bg-gray-50"
                                     fullWidth
                                     required
+                                    error={!!errors.endDate}
+                                    helperText={errors.endDate}
                                     InputLabelProps={{
                                         sx: {
                                             '& .MuiInputLabel-asterisk': { color: 'red' },
@@ -650,6 +680,8 @@ const AddEmployee = () => {
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
                                 required
+                                error={!!errors.reasonForLeaving}
+                                helperText={errors.reasonForLeaving}
                                 InputLabelProps={{
                                     sx: {
                                         '& .MuiInputLabel-asterisk': { color: 'red' },
@@ -673,6 +705,8 @@ const AddEmployee = () => {
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
                                 required
+                                error={!!errors.cardholderName}
+                                helperText={errors.cardholderName}
                                 InputLabelProps={{
                                     sx: {
                                         '& .MuiInputLabel-asterisk': { color: 'red' },
@@ -687,6 +721,8 @@ const AddEmployee = () => {
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
                                 required
+                                error={!!errors.cardNumber}
+                                helperText={errors.cardNumber}
                                 InputLabelProps={{
                                     sx: {
                                         '& .MuiInputLabel-asterisk': { color: 'red' },
@@ -708,6 +744,8 @@ const AddEmployee = () => {
                                         value={formData.paymentDetails.expiryDate}
                                         onChange={handleChange}
                                         className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
+                                        error={!!errors.expiryDate}
+                                        helperText={errors.expiryDate}
                                     />
                                 </div>
                                 <div className="grid gap-2">
@@ -729,6 +767,8 @@ const AddEmployee = () => {
                                                 '& .MuiInputLabel-asterisk': { color: 'red' },
                                             },
                                         }}
+                                        error={!!errors.cvv}
+                                        helperText={errors.cvv}
                                     />
                                 </div>
 
