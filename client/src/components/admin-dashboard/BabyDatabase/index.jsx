@@ -1,10 +1,159 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from "axios";
-import { Search, Upload, Edit, Save, Filter, Download, Loader2 } from 'lucide-react';
+import { Search, Upload, Edit, Save, Filter, Download, Loader2, Plus } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import { CSVLink } from 'react-csv';
 import 'react-toastify/dist/ReactToastify.css';
+
+const AddNameModal = ({ isOpen, onClose, onAdd }) => {
+    const [newName, setNewName] = useState({
+        bookName: '',
+        gender: 'male',
+        name: '',
+        meaning: '',
+        nameInHindi: '',
+        meaningInHindi: '',
+        shlokNo: '',
+        pageNo: ''
+    });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await onAdd(newName);
+            onClose();
+            setNewName({
+                bookName: '',
+                gender: '',
+                name: '',
+                meaning: '',
+                nameInHindi: '',
+                meaningInHindi: '',
+                shlokNo: '',
+                pageNo: ''
+            });
+        } catch (error) {
+            console.error('Error adding name:', error);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-white p-6 rounded-lg w-full max-w-2xl"
+            >
+                <h2 className="text-2xl font-bold mb-4">Add New Name</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Book Name</label>
+                            <input
+                                type="text"
+                                value={newName.bookName}
+                                onChange={(e) => setNewName({ ...newName, bookName: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Gender</label>
+                            <select
+                                value={newName.gender}
+                                onChange={(e) => setNewName({ ...newName, gender: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            >
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Name</label>
+                            <input
+                                type="text"
+                                value={newName.name}
+                                onChange={(e) => setNewName({ ...newName, name: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Meaning</label>
+                            <input
+                                type="text"
+                                value={newName.meaning}
+                                onChange={(e) => setNewName({ ...newName, meaning: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Name in Hindi</label>
+                            <input
+                                type="text"
+                                value={newName.nameInHindi}
+                                onChange={(e) => setNewName({ ...newName, nameInHindi: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Meaning in Hindi</label>
+                            <input
+                                type="text"
+                                value={newName.meaningInHindi}
+                                onChange={(e) => setNewName({ ...newName, meaningInHindi: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Shlok No.</label>
+                            <input
+                                type="text"
+                                value={newName.shlokNo}
+                                onChange={(e) => setNewName({ ...newName, shlokNo: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Page No.</label>
+                            <input
+                                type="text"
+                                value={newName.pageNo}
+                                onChange={(e) => setNewName({ ...newName, pageNo: e.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end space-x-4 mt-6">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Add Name
+                        </button>
+                    </div>
+                </form>
+            </motion.div>
+        </div>
+    );
+};
+
 
 const BabyDatabase = () => {
     const [page, setPage] = useState(0);
@@ -16,6 +165,7 @@ const BabyDatabase = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [babyNames, setBabyNames] = useState([]);
     const [editingName, setEditingName] = useState(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const fetchBabyNames = async () => {
         try {
@@ -66,6 +216,24 @@ const BabyDatabase = () => {
     const handleGenderFilter = (gender) => {
         setGenderFilter(gender);
         setPage(0);
+    };
+
+    const handleAddName = async (newName) => {
+        try {
+            await axios.post("http://localhost:8000/api/names", newName);
+            await fetchBabyNames();
+            toast.success("Name added successfully!", {
+                onClose: () => { },
+                toastId: 'add-success'
+            });
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to add name", {
+                onClose: () => { },
+                toastId: 'add-error'
+            });
+            throw err;
+        }
     };
 
     const handleStartingLetterFilter = (event) => {
@@ -173,6 +341,15 @@ const BabyDatabase = () => {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="px-4 py-2 rounded-lg bg-green-600 text-white transition duration-300"
+                    >
+                        <Plus className="h-5 w-5 inline-block mr-2" />
+                        Add Name
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={toggleFilters}
                         className="px-4 py-2 rounded-lg bg-blue-600 text-white transition duration-300"
                     >
@@ -225,6 +402,12 @@ const BabyDatabase = () => {
 
                 </div>
             </div>
+
+            <AddNameModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onAdd={handleAddName}
+            />
 
             {showFilters && (
                 <motion.div
