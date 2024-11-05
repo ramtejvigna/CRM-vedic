@@ -30,28 +30,28 @@ const AddExpense = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-        const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-        if (!allowedTypes.includes(file.type)) {
-            toast.error("Only JPG, PNG, and PDF files are allowed.");
-            setBankStatement(null);
-            return;
-        }
+      const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Only JPG, PNG, and PDF files are allowed.");
+        setBankStatement(null);
+        return;
+      }
 
-        // Set the file object directly to state instead of a base64 string
-        setBankStatement(file); // Store the file object for URL creation
+      // Set the file object directly to state instead of a base64 string
+      setBankStatement(file); // Store the file object for URL creation
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            // You could also use this base64 string if needed for other purposes
-            const base64String = reader.result; // This is the base64 string
-            // Do something with base64String if needed
-        };
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // You could also use this base64 string if needed for other purposes
+        const base64String = reader.result; // This is the base64 string
+        // Do something with base64String if needed
+      };
 
-        reader.readAsDataURL(file); // Convert file to base64 (if needed)
+      reader.readAsDataURL(file); // Convert file to base64 (if needed)
     }
-};
+  };
 
-  
+
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -59,11 +59,11 @@ const AddExpense = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (validateForm()) {
       try {
         setIsLoading(true);
-        
+
         // Convert file to base64
         const base64String = await new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -71,7 +71,7 @@ const AddExpense = () => {
           reader.onload = () => resolve(reader.result.split(',')[1]); // Remove data:image/jpeg;base64, prefix
           reader.onerror = error => reject(error);
         });
-  
+
         const expenseData = {
           expense_name: expenseName,
           amount: parseFloat(amountSpent),
@@ -79,13 +79,13 @@ const AddExpense = () => {
           bank_statement: base64String,
           file_type: bankStatement.type
         };
-  
+
         const response = await axios.post("https://vedic-backend-neon.vercel.app/api/expenses", expenseData, {
           headers: {
             'Content-Type': 'application/json',
           }
         });
-  
+
         if (response.data) {
           toast.success("Expense added successfully!");
           navigate("/admin-dashboard/expenses");
@@ -101,20 +101,20 @@ const AddExpense = () => {
   return (
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-10">
-      <div className="flex items-center mb-6">
-          <button 
-            onClick={() => navigate(-1)} // Navigate back
-            className="flex items-center text-gray-600 hover:text-blue-500"
-          >
-            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-           
-          </button>
-        </div>
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => navigate(-1)} // Navigate back
+            className="flex items-center text-gray-600 hover:text-blue-500"
+          >
+            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+
+          </button>
+        </div>
         <h1 className="text-3xl font-bold mb-6 text-center">Add Expense</h1>
 
         {/* Form Grid Layout */}
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-          
+
           {/* Expense Name */}
           <div className="flex flex-col gap-3">
             <label htmlFor="expenseName" className="uppercase text-xs tracking-wider font-semibold">Expense Name</label>
@@ -155,62 +155,62 @@ const AddExpense = () => {
             />
           </div>
 
-         {/* Bank Statement File Upload */}
-<div className="col-span-2 flex flex-col gap-3">
-  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-    Bank Statement
-  </label>
-  {!bankStatement ? (
-    <motion.div
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
-      className="mt-2 p-8 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 cursor-pointer"
-    >
-      <label className="w-full cursor-pointer">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-sm font-medium text-gray-600">Click here to upload file</p>
-          <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG, PDF</p>
-        </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          accept=".jpg,.png,.jpeg,.pdf"
-          className="hidden"
-        />
-      </label>
-    </motion.div>
-  ) : (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="mt-2"
-    >
-      <div className="relative w-40 h-40 rounded-lg overflow-hidden">
-        {bankStatement.type === 'application/pdf' ? (
-          <div className="flex items-center justify-center h-full bg-gray-200">
-            <p className="text-sm">PDF uploaded</p>
+          {/* Bank Statement File Upload */}
+          <div className="col-span-2 flex flex-col gap-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              Bank Statement
+            </label>
+            {!bankStatement ? (
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="mt-2 p-8 border-2 border-dashed border-blue-400 rounded-lg bg-blue-50 cursor-pointer"
+              >
+                <label className="w-full cursor-pointer">
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <p className="text-sm font-medium text-gray-600">Click here to upload file</p>
+                    <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG, PDF</p>
+                  </div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept=".jpg,.png,.jpeg,.pdf"
+                    className="hidden"
+                  />
+                </label>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-2"
+              >
+                <div className="relative w-40 h-40 rounded-lg overflow-hidden">
+                  {bankStatement.type === 'application/pdf' ? (
+                    <div className="flex items-center justify-center h-full bg-gray-200">
+                      <p className="text-sm">PDF uploaded</p>
+                    </div>
+                  ) : (
+                    <img
+                      src={URL.createObjectURL(bankStatement)}
+                      alt="Bank Statement"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setBankStatement(null)}
+                    className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white"
+                  >
+                    <XCircleIcon size={20} />
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+            {errors.bankStatement && <span className="text-xs text-red-400">{errors.bankStatement}</span>}
           </div>
-        ) : (
-          <img
-            src={URL.createObjectURL(bankStatement)}
-            alt="Bank Statement"
-            className="w-full h-full object-cover"
-          />
-        )}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setBankStatement(null)}
-          className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white"
-        >
-          <XCircleIcon size={20} />
-        </motion.button>
-      </div>
-    </motion.div>
-  )}
-  {errors.bankStatement && <span className="text-xs text-red-400">{errors.bankStatement}</span>}
-</div>
 
 
           {/* Submit Button */}
@@ -219,7 +219,7 @@ const AddExpense = () => {
               type="button"
               onClick={() => navigate("/admin-dashboard/expenses")}
               className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
+            >
               Cancel
             </button>
             <motion.button

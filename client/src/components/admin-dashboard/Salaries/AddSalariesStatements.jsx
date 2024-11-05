@@ -5,6 +5,7 @@ import { TextField } from '@mui/material';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
+import { ADD_SALARY_STATEMENT } from '../../../utils/constants';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -66,7 +67,7 @@ const AddSalariesStatements = () => {
       });
 
       try {
-        const response = await axios.post('https://vedic-backend-neon.vercel.app/salaries/', formDataToSend);
+        const response = await axios.post(`${ADD_SALARY_STATEMENT}`, formDataToSend);
         if (response.status === 200) {
           toast.success("Salary added successfully");
           navigate("/admin-dashboard/salaries");

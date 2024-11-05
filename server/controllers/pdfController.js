@@ -217,6 +217,16 @@ export const sendPdfWhatsApp = async (req, res) => {
     }
 };
 
+export const addBabyName = async (req,res) => {
+    try {
+        const newBabyName = new babyNames(req.body);
+        const savedName = await newBabyName.save();
+        res.status(201).json(savedName);
+    } catch (error) {
+        res.status(400).json({ message: 'Error adding baby name', error: error.message });
+    }
+}
+
 
 // export const getPdfsByCustomerId = async (req, res) => {
 //   const { customerId } = req.query;
