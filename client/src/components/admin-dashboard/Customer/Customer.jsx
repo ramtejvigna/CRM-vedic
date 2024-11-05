@@ -263,7 +263,9 @@ const Customer = () => {
                 <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
                 <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
                 <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
-                <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
+                <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> {customerDetails?.preferredStartingLetter}</p>
+                <p className="text-gray-600"><strong>Preferred Starting Letter Type:</strong> {customerDetails?.preferredStartingLetterType || 'Nakshthra'}</p>
+
             </div>
         </div>
     </div>

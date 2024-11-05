@@ -11,6 +11,7 @@ export const addCustomerWithAssignment = async (req, res) => {
         babyBirthTime,
         birthplace,
         preferredStartingLetter,
+        preferredStartingLetterType,
         preferredGod,
         referenceName,
         additionalPreferences
@@ -51,6 +52,7 @@ export const addCustomerWithAssignment = async (req, res) => {
             babyBirthTime,
             birthplace,
             preferredStartingLetter,
+            preferredStartingLetterType,
             preferredGod,
             referenceName,
             additionalPreferences
