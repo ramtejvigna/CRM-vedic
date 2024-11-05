@@ -160,8 +160,11 @@ const ViewExpenses = () => {
       try {
         const response = await fetch('https://vedic-backend-neon.vercel.app/api/expenses');
         const data = await response.json();
-        setExpenses(data.expenses);
-        setFilteredExpenses(data.expenses);
+        
+        const sortedExpenses = data.expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        setExpenses(sortedExpenses);
+        setFilteredExpenses(sortedExpenses);
       } catch (error) {
         toast.error("Error fetching expenses");
       } finally {
@@ -170,6 +173,7 @@ const ViewExpenses = () => {
     };
     fetchExpenses();
   }, []);
+  
 
   useEffect(() => {
     handleFilterAndSearch();

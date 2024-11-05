@@ -6,6 +6,7 @@ import { generatePdf } from './pdfDisplayComponent';
 import PDFViewer from './PDFviewer';
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {  Star } from 'lucide-react';
 
 import {
     Edit,
@@ -185,241 +186,281 @@ const Customer = () => {
     return (
         <div className="min-h-screen p-4 sm:p-8">
 
-            <div className="max-w-7xl mx-auto mb-6">
-                <div className="flex items-center mb-6">
-                    <button
-                        onClick={() => navigate(-1)} // Navigate back
-                        className="flex items-center text-gray-900 hover:text-blue-500"
-                    >
-                        <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-                    </button>
-                </div>
+<div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
+    
+    {/* Back Button and Header */}
+    <div className="flex items-center mb-6">
+        <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-900 hover:text-blue-500"
+        >
+            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+        </button>
+        <h2 className="text-lg font-semibold">Customer Details</h2>
+    </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    {/* Personal Information & Assigned Employee Card */}
-                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-                        {/* Personal Information */}
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Personal Information</h2>
-                        <div className="grid grid-cols-1 gap-2">
-                            <p className="text-gray-600"><strong>CustomerID:</strong> {customerDetails.customerID || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Father Name:</strong> {customerDetails.fatherName || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Mother Name:</strong> {customerDetails.motherName || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Email Id:</strong> {customerDetails.email || "N/A"}</p>
-                            <p className="text-gray-600"><strong>WhatsApp Number:</strong> {customerDetails.whatsappNumber || "N/A"}</p>
-                            <p className="text-gray-600"><strong>Baby Gender:</strong> {customerDetails.babyGender || "N/A"}</p>
-                        </div>
+    {/* Customer Name in Large Font */}
+    <p className="text-2xl font-medium ml-4 mb-4">{customerDetails.fatherName}</p>
+{/* Bordered Box around Customer Info */}
+<div className="border border-gray-300 rounded-lg p-4 mb-4">
+<h2 className="text-lg font-semibold mb-4">Customer Summary</h2>
 
-            {/* Divider */}
-            <hr className="my-3 border-gray-300" />
-            <p className="text-gray-600">
-  <strong>Requested On:</strong> {customerDetails.createdDateTime ? new Date(customerDetails.createdDateTime).toLocaleString() : "N/A"}
-</p>
-            <hr className="my-3 border-gray-300" />
+    {/* Grid Layout for Customer Info */}
+    <div className="grid grid-cols-2 md:grid-cols-4 ">
+        {[
+            { label: "customer Id", value: customerDetails.customerID },
+            { label: "date Joined", value: new Date(customerDetails.createdDateTime).toLocaleDateString() },
+            { label: "Contact No", value: customerDetails.whatsappNumber },
+            { label: "Email", value: customerDetails.email }
+        ].map((item, index) => (
+            <div key={index} className="flex flex-col">
+                
+                {/* Label with Full-width HR Line */}
+                <p className="text-sm font-bold text-gray-500 capitalize">{item.label}</p>
+                <hr className="my-3 border-gray-300 w-full" />
 
-                        {/* Assigned Employee */}
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Employee</h2>
-                        {customerDetails.assignedEmployee ? (
-                            <div className="text-gray-600">
-                                <p><strong>Name:</strong> {customerDetails.assignedEmployee.firstName}</p>
-                                <p><strong>Email Id:</strong> {customerDetails.assignedEmployee.email}</p>
-                                <p><strong>Contact:</strong> {customerDetails.assignedEmployee.phone}</p>
-                            </div>
-                        ) : (
-                            <p className="text-gray-600">No employee assigned.</p>
-                        )}
-                    </div>
-                    
-
-                    {/* Payment Details & Astrological Details Card */}
-                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-                        {/* Payment Details */}
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Payment Details</h2>
-                        {customerDetails?.customerStatus === "newRequests" ? (
-                            <div className="flex-grow flex items-center justify-center">
-                                <p className="text-center">Payment details not verified yet.</p>
-                            </div>
-                        ) : customerDetails?.customerStatus === "rejected" ? (
-                            <div className="flex-grow flex items-center justify-center">
-                                <p className="text-red-600 text-center font-bold">Payment Status: Rejected</p>
-                            </div>
-                        ) : (
-                            <div className="flex-grow">
-                                <div className="grid grid-cols-1 gap-2">
-                                <p className="text-gray-600">
-  <strong>Payment Date:</strong> {customerDetails?.paymentDate ? new Date(customerDetails.paymentDate).toLocaleDateString() : "N/A"}
-</p>
-                                    <p className="text-gray-600"><strong>Payment Time:</strong> {customerDetails?.paymentTime || "N/A"}</p>
-                                    <p className="text-gray-600"><strong>Transaction ID:</strong> {customerDetails?.payTransactionID || "N/A"}</p>
-                                    <p className="text-gray-600"><strong>Amount Paid:</strong> {customerDetails?.amountPaid || "N/A"}</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Divider */}
-                        <hr className="my-6 border-gray-300" />
-
-                        {/* Astrological Details */}
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Astrological Details</h2>
-                        <div className="grid grid-cols-1 gap-2">
-                            <p className="text-gray-600"><strong>Zodiac Sign:</strong> Leo</p>
-                            <p className="text-gray-600"><strong>Nakshatra:</strong> Ashwini</p>
-                            <p className="text-gray-600"><strong>Gemstone:</strong> Ruby</p>
-                            <p className="text-gray-600"><strong>Lucky Metal:</strong> Gold</p>
-                            <p className="text-gray-600"><strong>Numerology:</strong> 3</p>
-                            <p className="text-gray-600"><strong>Preferred Starting Letter:</strong> A</p>
-                        </div>
-                    </div>
-                </div>
+                {/* Value with Full-width HR Line */}
+                <p className=" text-gray-900">{item.value}</p>
             </div>
+        ))}
+    </div>
+</div>
 
+
+
+
+
+                
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Baby Details Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 className="text-lg font-semibold mb-4">Baby Details</h2>
+                    <hr className="my-3 border-gray-300 w-full" />
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Gender:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.babyGender || "N/A"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Place of Birth:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.birthplace || "N/A"}</p>
+                        </div>
+                        <div>
+    <p className="text-sm font-medium text-gray-500">Date of Birth:</p>
+    <p className="mt-1 text-gray-900">
+        {customerDetails.babyBirthDate
+            ? new Date(customerDetails.babyBirthDate).toLocaleDateString()
+            : "N/A"}
+    </p>
+</div>
+
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Time of Birth:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.babyBirthTime || "N/A"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Mother's Name:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.motherName || "N/A"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Father's Name:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.fatherName || "N/A"}</p>
+                        </div>
+                        <div>
+    <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
+    <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
+</div>
+
+{/* Horizontal Line */}
+<div className="col-span-2 my-4">
+                <hr className="border-t border-gray-200" />
+            </div>
+<div>
+    <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
+    <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
+</div>
+
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Nakshatra:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Ashwini"}</p>
+                        </div>
+                       
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Numerology No :</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "3"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Lucky Colour:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "blue"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Gemstone:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Ruby"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Destiny Number:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "7"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Lucky Day:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "friday"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Lucky God:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Lord Shiva"}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Lucky Metal:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Gold"}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payment Data Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-auto overflow-y-auto">
+    <h2 className="text-lg font-semibold mb-4">Payment Data</h2>
+    <hr className=" border-gray-300 w-full" />
+
+    {/* Single Column Layout */}
+    <div className="grid grid-cols-1 gap-4">
+        <div>
+            <p className="text-sm font-medium text-gray-500">Payment Date:</p>
+            <p className=" text-gray-900">
+                {customerDetails.paymentDate 
+                    ? new Date(customerDetails.paymentDate).toLocaleDateString() 
+                    : "N/A"}
+            </p>
+        </div>
+        <div>
+            <p className="text-sm font-medium text-gray-500">Payment Time:</p>
+            <p className=" text-gray-900">{customerDetails.paymentTime || "N/A"}</p>
+        </div>
+        <div>
+            <p className="text-sm font-medium text-gray-500">Astro Offer:</p>
+            <p className=" text-gray-900">{customerDetails.offer || "N/A"}</p>
+        </div>
+        <div>
+            <p className="text-sm font-medium text-gray-500">Source(Instagram Lead):</p>
+            <p className=" text-gray-900">{customerDetails.otherSource || "N/A"}</p>
+        </div>
+    </div>
+    <div className="col-span-2 my-4">
+                <hr className="border-t border-gray-200" />
+            </div>
+<div></div>
+    <div className="w-full bg-white rounded-lg shadow-lg p-4">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-800">PDF's Generated</h2>
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">PDF</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">GENERATED</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">
+                <MessageCircle className="inline-block h-4 w-4" />
+              </th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">
+                <Mail className="inline-block h-4 w-4" />
+              </th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">FEEDBACK</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pdfs.map((pdf, index) => (
+              <tr key={pdf._id} className="border-b last:border-b-0">
+                <td className="px-4 py-4">
+  <div className="flex items-center space-x-3">
+   
+    <button 
+      onClick={() => handleShowPdf(pdf.babyNames, pdf._id)}
+      className="text-blue-600 hover:text-blue-800 flex items-center space-x-2"
+    >
+{/* Icon Only */}
+<FileText className="h-4 w-4 text-blue-600" aria-label="View PDF" />
+    </button>
+  </div>
+</td>
+                <td className="px-4 py-4">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-900">
+                      {new Date(pdf.createdAt).toLocaleDateString('en-US', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(pdf.createdAt).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex justify-center">
+                    <button 
+                      onClick={() => onWhatsAppSend(pdf)}
+                      className="relative"
+                    >
+                      <div className={`h-3 w-3 rounded-full ${
+                        pdf.whatsappStatus ? 'bg-green-500' : 'bg-red-500'
+                      }`} />
+                    </button>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex justify-center">
+                    <button 
+                      onClick={() => onEmailSend(pdf)}
+                      className="relative"
+                    >
+                      <div className={`h-3 w-3 rounded-full ${
+                        pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'
+                      }`} />
+                    </button>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex justify-center space-x-1">
+                    {[...Array(3)].map((_, i) => (
+                      <Star 
+                        key={i}
+                        className={`h-4 w-4 ${
+                          i < 3 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+
+</div>
+ 
+
+            </div>
+            
+            </div>
 
             <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div className="flex w-full items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold   text-gray-800 dark:text-white">Generated PDFs</h2>
+                    <h2 className="text-xl font-bold   text-gray-800 dark:text-white">PDF's Generated </h2>
                     <div className="flex items-center space-x-2">
-                        <Eye className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{pdfs.length} PDFs Generated</span>
                     </div>
                 </div>
-
-                {pdfsLoading ? (
-                    <div className="flex items-center justify-center h-[400px]">
-                        <div className="relative w-16 h-16">
-                            <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-200 dark:border-gray-700 rounded-full"></div>
-                            <div className="absolute top-0 left-0 w-full h-full border-4 border-t-blue-500 rounded-full animate-spin"></div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700">
-                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead className="bg-gray-50 dark:bg-gray-800">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                                        SNo.
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                                        Generated On
-                                    </th>
-                                    <th className="px-6 py-4 text-center text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-4 text-right text-xm font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                                {pdfs.map((pdf, index) => (
-                                    <React.Fragment key={pdf._id}>
-                                        <tr
-                                            className={`group hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer
-                      ${expandedRow === pdf._id ? 'bg-gray-50 dark:bg-gray-800' : ''}`}
-                                            onClick={() => setExpandedRow(expandedRow === pdf._id ? null : pdf._id)}
-                                        >
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                                                    <span className="text-sm font-medium text-blue-600 dark:text-blue-400">{index + 1}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {new Date(pdf.createdAt).toLocaleDateString('en-US', {
-                                                            day: '2-digit',
-                                                            month: 'short',
-                                                            year: 'numeric'
-                                                        })}
-                                                    </span>
-                                                    <span className="text-sm text-gray-500">
-                                                        {new Date(pdf.createdAt).toLocaleTimeString('en-US', {
-                                                            hour: '2-digit',
-                                                            minute: '2-digit'
-                                                        })}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center justify-center space-x-4">
-                                                    <div className="flex items-center space-x-2">
-                                                        <div className={`flex items-center justify-center h-8 w-8 rounded-full transition-colors duration-300 
-                            ${pdf.whatsappStatus ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
-                                                            {pdf.whatsappStatus ? (
-                                                                <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
-                                                            ) : (
-                                                                <X className="h-3 w-3 text-red-600 dark:text-red-400" />
-                                                            )}
-                                                        </div>
-                                                        <span className="text-sm font-semibold text-gray-500">WhatsApp</span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2">
-                                                        <div className={`flex items-center justify-center h-8 w-8 rounded-full transition-colors duration-300 
-                            ${pdf.mailStatus ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
-                                                            {pdf.mailStatus ? (
-                                                                <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
-                                                            ) : (
-                                                                <X className="h-3 w-3 text-red-600 dark:text-red-400" />
-                                                            )}
-                                                        </div>
-                                                        <span className="text-sm font-semibold text-gray-500">Email</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                                                <div className="flex items-center justify-end space-x-2">
-                                                    <div className="relative">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setActiveDropdown(activeDropdown === pdf._id ? null : pdf._id);
-                                                            }}
-                                                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
-                                                        >
-                                                            <MoreHorizontal className="h-5 w-5" />
-                                                        </button>
-
-                                                        {activeDropdown === pdf._id && (
-                                                            <>
-                                                                <div
-                                                                    className="fixed inset-0 z-10"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                />
-                                                                <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20 animate-in slide-in-from-top-2 duration-200">
-                                                                    {[
-                                                                        { icon: FileText, label: 'View PDF', action: 'view' },
-                                                                        { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
-                                                                        { icon: Mail, label: 'Send to Mail', action: 'mail' },
-                                                                        { icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' }
-                                                                    ].map((item, i) => (
-                                                                        <button
-                                                                            key={i}
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleActionClick(item.action, pdf);
-                                                                            }}
-                                                                            className="flex items-center w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                                                                        >
-                                                                            <item.icon className="h-4 w-4 mr-3" />
-                                                                            <span>{item.label}</span>
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </React.Fragment>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-            <div className="mt-8">
+                </div>
+          
+                <div className="mt-8">
                 {showViewer && (
                     <PDFViewer
                         pdfUrl={pdfUrl}
@@ -432,6 +473,7 @@ const Customer = () => {
                     />
                 )}
             </div>
+        
         </div>
     );
 };
