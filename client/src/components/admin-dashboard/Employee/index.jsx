@@ -30,7 +30,6 @@ const EmployeeTable = () => {
       const res = await fetch(GET_ALL_EMPLOYEES);
       if (!res.ok) throw new Error("Failed to fetch employees");
       const data = await res.json();
-      console.log(data.employees)
       setEmployees(data.employees);
     } catch (error) {
       toast.error("Error fetching employees!");
