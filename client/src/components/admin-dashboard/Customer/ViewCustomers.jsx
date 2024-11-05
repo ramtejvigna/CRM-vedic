@@ -140,7 +140,9 @@ const CustomerDetails = () => {
     </button>
   </div>
 </div>
-
+<div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
+                Showing {customers.length} results
+            </div>
         <AnimatePresence>
   {showFilters && (
     <motion.div
