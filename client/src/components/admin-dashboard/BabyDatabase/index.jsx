@@ -341,15 +341,6 @@ const BabyDatabase = () => {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="px-4 py-2 rounded-lg bg-green-600 text-white transition duration-300"
-                    >
-                        <Plus className="h-5 w-5 inline-block mr-2" />
-                        Add Name
-                    </motion.button>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
                         onClick={toggleFilters}
                         className="px-4 py-2 rounded-lg bg-blue-600 text-white transition duration-300"
                     >
@@ -399,7 +390,14 @@ const BabyDatabase = () => {
                             Template
                         </a>
                     </motion.label>
-
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="px-4 py-2 rounded-lg bg-green-600 text-white transition duration-300"
+                    >
+                        <Plus className="h-4 w-4 inline-block" />
+                    </motion.button>
                 </div>
             </div>
 
