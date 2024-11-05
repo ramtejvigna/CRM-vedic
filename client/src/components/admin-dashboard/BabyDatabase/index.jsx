@@ -19,6 +19,7 @@ const BabyDatabase = () => {
     const fetchBabyNames = async () => {
         try {
             const response = await axios.get("https://vedic-backend-neon.vercel.app/api/names");
+            console.log(response.data.length,'lenght')
             setBabyNames(response.data);
         } catch (err) {
             console.error(err);
@@ -45,6 +46,7 @@ const BabyDatabase = () => {
             (genderFilter === 'all' || baby.gender.toLowerCase() === genderFilter) &&
             (startingLetterFilter === '' || baby.name.toLowerCase().startsWith(startingLetterFilter.toLowerCase()))
     );
+    console.log(filteredNames.length)
 
     const handleChangePage = (newPage) => {
         setPage(newPage);
@@ -205,6 +207,10 @@ const BabyDatabase = () => {
                     </motion.label>
 
                 </div>
+            </div>
+
+            <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
+                Showing {filteredNames.length} results
             </div>
 
             {showFilters && (

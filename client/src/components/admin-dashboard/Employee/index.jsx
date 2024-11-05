@@ -150,6 +150,9 @@ const EmployeeTable = () => {
                   </Link>
                 </motion.button>
             </div>
+            <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
+                Showing {employees.length} results
+            </div>
           {
             showFilters && (
                 <div className="flex py-3">
