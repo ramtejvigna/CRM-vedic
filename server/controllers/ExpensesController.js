@@ -10,12 +10,16 @@ const __dirname = dirname(__filename);
 // Get all expenses
 export const getAllExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find().select('-bank_statement'); // Exclude base64 data from list view
+    const expenses = await Expense.find()
+      .sort({ date: -1 })  
+      .select('-bank_statement');  
+
     res.status(200).json({ expenses });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const getExpenseFile = async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
