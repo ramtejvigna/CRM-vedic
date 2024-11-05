@@ -47,6 +47,7 @@ const Customer = () => {
         } else if (action === 'mail') {
             await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
             setPdfId(pdf._id);
+            fetchPdfs();
         } else if (action === 'whatsapp') {
 
         } else if (action === 'feedback') {
