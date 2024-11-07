@@ -56,32 +56,7 @@ export const addCustomerWithAssignment = async (req, res) => {
             additionalPreferences
         });
 
-        // Find all employees and populate the customers they have
-        const employees = await Employee.find().populate('customers');
-
-        if (employees.length === 0) {
-            return res.status(400).json({ error: "No employees available for assignment" });
-        }
-
-        // Sort employees by the number of customers they have (ascending order)
-        employees.sort((a, b) => a.customers.length - b.customers.length);
-
-        // Pick the employee with the fewest customers
-        const employeeToAssign = employees[0];
-
-        // Push the new customer to the employee's customers array
-        employeeToAssign.customers.push(newCustomer._id);
-
-        // Assign the employee to the customer
-        newCustomer.assignedEmployee = employeeToAssign._id;
-
-        console.log("Assigning employee:", employeeToAssign);
-
-        // Save both the new customer and the updated employee
-        await newCustomer.save();
-        await employeeToAssign.save();
-
-        res.status(201).json({ customer: newCustomer, employee: employeeToAssign });
+        res.status(201).json({ customer: newCustomer });
     } catch (error) {
         console.error("Error adding customer:", error.message); // Log full error
         res.status(500).json({ error: "Error adding customer" });
