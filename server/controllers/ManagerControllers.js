@@ -31,8 +31,17 @@ export const getNewCustomers = async (req , res) => {
 
 export const getEmployees = async (req ,res) => {
     try {
-        const employees = await Employee.find({$or : {role : "Senior Employee" , role : ""}}).populate("customers" , "fatherName motherName").sort({createdAt : -1});
-        return res.status(200).json({employees});
+        const employees = await Employee.find({
+            $or: [
+              { role: "Senior Employee" },
+              { role: "Junior Employee" }
+            ]
+          })
+          .populate("customers", "fatherName motherName")
+          .sort({ createdAt: -1 });
+                  return res.status(200).json({employees});
+
+        return res.status(200).json({employees})
     } catch (error) {
         return res.status(500).send("Internal server error");
     }

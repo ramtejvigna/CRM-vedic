@@ -68,7 +68,7 @@ const CustomerDetails = () => {
     const employeeMatch = filteredAssignedEmployee === "All" || row.assignedEmployeeName === filteredAssignedEmployee;
     const searchMatch =
       row.fatherName?.toLowerCase().includes(searchTerm) ||
-      row.customerId?.toLowerCase().includes(searchTerm) ||
+      row.customerID?.toLowerCase().includes(searchTerm) ||
       row.whatsappNumber?.toLowerCase().includes(searchTerm) ||
       row.babyGender?.toLowerCase().includes(searchTerm) ||
       row.assignedEmployeeName?.toLowerCase().includes(searchTerm) ||
@@ -118,7 +118,7 @@ const CustomerDetails = () => {
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
       <div className="max-w-7xl mx-auto">
       <div className="flex flex-col mb-4">
-  <h1 className="text-4xl font-bold mb-8">Customer Details</h1>
+  <h1 className="text-4xl font-bold mb-3">Customer Details</h1>
   <div className="flex items-center space-x-4 mt-8"> {/* Added mt-2 for margin-top */}
   <div className="relative w-full" style={{ width: '22%' }}>
   <input
@@ -140,7 +140,9 @@ const CustomerDetails = () => {
     </button>
   </div>
 </div>
-
+<div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
+                Showing {customers.length} results
+            </div>
         <AnimatePresence>
   {showFilters && (
     <motion.div
@@ -220,7 +222,7 @@ const CustomerDetails = () => {
                   "Father Name",
                   "WhatsApp Number",
                   "Baby Gender",
-                  "EmployeeAssigned",
+                  "Employee Assigned",
                   "Work Status",
                   "Actions",
                 ].map((header) => (

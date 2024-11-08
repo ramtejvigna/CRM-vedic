@@ -84,7 +84,12 @@ const ViewEmployee = () => {
 
          <div className='flex flex-wrap   p-2 gap-3 rounded-xl'>
             <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 ">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Personal Details</h2>
+                <h2 className="text-xl font-semibold flex items-center justify-between text-gray-800 mb-4">
+                    <span>Personal Details</span>
+                    {employee?.role && (
+                        <span className='px-4 py-2 text-xs rounded-full border border-blue-500 '>{employee?.role}</span>
+                    )}
+                </h2>
 
                 <div className="border-t border-gray-200">
                     <dl>
