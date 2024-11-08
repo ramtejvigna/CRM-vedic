@@ -16,6 +16,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js"
 import {tokenExpirationMiddleware} from './middleware/auth.js';
 import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from "./routes/adminNotifications.js"
+import managerRoutes from "./routes/ManagerRoutes.js"
 // import employeeRoutes from './routes/employeeRoutes.js';
 // import notificationRoutes from './routes/notificationRoutes.js';
 // import errorMiddleware from './middleware/errorMiddleware.js';
@@ -47,6 +48,7 @@ app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
 app.use('/', dashboardRoutes);
+app.use('/api/manager' , managerRoutes)
 app.use('/admin', adminNotifications)
 app.use('/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
