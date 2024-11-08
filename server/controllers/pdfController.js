@@ -139,44 +139,56 @@ export const getPdfsByCustomerId = async (req, res) => {
 
 export const sendPdfEmail = async (req, res) => {
     const { email, base64Pdf, uniqueId } = req.body;
-  
     try {
-      // Decode base64 to binary PDF content
-      const pdfBuffer = Buffer.from(base64Pdf, 'base64');
-  
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Your Generated PDF',
-        text: 'Here is your PDF document.',
-        attachments: [{
-          filename: `${uniqueId}.pdf`,
-          content: pdfBuffer,  // Pass the buffer as content
-          encoding: 'base64'   // Specify that the content is base64-encoded
-        }]
-      };
-  
-      // Send the email with the attachment
-      await transporter.sendMail(mailOptions);
-  
-      // Update the mailStatus of the PDF document in the database
-      const updatedPdf = await PDF.findByIdAndUpdate(
-        uniqueId,
-        { mailStatus: true },
-        { new: true } // Return the updated document
-      );
-  
-      if (!updatedPdf) {
-        return res.status(404).json({ error: 'PDF document not found' });
-      }
-  
-      res.status(200).json({ message: 'Email sent successfully' });
+        // Clean base64 if it includes the data URL prefix
+        const cleanBase64 = base64Pdf.startsWith('data:application/pdf;base64,')
+            ? base64Pdf.split(',')[1]
+            : base64Pdf;
+        
+        // Decode base64 to binary PDF content
+        const pdfBuffer = Buffer.from(cleanBase64, 'base64');
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: '🎉 A Special Collection of Baby Names for You!',
+            text: 'Hello,\n\nWe’re delighted to share this collection of baby names, thoughtfully prepared for you. In the attached PDF, you’ll find names with their meanings, crafted to help you choose a truly special name for your little one.\n\nIf you have any questions or need further assistance, feel free to get in touch!\n\nWarm regards,\nThe Team',
+            attachments: [
+                {
+                    filename: `${uniqueId}.pdf`,
+                    content: pdfBuffer, // Buffer content
+                    contentType: 'application/pdf' // Ensure the MIME type is set
+                },
+            ],
+        };
+
+        // Log important details for debugging
+        console.log('Email:', email);
+        console.log('Unique ID:', uniqueId);
+        console.log('PDF Buffer Length:', pdfBuffer.length);
+
+        // Send the email with the attachment
+        await transporter.sendMail(mailOptions);
+
+        // Update the mailStatus of the PDF document in the database
+        const updatedPdf = await PDF.findByIdAndUpdate(
+            uniqueId,
+            { mailStatus: true },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedPdf) {
+            return res.status(404).json({ error: 'PDF document not found' });
+        }
+
+        res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
-      console.error('Error sending email:', error);
-      res.status(500).json({ error: 'Failed to send email' });
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'Failed to send email' });
     }
-  };
-  
+};
+
+
 
 
 
@@ -204,6 +216,16 @@ export const sendPdfWhatsApp = async (req, res) => {
         });
     }
 };
+
+export const addBabyName = async (req,res) => {
+    try {
+        const newBabyName = new babyNames(req.body);
+        const savedName = await newBabyName.save();
+        res.status(201).json(savedName);
+    } catch (error) {
+        res.status(400).json({ message: 'Error adding baby name', error: error.message });
+    }
+}
 
 
 // export const getPdfsByCustomerId = async (req, res) => {

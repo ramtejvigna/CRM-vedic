@@ -5,7 +5,7 @@ import { Delete, Edit , Eye, Plus, Trash } from 'lucide-react';
 import { TextField , InputLabel } from '@mui/material';
 import axios from 'axios';
 import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineDownload, AiOutlinePrinter} from "react-icons/ai"
-import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
+import { ADD_SALARY_STATEMENT, GET_ALL_SALARIES, HOST } from '../../../utils/constants';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { Search, Upload, User, Users, Filter  } from 'lucide-react';
@@ -44,7 +44,7 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
-      const response = await fetch("http://localhost:3000/salaries/");
+      const response = await fetch(GET_ALL_SALARIES);
       const data = await response.json()
       setSalaryStatements(data);
     } catch (error) {
@@ -63,7 +63,7 @@ function Salaries() {
   const handleDelete = async () => {
     if(selectedEventId) {
       try {
-        const response = await axios.delete(`http://localhost:3000/salaries/delete/${selectedEventId}`);
+        const response = await axios.delete(`${HOST}/salaries/delete/${selectedEventId}`);
         if(response.status === 200) {
           toast.success("Salary statement deleted successfully")
           setShowDeleteCard(false);
@@ -85,7 +85,7 @@ function Salaries() {
     if(filterData || filteringMonth) {
         try {
           setIsLoading(true);
-          const response = await axios.get(`https://vedic-backend-neon.vercel.app/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
+          const response = await axios.get(`${HOST}/salaries/search?month=${filteringMonth}&year=${filteringYear}`);
           if(response.status === 200) {
             setSalaryStatements(response.data);
             setIsLoading(false)
@@ -117,7 +117,7 @@ function Salaries() {
           className={`relative inline-flex items-center px-4 py-2 border ${
             isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
           } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-            currentPage === i ? "bg-blue-500 text-white" : ""
+            currentPage === i ? "bg-blue-500 text-black" : ""
           }`}
         >
           {i}
@@ -185,10 +185,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
   } , [searchTerm]);
 
 
-  useEffect(() => {
-    console.log(image)
-     
-  } , [image])
+
 
 
 
@@ -281,20 +278,22 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                             isDarkMode ? "bg-gray-700" : "bg-gray-200"
                           }`}
                         >
-                          <tr>
-                            {["s no", "Employee name" , "Amount paid" , "year", "month" , "status" , "Actions"].map(
-                              (header) => (
-                                <th
-                                  key={header}
-                                  className={`px-6 py-3  text-xs font-medium capitalize tracking-wider ${
-                                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                                  }`}
-                                >
-                                  {header}
-                                </th>
-                              )
-                            )}
-                          </tr>
+                         <tr>
+  {["s no", "Employee name", "Amount paid", "year", "month", "status", "Actions"].map((header) => (
+    <th
+      key={header}
+      className={`px-6 py-1 text-xs font-medium capitalize tracking-wider ${
+        isDarkMode ? "text-gray-300" : "text-gray-700"
+      }`}
+      style={{
+        textAlign: "left", // Ensures the text aligns to the left
+      }}
+    >
+      {header}
+    </th>
+  ))}
+</tr>
+
                         </thead>
                         <tbody
                           className={`divide-y ${
@@ -479,7 +478,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                       {/* Download and Print Buttons */}
                       <div className='w-full p-5 flex items-center justify-between bg-black'>
                         <div className='p-2'>
-                          <span className='text-xl text-white tracking-wider capitalize'>Bank statement</span>
+                          <span className='text-xl text-white tracking-wider capitalize'>Salary statement</span>
                         </div>
                         <div>
                           <button

@@ -4,17 +4,16 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField, InputLabel, Typography } from '@mui/material';
+import { TextField, InputLabel, Typography , Select  , MenuItem} from '@mui/material';
 import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
-import { AiOutlineUpload, AiOutlineDelete } from "react-icons/ai"
-
+import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
 import { ADD_EMPLOYEE_ROUTE } from '../../../utils/constants';
-
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
 const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'paymentDetails']
 
 const AddEmployee = () => {
+
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
     const [errors, setErrors] = useState({});
@@ -23,6 +22,7 @@ const AddEmployee = () => {
         personalInfo: {
             firstName: '',
             lastName: '',
+            role : '' , 
             phone: '',
             email: '',
             city: '',
@@ -65,7 +65,7 @@ const AddEmployee = () => {
         const formErrors = {};
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[679]\d{9}$/;
+        const phoneRegex = /^[6789]\d{9}$/;
         const ssnRegex = /^\d{3}\d{2}\d{4}$/;
         const cvvRegex = /^\d{3}$/;
         const cardNumberRegex = /^\d{16}$/;
@@ -88,6 +88,7 @@ const AddEmployee = () => {
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
+            if (!form.role) formErrors.role = 'role of employee is required';
         }
 
         if (activeStep === 1) {
@@ -136,7 +137,7 @@ const AddEmployee = () => {
                 formErrors.cvv = 'Invalid CVV format. Use 3 digits';
             }
         }
-
+        // console.log(formErrors)
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
@@ -218,41 +219,64 @@ const AddEmployee = () => {
             case 0:
                 return (
                     <div className="space-y-8 p-2 sm:p-5 ">
+                        <h2 className="text-lg font-semibold text-gray-700">Employee Role Designation</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className='w-full'>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={formData.personalInfo.role}
+                                    onChange={handleChange}
+                                    className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                >
+                                    <option value="">Select Employee Role</option>
+                                    <option value="Junior Employee">Junior Employee</option>
+                                    <option value="Senior Employee">Senior Employee</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                                {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
+ 
+                            </div>
+
+                        </div>
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
                                 className="flex-1"
-                                label='First Name'
+                                label={"First Name"}
                                 name="firstName"
                                 value={formData.personalInfo.firstName}
                                 onChange={handleChange}
                                 error={!!errors.firstName}
                                 helperText={errors.firstName}
                                 required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
                                 className="flex-1"
-                                label={
-                                    <Typography>
-                                        Last Name<span style={{ color: 'red', marginLeft: '4px' }}>*</span>
-                                    </Typography>
-                                }
+                                label={"Last Name"}
                                 name="lastName"
                                 value={formData.personalInfo.lastName}
                                 onChange={handleChange}
                                 error={!!errors.lastName}
                                 helperText={errors.lastName}
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                         </div>
 
                         <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
-                                label={
-                                    <>
-                                        Phone<span style={{ color: 'red', marginLeft: '4px' }}>*</span>
-                                    </>
-                                }
+                                label={"Phone"}
                                 name="phone"
                                 value={formData.personalInfo.phone}
                                 onChange={handleChange}
@@ -264,22 +288,34 @@ const AddEmployee = () => {
                                     pattern: '[0-9]*'
                                 }}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="Email"
+                                label={"Email"}
                                 name="email"
                                 value={formData.personalInfo.email}
                                 onChange={handleChange}
                                 error={!!errors.email}
                                 helperText={errors.email}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                         </div>
 
                         <h3 className="text-lg font-semibold text-gray-700">Address</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
-                                label="Address"
+                                label={"Address"}
                                 name="address"
                                 value={formData.personalInfo.address}
                                 onChange={handleChange}
@@ -287,9 +323,15 @@ const AddEmployee = () => {
                                 helperText={errors.address}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="City"
+                                label={"City"}
                                 name="city"
                                 value={formData.personalInfo.city}
                                 onChange={handleChange}
@@ -297,11 +339,17 @@ const AddEmployee = () => {
                                 helperText={errors.city}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <TextField
-                                label="State"
+                                label={"State"}
                                 name="state"
                                 value={formData.personalInfo.state}
                                 onChange={handleChange}
@@ -309,24 +357,41 @@ const AddEmployee = () => {
                                 helperText={errors.state}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="Pincode"
+                                label={"Pincode"}
                                 name="pincode"
                                 value={formData.personalInfo.pincode}
                                 onChange={handleChange}
                                 error={!!errors.pincode}
                                 helperText={errors.pincode}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
                             />
                             <TextField
-                                label="Country"
+                                label='Country'
                                 name="country"
                                 value={formData.personalInfo.country}
                                 onChange={handleChange}
                                 error={!!errors.country}
                                 helperText={errors.country}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                InputLabelProps={{
+                                    sx: {
+                                      '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                  }}
+                                  required
                             />
                         </div>
                     </div>
@@ -337,97 +402,103 @@ const AddEmployee = () => {
                     <div className="p-2 sm:p-5  space-y-8">
                         <h2 className="text-lg font-semibold text-gray-700">Identification Documents</h2>
 
-                        {/* Aadhar or PAN section */}
-                        {!formData.idDocuments.aadharOrPan ? (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex gap-2 items-center">
-                                            <AiOutlineUpload /> Upload File
-                                        </span>
-                                        <input
-                                            type="file"
-                                            accept=".jpg,.png,.jpeg"
-                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
-                                            error={!!errors.aadharOrPan}
-                                            helperText={errors.aadharOrPan}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                </div>
-                                {errors.aadharOrPan ? <span className='text-xs text-red-500'>aadhar or Pan is required</span> : ""}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg w-40 h-40 bg-gray-50 flex items-center justify-center">
-                                    <img
-                                        src={URL.createObjectURL(formData.idDocuments.aadharOrPan)}
-                                        alt="Aadhar or Pan"
-                                        className=" object-cover"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => handleFileClear('idDocuments', 'aadharOrPan')}
-                                    className="text-red-500 mt-2 flex items-center gap-2"
-                                >
-                                    <AiOutlineDelete /> Clear Upload
-                                </button>
-                            </div>
-                        )}
+                    {/* Aadhar or PAN section */}
+                    {!formData.idDocuments.aadharOrPan ? (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Aadhar or Pan <span className='text-red-500'>*</span> </InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                            <label className="w-full h-full flex flex-col items-center justify-center">
+                            <span className="text-gray-500 flex gap-2 items-center">
+                                <AiOutlineUpload /> Upload File
+                            </span>
+                            <input
+                                type="file"
+                                accept=".jpg,.png,.jpeg"
+                                onChange={(e) => handleFileChange(e, 'idDocuments', 'aadharOrPan')}
+                                error={!!errors.aadharOrPan}
+                                helperText={errors.aadharOrPan}
+                                className="hidden"
+                            />
+                            </label>
+                        </div>
+                            {errors.aadharOrPan ? <span className='text-xs text-red-500'>aadhar or Pan is required</span> : ""}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                        <InputLabel className="text-gray-700">Aadhar or Pan  <span className='text-red-500'>*</span></InputLabel>
+                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg w-40 h-40 bg-gray-50 flex items-center justify-center">
+                            <img
+                            src={URL.createObjectURL(formData.idDocuments.aadharOrPan)}
+                            alt="Aadhar or Pan"
+                            className=" object-cover"
+                            />
+                        </div>
+                        <button
+                            onClick={() => handleFileClear('idDocuments', 'aadharOrPan')}
+                            className="text-red-500 mt-2 flex items-center gap-2"
+                        >
+                            <AiOutlineDelete /> Clear Upload
+                        </button>
+                        </div>
+                    )}
 
-                        {/* Passport or Driving License section */}
-                        {!formData.idDocuments.passport ? (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Passport </InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex gap-2 items-center">
-                                            <AiOutlineUpload /> Upload File
-                                        </span>
-                                        <input
-                                            type="file"
-                                            accept=".jpg,.png,.jpeg"
-                                            onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
-                                            error={!!errors.passport}
-                                            helperText={errors.passport}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                </div>
-                                {errors.passport ? <span className='text-xs text-red-500'>passport or driving liscense is required</span> : ""}
+                    {/* Passport or Driving License section */}
+                    {!formData.idDocuments.passport ? (
+                        <div className="flex flex-col">
+                            <InputLabel className="text-gray-700">Passport  <span className='text-red-500'>*</span> </InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                <label className="w-full h-full flex flex-col items-center justify-center">
+                                <span className="text-gray-500 flex gap-2 items-center">
+                                    <AiOutlineUpload /> Upload File
+                                </span>
+                                <input
+                                    type="file"
+                                    accept=".jpg,.png,.jpeg"
+                                    onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
+                                    error={!!errors.passport}
+                                    helperText={errors.passport}
+                                    className="hidden"
+                                />
+                                </label>
                             </div>
-                        ) : (
-                            <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 h-40 w-40 rounded-lg bg-gray-50 flex items-center justify-center">
-                                    <img
-                                        src={URL.createObjectURL(formData.idDocuments.passport)}
-                                        alt="Passport or Driving License"
-                                        className=" object-cover"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => handleFileClear('idDocuments', 'passport')}
-                                    className="text-red-500 mt-2 flex items-center gap-2"
-                                >
-                                    <AiOutlineDelete /> Clear Upload
-                                </button>
+                            {errors.passport ? <span className='text-xs text-red-500'>passport  is required</span> : ""}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col">
+                            <InputLabel className="text-gray-700">Passport  <span className='text-red-500'>*</span></InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 h-40 w-40 rounded-lg bg-gray-50 flex items-center justify-center">
+                                <img
+                                src={URL.createObjectURL(formData.idDocuments.passport)}
+                                alt="Passport or Driving License"
+                                className=" object-cover"
+                                />
                             </div>
-                        )}
+                            <button
+                                onClick={() => handleFileClear('idDocuments', 'passport')}
+                                className="text-red-500 mt-2 flex items-center gap-2"
+                            >
+                                <AiOutlineDelete /> Clear Upload
+                            </button>
+                        </div>
+                    )}
 
-                        {/* Social Security Number input */}
-                        <TextField
-                            label="Social Security Number"
-                            name="ssn"
-                            value={formData.idDocuments.ssn}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                            error={!!errors.ssn}
-                            helperText={errors.snn}
-                        />
+                    {/* Social Security Number input */}
+                    <TextField
+                        label={"Social Security Number"}
+                        name="ssn"
+                        value={formData.idDocuments.ssn}
+                        onChange={handleChange}
+                        className="rounded-md shadow-sm bg-gray-50"
+                        fullWidth
+                        error={!!errors.ssn}
+                        helperText={errors.snn}
+                        required
+                        InputLabelProps={{
+                            sx: {
+                              '& .MuiInputLabel-asterisk': { color: 'red' },
+                            },
+                          }}
+                    />
                     </div>
                 );
 
@@ -439,147 +510,186 @@ const AddEmployee = () => {
                         {/* Degrees/Certificates Section */}
                         {!formData.education.degrees ? (
                             <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex items-center gap-2">
-                                            <AiOutlineUpload /> Upload File
-                                        </span>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleFileChange(e, 'education', 'degrees')}
-                                            className="hidden"
-                                            accept=".jpg,.png,.jpeg"
-                                            error={!!errors.degrees}
-                                            helperText={errors.degrees}
-                                        />
-                                    </label>
-                                </div>
+                            <InputLabel className="text-gray-700">Degrees Certificates <span className='text-red-500'>*</span> </InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                <label className="w-full h-full flex flex-col items-center justify-center">
+                                <span className="text-gray-500 flex items-center gap-2">
+                                    <AiOutlineUpload /> Upload File
+                                </span>
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleFileChange(e, 'education', 'degrees')}
+                                    className="hidden"
+                                    accept=".jpg,.png,.jpeg"
+                                    error={!!errors.degrees}
+                                    helperText={errors.degrees}
+                                />
+                                </label>
+                            </div>
                                 {errors.degrees ? <span className='text-xs text-red-500'>degree certificate is required</span> : ""}
                             </div>
                         ) : (
                             <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                                    <img
-                                        src={URL.createObjectURL(formData.education.degrees)}
-                                        alt="Degrees/Certificates"
-                                        className=" object-cover"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => handleFileClear('education', 'degrees')}
-                                    className="text-red-500 mt-2 flex items-center gap-2"
-                                >
-                                    <AiOutlineDelete /> Clear Upload
-                                </button>
+                            <InputLabel className="text-gray-700">Degrees Certificate <span className='text-red-500'>*</span></InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                                <img
+                                src={URL.createObjectURL(formData.education.degrees)}
+                                alt="Degrees/Certificates"
+                                className=" object-cover"
+                                />
+                            </div>
+                            <button
+                                onClick={() => handleFileClear('education', 'degrees')}
+                                className="text-red-500 mt-2 flex items-center gap-2"
+                            >
+                                <AiOutlineDelete /> Clear Upload
+                            </button>
                             </div>
                         )}
 
                         {/* Transcripts Section */}
                         {!formData.education.transcripts ? (
                             <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
-                                <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                                    <label className="w-full h-full flex flex-col items-center justify-center">
-                                        <span className="text-gray-500 flex items-center gap-2">
-                                            <AiOutlineUpload /> Upload File
-                                        </span>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleFileChange(e, 'education', 'transcripts')}
-                                            className="hidden"
-                                            accept=".jpg,.png,.jpeg"
-                                            error={!!errors.transcripts}
-                                            helperText={errors.transcripts}
-                                        />
-                                    </label>
-                                </div>
-                                {errors.transcripts ? <span className='text-xs text-red-500'>transcript is required</span> : ""}
+                            <InputLabel className="text-gray-700">Upload Transcripts <span className='text-red-500'>*</span></InputLabel>
+                            <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
+                                <label className="w-full h-full flex flex-col items-center justify-center">
+                                <span className="text-gray-500 flex items-center gap-2">
+                                    <AiOutlineUpload /> Upload File
+                                </span>
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleFileChange(e, 'education', 'transcripts')}
+                                    className="hidden"
+                                    accept=".jpg,.png,.jpeg"
+                                    error={!!errors.transcripts}
+                                    helperText={errors.transcripts}
+                                />
+                                </label>
+                            </div>
+                            {errors.transcripts ? <span className='text-xs text-red-500'>transcript is required</span> : ""}
                             </div>
                         ) : (
                             <div className="flex flex-col">
-                                <InputLabel className="text-gray-700">Transcripts</InputLabel>
-                                <div className="mt-2 h-40 w-40 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                                    <img
-                                        src={URL.createObjectURL(formData.education.transcripts)}
-                                        alt="Transcripts"
-                                        className=" object-cover"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => handleFileClear('education', 'transcripts')}
-                                    className="text-red-500 mt-2 flex items-center gap-2"
-                                >
-                                    <AiOutlineDelete /> Clear Upload
-                                </button>
+                            <InputLabel className="text-gray-700">Transcripts <span className='text-red-500'>*</span></InputLabel>
+                            <div className="mt-2 h-40 w-40 p-4 border-dashed border-2  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                                <img
+                                src={URL.createObjectURL(formData.education.transcripts)}
+                                alt="Transcripts"
+                                className=" object-cover"
+                                />
+                            </div>
+                            <button
+                                onClick={() => handleFileClear('education', 'transcripts')}
+                                className="text-red-500 mt-2 flex items-center gap-2"
+                            >
+                                <AiOutlineDelete /> Clear Upload
+                            </button>
                             </div>
                         )}
                     </div>
                 );
 
-            case 3:
-                return (
-                    <div className="space-y-6 p-2 sm:p-5">
-                        <h2 className="text-lg font-semibold text-gray-700">Previous Employment Details</h2>
-                        <TextField
-                            label="Previous Employer Name"
-                            name="employerName"
-                            value={formData.employment.employerName}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                        <TextField
-                            label="Job Title"
-                            name="jobTitle"
-                            value={formData.employment.jobTitle}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                        <div className="grid gap-2">
-                            <label
-                                htmlFor="startDate"
-                                className="block text-sm capitalize font-medium "
-                            >
-                                start date
-                            </label>
+                case 3:
+                    return (
+                        <div className="space-y-6 p-2 sm:p-5">
+                            <h2 className="text-lg font-semibold text-gray-700">Previous Employment Details</h2>
                             <TextField
-                                name="startDate"
-                                type='date'
-                                value={formData.employment.startDate}
+                                label="Previous Employer Name"
+                                name="employerName"
+                                value={formData.employment.employerName}
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
+                                error={!!errors.employerName}
+                                helperText={errors.employerName}
                             />
-                        </div>
-                        <div className="grid gap-2">
-                            <label
-                                htmlFor="endDate"
-                                className="block capitalize text-sm font-medium "
-                            >
-                                end date
-                            </label>
                             <TextField
-                                type='date'
-                                name="endDate"
-                                value={formData.employment.endDate}
+                                label="Job Title"
+                                name="jobTitle"
+                                value={formData.employment.jobTitle}
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
+                                error={!!errors.jobTitle}
+                                helperText={errors.jobTitle}
+                            />
+                            <div className="grid gap-2">
+                                 <label 
+                                    htmlFor="startDate" 
+                                     className="block text-sm capitalize font-medium "
+                                >
+                                    start date <span className='text-red-500'>*</span>
+                                </label>
+                                <TextField
+                                    name="startDate"
+                                    type='date'
+                                    value={formData.employment.startDate}
+                                    onChange={handleChange}
+                                    className="rounded-md shadow-sm bg-gray-50"
+                                    fullWidth
+                                    error={!!errors.startDate}
+                                    helperText={errors.startDate}
+
+                                />
+
+                            </div>
+                            <div className="grid gap-2">
+                                 <label 
+                                    htmlFor="endDate" 
+                                     className="block capitalize text-sm font-medium "
+                                >
+                                    end date <span className='text-red-500'>*</span>
+
+                                </label>
+                                <TextField
+                                    type='date'
+                                    name="endDate"
+                                    value={formData.employment.endDate}
+                                    onChange={handleChange}
+                                    className="rounded-md shadow-sm bg-gray-50"
+                                    fullWidth
+                                    required
+                                    error={!!errors.endDate}
+                                    helperText={errors.endDate}
+                                    InputLabelProps={{
+                                        sx: {
+                                            '& .MuiInputLabel-asterisk': { color: 'red' },
+                                        },
+                                    }}
+                                />
+
+
+                            </div>
+                            <TextField
+                                label="Reason for Leaving"
+                                name="reasonForLeaving"
+                                value={formData.employment.reasonForLeaving}
+                                onChange={handleChange}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                                required
+                                error={!!errors.reasonForLeaving}
+                                helperText={errors.reasonForLeaving}
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                         </div>
-                        <TextField
-                            label="Reason for Leaving"
-                            name="reasonForLeaving"
-                            value={formData.employment.reasonForLeaving}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                    </div>
-                );
+                    );
 
             case 4:
                 return (
@@ -587,57 +697,84 @@ const AddEmployee = () => {
                         <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
                         <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
 
-                        <TextField
-                            label="Cardholder Name"
-                            name="cardholderName"
-                            value={formData.paymentDetails.cardholderName}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                        <TextField
-                            label="Card Number"
-                            name="cardNumber"
-                            value={formData.paymentDetails.cardNumber}
-                            onChange={handleChange}
-                            className="rounded-md shadow-sm bg-gray-50"
-                            fullWidth
-                        />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="grid gap-2">
-                                <label
-                                    htmlFor="expiryDate"
-                                    className="block text-sm font-medium text-gray-500"
-                                >
-                                    expiry date
-                                </label>
-                                <TextField
-                                    id="expiryDate"
-                                    name="expiryDate"
-                                    type='date'
-                                    value={formData.paymentDetails.expiryDate}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <label
-                                    htmlFor="cvv"
-                                    className="block text-sm font-medium opacity-0"
-                                >
-                                    cvv
-                                </label>
-                                <TextField
-                                    label="CVV"
-                                    name="cvv"
-                                    value={formData.paymentDetails.cvv}
-                                    onChange={handleChange}
-                                    className="rounded-md shadow-sm bg-gray-50"
-                                />
+                            <TextField
+                                label="Cardholder Name"
+                                name="cardholderName"
+                                value={formData.paymentDetails.cardholderName}
+                                onChange={handleChange}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                                required
+                                error={!!errors.cardholderName}
+                                helperText={errors.cardholderName}
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
+                            />
+                            <TextField
+                                label="Card Number"
+                                name="cardNumber"
+                                value={formData.paymentDetails.cardNumber}
+                                onChange={handleChange}
+                                className="rounded-md shadow-sm bg-gray-50"
+                                fullWidth
+                                required
+                                error={!!errors.cardNumber}
+                                helperText={errors.cardNumber}
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
+                            />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="grid gap-2">
+                                    <label 
+                                        htmlFor="expiryDate" 
+                                        className="block text-sm font-medium text-gray-500"
+                                    >
+                                        expiry date <span className='text-red-500'>*</span>
+                                    </label>
+                                    <TextField
+                                        id="expiryDate"
+                                        name="expiryDate"
+                                        type='date'
+                                        value={formData.paymentDetails.expiryDate}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
+                                        error={!!errors.expiryDate}
+                                        helperText={errors.expiryDate}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <label 
+                                        htmlFor="cvv" 
+                                        className="block text-sm font-medium opacity-0"
+                                    >
+                                        cvv <span className='text-red-500'>*</span>
+                                    </label>
+                                    <TextField
+                                        label="CVV"
+                                        name="cvv"
+                                        value={formData.paymentDetails.cvv}
+                                        onChange={handleChange}
+                                        className="rounded-md shadow-sm bg-gray-50"
+                                        required
+                                        InputLabelProps={{
+                                            sx: {
+                                                '& .MuiInputLabel-asterisk': { color: 'red' },
+                                            },
+                                        }}
+                                        error={!!errors.cvv}
+                                        helperText={errors.cvv}
+                                    />
+                                </div>
+
                             </div>
                         </div>
-                    </div>
-                );
+                    );
 
             default:
                 return null;

@@ -24,6 +24,7 @@ const EditEmployee = () => {
         personalInfo: {
             firstName: '',
             lastName: '',
+            role : '' ,
             phone: '',
             email: '',
             city: '',
@@ -64,6 +65,7 @@ const EditEmployee = () => {
                         ...prev.personalInfo, 
                         firstName: data.employee.firstName, 
                         lastName: data.employee.lastName,
+                        role : data.employee?.role , 
                         phone: data.employee.phone,
                         email: data.employee.email,
                         city: data.employee.city,
@@ -140,7 +142,7 @@ const EditEmployee = () => {
         const formErrors = {};
     
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-        const phoneRegex = /^[679]\d{9}$/; 
+        const phoneRegex = /^[6789]\d{9}$/; 
         const ssnRegex = /^\d{3}\d{2}\d{4}$/; 
         const cvvRegex = /^\d{3}$/; 
         const cardNumberRegex = /^\d{16}$/;
@@ -163,6 +165,7 @@ const EditEmployee = () => {
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
+            if (!form.role) formErrors.role = 'role is required';
         }
     
         if (activeStep === 1) {
@@ -304,6 +307,26 @@ const EditEmployee = () => {
             case 0:
                 return (
                     <div className="space-y-8 p-4 sm:p-5">
+                        <h2 className="text-lg font-semibold text-gray-700">Employee Role Designation</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className='w-full'>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={formData.personalInfo.role}
+                                    onChange={handleChange}
+                                    className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                >
+                                    <option value="">Select Employee Role</option>
+                                    <option value="Junior Employee">Junior Employee</option>
+                                    <option value="Senior Employee">Senior Employee</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                                {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
+ 
+                            </div>
+
+                        </div>
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
@@ -315,7 +338,12 @@ const EditEmployee = () => {
                                     onChange={handleChange}
                                     error={!!errors.firstName}
                                     helperText={errors.firstName}
-
+                                   required
+                                   InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                                 />
                                 <div className=''></div>        
                             </div>
@@ -327,6 +355,12 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.lastName}
                                 helperText={errors.lastName}
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                         </div>
 
@@ -340,6 +374,12 @@ const EditEmployee = () => {
                                 error={!!errors.phone}
                                 helperText={errors.phone}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <TextField
                                 label="Email"
@@ -349,6 +389,12 @@ const EditEmployee = () => {
                                 error={!!errors.email}
                                 helperText={errors.email}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                         </div>
 
@@ -363,6 +409,12 @@ const EditEmployee = () => {
                                 helperText={errors.address}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <TextField
                                 label="City"
@@ -373,6 +425,12 @@ const EditEmployee = () => {
                                 helperText={errors.city}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
 
                         </div>
@@ -385,6 +443,12 @@ const EditEmployee = () => {
                                 error={!!errors.state}
                                 helperText={errors.state}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <TextField
                                 label="Pincode"
@@ -394,6 +458,12 @@ const EditEmployee = () => {
                                 error={!!errors.pincode}
                                 helperText={errors.pincode}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                             <TextField
                                 label="Country"
@@ -403,6 +473,12 @@ const EditEmployee = () => {
                                 error={!!errors.country}
                                 helperText={errors.country}
                                 className="rounded-md shadow-sm bg-gray-50"
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                         </div>
                     </div>
@@ -416,7 +492,7 @@ const EditEmployee = () => {
                     {/* Aadhar or PAN section */}
                     {!formData.idDocuments.aadharOrPan ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
+                        <InputLabel className="text-gray-700">Aadhar or Pan <span className='text-red-500'>*</span> </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex gap-2 items-center">
@@ -436,7 +512,7 @@ const EditEmployee = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Aadhar or Pan</InputLabel>
+                        <InputLabel className="text-gray-700">Aadhar or Pan <span className='text-red-500'>*</span> </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
                             <img
                             src={typeof formData.idDocuments.aadharOrPan === "string" ? `data:image/jpeg;base64,${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan)} 
@@ -456,7 +532,7 @@ const EditEmployee = () => {
                     {/* Passport or Driving License section */}
                     {!formData.idDocuments.passport ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
+                        <InputLabel className="text-gray-700">Passport <span className='text-red-500'>*</span></InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex gap-2 items-center">
@@ -477,7 +553,7 @@ const EditEmployee = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Passport or Driving License</InputLabel>
+                            <InputLabel className="text-gray-700">Passport <span className='text-red-500'>*</span></InputLabel>
                             <div className="mt-2 h-40 w-40 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
                                 <img
                             src={typeof formData.idDocuments.passport === "string" ? `data:image/jpeg;base64,${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport)} 
@@ -504,6 +580,12 @@ const EditEmployee = () => {
                         fullWidth
                         error={!!errors.ssn}
                         helperText={errors.ssn }
+                        required
+                        InputLabelProps={{
+                            sx: {
+                                '& .MuiInputLabel-asterisk': { color: 'red' },
+                            },
+                        }}
                     />
                     </div>
                 );
@@ -516,7 +598,7 @@ const EditEmployee = () => {
                     {/* Degrees/Certificates Section */}
                     {!formData.education.degrees ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Upload Degrees/Certificates</InputLabel>
+                        <InputLabel className="text-gray-700">Degrees Certificates <span className='text-red-500'>*</span> </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex items-center gap-2">
@@ -532,12 +614,12 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
-                        {errors.degrees ? <span className='text-xs text-red-500'>degrees is required</span> : ""}
+                        {errors.degrees ? <span className='text-xs text-red-500'>degree certificate is required</span> : ""}
 
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Degrees/Certificates</InputLabel>
+                        <InputLabel className="text-gray-700">Degrees Certificates <span className='text-red-500'>*</span></InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
                             src={typeof formData.education.degrees === "string" ? `data:image/jpeg;base64,${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees)} 
@@ -557,7 +639,7 @@ const EditEmployee = () => {
                     {/* Transcripts Section */}
                     {!formData.education.transcripts ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Upload Transcripts</InputLabel>
+                        <InputLabel className="text-gray-700">Transcripts <span className='text-red-500'>*</span></InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex items-center gap-2">
@@ -577,12 +659,12 @@ const EditEmployee = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Transcripts</InputLabel>
+                        <InputLabel className="text-gray-700">Transcripts <span className='text-red-500'>*</span></InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
-                            src={typeof formData.education.transcripts === "string" ? `data:image/jpeg;base64,${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts)} 
-                            alt="Transcripts"
-                            className="object-cover"
+                                src={typeof formData.education.transcripts === "string" ? `data:image/jpeg;base64,${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts)} 
+                                alt="Transcripts"
+                                className="object-cover"
                             />
                         </div>
                         <button
@@ -607,6 +689,12 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
+                            required
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
                         />
                         <TextField
                             label="Job Title"
@@ -615,13 +703,19 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
+                            required
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
                         />
                         <div className="grid gap-2">
                              <label 
                                 htmlFor="startDate" 
                                  className="block capitalize text-sm font-medium "
                             >
-                                start date
+                                start date <span className='text-red-500'>*</span>
                             </label>
                             <TextField
                                 name="startDate"
@@ -638,7 +732,7 @@ const EditEmployee = () => {
                                 htmlFor="endDate" 
                                  className="block capitalize text-sm font-medium "
                             >
-                                end date
+                                end date <span className='text-red-500'>*</span>
 
                             </label>
                             <TextField
@@ -648,6 +742,12 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
+                                required
+                                InputLabelProps={{
+                                    sx: {
+                                        '& .MuiInputLabel-asterisk': { color: 'red' },
+                                    },
+                                }}
                             />
                         </div>
                         <TextField
@@ -657,6 +757,12 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
+                            required
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
                         />
                     </div>
                 );
@@ -676,6 +782,12 @@ const EditEmployee = () => {
                             error={!!errors.cardholderName}
                             helperText={errors.cardholderName}
                             fullWidth
+                            required
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
                         />
                         <TextField
                             label="Card Number"
@@ -686,6 +798,12 @@ const EditEmployee = () => {
                             error={!!errors.cardNumber}
                             helperText={errors.cardNumber}
                             fullWidth
+                            required
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
                         />
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -694,7 +812,7 @@ const EditEmployee = () => {
                                     htmlFor="expiryDate" 
                                     className="block text-sm font-medium text-gray-500"
                                 >
-                                    Expiry Date 
+                                    Expiry Date  <span className='text-red-500'>*</span>
                                 </label>
                                 <TextField
                                     id="expiryDate"
@@ -705,6 +823,12 @@ const EditEmployee = () => {
                                     error={!!errors.expiryDate}
                                     helperText={errors.expiryDate}
                                     className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
+                                    required
+                                    InputLabelProps={{
+                                        sx: {
+                                            '& .MuiInputLabel-asterisk': { color: 'red' },
+                                        },
+                                    }}
                                 />
 
                             </div>
@@ -724,6 +848,12 @@ const EditEmployee = () => {
                                     error={!!errors.cvv}
                                     helperText={errors.cvv}
                                     className="rounded-md shadow-sm bg-gray-50"
+                                    required
+                                    InputLabelProps={{
+                                        sx: {
+                                            '& .MuiInputLabel-asterisk': { color: 'red' },
+                                        },
+                                    }}
                                 />
                             </div>
                         </div>

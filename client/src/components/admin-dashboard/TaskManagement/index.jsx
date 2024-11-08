@@ -50,7 +50,7 @@ const TaskManagement = () => {
     setIsLoadingTasks(true);
     try {
       const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/tasks?page=${page}&limit=${tasksPerPage}`);
-      // const response = await axios.get(`http://localhost:3000/api/tasks?page=${page}&limit=${tasksPerPage}`);
+      // const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/tasks?page=${page}&limit=${tasksPerPage}`);
 
       setTasks(response.data.tasks);
       setTotalPages(response.data.totalPages);

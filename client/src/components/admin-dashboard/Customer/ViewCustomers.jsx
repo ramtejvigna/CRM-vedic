@@ -68,7 +68,7 @@ const CustomerDetails = () => {
     const employeeMatch = filteredAssignedEmployee === "All" || row.assignedEmployeeName === filteredAssignedEmployee;
     const searchMatch =
       row.fatherName?.toLowerCase().includes(searchTerm) ||
-      row.customerId?.toLowerCase().includes(searchTerm) ||
+      row.customerID?.toLowerCase().includes(searchTerm) ||
       row.whatsappNumber?.toLowerCase().includes(searchTerm) ||
       row.babyGender?.toLowerCase().includes(searchTerm) ||
       row.assignedEmployeeName?.toLowerCase().includes(searchTerm) ||
@@ -103,7 +103,7 @@ const CustomerDetails = () => {
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
-    setPage(0); // Reset to first page when rows per page changes
+    setPage(0);
   };
 
   if (isLoading) {
@@ -118,7 +118,7 @@ const CustomerDetails = () => {
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
       <div className="max-w-7xl mx-auto">
       <div className="flex flex-col mb-4">
-  <h1 className="text-4xl font-bold mb-8">Customer Details</h1>
+  <h1 className="text-4xl font-bold mb-3">Customer Details</h1>
   <div className="flex items-center space-x-4 mt-8"> {/* Added mt-2 for margin-top */}
   <div className="relative w-full" style={{ width: '22%' }}>
   <input
@@ -141,7 +141,7 @@ const CustomerDetails = () => {
   </div>
 </div>
 <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
-                Showing {customers.length} results
+                Showing {filteredData.length} results
             </div>
         <AnimatePresence>
   {showFilters && (
@@ -178,7 +178,7 @@ const CustomerDetails = () => {
             className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
           >
             <option value="All">All</option>
-            <option value="inProgress">Inprogress</option>
+            <option value="inProgress">In progress</option>
             <option value="completed">Completed</option>
             <option value="newRequests">New Requests</option>
             <option value="rejected">Rejected</option>
@@ -222,13 +222,13 @@ const CustomerDetails = () => {
                   "Father Name",
                   "WhatsApp Number",
                   "Baby Gender",
-                  "EmployeeAssigned",
+                  "Employee Assigned",
                   "Work Status",
                   "Actions",
                 ].map((header) => (
                   <th
                     key={header}
-                    className="px-4 py-3 text-left text-xm font-medium  tracking-wider"
+                    className="px-4 py-3 text-left text-xs font-medium  tracking-wider"
                   >
                     {header}
                   </th>
@@ -246,23 +246,23 @@ const CustomerDetails = () => {
                     className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
                       } transition-colors duration-150`}
                   >
-                    <td className="px-4 py-3 whitespace-nowrap">{index + 1}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">{index + 1}</td>
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
                      {row.customerID
 }
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
                       {row.fatherName}
                     </td>
                     
-               <td className="px-4 py-3 whitespace-nowrap">
+               <td className="px-4 py-3 text-sm whitespace-nowrap">
                       {row.whatsappNumber}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm whitespace-nowrap">
                       {row.babyGender}
                     </td>
                     
-<td className="px-4 py-3 whitespace-nowrap">
+<td className="px-4 py-3 text-sm  whitespace-nowrap">
     {row.assignedEmployeeName || 'Not Assigned'}
 </td>
 
@@ -272,16 +272,16 @@ const CustomerDetails = () => {
                        className={`
                         px-2 py-1 rounded-full text-sm inline-flex leading-5 font-semibold
                         ${row.customerStatus === "newRequests" 
-                          ? "text-yellow-600 bg-yellow-100" 
+                          ? "text-yellow-600 text-sm  bg-yellow-100" 
                           : ""}
                         ${row.customerStatus === "inProgress" 
-                          ? "text-gray-900 bg-gray-100" 
+                          ? "text-gray-900 text-sm text-sm bg-gray-100" 
                           : ""}
                         ${row.customerStatus === "completed" 
-                          ? " text-green-500 bg-green-100" 
+                          ? " text-green-500 text-sm bg-green-100" 
                           : ""}
                         ${row.customerStatus === "rejected" 
-                          ? "text-red-800 bg-red-100" 
+                          ? "text-red-800 text-sm  bg-red-100" 
                           : ""}
                       `}
                       
@@ -295,7 +295,7 @@ const CustomerDetails = () => {
     {row.customerStatus === "inProgress" && (
       <>
         <Clock className="w-4 h-4 mr-1" />
-        Inprogress
+        In Progress
       </>
     )}
     {row.customerStatus === "completed" && (

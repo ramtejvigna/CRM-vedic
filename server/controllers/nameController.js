@@ -18,13 +18,13 @@ export const uploadCsvNames = async (req, res) => {
 
     // Parse the CSV file
     readableFile
-        .pipe(csvParser())
+        .pipe(csvParser({ encoding: 'utf-8' }))
         .on('data', (row) => {
-            results.push(row);  // Collect each row of data
+            results.push(row);
         })
         .on('end', async () => {
             try {
-                // Insert parsed data into the MongoDB collection
+                console.log(results)
                 await babyNames.insertMany(results);
                 res.status(200).json({ message: "Baby names uploaded successfully" });
             } catch (error) {
