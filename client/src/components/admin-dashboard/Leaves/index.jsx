@@ -167,7 +167,7 @@ const Leaves = () => {
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
                   />
                 )}
-                {activeTab === "pending" && pendingCount > 0 && status !== 'completed' && (
+                { pendingCount > 0 && status !== 'completed' && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -263,7 +263,7 @@ const Leaves = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Search Employee
                 </label>
@@ -278,7 +278,7 @@ const Leaves = () => {
                     className="w-full p-2 pl-10 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           </motion.div>
         )}

@@ -30,7 +30,6 @@ const EmployeeTable = () => {
       const res = await fetch(GET_ALL_EMPLOYEES);
       if (!res.ok) throw new Error("Failed to fetch employees");
       const data = await res.json();
-      console.log(data.employees)
       setEmployees(data.employees);
     } catch (error) {
       toast.error("Error fetching employees!");
@@ -43,36 +42,37 @@ const EmployeeTable = () => {
   const handleEdit = (id) => navigate(`edit-employee/${id}`);
   const handleView = (id) => navigate(`view-employee/${id}`);
   const handleDelete = (id) => navigate(`delete-employee/${id}`);
-
+  const indexOfFirstRecord = (currentPage - 1) * recordsPerPage;
   const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  
   const currentRecords = employees?.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(employees?.length / recordsPerPage);
+  const totalPages = Math.ceil(employees.length / recordsPerPage);
 
   const getStatusColor = (isOnline) =>
     isOnline
       ? `${isDarkMode ? "bg-green-800 text-green-100" : "bg-green-100 text-green-800"}`
       : `${isDarkMode ? "bg-red-800 text-red-100" : "bg-red-100 text-red-800"}`;
 
-  const renderPaginationButtons = () => {
-    const buttons = [];
-    for (let i = 1; i <= totalPages; i++) {
-      buttons.push(
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i)}
-          className={`relative inline-flex items-center px-4 py-2 border ${
-            isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
-          } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-            currentPage === i ? "bg-blue-500 text-white" : ""
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return buttons;
-  };
+      const renderPaginationButtons = () => {
+        const buttons = [];
+        for (let i = 1; i <= totalPages; i++) {
+          buttons.push(
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i)}
+              className={`relative inline-flex items-center px-4 py-2 border ${
+                isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+              } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+                currentPage === i ? "bg-blue-500 text-black" : ""
+              }`}
+            >
+              {i}
+            </button>
+          );
+        }
+        return buttons;
+      };
+      
 
   const handleSearchTerm = (e) => {
     setCurrentPage(1);
@@ -152,6 +152,9 @@ const EmployeeTable = () => {
                     <AiOutlineUserAdd/> <span className="">Add Employee</span>
                   </Link>
                 </motion.button>
+            </div>
+            <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
+                Showing {employees.length} results
             </div>
           {
             showFilters && (
@@ -358,7 +361,9 @@ const EmployeeTable = () => {
                     >
                       Previous
                     </button>
-                    {renderPaginationButtons()}
+                    {
+                    renderPaginationButtons()
+                    }
                     <button
                       onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}

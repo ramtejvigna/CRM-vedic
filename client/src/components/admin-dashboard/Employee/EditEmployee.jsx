@@ -24,6 +24,7 @@ const EditEmployee = () => {
         personalInfo: {
             firstName: '',
             lastName: '',
+            role : '' ,
             phone: '',
             email: '',
             city: '',
@@ -64,6 +65,7 @@ const EditEmployee = () => {
                         ...prev.personalInfo, 
                         firstName: data.employee.firstName, 
                         lastName: data.employee.lastName,
+                        role : data.employee?.role , 
                         phone: data.employee.phone,
                         email: data.employee.email,
                         city: data.employee.city,
@@ -140,7 +142,7 @@ const EditEmployee = () => {
         const formErrors = {};
     
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-        const phoneRegex = /^[679]\d{9}$/; 
+        const phoneRegex = /^[6789]\d{9}$/; 
         const ssnRegex = /^\d{3}\d{2}\d{4}$/; 
         const cvvRegex = /^\d{3}$/; 
         const cardNumberRegex = /^\d{16}$/;
@@ -163,6 +165,7 @@ const EditEmployee = () => {
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
+            if (!form.role) formErrors.role = 'role is required';
         }
     
         if (activeStep === 1) {
@@ -304,6 +307,26 @@ const EditEmployee = () => {
             case 0:
                 return (
                     <div className="space-y-8 p-4 sm:p-5">
+                        <h2 className="text-lg font-semibold text-gray-700">Employee Role Designation</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className='w-full'>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={formData.personalInfo.role}
+                                    onChange={handleChange}
+                                    className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                >
+                                    <option value="">Select Employee Role</option>
+                                    <option value="Junior Employee">Junior Employee</option>
+                                    <option value="Senior Employee">Senior Employee</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                                {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
+ 
+                            </div>
+
+                        </div>
                         <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>

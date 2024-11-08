@@ -35,6 +35,7 @@ const employeeSchema = new mongoose.Schema({
     // username: { type: String, required: true },
     firstName: { type: String },
     lastName: { type: String },
+    role : {type : String , enum : ["Employee" , "Manager" , "Junior Employee" , "Senior Employee"] , required : true} , 
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },

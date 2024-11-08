@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaDownload, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
-const PDFViewer = ({ pdfUrl, onClose }) => {
+const PDFViewer = ({ pdfUrl, handleDownload, handleSendMail, email, enabledRow, pdfId, onClose }) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center z-[1000] bg-black bg-opacity-75 backdrop-blur-md overflow-scroll scrollbar-hide">
       <div className="bg-white rounded-lg shadow-xl p-7 w-full mx-auto max-w-[800px] h-full max-h-[600px] relative">
@@ -16,8 +16,11 @@ const PDFViewer = ({ pdfUrl, onClose }) => {
 
         <h2 className="mb-4 text-xl font-semibold">Generated PDF:</h2>
 
+        {/* Button container */}
+        
+
         {/* PDF Iframe Viewer */}
-        <div className="flex items-center justify-center w-full h-[90%]">
+        <div className="flex items-center justify-center w-full h-[80%]">
           <iframe
             src={pdfUrl}
             className="w-full h-full border rounded-lg"

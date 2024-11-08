@@ -16,6 +16,7 @@ export const addEmployee = async (req, res) => {
         const {
             firstName,
             lastName,
+            role ,
             phone,
             email,
             city,
@@ -34,8 +35,6 @@ export const addEmployee = async (req, res) => {
             cvv,
             expiryDate,
         } = req.body;
-
-        console.log(req.body)
 
         if(!req.files) {
             return res.status(400).json({message : "files are missing"})
@@ -56,6 +55,7 @@ export const addEmployee = async (req, res) => {
         const newEmployee = await Employee.create({
             firstName,
             lastName,
+            role,
             phone,
             email,
             city,
@@ -124,7 +124,7 @@ export const getEmployee = async (req , res) => {
 // @access public
 export const updateEmployee = async (req, res) => {
     try {
-        const { id, firstName, lastName, phone, email, city, address, state, country, pincode, ssn,
+        const { id, firstName, lastName , role , phone, email, city, address, state, country, pincode, ssn,
             employerName, jobTitle, startDate, endDate, reasonForLeaving,
             cardNumber, cardholderName, cvv, expiryDate } = req.body;
 
@@ -133,8 +133,6 @@ export const updateEmployee = async (req, res) => {
             return res.status(404).json({ message: "Employee with provided ID does not exist" });
         }
 
-        // Logging received files for debugging
-        console.log('Received files:', req.files);
 
         // Handling file uploads and existing file paths
         const passportFile = req.files && req.files.passport ? req.files.passport[0] : null;
@@ -156,6 +154,7 @@ export const updateEmployee = async (req, res) => {
             {
                 firstName,
                 lastName,
+                role ,
                 phone,
                 email,
                 city,
@@ -196,13 +195,17 @@ export const updateEmployee = async (req, res) => {
 
 export const filterEmployeesByStatus = async (req ,res) => {
     try {
-        const {status} = req.query;
+        const {status , role } = req.query;
         const searchQuery = {}
         if(status && status !== "select status"){
             searchQuery.isOnline = (status === 'online')
         }
 
-        const isOnline = status === "online";
+        if(role && role !== "select role") {
+            searchQuery.role = role;
+        }
+
+
 
         const employees = await Employee.find(searchQuery);
 
