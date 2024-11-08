@@ -131,32 +131,23 @@ export const getCustomersBasedOnRequests = async (req, res) => {
 
         const customers = employee.customers;
         
-        const newRequests = customers
-            .filter(customer => customer.customerStatus === 'newRequests')
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        const inProgress = customers
-            .filter(customer => customer.customerStatus === 'inProgress')
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
         const completed = customers
             .filter(customer => customer.customerStatus === 'completed')
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        const rejected = customers
-            .filter(customer => customer.customerStatus === 'rejected')
+
+        const remainingCustomers = customers
+            .filter(customer => customer.customerStatus !== 'completed')
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         res.status(200).json({
-            newRequests,
-            inProgress,
+            assignedCustomers: remainingCustomers,
             completed,
-            rejected
         });
     } catch (error) {
         res.status(500).json({ error: "Error fetching customers for employee" });
     }
 };
+
 
 export const getCustomerData = async (req, res) => {
     const { id } = req.params;
