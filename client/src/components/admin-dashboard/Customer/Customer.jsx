@@ -185,11 +185,8 @@ const Customer = () => {
 
     return (
         <div className="min-h-screen p-4 sm:p-8">
-
-<div className="bg-white rounded-xl shadow-lg p-6 border border-gray-300 flex flex-col">
-    
-    {/* Back Button and Header */}
-    <div className="flex items-center mb-6">
+ {/* Back Button and Header */}
+ <div className="flex items-center mb-6">
         <button
             onClick={() => navigate(-1)}
             className="flex items-center text-gray-900 hover:text-blue-500"
@@ -197,12 +194,14 @@ const Customer = () => {
             <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
         </button>
         <h2 className="text-lg font-semibold">Customer Details</h2>
+        
     </div>
-
-    {/* Customer Name in Large Font */}
     <p className="text-2xl font-medium ml-4 mb-4">{customerDetails.fatherName}</p>
+
+<div className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col">
+    {/* Customer Name in Large Font */}
+    
 {/* Bordered Box around Customer Info */}
-<div className="border border-gray-900 rounded-lg p-4 mb-4">
 <h2 className="text-lg font-semibold mb-4">Customer Summary</h2>
 
     {/* Grid Layout for Customer Info */}
@@ -224,12 +223,13 @@ const Customer = () => {
             </div>
         ))}
     </div>
+
 </div>
-    
+
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Baby Details Card */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-900 p-6">
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col">
                     <h2 className="text-lg font-semibold mb-4">Baby Details</h2>
                     <hr className="my-3 border-gray-300 w-full" />
 
@@ -315,8 +315,10 @@ const Customer = () => {
               {/* Right Column */}
               <div className="space-y-6">
                 {/* Payment Data Card */}
-                <div className="border border-gray-900 rounded-lg p-6">
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
                   <h2 className="text-lg font-medium text-gray-500 mb-4">Payment Data</h2>
+                  <hr className="my-3 border-gray-300 w-full" />
+
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm font-medium text-gray-500">Payment Date</p>
@@ -338,8 +340,10 @@ const Customer = () => {
                 </div>
     
                 {/* PDFs Generated Card */}
-                <div className="border border-gray-900 rounded-lg p-6">
-                  <h2 className="text-lg font-semibold mb-4">PDF's Generated</h2>
+                <div
+  className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col overflow-y-auto"
+  style={{ height: '345px' }}
+>                  <h2 className="text-lg font-semibold mb-4">PDF's Generated</h2>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -387,9 +391,9 @@ const Customer = () => {
               </div>
             </div>
  
-</div>
+
            
-            <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="w-full bg-white mt-10 dark:bg-gray-800  h-80 rounded-lg shadow-lg p-6">
                 <div className="flex w-full items-center justify-between mb-6">
                     <h2 className="text-xl font-bold   text-gray-800 dark:text-white">PDF's Generated </h2>
                     <div className="flex items-center space-x-2">
