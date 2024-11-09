@@ -88,7 +88,6 @@ const Customer = () => {
             const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`);
             if (response.data.length > 0) {
                 setPdfs(response.data);
-                console.log(response.data);
             }
             setPdfsLoading(false);
         } catch (error) {

@@ -481,6 +481,7 @@ const handleGeneratePdf = async () => {
           names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
           customerId: customerData._id,
           additionalBabyNames: additionalBabyNames,
+          generatedBy: "Admin",
       });
 
       toast.success("PDF Generated Successfully");

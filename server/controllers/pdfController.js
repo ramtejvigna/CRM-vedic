@@ -103,8 +103,7 @@ export const getBabyNames = async (req, res) => {
 // }
 
 export const sendDetails = async (req, res) => {
-    const { names, customerId, additionalBabyNames } = req.body;
-    console.log(additionalBabyNames);
+    const { names, customerId, additionalBabyNames, generatedBy } = req.body;
 
     if (!names || names.length === 0) {
         return res.status(400).json({ error: 'No baby names selected' });
@@ -125,6 +124,7 @@ export const sendDetails = async (req, res) => {
         const newPdf = new PDF({
             babyNames: selectedNamesIds, // Store baby names' IDs
             additionalBabyNames: additionalBabyNames,
+            generatedBy: generatedBy,
         });
 
         const savedPdf = await newPdf.save();
@@ -138,7 +138,6 @@ export const sendDetails = async (req, res) => {
             { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is updated/inserted and array created if missing
         );
 
-        console.log("PDF ID added to customer record");
 
         // Send a response indicating success and the stored PDF metadata
         res.status(200).json({
