@@ -152,7 +152,7 @@ export const getCustomersBasedOnRequests = async (req, res) => {
 export const getCustomerData = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, pdfGenerated, feedback, customerStatus,
-        paymentDate, paymentTime, amountPaid, transactionId
+        paymentDate, paymentTime, amountPaid, transactionId,leadsource,
     } = req.body;
 
     try {
@@ -174,6 +174,7 @@ export const getCustomerData = async (req, res) => {
         customer.amountPaid = amountPaid;
         customer.paymentDate = paymentDate;
         customer.paymentTime = paymentTime;
+        customer.leadSource=leadsource;
 
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
