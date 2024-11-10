@@ -256,6 +256,10 @@ const Customer = () => {
                             <p className="mt-1 text-gray-900">{customerDetails.babyBirthTime || "N/A"}</p>
                         </div>
                         <div>
+                            <p className="text-sm font-medium text-gray-500">Customer's Name:</p>
+                            <p className="mt-1 text-gray-900">{customerDetails.customerName || "N/A"}</p>
+                        </div>
+                        <div>
                             <p className="text-sm font-medium text-gray-500">Mother's Name:</p>
                             <p className="mt-1 text-gray-900">{customerDetails.motherName || "N/A"}</p>
                         </div>

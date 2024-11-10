@@ -54,4 +54,4 @@ app.use('/api/expenses', expensesRoutes);     // Expenses routes
 
 
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
+server.listen(3000, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));

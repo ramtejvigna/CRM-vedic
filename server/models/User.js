@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const customerSchema = new mongoose.Schema({
     customerID: { type: String, required: true },
     fatherName: { type: String, required: true },
+    customerName : {type : String, required : true},
     motherName: { type: String, required: true },
     email: { type: String },
     whatsappNumber: { type: String, required: true },
@@ -28,7 +29,7 @@ const customerSchema = new mongoose.Schema({
     offer: { type: String },
     customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now },
-    preferredStartingLetterType : {type : String,enum:['Alphabet-based','Nakshatra-based','Rashi-based']}
+    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']}
 });
 
 
