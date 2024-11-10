@@ -7,6 +7,7 @@ import PDFViewer from './PDFviewer';
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {  Star } from 'lucide-react';
+import { handleDownload, handleSendMail, handleSendWhatsApp } from './CheckBoxList';
 
 import {
     Edit,
@@ -21,6 +22,7 @@ import {
     Eye,
     AlertCircle
 } from 'lucide-react';
+import CustomerDetails from "./ViewCustomers";
 
 const Customer = () => {
     const { id } = useParams();
@@ -37,21 +39,26 @@ const Customer = () => {
     const [enabledRow, setEnabledRow] = useState(null); // State to track which row's buttons are enabled
     const [showViewer, setShowViewer] = useState(false); // State to control PDF viewer visibility
     const [activeDropdown, setActiveDropdown] = useState(null);
-    const [expandedRow, setExpandedRow] = useState(null);
+    const [pdfId, setPdfId] = useState(null);
+    const [mailUrl, setMailUrl] = useState(null);
 
-    const handleActionClick = (action, pdf) => {
-        setActiveDropdown(null);
-        if (action === 'view') {
-            handleShowPdf(pdf.babyNames, pdf._id)
-        } else if (action === 'mail') {
-            handleSetPdfUrl(pdf.babyNames);
-            handleSendMail(pdfUrl, pdf._id, customerDetails.email);
-        } else if (action === 'whatsapp') {
-
-        } else if (action === 'feedback') {
-
-        }
+    const toggleDropdown = (pdfId) => {
+      setActiveDropdown(activeDropdown === pdfId ? null : pdfId);
     };
+
+    const handleActionClick = async (action, pdf) => {
+      setActiveDropdown(null);
+      if (action === 'view') {
+          handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
+      } else if (action === 'mail') {
+          await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
+          setPdfId(pdf._id);
+      } else if (action === 'whatsapp') {
+
+      } else if (action === 'feedback') {
+
+      }
+  };
 
     useEffect(() => {
         const getCustomerDetails = async (id) => {
@@ -81,7 +88,6 @@ const Customer = () => {
             const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`);
             if (response.data.length > 0) {
                 setPdfs(response.data);
-                console.log(response.data);
             }
             setPdfsLoading(false);
         } catch (error) {
@@ -94,16 +100,37 @@ const Customer = () => {
             fetchPdfs();
         }
     }, [customerId]);
-    const handleSetPdfUrl = async (babyNames) => {
-        const generatedPdfUrl = await generatePdf(babyNames);
-        setPdfUrl(generatedPdfUrl);
-    }
+    const handleSetPdfUrl = async (babyNames, additionalBabyNames) => {
+      try {
+          const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
+          setMailUrl(generatedPdfUrl);
+      } catch (error) {
+          console.error("Error generating PDF URL:", error);
+          alert("Error generating PDF URL");
+      }
+  };
     const handleShowPdf = async (babyNames, _id) => {
         const generatedPdfUrl = await generatePdf(babyNames); // Call the generatePdf function
         setPdfUrl(generatedPdfUrl); // Set the URL state
         setEnabledRow(_id);
         setShowViewer(true);
     };
+
+    useEffect(() => {
+      const sendMailAndFetchPdfs = async () => {
+          if (mailUrl && pdfId) {
+              try {
+                  await handleSendMail(mailUrl, pdfId, customerDetails.email);
+                  await fetchPdfs(); // Re-fetch PDFs after sending mail
+              } catch (error) {
+                  console.error("Error sending mail:", error);
+              }
+          }
+      };
+  
+      sendMailAndFetchPdfs();
+  }, [mailUrl, pdfId]);
+
 
     const handleClose = () => {
         setShowViewer(false); // Hide the PDF viewer
@@ -122,24 +149,7 @@ const Customer = () => {
         link.click();
     };
 
-    const handleSendMail = async (pdfUrl, uniqueId, email) => {
-        if (!email || !pdfUrl) {
-            alert("Provide a valid email and ensure the PDF is generated.");
-            return;
-        }
 
-        try {
-            await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-email", {
-                email,
-                pdfUrl,
-                uniqueId,
-            });
-            alert("PDF sent to email");
-        } catch (error) {
-            console.error("Error sending PDF to email", error);
-            alert("Error sending email");
-        }
-    };
 
     const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
         if (!phoneNumber || !pdfUrl || !uniqueId) {
@@ -165,6 +175,14 @@ const Customer = () => {
         pdfWindow.document.write(
             `<iframe width='100%' height='100%' src='data:application/pdf;base64,${base64Pdf}'></iframe>`
         );
+    };
+
+    const handleNavigate = () => {
+        navigate("generate-pdf", {
+            state: {
+                customerDetails
+            },
+        });
     };
 
     if (loading) {
@@ -338,64 +356,144 @@ const Customer = () => {
                 </div>
     
                 {/* PDFs Generated Card */}
-                <div className="border border-gray-900 rounded-lg p-6">
-                  <h2 className="text-lg font-semibold mb-4">PDF's Generated</h2>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="px-4 py-2 text-left">PDF</th>
-                          <th className="px-4 py-2 text-left">Generated</th>
-                          <th className="px-4 py-2 text-center"><MessageCircle className="inline h-4 w-4" /></th>
-                          <th className="px-4 py-2 text-center"><Mail className="inline h-4 w-4" /></th>
-                          <th className="px-4 py-2 text-center">Feedback</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {pdfs.map((pdf) => (
-                          <tr key={pdf._id} className="border-b">
-                            <td className="px-4 py-2">
-                              <button onClick={() => handleShowPdf(pdf.babyNames, pdf._id)}>
-                                <FileText className="h-4 w-4 text-blue-600" />
-                              </button>
-                            </td>
-                            <td className="px-4 py-2">
-                              <div className="flex flex-col">
-                                <span className="text-sm">{new Date(pdf.createdAt).toLocaleDateString()}</span>
-                                <span className="text-xs text-gray-500">{new Date(pdf.createdAt).toLocaleTimeString()}</span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <div className={`h-3 w-3 rounded-full ${pdf.whatsappStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <div className={`h-3 w-3 rounded-full ${pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
-                            </td>
-                            <td className="px-4 py-2">
-                              <div className="flex justify-center space-x-1">
-                                {[...Array(3)].map((_, i) => (
-                                  <Star key={i} className={`h-4 w-4 ${i < 3 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                                ))}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                <div
+      className="border border-gray-900 rounded-lg p-6 overflow-visible transition-all duration-300"
+      style={{
+        maxHeight: activeDropdown ? '1000px' : '800px',
+      }}
+    >
+      <h2 className="text-lg font-semibold mb-4">PDF's Generated</h2>
+      <div
+        className="overflow-visible transition-all duration-300"
+        style={{
+          maxHeight: activeDropdown ? '900px' : '700px',
+        }}
+      >
+        <table className="w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="px-4 py-2 text-left">PDF</th>
+              <th className="px-4 py-2 text-left">Generated</th>
+              <th className="px-4 py-2 text-center">
+                <MessageCircle className="inline h-4 w-4" />
+              </th>
+              <th className="px-4 py-2 text-center">
+                <Mail className="inline h-4 w-4" />
+              </th>
+              <th className="px-4 py-2 text-center">Feedback</th>
+              <th className="px-4 py-2 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="overflow-y-auto">
+            {pdfs.map((pdf) => (
+              <tr key={pdf._id} className="border-b">
+                <td className="px-4 py-2">
+                  <button onClick={() => handleShowPdf(pdf.babyNames, pdf._id)}>
+                    <FileText className="h-4 w-4 text-blue-600" />
+                  </button>
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex flex-col">
+                    <span className="text-sm">{new Date(pdf.createdAt).toLocaleDateString()}</span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(pdf.createdAt).toLocaleTimeString()}
+                    </span>
                   </div>
-                </div>
+                </td>
+                <td className="px-4 py-2 text-center">
+                  <div className={`h-3 w-3 rounded-full ${pdf.whatsappStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
+                </td>
+                <td className="px-4 py-2 text-center">
+                  <div className={`h-3 w-3 rounded-full ${pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex justify-center space-x-1">
+                    {[...Array(3)].map((_, i) => (
+                      <Star key={i} className={`h-4 w-4 ${i < 3 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                    ))}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right relative">
+                  <div className="flex items-center justify-end space-x-2">
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDropdown(pdf._id);
+                        }}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                      >
+                        <MoreHorizontal className="h-5 w-5" />
+                      </button>
+
+                      {activeDropdown === pdf._id && (
+                        <>
+                          {/* Background overlay to close the dropdown when clicked outside */}
+                          <div
+                            className="fixed inset-0 z-40"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveDropdown(null);
+                            }}
+                          />
+                          {/* Dropdown menu */}
+                          <div
+                            className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+                            style={{
+                              top: '100%',
+                              right: '0',
+                            }}
+                          >
+                            {[
+                              { icon: FileText, label: 'View PDF', action: 'view' },
+                              { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
+                              { icon: Mail, label: 'Send to Mail', action: 'mail' },
+                              { icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' },
+                            ].map((item, i) => (
+                              <button
+                                key={i}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleActionClick(item.action, pdf);
+                                }}
+                                className="flex items-center w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                              >
+                                <item.icon className="h-4 w-4 mr-3" />
+                                <span>{item.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
               </div>
             </div>
  
 </div>
+            {customerDetails.customerStatus === 'inProgress' ? (
+                                <>
+                                    <div className="flex justify-between items-center my-10">
+                                        <button
+                                            onClick={handleNavigate}
+                                            className={`bg-blue-500 text-white px-4 py-2 rounded `}
+
+                                        >
+                                            Generate Pdf
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <></>
+                            )}
            
-            <div className="w-full bg-white mt-10 dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                <div className="flex w-full items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold   text-gray-800 dark:text-white">PDF's Generated </h2>
-                    <div className="flex items-center space-x-2">
-                    </div>
-                </div>
-                </div>
           
                 <div className="mt-8">
                 {showViewer && (

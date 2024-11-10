@@ -1,6 +1,19 @@
 
 import mongoose from "mongoose";
 
+// const PdfSchema = new mongoose.Schema({
+//     babyNames: [{ type: mongoose.Schema.Types.ObjectId, ref: 'babyNames' }],
+//     createdAt: { type: Date, default: Date.now },
+//     whatsappStatus: { type: Boolean, default: false },
+//     mailStatus: { type: Boolean, default: false },
+//     additionalBabyNames: [
+//         {
+//             name: { type: String, required: true },
+//             meaning: { type: String, required: true }
+//         }
+//     ],
+// });
+
 const PdfSchema = new mongoose.Schema({
     babyNames: [{ type: mongoose.Schema.Types.ObjectId, ref: 'babyNames' }],
     createdAt: { type: Date, default: Date.now },
@@ -8,10 +21,11 @@ const PdfSchema = new mongoose.Schema({
     mailStatus: { type: Boolean, default: false },
     additionalBabyNames: [
         {
-            name: { type: String, required: true },
+            nameEmployee: { type: String, required: true },
             meaning: { type: String, required: true }
         }
     ],
+    generatedBy:{type:String,required:true},
 });
 
 const NameSchema = new mongoose.Schema({
