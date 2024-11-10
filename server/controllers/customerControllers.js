@@ -4,6 +4,7 @@ export const addCustomerWithAssignment = async (req, res) => {
     const {
         fatherName,
         motherName,
+        customerName,
         email,
         whatsappNumber,
         babyGender,
@@ -11,6 +12,7 @@ export const addCustomerWithAssignment = async (req, res) => {
         babyBirthTime,
         birthplace,
         preferredStartingLetter,
+        preferredStartingLetterType,
         preferredGod,
         referenceName,
         additionalPreferences
@@ -39,6 +41,7 @@ export const addCustomerWithAssignment = async (req, res) => {
             customerID, 
             fatherName,
             motherName,
+            customerName,
             email,
             whatsappNumber,
             babyGender,
@@ -46,31 +49,15 @@ export const addCustomerWithAssignment = async (req, res) => {
             babyBirthTime,
             birthplace,
             preferredStartingLetter,
+            preferredStartingLetterType,
             preferredGod,
             referenceName,
             additionalPreferences
         });
 
-        const employees = await Employee.find().populate('customers');
-
-        if (employees.length === 0) {
-            return res.status(400).json({ error: "No employees available for assignment" });
-        }
-
-        employees.sort((a, b) => a.customers.length - b.customers.length);
-
-        const employeeToAssign = employees[0];
-
-        employeeToAssign.customers.push(newCustomer._id);
-
-        newCustomer.assignedEmployee = employeeToAssign._id;
-
-        console.log("Assigning employee:", employeeToAssign);
-
         await newCustomer.save();
-        await employeeToAssign.save();
 
-        res.status(201).json({ customer: newCustomer, employee: employeeToAssign });
+        res.status(201).json({ customer: newCustomer });
     } catch (error) {
         console.error("Error adding customer:", error.message); // Log full error
         res.status(500).json({ error: "Error adding customer" });
