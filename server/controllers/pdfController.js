@@ -146,8 +146,8 @@ export const sendDetails = async (req, res) => {
             customerId: customerId,
         });
     } catch (err) {
-        console.error('Error generating PDF:', err);
-        res.status(500).json({ error: 'Failed to generate PDF' });
+        console.error('Error generating PDF:', err.message, err.stack); // Log detailed error info
+        res.status(500).json({ error: 'Failed to generate PDF', details: err.message });
     }
 };
 

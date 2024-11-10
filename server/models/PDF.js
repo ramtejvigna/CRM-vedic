@@ -21,7 +21,7 @@ const PdfSchema = new mongoose.Schema({
     mailStatus: { type: Boolean, default: false },
     additionalBabyNames: [
         {
-            nameEmployee: { type: String, required: true },
+            nameEnglish: { type: String, required: true },
             meaning: { type: String, required: true }
         }
     ],
