@@ -4,6 +4,7 @@ export const addCustomerWithAssignment = async (req, res) => {
     const {
         fatherName,
         motherName,
+        customerName,
         email,
         whatsappNumber,
         babyGender,
@@ -11,6 +12,7 @@ export const addCustomerWithAssignment = async (req, res) => {
         babyBirthTime,
         birthplace,
         preferredStartingLetter,
+        preferredStartingLetterType,
         preferredGod,
         referenceName,
         additionalPreferences
@@ -39,6 +41,7 @@ export const addCustomerWithAssignment = async (req, res) => {
             customerID, 
             fatherName,
             motherName,
+            customerName,
             email,
             whatsappNumber,
             babyGender,
@@ -46,6 +49,7 @@ export const addCustomerWithAssignment = async (req, res) => {
             babyBirthTime,
             birthplace,
             preferredStartingLetter,
+            preferredStartingLetterType,
             preferredGod,
             referenceName,
             additionalPreferences
