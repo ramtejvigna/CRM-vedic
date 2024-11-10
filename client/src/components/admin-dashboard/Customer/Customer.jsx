@@ -41,6 +41,7 @@ const Customer = () => {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [pdfId, setPdfId] = useState(null);
     const [mailUrl, setMailUrl] = useState(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     const toggleDropdown = (pdfId) => {
       setActiveDropdown(activeDropdown === pdfId ? null : pdfId);
@@ -176,6 +177,9 @@ const Customer = () => {
             `<iframe width='100%' height='100%' src='data:application/pdf;base64,${base64Pdf}'></iframe>`
         );
     };
+
+
+
 
     const handleNavigate = () => {
         navigate("generate-pdf", {
@@ -472,21 +476,26 @@ const Customer = () => {
 
 
          
-          {customerDetails.customerStatus === 'inProgress' ? (
-                                <>
-                                    <div className="flex justify-between items-center my-10">
-                                        <button
-                                            onClick={handleNavigate}
-                                            className={`bg-blue-500 text-white px-4 py-2 rounded `}
+          {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') ? (
+                                        <>
+                                            <div className="flex justify-between items-center my-10">
+                                                <button
+                                                    onClick={handleNavigate}
+                                                    className={`bg-blue-500 text-white px-4 py-2 rounded `}
+        
+                                                >
+                                                    Generate Pdf
+                                                </button>
+                                            </div>
 
-                                        >
-                                            Generate Pdf
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <></>
-                            )}
+                                            
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
+              
+
+
               <div className="mt-8">
               {showViewer && (
                   <PDFViewer
