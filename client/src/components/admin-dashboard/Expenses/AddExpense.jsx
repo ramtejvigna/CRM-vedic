@@ -51,7 +51,13 @@ const AddExpense = () => {
     }
   };
 
-
+  const resetForm = () => {
+    setExpenseName("");
+    setAmountSpent("");
+    setBankStatement(null);
+    setExpenseDate(new Date().toISOString().split("T")[0]);
+    setErrors({});
+  };
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -215,13 +221,15 @@ const AddExpense = () => {
 
           {/* Submit Button */}
           <div className="col-span-2 flex items-center justify-end gap-5">
-            <button
-              type="button"
-              onClick={() => navigate("/admin-dashboard/expenses")}
-              className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Cancel
-            </button>
+          <button
+  type="button"
+  onClick={() => {
+    resetForm();
+  }}
+  className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+>
+  Cancel
+</button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

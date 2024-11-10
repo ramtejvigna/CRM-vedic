@@ -132,7 +132,7 @@ const ViewExpenses = () => {
   const [payslipModalOpen, setPayslipModalOpen] = useState(false);
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [fileType, setFileType] = useState('');
-
+  const [initialExpenses, setInitialExpenses] = useState([]);
   const currentYear = new Date().getFullYear();
   const startYear = 2010;
   const endYear = currentYear;
@@ -165,6 +165,7 @@ const ViewExpenses = () => {
         
         setExpenses(sortedExpenses);
         setFilteredExpenses(sortedExpenses);
+        setInitialExpenses(sortedExpenses);
       } catch (error) {
         toast.error("Error fetching expenses");
       } finally {
@@ -197,8 +198,8 @@ const ViewExpenses = () => {
   };
 
   const handleFilterAndSearch = () => {
-    let filtered = [...expenses];
-
+    let filtered = [...initialExpenses];
+  
     if (searchTerm) {
       filtered = filtered.filter((expense) =>
         Object.values(expense).some((value) =>
@@ -206,20 +207,20 @@ const ViewExpenses = () => {
         )
       );
     }
-
+  
     if (selectedMonth || selectedYear) {
       filtered = filtered.filter((expense) => {
         const expenseDate = new Date(expense.date);
         const expenseMonth = months[expenseDate.getMonth()];
         const expenseYear = expenseDate.getFullYear().toString();
-
+  
         const monthMatch = !selectedMonth || expenseMonth === selectedMonth;
         const yearMatch = !selectedYear || expenseYear === selectedYear;
-
+  
         return monthMatch && yearMatch;
       });
     }
-
+  
     setFilteredExpenses(filtered);
     setCurrentPage(1);
   };
@@ -395,6 +396,17 @@ const ViewExpenses = () => {
                       ))}
                     </select>
                   </div>
+                  <button
+  onClick={() => {
+    setFilteredExpenses(initialExpenses);
+    setSearchTerm("");
+    setSelectedMonth("");
+    setSelectedYear("");
+  }}
+  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors duration-300"
+>
+  Reset Filters
+</button>
                 </form>
               </div>
             )}
