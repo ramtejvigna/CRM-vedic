@@ -17,7 +17,7 @@ export const generatePdf = async (babyNames) => {
     const firstPage = pdfDoc.getPage(0);
     let secondPage = pdfDoc.getPage(1);  // Initially assume second page
     let thirdPage = pdfDoc.getPageCount() > 2 ? pdfDoc.getPage(2) : null;  // Check if third page already exists
-
+    let currentPage = secondPage; 
     // Static data
     const staticData = {
       gender: 'Girl',
@@ -74,25 +74,50 @@ export const generatePdf = async (babyNames) => {
 
     // Embed babyNames on the second (or third) page
     let yPosition = 600;
-    babyNames.forEach(({ name, meaning }, index) => {
-      if (yPosition < 100 && !thirdPage) {
-        // Move to third page, check if it's already present
-        thirdPage = pdfDoc.addPage();  // Add third page if it doesn't exist
-        yPosition = 600;
-      } else if (yPosition < 100 && thirdPage) {
-        // If we already have the third page, use it
-        secondPage = thirdPage;
-        yPosition = 600;
-      }
+    const pageLimit=100;
+    // babyNames.forEach(({ nameEnglish, meaning }, index) => {
+    //   if (yPosition < 100 && !thirdPage) {
+    //     // Move to third page, check if it's already present
+    //     thirdPage = pdfDoc.addPage();  // Add third page if it doesn't exist
+    //     yPosition = 600;
+    //   } else if (yPosition < 100 && thirdPage) {
+    //     // If we already have the third page, use it
+    //     secondPage = thirdPage;
+    //     yPosition = 600;
+    //   }
 
-      // Draw text on the current page (either second or third)
-      secondPage.drawText(`Name: ${name}`, { x: 50, y: yPosition, size: fontSize, font });
-      yPosition -= 60;
-      secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition, size: fontSize, font });
-      yPosition -= 80;
-    });
+    //   // Draw text on the current page (either second or third)
+    //   secondPage.drawText(`Name: ${nameEnglish}`, { x: 50, y: yPosition, size: fontSize, font });
+    //   yPosition -= 60;
+    //   secondPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition, size: fontSize, font });
+    //   yPosition -= 80;
+    // });
 
     // Save the PDF and return Blob URL
+    
+    for (const { nameEnglish, meaning } of babyNames) {
+      // If we reach the bottom of the current page, switch pages
+      if (yPosition < pageLimit) {
+        if (currentPage === secondPage && thirdPage) {
+          // Move to third page if available
+          currentPage = thirdPage;
+          yPosition = 600;
+        } else {
+          // Clone the template's second page for further pages if both second and third pages are filled
+          const [clonedPage] = await pdfDoc.copyPages(pdfDoc, [1]);
+          pdfDoc.addPage(clonedPage);
+          currentPage = clonedPage;
+          yPosition = 600;
+        }
+      }
+
+      // Draw the name and meaning on the current page
+      currentPage.drawText(`Name: ${nameEnglish}`, { x: 50, y: yPosition, size: fontSize, font });
+      yPosition -= 60;
+      currentPage.drawText(`Meaning: ${meaning}`, { x: 50, y: yPosition, size: fontSize, font });
+      yPosition -= 80;
+    }
+    
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const blobUrl = URL.createObjectURL(blob);

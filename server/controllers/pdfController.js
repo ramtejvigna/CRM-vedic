@@ -50,45 +50,94 @@ export const getBabyNames = async (req, res) => {
     }
 };
 
+// export const sendDetails = async (req, res) => {
+//     const { names, customerId,additionalBabyNames } = req.body;
+//     console.log(additionalBabyNames)
+//     if (!names || names.length === 0) {
+//         return res.status(400).json({ error: 'No baby names selected' });
+//     }
+
+//     try {
+//         // Fetch the selected baby names from the database using the provided names
+//         const selectedNames = await babyNames.find({ name: { $in: names } });
+
+
+//         if (!selectedNames || selectedNames.length === 0) {
+//             return res.status(404).json({ error: 'Baby names not found' });
+//         }
+
+//         // Extract the IDs of the selected baby names
+//         const selectedNamesIds = selectedNames.map(name => name._id);
+
+//         // Save the baby names' IDs and other PDF metadata in the PDF collection
+//         const newPdf = new PDF({
+//             babyNames: selectedNamesIds,  // Store baby names' IDs
+//             additionalBabyNames:additionalBabyNames,
+//         });
+
+//         const savedPdf = await newPdf.save();
+
+
+//         // Store the PDF document ID in the customer's record
+//         // If 'pdfGenerated' array doesn't exist, it will be created
+//         await Customer.findByIdAndUpdate(
+//             customerId,
+//             {
+//                 $push: { pdfGenerated: savedPdf._id }  // Add the PDF document's ID to the customer record
+//             },
+//             { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is updated/inserted and array created if missing
+//         );
+
+//         console.log("PDF ID added to customer record");
+
+//         // Send a response indicating success and the stored PDF metadata
+//         res.status(200).json({
+//             message: 'PDF details saved successfully',
+//             pdfId: savedPdf._id,
+//             customerId: customerId,
+//         });
+//     } catch (err) {
+//         console.error('Error generating PDF:', err);
+//         res.status(500).json({ error: 'Failed to generate PDF' });
+//     }
+// }
+
 export const sendDetails = async (req, res) => {
-    const { names, customerId,additionalBabyNames } = req.body;
-    console.log(additionalBabyNames)
+    const { names, customerId, additionalBabyNames, generatedBy } = req.body;
+
     if (!names || names.length === 0) {
         return res.status(400).json({ error: 'No baby names selected' });
     }
 
     try {
-        // Fetch the selected baby names from the database using the provided names
-        const selectedNames = await babyNames.find({ name: { $in: names } });
-
+        // Fetch the selected baby names from the database using the provided IDs
+        const selectedNames = await babyNames.find({ _id: { $in: names } });
 
         if (!selectedNames || selectedNames.length === 0) {
             return res.status(404).json({ error: 'Baby names not found' });
         }
 
-        // Extract the IDs of the selected baby names
+        // Extract the IDs of the selected baby names (already _id, so this is unnecessary)
         const selectedNamesIds = selectedNames.map(name => name._id);
 
         // Save the baby names' IDs and other PDF metadata in the PDF collection
         const newPdf = new PDF({
-            babyNames: selectedNamesIds,  // Store baby names' IDs
-            additionalBabyNames:additionalBabyNames,
+            babyNames: selectedNamesIds, // Store baby names' IDs
+            additionalBabyNames: additionalBabyNames,
+            generatedBy: generatedBy,
         });
 
         const savedPdf = await newPdf.save();
 
-
         // Store the PDF document ID in the customer's record
-        // If 'pdfGenerated' array doesn't exist, it will be created
         await Customer.findByIdAndUpdate(
             customerId,
             {
-                $push: { pdfGenerated: savedPdf._id }  // Add the PDF document's ID to the customer record
+                $push: { pdfGenerated: savedPdf._id } // Add the PDF document's ID to the customer record
             },
             { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is updated/inserted and array created if missing
         );
 
-        console.log("PDF ID added to customer record");
 
         // Send a response indicating success and the stored PDF metadata
         res.status(200).json({
@@ -100,7 +149,8 @@ export const sendDetails = async (req, res) => {
         console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'Failed to generate PDF' });
     }
-}
+};
+
 
 export const getPdfsByCustomerId = async (req, res) => {
     const { customerId } = req.query;

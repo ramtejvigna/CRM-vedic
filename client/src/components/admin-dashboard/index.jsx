@@ -14,6 +14,7 @@ import Leaves from "./Leaves";
 import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 // import { VoiceRecognition } from "./VoiceRecognition.jsx";
 import VoiceRecognition from './Voice2.jsx'
+import CheckBoxListPage from "./Customer/CheckBoxList.jsx";
 // import {VoiceRecognition} from './VoiceRecognition.jsx'
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
@@ -40,6 +41,7 @@ const AdminDashboard = () => {
             <Route path="employees/add-employee" element={<AddEmployee />} />
             <Route path="employees/edit-employee/:id" element={<EditEmployee />} />
             <Route path="customers/:id" element={<Customer />} /> {/* Ensure correct import */}
+            <Route path="customers/:id/generate-pdf" element={<CheckBoxListPage />} />
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
             <Route path="/expenses/add-expense" element={<AddExpense />} />
