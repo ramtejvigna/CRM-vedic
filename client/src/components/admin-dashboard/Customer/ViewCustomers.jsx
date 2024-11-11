@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useStore } from "../../../store";
 import { motion, AnimatePresence } from "framer-motion";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
-import { ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Clock,XCircle,Filter, Eye, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, Briefcase,AlertCircle, Clock,XCircle,Filter, Eye, Search } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -141,7 +141,7 @@ const CustomerDetails = () => {
   </div>
 </div>
 <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
-                Showing {customers.length} results
+                Showing {filteredData.length} results
             </div>
         <AnimatePresence>
   {showFilters && (
@@ -178,7 +178,8 @@ const CustomerDetails = () => {
             className={`w-full p-2 rounded-md ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-900"}`}
           >
             <option value="All">All</option>
-            <option value="inProgress">In progress</option>
+            <option value="inProgress">In Progress</option>
+            <option value="inWorking">In Working</option>
             <option value="completed">Completed</option>
             <option value="newRequests">New Requests</option>
             <option value="rejected">Rejected</option>
@@ -274,8 +275,12 @@ const CustomerDetails = () => {
                         ${row.customerStatus === "newRequests" 
                           ? "text-yellow-600 text-sm  bg-yellow-100" 
                           : ""}
+                          
                         ${row.customerStatus === "inProgress" 
                           ? "text-gray-900 text-sm text-sm bg-gray-100" 
+                          : ""}
+                           ${row.customerStatus === "inWorking" 
+                          ? "text-blue-900 text-sm text-sm bg-blue-100" 
                           : ""}
                         ${row.customerStatus === "completed" 
                           ? " text-green-500 text-sm bg-green-100" 
@@ -298,6 +303,13 @@ const CustomerDetails = () => {
         In Progress
       </>
     )}
+  {row.customerStatus === "inWorking" && (
+  <>
+    <Briefcase className=" mt-1 w-4 h-4 mr-1" /> 
+   In Working
+  </>
+)}
+
     {row.customerStatus === "completed" && (
       <>
         <CheckCircle className="w-4 h-4 mr-1" />
