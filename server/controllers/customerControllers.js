@@ -217,7 +217,7 @@ export const getCustomerPdfs = async (req, res) => {
 export const updateCustomerData = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, feedback, customerStatus, 
-        paymentDate, paymentTime, amountPaid, transactionId 
+        paymentDate, paymentTime, amountPaid, transactionId ,socialMediaId , leadSource
     } = req.body;
 
     try {
@@ -226,7 +226,7 @@ export const updateCustomerData = async (req, res) => {
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
         }
-
+        console.log(socialMediaId,leadSource,"sid")
         if (paymentStatus !== undefined) {
             customer.paymentStatus = paymentStatus;
         }
@@ -236,10 +236,13 @@ export const updateCustomerData = async (req, res) => {
         customer.amountPaid = amountPaid;
         customer.paymentDate = paymentDate;
         customer.paymentTime = paymentTime;
+        customer.socialMediaId = socialMediaId;
+        customer.leadSource = leadSource;
 
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
     } catch (err) {
+        console.log(err.message)
         res.status(500).json({ message: 'Error updating customer', error: err });
     }
 };
