@@ -218,9 +218,9 @@ export const getCustomerPdfs = async (req, res) => {
 export const updateCustomerData = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, feedback, customerStatus, 
-        paymentDate, paymentTime, amountPaid, transactionId 
+        paymentDate, paymentTime, amountPaid, transactionId,leadSource,
     } = req.body;
-
+    console.log(leadSource);
     try {
         const customer = await Customer.findById(id);
 
@@ -237,6 +237,7 @@ export const updateCustomerData = async (req, res) => {
         customer.amountPaid = amountPaid;
         customer.paymentDate = paymentDate;
         customer.paymentTime = paymentTime;
+        customer.leadSource=leadSource;
 
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
