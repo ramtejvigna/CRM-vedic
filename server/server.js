@@ -55,5 +55,5 @@ app.use('/salaries' , salaryRoutes)
 app.use('/api/expenses', expensesRoutes);     // Expenses routes
 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 server.listen(3000, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
