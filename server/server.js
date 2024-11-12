@@ -48,7 +48,7 @@ app.use('/', authRoutes);
 app.use('/customers', customerRoutes);
 app.use('/admin',adminLeaveRoutes)
 app.use('/', dashboardRoutes);
-app.use('/api/manager' , managerRoutes)
+app.use('/api/manager' , managerRoutes);
 app.use('/admin', adminNotifications)
 app.use('/salaries' , salaryRoutes)
 // app.use('/api/notifications', notificationRoutes);
@@ -56,4 +56,4 @@ app.use('/api/expenses', expensesRoutes);     // Expenses routes
 
 
 const PORT = process.env.PORT || 8000;
-server.listen(3000, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
