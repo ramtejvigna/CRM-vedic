@@ -22,6 +22,7 @@ import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import { dirname } from 'path';
 
+import "./deadlineNotification.js";
 
 dotenv.config();
 const app = express();
