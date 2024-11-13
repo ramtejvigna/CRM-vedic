@@ -30,7 +30,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // middlewares
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "https://vedic-crm.netlify.app",
     credentials : true
 }));
 app.use(express.json({limit : '50mb'}));
