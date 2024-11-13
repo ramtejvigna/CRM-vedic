@@ -29,6 +29,8 @@ export const login = async (req, res) => {
             { expiresIn: '1d' }
         );
 
+        
+
         // Return token in response
         res.status(200).json({
             token,

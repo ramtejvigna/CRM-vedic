@@ -74,7 +74,19 @@ const employeeSchema = new mongoose.Schema({
     isAdmin: { type: Boolean, default: false }
 } ,  {timestamps : true});
 
+
+const adminSchema = new mongoose.Schema({
+    
+    email: { type: String, required: true },
+    password : {type : String , required : true},
+
+    resetPasswordVerificationToken : String ,
+    resetPasswordVerificationTokenExpiresAt : Date,
+    verificationToken : String
+} ,  {timestamps : true});
+
 export const Employee = mongoose.model('Employee', employeeSchema);
 
 
 export const Customer = mongoose.model('Customer', customerSchema);
+export const Admin = mongoose.model('Admin', adminSchema);

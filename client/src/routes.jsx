@@ -19,6 +19,7 @@ import Salaries from "./components/admin-dashboard/Salaries";
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
 import Leaves from "./components/admin-dashboard/Leaves";
 import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
+import Settings from "./components/admin-dashboard/settings";
 const Component = ({ name }) => {
   return (
     <>
@@ -101,6 +102,6 @@ export const routes = [
   {
     name: "settings",
     path: "settings",
-    element: <Component name={"settings"} />,
+    element: <Settings/>,
   },
 ];
