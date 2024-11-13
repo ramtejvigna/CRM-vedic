@@ -20,7 +20,8 @@ import {
     X,
     ChevronDown,
     Eye,
-    AlertCircle
+    AlertCircle,
+    FilePlus2,
 } from 'lucide-react';
 import CustomerDetails from "./ViewCustomers";
 
@@ -41,25 +42,93 @@ const Customer = () => {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [pdfId, setPdfId] = useState(null);
     const [mailUrl, setMailUrl] = useState(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [selectedRating, setSelectedRating] = useState(0);
+    const [selectedPdf, setSelectedPdf]=useState(null);
 
     const toggleDropdown = (pdfId) => {
       setActiveDropdown(activeDropdown === pdfId ? null : pdfId);
     };
 
-    const handleActionClick = async (action, pdf) => {
-      setActiveDropdown(null);
-      if (action === 'view') {
-          handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
-      } else if (action === 'mail') {
-          await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
-          setPdfId(pdf._id);
-      } else if (action === 'whatsapp') {
+  //   const handleActionClick = async (action, pdf) => {
+  //     setActiveDropdown(null);
+  //     if (action === 'view') {
+  //         handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
+  //     } else if (action === 'mail') {
+  //         await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
+  //         setPdfId(pdf._id);
+  //     } else if (action === 'whatsapp') {
 
-      } else if (action === 'feedback') {
+  //     } else if (action === 'feedback') {
+  //       setShowFeedbackModal(true);
+  //     }
+  // };
 
+  // const handleStarClick = (rating) => {
+  //   setSelectedRating(rating);
+  // };
+
+  // const handleSubmitFeedback = () => {
+  //   if (selectedRating > 0) {
+  //     console.log('Feedback submitted with rating:', selectedRating);
+  //     setSelectedRating(0);
+  //     setShowFeedbackModal(false); 
+  //   } else {
+  //     alert('Please select a rating');
+  //   }
+  // };
+
+  const handleActionClick = async (action, pdf) => {
+    setActiveDropdown(null);
+    if (action === 'view') {
+      handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
+    } else if (action === 'mail') {
+      await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
+      setPdfId(pdf._id);
+    } else if (action === 'whatsapp') {
+      // Handle WhatsApp action
+    } else if (action === 'feedback') {
+      if (pdf.whatsappStatus || pdf.mailStatus) {
+        // If at least one status is true, show the feedback modal
+        setSelectedPdf(pdf); // Store the PDF object
+        setShowFeedbackModal(true); // Show the feedback modal
+      } else {
+        // If both statuses are false, raise a message
+        alert("Feedback can only be given if the PDF has been sent via WhatsApp or email.");
       }
+    }
   };
-
+  
+  const handleStarClick = (rating) => {
+    setSelectedRating(rating); // Update the selected rating
+  };
+  
+  const handleSubmitFeedback = async () => {
+    if (selectedRating > 0 && selectedPdf) {
+      console.log(selectedRating,selectedPdf._id);
+      try {
+        // Send pdfId and rating in the body of the PUT request
+        const response = await axios.put(
+          'http://localhost:8000/api/feedback', // No need to pass pdfId in the URL
+          {
+            pdfId: selectedPdf._id,  // Pass the pdfId in the body
+            rating: selectedRating,   // Pass the selected rating
+          }
+        );        
+        // Reset form and close modal
+        setSelectedRating(0);
+        setShowFeedbackModal(false);
+      } catch (error) {
+        console.error('Error submitting feedback:', error.message);
+        alert('An error occurred while submitting feedback.');
+      }
+    } else {
+      alert('Please select a rating');
+    }
+  };
+  
+  
     useEffect(() => {
         const getCustomerDetails = async (id) => {
             try {
@@ -177,6 +246,9 @@ const Customer = () => {
         );
     };
 
+
+
+
     const handleNavigate = () => {
         navigate("generate-pdf", {
             state: {
@@ -282,18 +354,18 @@ const Customer = () => {
                           <p className="mt-1 text-gray-900">{customerDetails.fatherName || "N/A"}</p>
                       </div>
                       <div>
-  <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
-  <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
-</div>
+                        <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
+                        <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
+                      </div>
 
-{/* Horizontal Line */}
-<div className="col-span-2 my-4">
-              <hr className="border-t border-gray-200" />
-          </div>
-<div>
-  <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
-  <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
-</div>
+                      {/* Horizontal Line */}
+                      <div className="col-span-2 my-4">
+                                    <hr className="border-t border-gray-200" />
+                                </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
+                        <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
+                      </div>
 
                       <div>
                           <p className="text-sm font-medium text-gray-500">Nakshatra:</p>
@@ -361,8 +433,17 @@ const Customer = () => {
              {/* PDFs Generated Card */}
              {/* PDFs Generated Card */}
 <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
-  <h2 className="text-lg font-semibold mb-4">PDF's Generated</h2>
-  <div className="overflow-visible"> {/* Changed this to allow dropdowns to overflow */}
+<div className="flex justify-between items-center mb-4">
+    <h2 className="text-lg font-semibold">PDFs Generated</h2>
+    {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') && (
+      <button
+        onClick={handleNavigate}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        <FilePlus2 />
+      </button>
+    )}
+  </div>  <div className="overflow-visible"> 
     <table className="w-full">
       <thead>
         <tr className="border-b">
@@ -400,12 +481,20 @@ const Customer = () => {
             <td className="px-4 py-2 text-center">
               <div className={`h-3 w-3 rounded-full ${pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
             </td>
-            <td className="px-4 py-2">
-              <div className="flex justify-center space-x-1">
-                {[...Array(3)].map((_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < 3 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                ))}
-              </div>
+            <td className="px-4 py-2 text-center">
+              <span className="text-sm font-medium">
+                {pdf.rating === 0
+                  ? "-"
+                  : pdf.rating === 5
+                  ? "Outstanding"
+                  : pdf.rating === 4
+                  ? "Good"
+                  : pdf.rating === 3
+                  ? "Satisfactory"
+                  : pdf.rating === 2
+                  ? "Needs Improvement"
+                  : "Poor"}
+              </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right relative">
               <div className="flex items-center justify-end space-x-2">
@@ -441,7 +530,7 @@ const Customer = () => {
                           { icon: FileText, label: 'View PDF', action: 'view' },
                           { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
                           { icon: Mail, label: 'Send to Mail', action: 'mail' },
-                          { icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' },
+                          ...(pdf.rating === 0 ? [{ icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' }] : []),
                         ].map((item, i) => (
                           <button
                             key={i}
@@ -470,35 +559,55 @@ const Customer = () => {
             </div>
           </div>
 
+<div className="mt-8">
+{showViewer && (
+    <PDFViewer
+        pdfUrl={pdfUrl}
+        handleDownload={handleDownload}
+        handleSendMail={handleSendMail}
+        email={customerDetails.email}
+        enabledRow={enabledRow}
+        pdfId={enabledRow}
+        onClose={handleClose} // Pass the close handler
+    />
+)}
 
-         
-          {customerDetails.customerStatus === 'inProgress' ? (
-                                <>
-                                    <div className="flex justify-between items-center my-10">
-                                        <button
-                                            onClick={handleNavigate}
-                                            className={`bg-blue-500 text-white px-4 py-2 rounded `}
+{showFeedbackModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-lg w-80 text-center">
+      <h2 className="text-xl font-semibold mb-4">Feedback For Pdf</h2>
+      <div className="flex justify-center mb-4">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`cursor-pointer text-3xl ${star <= selectedRating ? 'text-yellow-500' : 'text-gray-400'}`}
+            onClick={() => handleStarClick(star)}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+      <div>
+        <button
+          onClick={handleSubmitFeedback}
+          className="bg-green-500 text-white py-2 px-4 rounded-md mt-4 w-full hover:bg-green-600"
+        >
+          Submit
+        </button>
+        {/* Close icon */}
+        <button
+          onClick={() => { setShowFeedbackModal(false); setSelectedRating(0); }}
+          className="absolute top-0 right-0 text-xl text-gray-500 hover:text-gray-700 p-2"
+        >
+          ✖
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
-                                        >
-                                            Generate Pdf
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <></>
-                            )}
-              <div className="mt-8">
-              {showViewer && (
-                  <PDFViewer
-                      pdfUrl={pdfUrl}
-                      handleDownload={handleDownload}
-                      handleSendMail={handleSendMail}
-                      email={customerDetails.email}
-                      enabledRow={enabledRow}
-                      pdfId={enabledRow}
-                      onClose={handleClose} // Pass the close handler
-                  />
-              )}
+
+
           </div>
       
       </div>
