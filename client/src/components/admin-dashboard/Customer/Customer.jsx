@@ -354,18 +354,18 @@ const Customer = () => {
                           <p className="mt-1 text-gray-900">{customerDetails.fatherName || "N/A"}</p>
                       </div>
                       <div>
-  <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
-  <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
-</div>
+                        <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
+                        <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
+                      </div>
 
-{/* Horizontal Line */}
-<div className="col-span-2 my-4">
-              <hr className="border-t border-gray-200" />
-          </div>
-<div>
-  <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
-  <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
-</div>
+                      {/* Horizontal Line */}
+                      <div className="col-span-2 my-4">
+                                    <hr className="border-t border-gray-200" />
+                                </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
+                        <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
+                      </div>
 
                       <div>
                           <p className="text-sm font-medium text-gray-500">Nakshatra:</p>
@@ -559,40 +559,18 @@ const Customer = () => {
             </div>
           </div>
 
-
-         
-          {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') ? (
-                                        <>
-                                            <div className="flex justify-between items-center my-10">
-                                                <button
-                                                    onClick={handleNavigate}
-                                                    className={`bg-blue-500 text-white px-4 py-2 rounded `}
-        
-                                                >
-                                                    Generate Pdf
-                                                </button>
-                                            </div>
-
-                                            
-                                        </>
-                                    ) : (
-                                        <></>
-                                    )}
-              
-
-
-              <div className="mt-8">
-              {showViewer && (
-                  <PDFViewer
-                      pdfUrl={pdfUrl}
-                      handleDownload={handleDownload}
-                      handleSendMail={handleSendMail}
-                      email={customerDetails.email}
-                      enabledRow={enabledRow}
-                      pdfId={enabledRow}
-                      onClose={handleClose} // Pass the close handler
-                  />
-              )}
+<div className="mt-8">
+{showViewer && (
+    <PDFViewer
+        pdfUrl={pdfUrl}
+        handleDownload={handleDownload}
+        handleSendMail={handleSendMail}
+        email={customerDetails.email}
+        enabledRow={enabledRow}
+        pdfId={enabledRow}
+        onClose={handleClose} // Pass the close handler
+    />
+)}
 
 {showFeedbackModal && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

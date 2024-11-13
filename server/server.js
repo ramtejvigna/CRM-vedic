@@ -24,6 +24,7 @@ import expensesRoutes from './routes/expensesRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import "./deadlineNotification.js";
 dotenv.config();
 const app = express();
 const server = http.createServer(app);

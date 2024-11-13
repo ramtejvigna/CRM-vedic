@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 
 const customerSchema = new mongoose.Schema({
     customerID: { type: String, required: true },
@@ -23,13 +23,14 @@ const customerSchema = new mongoose.Schema({
     payTransactionID: { type: String },
     pdfGenerated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PDF' }],
     amountPaid: { type: String },
-    leadSource: { type:String, default: "Other", enum:['Instagram', 'Facebook', 'Our Website', 'Other'] },
+    leadSource: { type:String, default: "Other", enum:['Instagram 1','Instagram 2', 'Whatsapp','Meta Ads','Google Ads','Facebook', 'Our Website', 'Other'] },
     socialMediaId: { type: String },
     otherSource: { type: String },
     offer: { type: String },
     customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now },
-    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']}
+    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
+    deadline : {type : Date}
 });
 
 
@@ -73,6 +74,8 @@ const employeeSchema = new mongoose.Schema({
 
     isAdmin: { type: Boolean, default: false }
 } ,  {timestamps : true});
+
+
 
 export const Employee = mongoose.model('Employee', employeeSchema);
 
