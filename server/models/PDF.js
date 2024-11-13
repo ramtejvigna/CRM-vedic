@@ -26,8 +26,10 @@ const PdfSchema = new mongoose.Schema({
         }
     ],
     generatedBy:{type:String,required:true},
-    rating: { type: Number, min: 1, max: 5, default: 0 }, 
+    rating: { type: Number, min: 0, max: 5, default: 0 }, 
 });
+
+
 
 const NameSchema = new mongoose.Schema({
     bookName: { type: String, required: true },

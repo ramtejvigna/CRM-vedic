@@ -110,7 +110,7 @@ const Customer = () => {
       try {
         // Send pdfId and rating in the body of the PUT request
         const response = await axios.put(
-          'http://localhost:8000/api/feedback', // No need to pass pdfId in the URL
+          'https://vedic-backend-neon.vercel.app/api/feedback', // No need to pass pdfId in the URL
           {
             pdfId: selectedPdf._id,  // Pass the pdfId in the body
             rating: selectedRating,   // Pass the selected rating

@@ -15,7 +15,7 @@ export const addCustomerWithAssignment = async (req, res) => {
         preferredStartingLetterType,
         preferredGod,
         referenceName,
-        additionalPreferences
+        additionalPreferences,
     } = req.body;
 
     try {
@@ -220,14 +220,14 @@ export const updateCustomerData = async (req, res) => {
     const { paymentStatus, feedback, customerStatus, 
         paymentDate, paymentTime, amountPaid, transactionId, completedOn
     } = req.body;
-    console.log(leadSource);
+
     try {
         const customer = await Customer.findById(id);
 
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
         }
-        console.log(socialMediaId,leadSource,"sid")
+
         if (paymentStatus !== undefined) {
             customer.paymentStatus = paymentStatus;
         }
@@ -244,7 +244,6 @@ export const updateCustomerData = async (req, res) => {
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
     } catch (err) {
-        console.log(err.message)
         res.status(500).json({ message: 'Error updating customer', error: err });
     }
 };
