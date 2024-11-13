@@ -15,7 +15,7 @@ export const addCustomerWithAssignment = async (req, res) => {
         preferredStartingLetterType,
         preferredGod,
         referenceName,
-        additionalPreferences
+        additionalPreferences,
     } = req.body;
 
     try {

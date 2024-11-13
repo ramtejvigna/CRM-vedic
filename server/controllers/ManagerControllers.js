@@ -55,6 +55,7 @@ export const getEmployees = async (req ,res) => {
 export const assignCustomerToEmployee = async (req, res) => {
     try {
       const { customerId, employeeId } = req.params;
+      const {deadline} = req.body
   
       const employee = await Employee.findById(employeeId);
       const customer = await Customer.findById(customerId);
@@ -62,9 +63,9 @@ export const assignCustomerToEmployee = async (req, res) => {
       if (!employee || !customer) {
         return res.status(400).json({ message: "Employee or Customer not found" });
       }
-  
       employee.customers.push(customer._id);
       customer.assignedEmployee = employee._id;
+      customer.deadline = deadline;
       customer.customerStatus = "inWorking";
   
       await employee.save();
