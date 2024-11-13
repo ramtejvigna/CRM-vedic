@@ -5,7 +5,7 @@ import { Notification } from "./models/Notification.js";
 const checkCustomerDeadlines = async () => {
     try {
         console.log("hello");
-      const oneDayInMillis = 2 * 24 * 60 * 60 * 1000; // Two days in milliseconds
+      const oneDayInMillis = 1 * 24 * 60 * 60 * 1000; // Two days in milliseconds
       const now = new Date();
   
       // Fetch all customers with status 'inWorking'

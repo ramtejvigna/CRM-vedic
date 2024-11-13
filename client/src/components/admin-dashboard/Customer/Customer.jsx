@@ -429,9 +429,7 @@ const Customer = () => {
                 </div>
               </div>
   
-              {/* PDFs Generated Card */}
-             {/* PDFs Generated Card */}
-             {/* PDFs Generated Card */}
+
 <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
 <div className="flex justify-between items-center mb-4">
     <h2 className="text-lg font-semibold">PDFs Generated</h2>
@@ -443,7 +441,8 @@ const Customer = () => {
         <FilePlus2 />
       </button>
     )}
-  </div>  <div className="overflow-visible"> 
+  </div> 
+ <div className="overflow-visible"> 
     <table className="w-full">
       <thead>
         <tr className="border-b">
