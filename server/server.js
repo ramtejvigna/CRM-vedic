@@ -17,6 +17,7 @@ import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
+import ReportsRouter from "./routes/ReportsRouter.js"
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import { dirname } from 'path';
@@ -54,6 +55,6 @@ app.use('/admin', adminNotifications)
 app.use('/salaries' , salaryRoutes)
 app.use('/api/expenses', expensesRoutes);   
 app.use('/admin/auth' , AdminAuthRoutes)
-
+app.use('/api/reports',ReportsRouter)
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));

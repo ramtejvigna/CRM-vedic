@@ -28,6 +28,8 @@ const PdfSchema = new mongoose.Schema({
     generatedBy:{type:String,required:true},
 });
 
+
+
 const NameSchema = new mongoose.Schema({
     bookName: { type: String, required: true },
     gender: { type: String, required: true },

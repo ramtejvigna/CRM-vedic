@@ -224,9 +224,9 @@ function Settings() {
   };
   return (
     <div className="flex items-center gap-5 p-10 w-full flex-col">
-      <div className="w-full bg-white shadow-md border border-gray-200 rounded-xl p-5 max-w-4xl flex flex-col gap-3">
+      {/* <div className="w-full bg-white shadow-md border border-gray-200 rounded-xl p-5 max-w-4xl flex flex-col gap-3">
         <h1 className="text-xl capitalize text-opacity-70 font-semibold tracking-wider">Profile</h1>
-      </div>
+      </div> */}
       <ToastContainer 
         position="top-right"
         autoClose={3000}
