@@ -20,7 +20,8 @@ import {
     X,
     ChevronDown,
     Eye,
-    AlertCircle
+    AlertCircle,
+    FilePlus2,
 } from 'lucide-react';
 import CustomerDetails from "./ViewCustomers";
 
@@ -432,8 +433,17 @@ const Customer = () => {
              {/* PDFs Generated Card */}
              {/* PDFs Generated Card */}
 <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
-  <h2 className="text-lg font-semibold mb-4">PDF's Generated</h2>
-  <div className="overflow-visible"> {/* Changed this to allow dropdowns to overflow */}
+<div className="flex justify-between items-center mb-4">
+    <h2 className="text-lg font-semibold">PDFs Generated</h2>
+    {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') && (
+      <button
+        onClick={handleNavigate}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        <FilePlus2 />
+      </button>
+    )}
+  </div>  <div className="overflow-visible"> 
     <table className="w-full">
       <thead>
         <tr className="border-b">
