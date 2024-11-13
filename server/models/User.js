@@ -29,7 +29,8 @@ const customerSchema = new mongoose.Schema({
     offer: { type: String },
     customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now },
-    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']}
+    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
+    deadline : {type : Date}
 });
 
 
