@@ -62,10 +62,14 @@ export const assignCustomerToEmployee = async (req, res) => {
       if (!employee || !customer) {
         return res.status(400).json({ message: "Employee or Customer not found" });
       }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
   
       employee.customers.push(customer._id);
       customer.assignedEmployee = employee._id;
       customer.customerStatus = "inWorking";
+      customer.assignedOn = today.getDate();
   
       await employee.save();
       await customer.save();
