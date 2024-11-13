@@ -55,6 +55,7 @@ export const getEmployees = async (req ,res) => {
 export const assignCustomerToEmployee = async (req, res) => {
     try {
       const { customerId, employeeId } = req.params;
+      const {deadline} = req.body
   
       const employee = await Employee.findById(employeeId);
       const customer = await Customer.findById(customerId);
@@ -68,6 +69,7 @@ export const assignCustomerToEmployee = async (req, res) => {
   
       employee.customers.push(customer._id);
       customer.assignedEmployee = employee._id;
+      customer.deadline = deadline;
       customer.customerStatus = "inWorking";
       customer.assignedOn = today.getDate();
   
