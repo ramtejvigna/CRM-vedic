@@ -110,7 +110,7 @@ const Customer = () => {
       try {
         // Send pdfId and rating in the body of the PUT request
         const response = await axios.put(
-          'http://localhost:8000/api/feedback', // No need to pass pdfId in the URL
+          'https://vedic-backend-neon.vercel.app/api/feedback', // No need to pass pdfId in the URL
           {
             pdfId: selectedPdf._id,  // Pass the pdfId in the body
             rating: selectedRating,   // Pass the selected rating
@@ -277,16 +277,16 @@ const Customer = () => {
       <div className="min-h-screen p-4 sm:p-8">
 {/* Back Button and Header */}
 <div className="flex items-center mb-6">
-      <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-gray-900 hover:text-blue-500"
-      >
-          <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-      </button>
+<button
+    onClick={() => navigate(-1)}
+    className="flex items-center font-bold  p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+  >
+    <ArrowLeft size={25} className="mr-2" />
+  </button>
       <h2 className="text-lg font-semibold">Customer Details</h2>
       
   </div>
-  <p className="text-2xl font-medium ml-4 mb-4">{customerDetails.fatherName}</p>
+  <p className="text-2xl font-medium ml-4 mb-4">{customerDetails.customerName}</p>
 
 <div className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col">
   {/* Customer Name in Large Font */}
@@ -432,8 +432,7 @@ const Customer = () => {
               {/* PDFs Generated Card */}
              {/* PDFs Generated Card */}
              {/* PDFs Generated Card */}
-<div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
-<div className="flex justify-between items-center mb-4">
+ <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col overflow-y-auto relative" style={{ height: '345px' }}><div className="flex justify-between items-center mb-4">
     <h2 className="text-lg font-semibold">PDFs Generated</h2>
     {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') && (
       <button
@@ -518,14 +517,14 @@ const Customer = () => {
                           setActiveDropdown(null);
                         }}
                       />
-                      <div
-                        className="absolute right-0 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
-                        style={{
-                          bottom: '100%',
-                          right: '0',
-                          marginBottom: '0.5rem'
-                        }}
-                      >
+                     <div
+  className="absolute right-0 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+  style={{
+    top: '80%',         // Positioning below the button
+    right: '0',
+    marginTop: '0.1rem'  // Slight spacing between button and dropdown
+  }}
+>
                         {[
                           { icon: FileText, label: 'View PDF', action: 'view' },
                           { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
