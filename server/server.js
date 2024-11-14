@@ -22,6 +22,7 @@ import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import { dirname } from 'path';
 
+
 import "./deadlineNotification.js";
 
 dotenv.config();
@@ -31,7 +32,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // middlewares
 app.use(cors({
-    origin: ["https://vedic-crm.netlify.app", "https://vedic-employee.netlify.app", "https://crm-vedic-manager.netlify.app", "https://vedic-form.netlify.app"],
+    origin: ["https://vedic-crm.netlify.app", "https://vedic-employee.netlify.app", "https://crm-vedic-manager.netlify.app", "https://vedic-form.netlify.app" ,"http://localhost:5173", ],
     credentials : true
 }));
 app.use(express.json({limit : '50mb'}));

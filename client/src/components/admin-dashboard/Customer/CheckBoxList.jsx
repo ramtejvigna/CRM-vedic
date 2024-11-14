@@ -12,10 +12,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import {
   Edit,
-  
   ArrowRight,
 } from 'lucide-react';
 import { FaAngleLeft,FaAngleRight,FaArrowLeft } from "react-icons/fa";
+import { HOST } from "../../../utils/constants";
 
 export const handleDownload = (pdfUrl, uniqueId) => {
   if (!pdfUrl) {
@@ -52,7 +52,7 @@ export const handleSendMail = async (pdfUrl, uniqueId, email) => {
             const pdfBlob = await response.blob(); // Convert the response to a Blob
             const base64Pdf = await blobToBase64(pdfBlob);
     
-    await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-email", {
+    await axios.post(`${HOST}/api/send-pdf-email`, {
       email,
       base64Pdf,
       uniqueId,
@@ -200,7 +200,7 @@ useEffect(() => {
 
   useEffect(() => {
     axios
-      .get("https://vedic-backend-neon.vercel.app/api/names")
+      .get(`${HOST}/api/names`)
       .then((response) => {
         setNames(response.data);
         filterNames({
@@ -477,7 +477,7 @@ const handleGeneratePdf = async () => {
 
   try {
       setIsLoading(true);
-      const response = await axios.post("https://vedic-backend-neon.vercel.app/api/create-pdf", {
+      const response = await axios.post(`${HOST}/api/create-pdf`, {
           names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
           customerId: customerData._id,
           additionalBabyNames: additionalBabyNames,
@@ -848,7 +848,7 @@ const handleGeneratePdf = async () => {
             <input
               type="text"
               value={additionalBabyNames[index].nameEnglish}
-              onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+              onChange={(e) => handleInputChange(index, 'nameEnglish', e.target.value)}
               required
               className="border border-gray-300 rounded-md w-full max-w-xs p-2 mt-1 focus:outline-none focus:border-indigo-500 text-left"
             />
