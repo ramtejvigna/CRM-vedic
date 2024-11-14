@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "../../../store";
 import { motion, AnimatePresence } from "framer-motion";
-import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
+import { GET_ALL_EMPLOYEES, HOST } from "../../../utils/constants";
 import { ChevronLeft, ChevronRight, CheckCircle, Briefcase,AlertCircle, Clock,XCircle,Filter, Eye, Search } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -29,7 +29,7 @@ const CustomerDetails = () => {
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(
-        "https://vedic-backend-neon.vercel.app/customers/getCustomers"
+        `${HOST}/customers/getCustomers`
       );
       // Sort customers in reverse chronological order
       const sortedCustomers = response.data.sort((a, b) => {

@@ -24,6 +24,7 @@ import {
     FilePlus2,
 } from 'lucide-react';
 import CustomerDetails from "./ViewCustomers";
+import { HOST } from "../../../utils/constants";
 
 const Customer = () => {
     const { id } = useParams();
@@ -110,7 +111,7 @@ const Customer = () => {
       try {
         // Send pdfId and rating in the body of the PUT request
         const response = await axios.put(
-          'https://vedic-backend-neon.vercel.app/api/feedback', // No need to pass pdfId in the URL
+          `${HOST}/api/feedback`, // No need to pass pdfId in the URL
           {
             pdfId: selectedPdf._id,  // Pass the pdfId in the body
             rating: selectedRating,   // Pass the selected rating
@@ -133,7 +134,7 @@ const Customer = () => {
         const getCustomerDetails = async (id) => {
             try {
                 const response = await axios.get(
-                    `https://vedic-backend-neon.vercel.app/customers/getCustomerDetails/${id}`
+                    `${HOST}/customers/getCustomerDetails/${id}`
                 );
                 setCustomerDetails(response.data);
                 setLoading(false);
@@ -154,7 +155,7 @@ const Customer = () => {
     const fetchPdfs = async () => {
         try {
             setPdfsLoading(true);
-            const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`);
+            const response = await axios.get(`${HOST}/api/generatedpdf?customerId=${customerId}`);
             if (response.data.length > 0) {
                 setPdfs(response.data);
             }
@@ -178,10 +179,9 @@ const Customer = () => {
           alert("Error generating PDF URL");
       }
   };
-    const handleShowPdf = async (babyNames, _id) => {
-        const generatedPdfUrl = await generatePdf(babyNames); // Call the generatePdf function
+    const handleShowPdf = async (babyNames, additionalBabyNames) => {
+        const generatedPdfUrl = await generatePdf(babyNames,additionalBabyNames); // Call the generatePdf function
         setPdfUrl(generatedPdfUrl); // Set the URL state
-        setEnabledRow(_id);
         setShowViewer(true);
     };
 
