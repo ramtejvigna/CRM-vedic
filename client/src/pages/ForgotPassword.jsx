@@ -114,6 +114,8 @@ const ForgotPassword = () => {
           theme: "light",
         });
       }
+    }finally {
+      setIsLoading(false);
     }
   };
 

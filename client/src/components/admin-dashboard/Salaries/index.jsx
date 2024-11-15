@@ -45,13 +45,15 @@ function Salaries() {
 
   const fetchSalries = async () => {
     try {
+      setIsLoading(true)
       const response = await fetch(GET_ALL_SALARIES);
       const data = await response.json()
       setSalaryStatements(data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching employees:", error);
     } finally {
-
+      setIsLoading(false);
     }
   };
 
