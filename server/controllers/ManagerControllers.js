@@ -3,6 +3,7 @@ import { Customer, Employee } from "../models/User.js"
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 dotenv.config();
+
 export const getNewCustomers = async (req, res) => {
     try {
       const newRequests = await Customer.find({ assignedEmployee: undefined, customerStatus: 'newRequests' })
@@ -63,10 +64,15 @@ export const assignCustomerToEmployee = async (req, res) => {
       if (!employee || !customer) {
         return res.status(400).json({ message: "Employee or Customer not found" });
       }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+  
       employee.customers.push(customer._id);
       customer.assignedEmployee = employee._id;
       customer.deadline = deadline;
       customer.customerStatus = "inWorking";
+      customer.assignedOn = today.getDate();
   
       await employee.save();
       await customer.save();

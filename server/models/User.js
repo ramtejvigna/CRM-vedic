@@ -30,7 +30,9 @@ const customerSchema = new mongoose.Schema({
     customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now },
     preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
-    deadline : {type : Date}
+    deadline : {type : Date},
+    assignedOn: { type: Date },
+    completedOn: { type: Date },
 });
 
 
