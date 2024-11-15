@@ -54,22 +54,18 @@ export const updateSalaryStatement = async (req, res) => {
 
         let newBase64 = null;
 
-        // Check if a file was uploaded and convert it to base64
         if (req.file) {
-            newBase64 = req.file.buffer.toString('base64');  // Assuming multer or similar middleware
+            newBase64 = req.file.buffer.toString('base64');  
         }
 
-        // Update the salary statement with the provided data
         salaryStatement.employee = employee;
         salaryStatement.amountPaid = amountPaid;
         salaryStatement.year = year;
         salaryStatement.month = month;
-        salaryStatement.bankStatement = newBase64 || salaryStatement.bankStatement; // Only update if new file is provided
+        salaryStatement.bankStatement = newBase64 
 
-        // Save the updated salary statement
         const updatedSalaryStatement = await salaryStatement.save();
 
-        // Respond with success and the updated salary statement
         return res.status(200).json({
             message: "Salary statement updated successfully",
             updatedSalaryStatement
