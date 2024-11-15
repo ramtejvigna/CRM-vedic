@@ -89,8 +89,8 @@ const EditEmployee = () => {
                         ...prev.employment,
                         employerName: data.employee.employerName,
                         jobTitle: data.employee.jobTitle,
-                        startDate: formatDate(data.employee.startDate), // Convert date
-                        endDate: formatDate(data.employee.endDate), // Convert date
+                        startDate: formatDate(data.employee.startDate), 
+                        endDate: formatDate(data.employee.endDate), 
                         reasonForLeaving: data.employee.reasonForLeaving,
                     },
                     paymentDetails: {
@@ -98,7 +98,7 @@ const EditEmployee = () => {
                         cardNumber: data.employee.cardNumber,
                         cardholderName: data.employee.cardholderName,
                         cvv: data.employee.cvv,
-                        expiryDate: formatDate(data.employee.expiryDate), // Convert date
+                        expiryDate: formatDate(data.employee.expiryDate), 
                     },
                 }));
 
@@ -307,7 +307,7 @@ const EditEmployee = () => {
             case 0:
                 return (
                     <div className="space-y-8 p-4 sm:p-5">
-                        <h2 className="text-lg font-semibold text-gray-700">Employee Role Designation</h2>
+                        <h2 className="text-lg font-semibold text-gray-700">Employee Role</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className='w-full'>
                                 <select
@@ -318,8 +318,7 @@ const EditEmployee = () => {
                                     className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                                 >
                                     <option value="">Select Employee Role</option>
-                                    <option value="Junior Employee">Junior Employee</option>
-                                    <option value="Senior Employee">Senior Employee</option>
+                                    <option value="Employee">Employee</option>
                                     <option value="Manager">Manager</option>
                                 </select>
                                 {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
@@ -879,7 +878,7 @@ const EditEmployee = () => {
                         </Step>
                     ))}
                 </Stepper>
-                <div className="flex-1 mx-auto w-full p-5 flex flex-col justify-between   bg-white shadow-lg rounded-l">
+                <div className="flex-1 mx-auto w-full overflow-hidden p-5 flex flex-col justify-between bg-white shadow-lg rounded-l h-full">
                     {renderForm()}
                     <Box className="flex p-2 justify-between">
                         <Button
@@ -889,39 +888,52 @@ const EditEmployee = () => {
                             sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black" }}
                             onClick={handleBack}
                         >
-                        <span className='capitalize'>Previous</span>
-                            
+                            <span className="capitalize">Previous</span>
                         </Button>
                         {activeStep === steps.length - 1 ? (
                             <Button
-                                sx={{ border: "1px solid blue", backgroundColor: "green", color: "white", padding: "6px 15px", fontWeight: "700" }}
+                                sx={{
+                                    border: "1px solid blue",
+                                    backgroundColor: "green",
+                                    color: "white",
+                                    padding: "6px 15px",
+                                    fontWeight: "700",
+                                }}
                                 onClick={handleSubmit}
                             >
-                                <span className='capitalize'>Finish</span>
-                                
+                                <span className="capitalize">Finish</span>
                             </Button>
                         ) : (
-                            <div className='flex gap-10 capitalize'>
+                            <div className="flex gap-10 capitalize">
                                 <Button
-                                    sx={{ border: "1px solid red", color: "red", padding: "6px 15px", fontWeight: "400" }}
+                                    sx={{
+                                        border: "1px solid red",
+                                        color: "red",
+                                        padding: "6px 15px",
+                                        fontWeight: "400",
+                                    }}
                                     onClick={() => navigate("/admin-dashboard/employees")}
-                                    className='hover:bg-red-600 hover:text-white capitalize'
+                                    className="hover:bg-red-600 hover:text-white capitalize"
                                 >
-                                    <span className='capitalize'>cancel</span>
+                                    <span className="capitalize">cancel</span>
                                 </Button>
                                 <Button
-                                    sx={{ border: "1px solid blue", backgroundColor: "#3B82F6", color: "white", padding: "6px 15px", fontWeight: "700" }}
+                                    sx={{
+                                        border: "1px solid blue",
+                                        backgroundColor: "#3B82F6",
+                                        color: "white",
+                                        padding: "6px 15px",
+                                        fontWeight: "700",
+                                    }}
                                     onClick={handleNext}
                                 >
-                                    <span className='capitalize'>next</span>
-                                
+                                    <span className="capitalize">next</span>
                                 </Button>
                             </div>
-                        )
-
-                        }
+                        )}
                     </Box>
                 </div>
+
             </Box>
         </div>
     );

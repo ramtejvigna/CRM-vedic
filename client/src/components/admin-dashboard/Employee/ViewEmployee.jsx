@@ -8,7 +8,7 @@ import {format} from "date-fns"
 import {motion} from "framer-motion"
 import {AiOutlineUpload , AiOutlineDelete , AiOutlineClose, AiOutlineDownload, AiOutlinePrinter} from "react-icons/ai"
 
-import { ArrowBigLeft, ArrowLeftFromLineIcon , AlignLeft, ArrowLeftToLine } from 'lucide-react';
+import { ArrowBigLeft, ArrowLeftFromLineIcon , AlignLeft, ArrowLeftToLine, ArrowLeft } from 'lucide-react';
 import { TbArrowBigLeftLineFilled } from 'react-icons/tb';
 import { FaArrowLeft } from 'react-icons/fa';
 const ViewEmployee = () => {
@@ -74,15 +74,16 @@ const ViewEmployee = () => {
         </div>
     ) : (
         <div className='flex flex-col w-full  h-full'>
-            <div className="flex items-center justify-between">
-                <div className="flex">
-                    <Button onClick={() => navigate('/admin-dashboard/employees')} className=" text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-                       <FaArrowLeft/>
-                    </Button>
-                </div>
+            <div className="flex items-center mb-6  p-2 gap-3">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center text-gray-900 hover:text-blue-500"
+                >
+                    <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+                </button>
+                <h2 className="text-lg font-semibold">Employee Details</h2>
             </div>
-
-         <div className='flex flex-wrap   p-2 gap-3 rounded-xl'>
+            <div className='flex flex-wrap   p-2 gap-3 rounded-xl'>
             <Card className="bg-white flex-1 basis-auto shadow-md rounded-lg overflow-hidden p-6 ">
                 <h2 className="text-xl font-semibold flex items-center justify-between text-gray-800 mb-4">
                     <span>Personal Details</span>
@@ -168,7 +169,6 @@ const ViewEmployee = () => {
             </Card>
 
             </div>
-
             <div className='flex flex-wrap p-2 gap-3 '>
                 <Card className="flex-1 basis-auto  flex flex-col gap-6 p-6 bg-white rounded-xl  border border-gray-200">
                     <h1 className="text-xl  font-semibold text-gray-700 ">Document</h1>

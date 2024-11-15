@@ -38,7 +38,7 @@ const AddEmployee = () => {
     });
 
     const handleNext = () => {
-        if (validateForm()) {
+        if (true) {
             setActiveStep((prev) => prev + 1);
         } else {
             console.log("form errors")
@@ -218,183 +218,151 @@ const AddEmployee = () => {
         switch (activeStep) {
             case 0:
                 return (
-                    <div className="space-y-8 p-2 sm:p-5 ">
-                        <h2 className="text-lg font-semibold text-gray-700">Employee Role Designation</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className='w-full'>
-                                <select
-                                    id="role"
-                                    name="role"
-                                    value={formData.personalInfo.role}
-                                    onChange={handleChange}
-                                    className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                                >
-                                    <option value="">Select Employee Role</option>
-                                    <option value="Junior Employee">Junior Employee</option>
-                                    <option value="Senior Employee">Senior Employee</option>
-                                    <option value="Manager">Manager</option>
-                                </select>
-                                {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
- 
+                        <div className="flex flex-col p-2 sm:p-5 h-full">
+                            {/* Role Selection */}
+                            <div className="mb-5">
+                                <h2 className="text-lg font-semibold text-gray-700">Employee Role</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div className="w-full ">
+                                        <select
+                                            id="role"
+                                            name="role"
+                                            value={formData.personalInfo.role}
+                                            onChange={handleChange}
+                                            className="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        >
+                                            <option value="" disabled>Select Employee Role</option>
+                                            <option value="Employee">Employee</option>
+                                            <option value="Manager">Manager</option>
+                                        </select>
+                                        {errors.role && <span className="text-xs pl-3 text-red-500">Please select an employee role</span>}
+                                    </div>
+                                </div>
                             </div>
 
-                        </div>
-                        <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <TextField
-                                className="flex-1"
-                                label={"First Name"}
-                                name="firstName"
-                                value={formData.personalInfo.firstName}
-                                onChange={handleChange}
-                                error={!!errors.firstName}
-                                helperText={errors.firstName}
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                            <TextField
-                                className="flex-1"
-                                label={"Last Name"}
-                                name="lastName"
-                                value={formData.personalInfo.lastName}
-                                onChange={handleChange}
-                                error={!!errors.lastName}
-                                helperText={errors.lastName}
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                        </div>
+                            <div className="flex-1 mt-6    grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                                {/* General Information */}
+                                <div className="flex flex-col col-span-2">
+                                    <h2 className="text-lg mb-3 font-semibold text-gray-700">General Information</h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow">
+                                        <TextField
+                                            className="text-sm"
+                                            label="First Name"
+                                            name="firstName"
+                                            value={formData.personalInfo.firstName}
+                                            onChange={handleChange}
+                                            error={!!errors.firstName}
+                                            helperText={errors.firstName}
+                                            required
+                                        />
+                                        <TextField
+                                            className="text-sm"
+                                            label="Last Name"
+                                            name="lastName"
+                                            value={formData.personalInfo.lastName}
+                                            onChange={handleChange}
+                                            error={!!errors.lastName}
+                                            helperText={errors.lastName}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex-1 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                                {/* Contact Information */}
+                                <div className="flex flex-col col-span-2">
+                                    <h3 className="text-lg mb-3 font-semibold text-gray-700">Contact Information</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow">
+                                        <TextField
+                                            label="Phone"
+                                            name="phone"
+                                            value={formData.personalInfo.phone}
+                                            onChange={handleChange}
+                                            error={!!errors.phone}
+                                            helperText={errors.phone}
+                                            inputProps={{
+                                                maxLength: 10,
+                                                inputMode: 'numeric',
+                                                pattern: '[0-9]*',
+                                            }}
+                                            className="text-sm"
+                                            required
+                                        />
+                                        <TextField
+                                            label="Email"
+                                            name="email"
+                                            value={formData.personalInfo.email}
+                                            onChange={handleChange}
+                                            error={!!errors.email}
+                                            helperText={errors.email}
+                                            className="text-sm"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
 
-                        <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <TextField
-                                label={"Phone"}
-                                name="phone"
-                                value={formData.personalInfo.phone}
-                                onChange={handleChange}
-                                error={!!errors.phone}
-                                helperText={errors.phone}
-                                inputProps={{
-                                    maxLength: 10,
-                                    inputMode: 'numeric',
-                                    pattern: '[0-9]*'
-                                }}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                            <TextField
-                                label={"Email"}
-                                name="email"
-                                value={formData.personalInfo.email}
-                                onChange={handleChange}
-                                error={!!errors.email}
-                                helperText={errors.email}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
+                            {/* Address Section */}
+                            <div className="flex flex-1 justify-center  flex-col mt-6">
+                                <h3 className="text-lg font-semibold text-gray-700">Address</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <TextField
+                                        label="Address"
+                                        name="address"
+                                        value={formData.personalInfo.address}
+                                        onChange={handleChange}
+                                        error={!!errors.address}
+                                        helperText={errors.address}
+                                        className="text-sm"
+                                        fullWidth
+                                        required
+                                    />
+                                    <TextField
+                                        label="City"
+                                        name="city"
+                                        value={formData.personalInfo.city}
+                                        onChange={handleChange}
+                                        error={!!errors.city}
+                                        helperText={errors.city}
+                                        className="text-sm"
+                                        fullWidth
+                                        required
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-4">
+                                    <TextField
+                                        label="State"
+                                        name="state"
+                                        value={formData.personalInfo.state}
+                                        onChange={handleChange}
+                                        error={!!errors.state}
+                                        helperText={errors.state}
+                                        className="text-sm"
+                                        required
+                                    />
+                                    <TextField
+                                        label="Pincode"
+                                        name="pincode"
+                                        value={formData.personalInfo.pincode}
+                                        onChange={handleChange}
+                                        error={!!errors.pincode}
+                                        helperText={errors.pincode}
+                                        className="text-sm"
+                                        required
+                                    />
+                                    <TextField
+                                        label="Country"
+                                        name="country"
+                                        value={formData.personalInfo.country}
+                                        onChange={handleChange}
+                                        error={!!errors.country}
+                                        helperText={errors.country}
+                                        className="text-sm"
+                                        required
+                                    />
+                                </div>
+                            </div>
                         </div>
-
-                        <h3 className="text-lg font-semibold text-gray-700">Address</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <TextField
-                                label={"Address"}
-                                name="address"
-                                value={formData.personalInfo.address}
-                                onChange={handleChange}
-                                error={!!errors.address}
-                                helperText={errors.address}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                fullWidth
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                            <TextField
-                                label={"City"}
-                                name="city"
-                                value={formData.personalInfo.city}
-                                onChange={handleChange}
-                                error={!!errors.city}
-                                helperText={errors.city}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                fullWidth
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <TextField
-                                label={"State"}
-                                name="state"
-                                value={formData.personalInfo.state}
-                                onChange={handleChange}
-                                error={!!errors.state}
-                                helperText={errors.state}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                            <TextField
-                                label={"Pincode"}
-                                name="pincode"
-                                value={formData.personalInfo.pincode}
-                                onChange={handleChange}
-                                error={!!errors.pincode}
-                                helperText={errors.pincode}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                            />
-                            <TextField
-                                label='Country'
-                                name="country"
-                                value={formData.personalInfo.country}
-                                onChange={handleChange}
-                                error={!!errors.country}
-                                helperText={errors.country}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                InputLabelProps={{
-                                    sx: {
-                                      '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                  }}
-                                  required
-                            />
-                        </div>
-                    </div>
                 );
 
             case 1:
