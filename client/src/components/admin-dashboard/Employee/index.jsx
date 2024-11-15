@@ -108,7 +108,7 @@ const EmployeeTable = () => {
           toast.error("Error filtering employees")
         }
     }else {
-      toast.error(error.message)
+      toast.error("Please select Status")
     }
 
   }
@@ -167,9 +167,9 @@ const EmployeeTable = () => {
               {showFilters && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
+                  animate={{ height: 70, opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="flex  bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden"
                 >
                   <form className="flex px-4 py-3 w-full flex-wrap gap-y-4">
@@ -335,16 +335,7 @@ const EmployeeTable = () => {
                             <Eye size={18} />
                             {/* <MessageCircle size={18} /> */}
                           </button>
-                          {/* <button
-                            onClick={() => handleDelete(employee._id)}
-                            className={`transition-colors duration-300 ${
-                              isDarkMode
-                                ? "text-red-400 hover:text-red-200"
-                                : "text-red-600 hover:text-red-900"
-                            }`}
-                          >
-                            <Trash size={18} />
-                          </button> */}
+    
                         </td>
                       </motion.tr>
                     ))}

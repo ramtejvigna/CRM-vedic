@@ -4,8 +4,8 @@ import { XCircleIcon, } from 'lucide-react';
 import { CircularProgress, TextField } from '@mui/material';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate, Link } from 'react-router-dom';
-import { ADD_SALARY_STATEMENT } from '../../../utils/constants';
+import { useNavigate, Link, useParams } from 'react-router-dom';
+import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -13,14 +13,14 @@ const fadeIn = {
   exit: { opacity: 0, y: -20 }
 };
 
-const AddSalariesStatements = () => {
+const EditSalaries = () => {
+    const {id} = useParams()
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
-
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1999 }, (_, i) => currentYear - i);
+  const years = Array.from({ length: currentYear - 1999 }, (_, i) => "" + currentYear - i);
   const [isLoading , setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [errors, setErrors] = useState({});
@@ -33,6 +33,40 @@ const AddSalariesStatements = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+    const fetchSalaryDetails = async () => {
+        try {
+            setIsLoading(true); // Start loading
+
+            const response = await fetch(`${HOST}/salaries/${id}`); 
+
+            if (!response.ok) {
+                throw new Error("Salary statement not found");
+            }
+
+            const data = await response.json();
+            console.log(data)
+            setFormData((prev) => ({
+                ...prev ,
+                year : data?.year,
+                amountPaid : data?.amountPaid ,
+                bankStatement : data?.bankStatement,
+                month : data?.month ,
+                employee : data?.employee?._id
+            }))
+            setIsLoading(false); 
+        } catch (err) {
+            setIsLoading(false); 
+        }
+    };
+
+    if (id) {
+        fetchSalaryDetails(); 
+    }
+}, [id]);
 
   const fetchEmployees = async () => {
     try {
@@ -68,11 +102,11 @@ const AddSalariesStatements = () => {
       Object.keys(formData).forEach(key => {
         formDataToSend.append(key, formData[key]);
       });
-
+      formDataToSend.append("id" , id);
       try {
-        const response = await axios.post(`${ADD_SALARY_STATEMENT}`, formDataToSend);
+        const response = await axios.put(`${HOST}/salaries/edit-salary`, formDataToSend);
         if (response.status === 200) {
-          toast.success("Salary added successfully");
+          toast.success("Salary edited successfully");
           navigate("/admin-dashboard/salaries");
         }
       } catch (error) {
@@ -101,7 +135,7 @@ const AddSalariesStatements = () => {
             initial={{ x: -20 }}
             animate={{ x: 0 }}
           >
-            Add Salary Statement
+            Edit Salary Statement
           </motion.h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -255,7 +289,6 @@ const AddSalariesStatements = () => {
                 >
                   <label className="w-full cursor-pointer">
                     <div className="flex flex-col items-center justify-center gap-4">
-                      {/* <DocumentArrowUpIcon size={48} className="text-blue-500" /> */}
                       <p className="text-sm font-medium text-gray-600">Click or drag file to upload</p>
                       <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG</p>
                     </div>
@@ -275,7 +308,7 @@ const AddSalariesStatements = () => {
                 >
                   <div className="relative w-40 h-40 rounded-lg overflow-hidden">
                     <img
-                      src={URL.createObjectURL(formData.bankStatement)}
+                      src={typeof formData.bankStatement === "string" ? `data:image/jpeg;base64,${formData.bankStatement}` :   URL.createObjectURL(formData.bankStatement)}
                       alt="Bank Statement"
                       className="w-full h-full object-cover"
                     />
@@ -322,7 +355,7 @@ const AddSalariesStatements = () => {
                     className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   />
                 ) : (
-                  'Add Salary'
+                  'Edit Salary'
                 )}
               </motion.button>
             </motion.div>
@@ -333,4 +366,4 @@ const AddSalariesStatements = () => {
   );
 };
 
-export default AddSalariesStatements; 
+export default EditSalaries; 

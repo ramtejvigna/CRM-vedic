@@ -205,33 +205,47 @@ const ViewEmployee = () => {
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Financial Details</h2>
 
                     <div className="border-t border-gray-200">
-                        <dl >
-                        <div className="py-2 flex">
-                            <dt className="text-gray-500 w-1/3">Cardholder Name</dt>
-                            <dd className="text-gray-900 font-medium flex-1">
-                            {employee?.cardholderName !== undefined ? employee.cardholderName : "Not mentioned"}
-                            </dd>
-                        </div>
+                        <dl>
+                            <div className="py-2 flex">
+                                <dt className="text-gray-500 w-1/3">Account Holder Name</dt>
+                                <dd className="text-gray-900 font-medium flex-1">
+                                    {employee?.accountHolderName !== undefined ? employee.accountHolderName : "Not mentioned"}
+                                </dd>
+                            </div>
 
-                        <div className="py-2 flex">
-                            <dt className="text-gray-500 w-1/3">Card Number</dt>
-                            <dd className="text-gray-900 font-medium flex-1">{employee?.cardNumber}</dd>
-                        </div>
+                            <div className="py-2 flex">
+                                <dt className="text-gray-500 w-1/3">Bank Name</dt>
+                                <dd className="text-gray-900 font-medium flex-1">
+                                    {employee?.bankName !== undefined ? employee.bankName : "Not mentioned"}
+                                </dd>
+                            </div>
 
-                        <div className="py-2 flex">
-                            <dt className="text-gray-500 w-1/3">Expiry Date</dt>
-                            <dd className="text-gray-900 font-medium flex-1">
-                            {isNaN(new Date(employee?.expiryDate)) ? "Invalid Date" : format(new Date(employee.expiryDate), "MM/dd/yyyy")}
-                            </dd>
-                        </div>
+                            <div className="py-2 flex">
+                                <dt className="text-gray-500 w-1/3">Branch Name</dt>
+                                <dd className="text-gray-900 font-medium flex-1">
+                                    {employee?.branchName !== undefined ? employee.branchName : "Not mentioned"}
+                                </dd>
+                            </div>
 
-                        <div className="py-2 flex">
-                            <dt className="text-gray-500 w-1/3">CVV</dt>
-                            <dd className="text-gray-900 font-medium flex-1">{employee?.cvv}</dd>
-                        </div>
+                            <div className="py-2 flex">
+                                <dt className="text-gray-500 w-1/3">Bank Account Number</dt>
+                                <dd className="text-gray-900 font-medium flex-1">
+                                    {employee?.bankAccountNumber !== undefined ? employee.bankAccountNumber : "Not mentioned"}
+                                </dd>
+                            </div>
+
+                            <div className="py-2 flex">
+                                <dt className="text-gray-500 w-1/3">IFSC Code</dt>
+                                <dd className="text-gray-900 font-medium flex-1">
+                                    {employee?.ifscCode !== undefined ? employee.ifscCode : "Not mentioned"}
+                                </dd>
+                            </div>
+
+                    
                         </dl>
                     </div>
-                    </Card>
+                </Card>
+
 
             </div>
             {

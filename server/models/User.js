@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 
 const customerSchema = new mongoose.Schema({
     customerID: { type: String, required: true },
@@ -23,13 +23,16 @@ const customerSchema = new mongoose.Schema({
     payTransactionID: { type: String },
     pdfGenerated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PDF' }],
     amountPaid: { type: String },
-    leadSource: { type:String, default: "Other", enum:['Instagram', 'Facebook', 'Our Website', 'Other'] },
+    leadSource: { type:String, default: "Other", enum:['Instagram 1','Instagram 2', 'Whatsapp','Meta Ads','Google Ads','Facebook', 'Our Website', 'Other'] },
     socialMediaId: { type: String },
     otherSource: { type: String },
     offer: { type: String },
     customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now },
-    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']}
+    assignedOn: { type: Date },
+    completedOn: { type: Date },
+    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
+    deadline : {type : Date}
 });
 
 
@@ -37,44 +40,57 @@ const employeeSchema = new mongoose.Schema({
     // username: { type: String, required: true },
     firstName: { type: String },
     lastName: { type: String },
-    role : {type : String , enum : ["Employee" , "Manager"] , required : true} , 
+    role: { type: String, enum: ["Employee", "Manager"], required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
-    password : {type : String},
+    password: { type: String },
     address: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
 
-    aadharOrPan : {type : String} ,
-    passport : {type : String} ,
-    ssn : {type : String},
-    degrees : {type : String } ,
-    transcripts : {type : String },
+    aadharOrPan: { type: String },
+    passport: { type: String },
+    ssn: { type: String },
+    degrees: { type: String },
+    transcripts: { type: String },
 
-    employerName : {type : String } ,
-    jobTitle : {type : String} ,
+    employerName: { type: String },
+    jobTitle: { type: String },
     startDate: { type: Date },
     endDate: { type: Date },
-    reasonForLeaving : {type : String } ,
+    reasonForLeaving: { type: String },
 
-    cardNumber : {type : String} ,
-    cardholderName : {type : String } ,
-    cvv : {type : String} ,
-    expiryDate : {type : Date} ,
+    accountHolderName: { type: String },
+    bankName: { type: String },
+    branchName: { type: String },
+    bankAccountNumber: { type: String },
+    ifscCode: { type: String },
 
-    isOnline :  {type : Boolean , default : false},
+    isOnline: { type: Boolean, default: false },
     leaveBalance: { type: Number, default: 15 },
     lastLeaveReset: { type: Date, default: new Date() },
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
-    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
+    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     lastLeaveAcceptedDate: { type: Date, default: null },
 
     isAdmin: { type: Boolean, default: false }
+}, { timestamps: true });
+
+
+const adminSchema = new mongoose.Schema({
+    
+    email: { type: String, required: true },
+    password : {type : String , required : true},
+
+    resetPasswordVerificationToken : String ,
+    resetPasswordVerificationTokenExpiresAt : Date,
+    verificationToken : String
 } ,  {timestamps : true});
 
 export const Employee = mongoose.model('Employee', employeeSchema);
 
 
 export const Customer = mongoose.model('Customer', customerSchema);
+export const Admin = mongoose.model('Admin', adminSchema);

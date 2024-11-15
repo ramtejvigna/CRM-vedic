@@ -17,7 +17,6 @@ export const login = async (req, res) => {
         }
 
         employee.isOnline = true ;
-
         await employee.save();
         // Generate JWT token with employee ObjectId and isAdmin flag
         const token = jwt.sign(
@@ -28,6 +27,8 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
+
+        
 
         // Return token in response
         res.status(200).json({

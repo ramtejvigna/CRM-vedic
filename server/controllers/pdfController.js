@@ -277,6 +277,39 @@ export const addBabyName = async (req,res) => {
     }
 }
 
+export const submitFeedback = async (req, res) => {
+    const { pdfId, rating } = req.body; // Extract pdfId and rating from request body
+    
+    try {
+      // Validate the rating
+      if (rating < 1 || rating > 5) {
+        return res.status(400).json({ message: "Rating must be between 1 and 5" });
+      }
+  
+      // Find the PDF document by ID
+      const pdf = await PDF.findById(pdfId);
+  
+      if (!pdf) {
+        return res.status(404).json({ message: "PDF not found" });
+      }
+  
+      // Update the rating field of the found PDF document
+      pdf.rating = rating;
+  
+      // Save the updated PDF document
+      await pdf.save();
+  
+      return res.status(200).json({
+        message: "Rating successfully updated",
+        pdf,
+      });
+    } catch (error) {
+      console.error("Error updating rating:", error.message);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  };
+  
+
 
 // export const getPdfsByCustomerId = async (req, res) => {
 //   const { customerId } = req.query;

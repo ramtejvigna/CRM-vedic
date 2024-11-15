@@ -61,47 +61,49 @@ const EditEmployee = () => {
                 };
 
                 setFormData((prev) => ({
+                    ...prev, 
                     personalInfo: {
-                        ...prev.personalInfo, 
-                        firstName: data.employee.firstName, 
-                        lastName: data.employee.lastName,
-                        role : data.employee?.role , 
-                        phone: data.employee.phone,
-                        email: data.employee.email,
-                        city: data.employee.city,
-                        address: data.employee.address,
-                        state: data.employee.state,
-                        country: data.employee.country,
-                        pincode: data.employee.pincode,
+                        ...prev.personalInfo,
+                        firstName: data.employee?.firstName || "",
+                        lastName: data.employee?.lastName || "",
+                        role: data.employee?.role || "",
+                        phone: data.employee?.phone || "",
+                        email: data.employee?.email || "",
+                        city: data.employee?.city || "",
+                        address: data.employee?.address || "",
+                        state: data.employee?.state || "",
+                        country: data.employee?.country || "",
+                        pincode: data.employee?.pincode || "",
                     },
                     idDocuments: {
-                        ...prev.idDocuments, 
-                        aadharOrPan: data.employee.aadharOrPan,
-                        passport: data.employee.passport,
-                        ssn: data.employee.ssn,
+                        ...prev.idDocuments,
+                        aadharOrPan: data.employee?.aadharOrPan || "",
+                        passport: data.employee?.passport || "",
+                        ssn: data.employee?.ssn || "",
                     },
-                    education : {
-                        ...prev.educacation ,
-                        degrees : data.employee.degrees,
-                        transcripts : data.employee.transcripts
+                    education: {
+                        ...prev.education,
+                        degrees: data.employee?.degrees || "",
+                        transcripts: data.employee?.transcripts || "",
                     },
                     employment: {
                         ...prev.employment,
-                        employerName: data.employee.employerName,
-                        jobTitle: data.employee.jobTitle,
-                        startDate: formatDate(data.employee.startDate), 
-                        endDate: formatDate(data.employee.endDate), 
-                        reasonForLeaving: data.employee.reasonForLeaving,
+                        employerName: data.employee?.employerName || "",
+                        jobTitle: data.employee?.jobTitle || "",
+                        startDate: data.employee?.startDate ? formatDate(data.employee.startDate) : "",
+                        endDate: data.employee?.endDate ? formatDate(data.employee.endDate) : "",
+                        reasonForLeaving: data.employee?.reasonForLeaving || "",
                     },
                     paymentDetails: {
                         ...prev.paymentDetails,
-                        cardNumber: data.employee.cardNumber,
-                        cardholderName: data.employee.cardholderName,
-                        cvv: data.employee.cvv,
-                        expiryDate: formatDate(data.employee.expiryDate), 
+                        accountHolderName: data.employee?.accountHolderName || "",
+                        bankName: data.employee?.bankName || "",
+                        branchName: data.employee?.branchName || "",
+                        bankAccountNumber: data.employee?.bankAccountNumber || "",
+                        ifscCode: data.employee?.ifscCode || "",
                     },
                 }));
-
+                
                 
             } catch (error) {
                 toast.error(error.message);
@@ -134,18 +136,15 @@ const EditEmployee = () => {
                 [name]: value
             }
         });
-        // validateForm();
     };
 
     const validateForm = () => {
         const form = formData[formKeys[activeStep]];
         const formErrors = {};
     
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-        const phoneRegex = /^[6789]\d{9}$/; 
-        const ssnRegex = /^\d{3}\d{2}\d{4}$/; 
-        const cvvRegex = /^\d{3}$/; 
-        const cardNumberRegex = /^\d{16}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[6789]\d{9}$/;
+        const ssnRegex = /^\d{3}\d{2}\d{4}$/;
     
         if (activeStep === 0) {
             if (!form.firstName) formErrors.firstName = 'First name is required';
@@ -165,7 +164,7 @@ const EditEmployee = () => {
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
-            if (!form.role) formErrors.role = 'role is required';
+            if (!form.role) formErrors.role = 'Role of employee is required';
         }
     
         if (activeStep === 1) {
@@ -190,7 +189,7 @@ const EditEmployee = () => {
             if (!form.jobTitle) formErrors.jobTitle = 'Job title is required';
             if (!form.startDate) {
                 formErrors.startDate = 'Start date is required';
-            } 
+            }
             if (!form.endDate) {
                 formErrors.endDate = 'End date is required';
             }
@@ -198,20 +197,22 @@ const EditEmployee = () => {
         }
     
         if (activeStep === 4) {
-            if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            if (!form.cardNumber) {
-                formErrors.cardNumber = 'Card Number is required';
-            } 
-            if (!cardNumberRegex.test(form.cardNumber)) {
-                formErrors.cardNumber = 'Invalid Card Number. Use 16 digits ';
-            } 
-            if (!form.expiryDate) {
-                formErrors.expiryDate = 'Expiry Date is required';
-            } 
-            if (!form.cvv) {
-                formErrors.cvv = 'CVV is required';
-            } else if (!cvvRegex.test(form.cvv)) {
-                formErrors.cvv = 'Invalid CVV format. Use 3 digits';
+            if (!form.accountHolderName) {
+                formErrors.accountHolderName = 'Account Holder Name is required';
+            }
+            if (!form.bankName) {
+                formErrors.bankName = 'Bank Name is required';
+            }
+            if (!form.branchName) {
+                formErrors.branchName = 'Branch Name is required';
+            }
+            if (!form.bankAccountNumber) {
+                formErrors.bankAccountNumber = 'Bank Account Number is required';
+            } else if (!/^\d+$/.test(form.bankAccountNumber)) {
+                formErrors.bankAccountNumber = 'Bank Account Number should contain only digits';
+            }
+            if (!form.ifscCode) {
+                formErrors.ifscCode = 'IFSC Code is required';
             }
         }
     
@@ -306,97 +307,92 @@ const EditEmployee = () => {
         switch (activeStep) {
             case 0:
                 return (
-                    <div className="space-y-8 p-4 sm:p-5">
+                    <div className="flex flex-col p-2 sm:p-5 h-full">
+                    {/* Role Selection */}
+                    <div className="flex flex-col gap-6">
                         <h2 className="text-lg font-semibold text-gray-700">Employee Role</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className='w-full'>
+                            <div className="w-full ">
                                 <select
                                     id="role"
                                     name="role"
                                     value={formData.personalInfo.role}
                                     onChange={handleChange}
-                                    className={`block w-full px-4 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                    className="block cursor-pointer w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 >
-                                    <option value="">Select Employee Role</option>
+                                    <option value="" disabled>Select Employee Role</option>
                                     <option value="Employee">Employee</option>
                                     <option value="Manager">Manager</option>
                                 </select>
-                                {errors.role ? <span className='text-xs pl-3 text-red-500'>Please select an employee role</span> : ""}
- 
+                                {errors.role && <span className="text-xs pl-3 text-red-500">Please select an employee role</span>}
                             </div>
-
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-700">General Information</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div>
+                    </div>
+
+                    <div className="flex-1 mt-6    grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                        {/* General Information */}
+                        <div className="flex flex-col col-span-2">
+                            <h2 className="text-lg mb-3 font-semibold text-gray-700">General Information</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow">
                                 <TextField
-                                    className="flex-1"
+                                    className="text-sm"
                                     label="First Name"
                                     name="firstName"
                                     value={formData.personalInfo.firstName}
                                     onChange={handleChange}
                                     error={!!errors.firstName}
                                     helperText={errors.firstName}
-                                   required
-                                   InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
+                                    required
                                 />
-                                <div className=''></div>        
+                                <TextField
+                                    className="text-sm"
+                                    label="Last Name"
+                                    name="lastName"
+                                    value={formData.personalInfo.lastName}
+                                    onChange={handleChange}
+                                    error={!!errors.lastName}
+                                    helperText={errors.lastName}
+                                    required
+                                />
                             </div>
-                            <TextField
-                                className="flex-1"
-                                label="Last Name"
-                                name="lastName"
-                                value={formData.personalInfo.lastName}
-                                onChange={handleChange}
-                                error={!!errors.lastName}
-                                helperText={errors.lastName}
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
-                            />
                         </div>
-
-                        <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <TextField
-                                label="Phone Number"
-                                name="phone"
-                                value={formData.personalInfo.phone}
-                                onChange={handleChange}
-                                error={!!errors.phone}
-                                helperText={errors.phone}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
-                            />
-                            <TextField
-                                label="Email"
-                                name="email"
-                                value={formData.personalInfo.email}
-                                onChange={handleChange}
-                                error={!!errors.email}
-                                helperText={errors.email}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
-                            />
+                    </div>
+                    <div className="flex-1 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                        {/* Contact Information */}
+                        <div className="flex flex-col col-span-2">
+                            <h3 className="text-lg mb-3 font-semibold text-gray-700">Contact Information</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow">
+                                <TextField
+                                    label="Phone"
+                                    name="phone"
+                                    value={formData.personalInfo.phone}
+                                    onChange={handleChange}
+                                    error={!!errors.phone}
+                                    helperText={errors.phone}
+                                    inputProps={{
+                                        maxLength: 10,
+                                        inputMode: 'numeric',
+                                        pattern: '[0-9]*',
+                                    }}
+                                    className="text-sm"
+                                    required
+                                />
+                                <TextField
+                                    label="Email"
+                                    name="email"
+                                    value={formData.personalInfo.email}
+                                    onChange={handleChange}
+                                    error={!!errors.email}
+                                    helperText={errors.email}
+                                    className="text-sm"
+                                    required
+                                />
+                            </div>
                         </div>
+                    </div>
 
+                    {/* Address Section */}
+                    <div className="flex flex-1 justify-center gap-6  flex-col mt-6">
                         <h3 className="text-lg font-semibold text-gray-700">Address</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <TextField
@@ -406,14 +402,9 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.address}
                                 helperText={errors.address}
-                                className="rounded-md shadow-sm bg-gray-50"
+                                className="text-sm"
                                 fullWidth
                                 required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
                             />
                             <TextField
                                 label="City"
@@ -422,18 +413,12 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.city}
                                 helperText={errors.city}
-                                className="rounded-md shadow-sm bg-gray-50"
+                                className="text-sm"
                                 fullWidth
                                 required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
                             />
-
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-4">
                             <TextField
                                 label="State"
                                 name="state"
@@ -441,13 +426,8 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.state}
                                 helperText={errors.state}
-                                className="rounded-md shadow-sm bg-gray-50"
+                                className="text-sm"
                                 required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
                             />
                             <TextField
                                 label="Pincode"
@@ -456,13 +436,8 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.pincode}
                                 helperText={errors.pincode}
-                                className="rounded-md shadow-sm bg-gray-50"
+                                className="text-sm"
                                 required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
                             />
                             <TextField
                                 label="Country"
@@ -471,16 +446,12 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 error={!!errors.country}
                                 helperText={errors.country}
-                                className="rounded-md shadow-sm bg-gray-50"
+                                className="text-sm"
                                 required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
                             />
                         </div>
                     </div>
+                </div>
                 );
 
             case 1:
@@ -768,94 +739,94 @@ const EditEmployee = () => {
 
             case 4:
                 return (
-                    <div className="space-y-6 p-6 sm:p-10 bg-white shadow-lg rounded-lg">
+                    <div className="space-y-6 p-2 sm:p-5">
                         <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
-                        <p className="text-sm text-gray-500">Please provide employee payment details for billing.</p>
+                        <p className="text-sm text-gray-500">Please provide your bank details for payment processing.</p>
 
                         <TextField
-                            label="Card Holder Name"
-                            name="cardholderName"
-                            value={formData.paymentDetails.cardholderName}
+                            label="Account Holder Name"
+                            name="accountHolderName"
+                            value={formData.paymentDetails.accountHolderName}
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
-                            error={!!errors.cardholderName}
-                            helperText={errors.cardholderName}
                             fullWidth
                             required
+                            error={!!errors.accountHolderName}
+                            helperText={errors.accountHolderName}
                             InputLabelProps={{
                                 sx: {
                                     '& .MuiInputLabel-asterisk': { color: 'red' },
                                 },
                             }}
                         />
+
                         <TextField
-                            label="Card Number"
-                            name="cardNumber"
-                            value={formData.paymentDetails.cardNumber}
+                            label="Bank Name"
+                            name="bankName"
+                            value={formData.paymentDetails.bankName}
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
-                            error={!!errors.cardNumber}
-                            helperText={errors.cardNumber}
                             fullWidth
                             required
+                            error={!!errors.bankName}
+                            helperText={errors.bankName}
                             InputLabelProps={{
                                 sx: {
                                     '& .MuiInputLabel-asterisk': { color: 'red' },
                                 },
                             }}
                         />
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="grid gap-2">
-                                <label 
-                                    htmlFor="expiryDate" 
-                                    className="block text-sm font-medium text-gray-500"
-                                >
-                                    Expiry Date  <span className='text-red-500'>*</span>
-                                </label>
-                                <TextField
-                                    id="expiryDate"
-                                    name="expiryDate"
-                                    type='date'
-                                    value={formData.paymentDetails.expiryDate}
-                                    onChange={handleChange}
-                                    error={!!errors.expiryDate}
-                                    helperText={errors.expiryDate}
-                                    className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
-                                    required
-                                    InputLabelProps={{
-                                        sx: {
-                                            '& .MuiInputLabel-asterisk': { color: 'red' },
-                                        },
-                                    }}
-                                />
 
-                            </div>
-                            <div className="grid gap-2">
-                                <label 
-                                    htmlFor="cvv" 
-                                    className="block text-sm font-medium opacity-0"
-                                >
-                                    CVV 
-                                </label>
-                                <TextField
-                                    label="CVV"
-                                    name="cvv"
-                                    type="password"
-                                    value={formData.paymentDetails.cvv || ''}
-                                    onChange={handleChange}
-                                    error={!!errors.cvv}
-                                    helperText={errors.cvv}
-                                    className="rounded-md shadow-sm bg-gray-50"
-                                    required
-                                    InputLabelProps={{
-                                        sx: {
-                                            '& .MuiInputLabel-asterisk': { color: 'red' },
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
+                        <TextField
+                            label="Branch Name"
+                            name="branchName"
+                            value={formData.paymentDetails.branchName}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.branchName}
+                            helperText={errors.branchName}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
+
+                        <TextField
+                            label="Bank Account Number"
+                            name="bankAccountNumber"
+                            value={formData.paymentDetails.bankAccountNumber}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.bankAccountNumber}
+                            helperText={errors.bankAccountNumber}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
+
+                        <TextField
+                            label="IFSC Code"
+                            name="ifscCode"
+                            value={formData.paymentDetails.ifscCode}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.ifscCode}
+                            helperText={errors.ifscCode}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
                     </div>
                 );
 

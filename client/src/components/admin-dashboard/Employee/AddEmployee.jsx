@@ -22,7 +22,7 @@ const AddEmployee = () => {
         personalInfo: {
             firstName: '',
             lastName: '',
-            role : '' , 
+            role: '',
             phone: '',
             email: '',
             city: '',
@@ -34,11 +34,18 @@ const AddEmployee = () => {
         idDocuments: { aadharOrPan: '', passport: '', ssn: '' },
         education: { degrees: null, transcripts: null },
         employment: { employerName: '', jobTitle: '', startDate: '', endDate: '', reasonForLeaving: '' },
-        paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: '' },
+        paymentDetails: {
+            accountHolderName: '',
+            bankName: '',
+            branchName: '',
+            bankAccountNumber: '',
+            ifscCode: '',
+        },
     });
+    
 
     const handleNext = () => {
-        if (true) {
+        if (validateForm()) {
             setActiveStep((prev) => prev + 1);
         } else {
             console.log("form errors")
@@ -59,17 +66,14 @@ const AddEmployee = () => {
             }
         });
     };
-
     const validateForm = () => {
         const form = formData[formKeys[activeStep]];
         const formErrors = {};
-
+    
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = /^[6789]\d{9}$/;
         const ssnRegex = /^\d{3}\d{2}\d{4}$/;
-        const cvvRegex = /^\d{3}$/;
-        const cardNumberRegex = /^\d{16}$/;
-
+    
         if (activeStep === 0) {
             if (!form.firstName) formErrors.firstName = 'First name is required';
             if (!form.email) {
@@ -88,9 +92,9 @@ const AddEmployee = () => {
             if (!form.state) formErrors.state = 'State is required';
             if (!form.pincode) formErrors.pincode = 'Pincode is required';
             if (!form.country) formErrors.country = 'Country is required';
-            if (!form.role) formErrors.role = 'role of employee is required';
+            if (!form.role) formErrors.role = 'Role of employee is required';
         }
-
+    
         if (activeStep === 1) {
             if (!form.aadharOrPan) {
                 formErrors.aadharOrPan = 'Aadhar Card or PAN Card is required';
@@ -102,12 +106,12 @@ const AddEmployee = () => {
                 formErrors.ssn = 'Invalid SSN format. Use XXX XX XXXX';
             }
         }
-
+    
         if (activeStep === 2) {
             if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
             if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
         }
-
+    
         if (activeStep === 3) {
             if (!form.employerName) formErrors.employerName = 'Employer Name is required';
             if (!form.jobTitle) formErrors.jobTitle = 'Job title is required';
@@ -119,28 +123,31 @@ const AddEmployee = () => {
             }
             if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'Reason for leaving is required';
         }
-
+    
         if (activeStep === 4) {
-            if (!form.cardholderName) formErrors.cardholderName = 'Cardholder Name is required';
-            if (!form.cardNumber) {
-                formErrors.cardNumber = 'Card Number is required';
+            if (!form.accountHolderName) {
+                formErrors.accountHolderName = 'Account Holder Name is required';
             }
-            if (!cardNumberRegex.test(form.cardNumber)) {
-                formErrors.cardNumber = 'Invalid Card Number. Use 16 digits ';
+            if (!form.bankName) {
+                formErrors.bankName = 'Bank Name is required';
             }
-            if (!form.expiryDate) {
-                formErrors.expiryDate = 'Expiry Date is required';
+            if (!form.branchName) {
+                formErrors.branchName = 'Branch Name is required';
             }
-            if (!form.cvv) {
-                formErrors.cvv = 'CVV is required';
-            } else if (!cvvRegex.test(form.cvv)) {
-                formErrors.cvv = 'Invalid CVV format. Use 3 digits';
+            if (!form.bankAccountNumber) {
+                formErrors.bankAccountNumber = 'Bank Account Number is required';
+            } else if (!/^\d+$/.test(form.bankAccountNumber)) {
+                formErrors.bankAccountNumber = 'Bank Account Number should contain only digits';
+            }
+            if (!form.ifscCode) {
+                formErrors.ifscCode = 'IFSC Code is required';
             }
         }
-        // console.log(formErrors)
+    
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
+    
 
     const handleFileChange = (e, section, field) => {
         const file = e.target.files[0];
@@ -188,9 +195,11 @@ const AddEmployee = () => {
             })
 
             // payment details
-            Object.keys(formData.paymentDetails).forEach((key) => {
-                formDataToSend.append(key, formData.paymentDetails[key])
-            })
+            formDataToSend.append("accountHolderName", formData.paymentDetails.accountHolderName);
+            formDataToSend.append("bankName", formData.paymentDetails.bankName);
+            formDataToSend.append("branchName", formData.paymentDetails.branchName);
+            formDataToSend.append("bankAccountNumber", formData.paymentDetails.bankAccountNumber);
+            formDataToSend.append("ifscCode", formData.paymentDetails.ifscCode);
 
             try {
                 setIsLoading(true);
@@ -220,7 +229,7 @@ const AddEmployee = () => {
                 return (
                         <div className="flex flex-col p-2 sm:p-5 h-full">
                             {/* Role Selection */}
-                            <div className="mb-5">
+                            <div className="flex flex-col gap-6">
                                 <h2 className="text-lg font-semibold text-gray-700">Employee Role</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="w-full ">
@@ -229,7 +238,7 @@ const AddEmployee = () => {
                                             name="role"
                                             value={formData.personalInfo.role}
                                             onChange={handleChange}
-                                            className="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            className="block cursor-pointer w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                         >
                                             <option value="" disabled>Select Employee Role</option>
                                             <option value="Employee">Employee</option>
@@ -303,7 +312,7 @@ const AddEmployee = () => {
                             </div>
 
                             {/* Address Section */}
-                            <div className="flex flex-1 justify-center  flex-col mt-6">
+                            <div className="flex flex-1 justify-center gap-6  flex-col mt-6">
                                 <h3 className="text-lg font-semibold text-gray-700">Address</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <TextField
@@ -459,7 +468,7 @@ const AddEmployee = () => {
                         className="rounded-md shadow-sm bg-gray-50"
                         fullWidth
                         error={!!errors.ssn}
-                        helperText={errors.snn}
+                        helperText={errors.ssn}
                         required
                         InputLabelProps={{
                             sx: {
@@ -663,85 +672,94 @@ const AddEmployee = () => {
                 return (
                     <div className="space-y-6 p-2 sm:p-5">
                         <h2 className="text-2xl font-semibold text-gray-700">Payment Details</h2>
-                        <p className="text-sm text-gray-500">Please provide your payment details for billing.</p>
+                        <p className="text-sm text-gray-500">Please provide your bank details for payment processing.</p>
 
-                            <TextField
-                                label="Cardholder Name"
-                                name="cardholderName"
-                                value={formData.paymentDetails.cardholderName}
-                                onChange={handleChange}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                fullWidth
-                                required
-                                error={!!errors.cardholderName}
-                                helperText={errors.cardholderName}
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
-                            />
-                            <TextField
-                                label="Card Number"
-                                name="cardNumber"
-                                value={formData.paymentDetails.cardNumber}
-                                onChange={handleChange}
-                                className="rounded-md shadow-sm bg-gray-50"
-                                fullWidth
-                                required
-                                error={!!errors.cardNumber}
-                                helperText={errors.cardNumber}
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
-                            />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="grid gap-2">
-                                    <label 
-                                        htmlFor="expiryDate" 
-                                        className="block text-sm font-medium text-gray-500"
-                                    >
-                                        expiry date <span className='text-red-500'>*</span>
-                                    </label>
-                                    <TextField
-                                        id="expiryDate"
-                                        name="expiryDate"
-                                        type='date'
-                                        value={formData.paymentDetails.expiryDate}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md shadow-sm bg-gray-50"
-                                        error={!!errors.expiryDate}
-                                        helperText={errors.expiryDate}
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <label 
-                                        htmlFor="cvv" 
-                                        className="block text-sm font-medium opacity-0"
-                                    >
-                                        cvv <span className='text-red-500'>*</span>
-                                    </label>
-                                    <TextField
-                                        label="CVV"
-                                        name="cvv"
-                                        value={formData.paymentDetails.cvv}
-                                        onChange={handleChange}
-                                        className="rounded-md shadow-sm bg-gray-50"
-                                        required
-                                        InputLabelProps={{
-                                            sx: {
-                                                '& .MuiInputLabel-asterisk': { color: 'red' },
-                                            },
-                                        }}
-                                        error={!!errors.cvv}
-                                        helperText={errors.cvv}
-                                    />
-                                </div>
+                        <TextField
+                            label="Account Holder Name"
+                            name="accountHolderName"
+                            value={formData.paymentDetails.accountHolderName}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.accountHolderName}
+                            helperText={errors.accountHolderName}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
 
-                            </div>
-                        </div>
+                        <TextField
+                            label="Bank Name"
+                            name="bankName"
+                            value={formData.paymentDetails.bankName}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.bankName}
+                            helperText={errors.bankName}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
+
+                        <TextField
+                            label="Branch Name"
+                            name="branchName"
+                            value={formData.paymentDetails.branchName}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.branchName}
+                            helperText={errors.branchName}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
+
+                        <TextField
+                            label="Bank Account Number"
+                            name="bankAccountNumber"
+                            value={formData.paymentDetails.bankAccountNumber}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.bankAccountNumber}
+                            helperText={errors.bankAccountNumber}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
+
+                        <TextField
+                            label="IFSC Code"
+                            name="ifscCode"
+                            value={formData.paymentDetails.ifscCode}
+                            onChange={handleChange}
+                            className="rounded-md shadow-sm bg-gray-50"
+                            fullWidth
+                            required
+                            error={!!errors.ifscCode}
+                            helperText={errors.ifscCode}
+                            InputLabelProps={{
+                                sx: {
+                                    '& .MuiInputLabel-asterisk': { color: 'red' },
+                                },
+                            }}
+                        />
+                    </div>
+
                     );
 
             default:

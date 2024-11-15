@@ -106,18 +106,17 @@ const AddExpense = () => {
   };
   return (
     <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-10">
-        <div className="flex items-center mb-6">
-          <button
-            onClick={() => navigate(-1)} // Navigate back
-            className="flex items-center text-gray-600 hover:text-blue-500"
-          >
-            <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-
-          </button>
-        </div>
-        <h1 className="text-3xl font-bold mb-6 text-center">Add Expense</h1>
-
+      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-8">
+      <div className="flex items-center mb-6">
+  <button
+    onClick={() => navigate(-1)}
+    className="flex items-center font-bold  p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+  >
+    <ArrowLeft size={25} className="mr-2" />
+  </button>
+  <h1 className="text-3xl font-bold mb-2 ml-2 text-center">Add Expense</h1>
+</div>
+        
         {/* Form Grid Layout */}
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
 

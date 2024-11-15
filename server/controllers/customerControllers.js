@@ -15,7 +15,7 @@ export const addCustomerWithAssignment = async (req, res) => {
         preferredStartingLetterType,
         preferredGod,
         referenceName,
-        additionalPreferences
+        additionalPreferences,
     } = req.body;
 
     try {
@@ -139,7 +139,7 @@ export const getCustomersBasedOnRequests = async (req, res) => {
 export const getCustomerData = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, pdfGenerated, feedback, customerStatus,
-        paymentDate, paymentTime, amountPaid, transactionId
+        paymentDate, paymentTime, amountPaid, transactionId,leadsource,
     } = req.body;
 
     try {
@@ -161,6 +161,7 @@ export const getCustomerData = async (req, res) => {
         customer.amountPaid = amountPaid;
         customer.paymentDate = paymentDate;
         customer.paymentTime = paymentTime;
+        customer.leadSource=leadsource;
 
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
@@ -217,7 +218,7 @@ export const getCustomerPdfs = async (req, res) => {
 export const updateCustomerData = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, feedback, customerStatus, 
-        paymentDate, paymentTime, amountPaid, transactionId 
+        paymentDate, paymentTime, amountPaid, transactionId, completedOn
     } = req.body;
 
     try {
@@ -236,6 +237,9 @@ export const updateCustomerData = async (req, res) => {
         customer.amountPaid = amountPaid;
         customer.paymentDate = paymentDate;
         customer.paymentTime = paymentTime;
+
+        if(completedOn !== undefined) 
+            customer.completedOn = completedOn;
 
         await customer.save();
         res.status(200).json({ message: 'Customer updated successfully' });
