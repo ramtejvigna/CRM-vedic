@@ -5,7 +5,7 @@ import { CircularProgress, TextField } from '@mui/material';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
+import {  HOST } from '../../../utils/constants';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -39,16 +39,15 @@ const EditSalaries = () => {
   useEffect(() => {
     const fetchSalaryDetails = async () => {
         try {
-            setIsLoading(true); // Start loading
+            setIsLoading(true); 
 
-            const response = await fetch(`${HOST}/salaries/${id}`); 
+            const response = await axios.get(`${HOST}/salaries/${id}`); 
 
-            if (!response.ok) {
+            if (!response.status === 200) {
                 throw new Error("Salary statement not found");
             }
 
-            const data = await response.json();
-            console.log(data)
+            const data = response.data
             setFormData((prev) => ({
                 ...prev ,
                 year : data?.year,
@@ -63,15 +62,15 @@ const EditSalaries = () => {
         }
     };
 
-    if (id) {
+    
         fetchSalaryDetails(); 
-    }
+    
 }, [id]);
 
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("https://vedic-backend-neon.vercel.app/api/employees");
+      const response = await axios.get(`${HOST}/api/employees`);
       setEmployees(response.data);
       setIsLoading(false);
     } catch (error) {
