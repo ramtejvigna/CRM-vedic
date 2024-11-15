@@ -12,10 +12,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import {
   Edit,
+  
   ArrowRight,
 } from 'lucide-react';
 import { FaAngleLeft,FaAngleRight,FaArrowLeft } from "react-icons/fa";
-import { HOST } from "../../../utils/constants";
 
 export const handleDownload = (pdfUrl, uniqueId) => {
   if (!pdfUrl) {
@@ -52,7 +52,7 @@ export const handleSendMail = async (pdfUrl, uniqueId, email) => {
             const pdfBlob = await response.blob(); // Convert the response to a Blob
             const base64Pdf = await blobToBase64(pdfBlob);
     
-    await axios.post(`${HOST}/api/send-pdf-email`, {
+    await axios.post(`${api}/api/send-pdf-email`, {
       email,
       base64Pdf,
       uniqueId,
@@ -74,7 +74,7 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
   }
 
   try {
-    await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-whatsapp", {
+    await axios.post(`${api}/api/send-pdf-whatsapp`, {
       phoneNumber,
       pdfUrl,
       uniqueId,
@@ -89,8 +89,7 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
 
 const CheckBoxListPage = () => {
   const { state } = useLocation();
-  const { customerDetails  } = state || {};
-  const customerData  = customerDetails;
+  const { customerData  } = state || {};
   const [email, setEmail] = useState(customerData?.email || "");
   const [phoneNumber, setPhoneNumber] = useState(customerData?.whatsappNumber || "");
   const [names, setNames] = useState([]);
@@ -128,7 +127,7 @@ const CheckBoxListPage = () => {
     const handleNumberOfNamesChange = (e) => {
         const count = parseInt(e.target.value, 10);
         setNumberOfNames(count);
-        setAdditionalBabyNames(Array.from({ length: count }, () => ({ nameEnglish: '', meaning: '' })));
+        setAdditionalBabyNames(Array.from({ length: count }, () => ({ name: '', meaning: '' })));
     };
 
     const handleInputChange = (index, field, value) => {
@@ -200,7 +199,7 @@ useEffect(() => {
 
   useEffect(() => {
     axios
-      .get(`${HOST}/api/names`)
+      .get(`${api}/api/names`)
       .then((response) => {
         setNames(response.data);
         filterNames({
@@ -262,7 +261,7 @@ useEffect(() => {
     const lowerCaseLetter = startingLetter.toLowerCase();
     // Filter items based on the first character
     filtered = filtered.filter((item) => 
-        item.nameEnglish.charAt(0).toLowerCase() === lowerCaseLetter // Compare both in lowercase
+        item.name.charAt(0).toLowerCase() === lowerCaseLetter // Compare both in lowercase
     );
   }
 
@@ -432,74 +431,41 @@ const handleMeaningChange = (e) => {
 
   
   
-//   const handleGeneratePdf = async () => {
-//     console.log(additionalBabyNames);
-//     console.log(selectedItems);
-//     if (selectedItems.length === 0) {
-//         alert("No items selected!");
-//         return;
-//     }
+  const handleGeneratePdf = async () => {
+    console.log(additionalBabyNames);
+    console.log(selectedItems);
+    if (selectedItems.length === 0) {
+        alert("No items selected!");
+        return;
+    }
 
-//     try {
-//         setIsLoading(true);
-//         const response = await axios.post("http://localhost:8000/api/create-pdf", {
-//             names: selectedItems.map((item) => item.name),
-//             customerId: customerData._id,
-//             additionalBabyNames:additionalBabyNames,
-//         });
+    try {
+        setIsLoading(true);
+        const response = await axios.post(`${api}/api/create-pdf`, {
+            names: selectedItems.map((item) => item.name),
+            customerId: customerData._id,
+            additionalBabyNames:additionalBabyNames,
+        });
 
-//         toast.success("PDF Generated Successfully", {
+        toast.success("PDF Generated Successfully", {
             
-//         });
+        });
 
-//         setSelectedItems([]);
+        setSelectedItems([]);
 
-//         // Delay navigation to allow the toast to be visible
-//         setTimeout(() => {
-//             console.log("Navigating back");
-//             navigate(-1);
-//         }, 3000); // Adjust the timeout duration as needed (2000 ms = 2 seconds)
-//     } catch (error) {
-//         console.error("Error generating PDF:", error);
-//         toast.error("PDF generation failed");
-//     } finally {
-//         setIsLoading(false); // Ensure loading state is set to false in any case
-//     }
-// };
-
-const handleGeneratePdf = async () => {
-  console.log(additionalBabyNames);
-  console.log(selectedItems);
-  if (selectedItems.length === 0) {
-      alert("No items selected!");
-      return;
-  }
-
-  try {
-      setIsLoading(true);
-      const response = await axios.post(`${HOST}/api/create-pdf`, {
-          names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
-          customerId: customerData._id,
-          additionalBabyNames: additionalBabyNames,
-          generatedBy: "Admin",
-      });
-
-      toast.success("PDF Generated Successfully");
-
-      setSelectedItems([]);
-
-      // Delay navigation to allow the toast to be visible
-      setTimeout(() => {
-          console.log("Navigating back");
-          navigate(-1);
-      }, 3000); // Adjust the timeout duration as needed (3000 ms = 3 seconds)
-  } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("PDF generation failed");
-  } finally {
-      setIsLoading(false); // Ensure loading state is set to false in any case
-  }
+        // Delay navigation to allow the toast to be visible
+        setTimeout(() => {
+            console.log("Navigating back");
+            navigate(-1);
+        }, 3000); // Adjust the timeout duration as needed (2000 ms = 2 seconds)
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast.error("PDF generation failed");
+    } finally {
+        setIsLoading(false); // Ensure loading state is set to false in any case
+    }
 };
+
 
 
   const handleClose = () => {
@@ -674,24 +640,14 @@ const handleGeneratePdf = async () => {
           <thead className="bg-gray-100">
             <tr>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Select</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name(English)</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Meaning</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Gender</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">BookName</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name(Devangari)</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Numerology</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Zodiac</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Rashi</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Nakshatra</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Planetary Influence</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Element</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name In Hindi</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Meaning In Hindi</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Shlok No</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Page No</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Syllable Count</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Character Significance</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Mantra Ref</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Related Festival</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Extra Note</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Research Tag</th>
             </tr>
           </thead>
           <tbody>
@@ -705,24 +661,14 @@ const handleGeneratePdf = async () => {
                     className="rounded"
                   />
                 </td>
-                <td className="px-4 py-2">{item.nameEnglish}</td>
+                <td className="px-4 py-2">{item.name}</td>
                 <td className="px-4 py-2">{item.meaning}</td>
                 <td className="px-4 py-2">{item.gender}</td>
                 <td className="px-4 py-2">{item.bookName}</td>
-                <td className="px-4 py-2">{item.nameDevanagari}</td>
-                <td className="px-4 py-2">{item.numerology}</td>
-                <td className="px-4 py-2">{item.zodiac}</td>
-                <td className="px-4 py-2">{item.rashi}</td>
-                <td className="px-4 py-2">{item.nakshatra}</td>
-                <td className="px-4 py-2">{item.planetaryInfluence}</td>
-                <td className="px-4 py-2">{item.element}</td>
+                <td className="px-4 py-2">{item.nameInHindi}</td>
+                <td className="px-4 py-2">{item.meaningInHindi}</td>
+                <td className="px-4 py-2">{item.shlokNo}</td>
                 <td className="px-4 py-2">{item.pageNo}</td>
-                <td className="px-4 py-2">{item.syllableCount}</td>
-                <td className="px-4 py-2">{item.characterSignificance}</td>
-                <td className="px-4 py-2">{item.mantraRef}</td>
-                <td className="px-4 py-2">{item.relatedFestival}</td>
-                <td className="px-4 py-2">{item.extraNote}</td>
-                <td className="px-4 py-2">{item.researchTag}</td>
               </tr>
             ))}
           </tbody>
@@ -847,8 +793,8 @@ const handleGeneratePdf = async () => {
             <span className="text-sm font-medium">Baby Name: <span className="text-red-500">*</span></span>
             <input
               type="text"
-              value={additionalBabyNames[index].nameEnglish}
-              onChange={(e) => handleInputChange(index, 'nameEnglish', e.target.value)}
+              value={additionalBabyNames[index].name}
+              onChange={(e) => handleInputChange(index, 'name', e.target.value)}
               required
               className="border border-gray-300 rounded-md w-full max-w-xs p-2 mt-1 focus:outline-none focus:border-indigo-500 text-left"
             />
@@ -886,7 +832,7 @@ const handleGeneratePdf = async () => {
     {currentStep === numberOfNames - 1 && ( // Only show button on last step
       <button
         onClick={() => {
-          const allFilled = additionalBabyNames.every(entry => entry.nameEnglish && entry.meaning);
+          const allFilled = additionalBabyNames.every(entry => entry.name && entry.meaning);
           if (!allFilled) {
             toast.error('Please fill out all fields before submitting.');
             return;

@@ -36,13 +36,28 @@ export const getNewCustomers = async (req, res) => {
   };
   
 
+  
+export const getCompletedReq = async (req, res) => {
+  try {
+    
+    const completed = await Customer.find({ assignedEmployee: undefined, customerStatus: 'completed' })
+      .sort({ createdAt: -1 });
+
+  
+    return res.status(200).json({
+     
+      completed
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getEmployees = async (req ,res) => {
     try {
         const employees = await Employee.find({
-            $or: [
-              { role: "Senior Employee" },
-              { role: "Junior Employee" }
-            ]
+            
           })
           .populate("customers", "fatherName motherName")
           .sort({ createdAt: -1 });
@@ -56,8 +71,7 @@ export const getEmployees = async (req ,res) => {
 export const assignCustomerToEmployee = async (req, res) => {
     try {
       const { customerId, employeeId } = req.params;
-      const {deadline} = req.body
-  
+      console.log(customerId,employeeId,"Ids")
       const employee = await Employee.findById(employeeId);
       const customer = await Customer.findById(customerId);
       console.log(customer)
@@ -70,7 +84,6 @@ export const assignCustomerToEmployee = async (req, res) => {
   
       employee.customers.push(customer._id);
       customer.assignedEmployee = employee._id;
-      customer.deadline = deadline;
       customer.customerStatus = "inWorking";
       customer.assignedOn = today.getDate();
   
@@ -93,7 +106,6 @@ export const assignCustomerToEmployee = async (req, res) => {
 
         // Find employee by username and phone
         const employee = await Employee.findOne({ email, phone });
-        console.log(employee)
         if (employee.role !== 'Manager') {
             return res.status(400).json({ message: 'Invalid credentials' });
         }

@@ -29,10 +29,10 @@ const customerSchema = new mongoose.Schema({
     offer: { type: String },
     customerStatus: { type: String, default: 'newRequests' },
     createdDateTime: { type: Date, default: Date.now },
-    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
-    deadline : {type : Date},
     assignedOn: { type: Date },
     completedOn: { type: Date },
+    preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
+    deadline : {type : Date}
 });
 
 
@@ -78,8 +78,18 @@ const employeeSchema = new mongoose.Schema({
 } ,  {timestamps : true});
 
 
+const adminSchema = new mongoose.Schema({
+    
+    email: { type: String, required: true },
+    password : {type : String , required : true},
+
+    resetPasswordVerificationToken : String ,
+    resetPasswordVerificationTokenExpiresAt : Date,
+    verificationToken : String
+} ,  {timestamps : true});
 
 export const Employee = mongoose.model('Employee', employeeSchema);
 
 
 export const Customer = mongoose.model('Customer', customerSchema);
+export const Admin = mongoose.model('Admin', adminSchema);

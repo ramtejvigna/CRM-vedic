@@ -12,7 +12,7 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
         className="chart-container"
         style={{
           width: '90%', // Smaller width for spacing on the sides
-          height: '200px', // Height of the chart
+          height: '220px', // Height of the chart
           position: 'absolute', // Float above the card
           top: '-1cm', // Adjusted this value to stretch further back
           left: '50%', // Center horizontally
@@ -25,7 +25,7 @@ export function StatisticsChart({ color, chart, title, description, footer }) {
       </div>
 
       {/* Background Container for Text */}
-      <CardBody className="px-6 pt-40 pb-4 mt-2"> {/* Adjusted padding top (pt) for more space */}
+      <CardBody className="px-6 pt-48 pb-4 mt-2"> {/* Adjusted padding top (pt) for more space */}
         <Typography variant="h5" color="blue-gray" className="mb-2"> {/* Space below title for separation */}
           {title}
         </Typography>

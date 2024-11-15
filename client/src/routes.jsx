@@ -19,6 +19,9 @@ import Salaries from "./components/admin-dashboard/Salaries";
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
 import Leaves from "./components/admin-dashboard/Leaves";
 import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
+import Settings from "./components/admin-dashboard/settings";
+import Reports from "./components/admin-dashboard/Reports"
+import Customers from "./components/admin-dashboard/Customers";
 const Component = ({ name }) => {
   return (
     <>
@@ -48,7 +51,7 @@ export const routes = [
     name: "customers",
     path: "customers",
     icon: <VscFileSubmodule {...icon} />,
-    element: <ViewCustomers />,
+    element: <Customers />,
   },
   {
     name: "task management",
@@ -78,7 +81,7 @@ export const routes = [
     name: "reports",
     path: "reports",
     icon: <TbReportAnalytics {...icon} />,
-    element: <Home />,
+    element: <Reports />,
   },
   {
     name: "salaries",
@@ -101,6 +104,6 @@ export const routes = [
   {
     name: "settings",
     path: "settings",
-    element: <Component name={"settings"} />,
+    element: <Settings/>,
   },
 ];
