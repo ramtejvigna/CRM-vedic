@@ -44,6 +44,8 @@ app.use(bodyParser.json());
 app.use(cookieParser())
 
 app.use('/api/employees',employeeRoutes);
+app.use('/employees',employeeRoutes);
+
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);
