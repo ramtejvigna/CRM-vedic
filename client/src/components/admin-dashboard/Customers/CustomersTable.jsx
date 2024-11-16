@@ -4,6 +4,7 @@ import { Eye, Check, X, User, Briefcase, MoreHorizontal } from "lucide-react";
 import EmptyState from "./EmptyState";
 import RejectConfirmationModal from "./RejectConfirmationModal";
 
+
 const CustomersTable = ({
   customers,
   fromSection,
@@ -47,6 +48,17 @@ const CustomersTable = ({
           "Mobile",
           "Actions",
         ];
+        case "assignTo":
+          return [
+          "S.no",
+          "Customer ID",
+          "Customer Name",
+          "Mobile",
+          "Baby Gender",
+          "Employee Assigned",
+          "Deadline",
+          "Actions",
+          ];
       case "rejected":
         return [
           "S.no",
@@ -73,6 +85,8 @@ const CustomersTable = ({
   };
 
   const renderTableRows = (customer, index) => {
+    console.log(fromSection)
+
     switch (fromSection) {
       case "newRequests":
         return (
@@ -231,6 +245,73 @@ const CustomersTable = ({
             </td>
           </tr>
         );
+        case "assignTo" : 
+          return(
+          <tr
+          key={customer._id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 ease-in-out"
+        >
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
+            {index + 1}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
+            {customer.customerID}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
+            {customer.customerName}
+          </td>
+          
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+            {customer.whatsappNumber}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+            {customer.babyGender}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+            {customer.assignedEmployee?.firstName +
+              " " +
+              customer.assignedEmployee?.lastName ||
+              customer.assignedEmployee?.email ||
+              "Not Assigned"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {customer.deadline ? new Date(customer.deadline).toLocaleDateString() : 'No deadline'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-normal relative">
+            <div className="flex space-x-2">
+              {(fromSection === "inProgress" ||
+                fromSection === "completed" ||
+                activeTab === "assignedTo") && (
+                <>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200"
+                    onClick={() => handleActionClick("view", customer, fromSection, nextSection)}
+                  >
+                    <Eye size={20} />
+                  </motion.button>
+                  {fromSection === "inProgress" && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200"
+                      onClick={() => handleActionClick("assign", customer, fromSection, nextSection)}
+                    >
+                      <User size={20} />
+                    </motion.button>
+                  )}
+                </>
+              )}
+            </div>
+          </td>
+        </tr>
+      );
+        
       default:
         return (
           <tr
@@ -266,6 +347,7 @@ const CustomersTable = ({
                 customer.assignedEmployee?.email ||
                 "Not Assigned"}
             </td>
+           
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal relative">
               <div className="flex space-x-2">
                 {(fromSection === "inProgress" ||
