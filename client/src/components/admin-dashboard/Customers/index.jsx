@@ -26,8 +26,8 @@ import { useStore } from "../../../store"; // Assuming you have a store for dark
 import { useNavigate } from "react-router-dom";
 import CheckBoxListPage from "./CheckBoxList";
 import { FaAvianex } from "react-icons/fa";
-import { api } from "../../../utils/constants.js";
 import { Dialog, Transition } from "@headlessui/react";
+import { api } from "../../../utils/constants";
 import CustomPagination from "./Pagination";
 import {
   X as CloseIcon,
