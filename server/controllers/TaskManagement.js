@@ -227,6 +227,7 @@ export const markNotificationAsRead = async (req, res, next) => {
     // }
 
     notification.read = true;
+    await Notification.deleteOne(req.params.id)
     await notification.save();
 
     res.json({ message: 'Notification marked as read' });
