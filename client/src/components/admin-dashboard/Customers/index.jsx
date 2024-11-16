@@ -405,7 +405,7 @@ export const Customers = () => {
     },
   };
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = Math.ceil(activeTabData.length / rowsPerPage);
 
   // Reset pagination when tab changes
   useEffect(() => {
@@ -528,7 +528,7 @@ export const Customers = () => {
         </div>
       )}
     <CustomPagination
-          totalItems={filteredData.length}
+          totalItems={activeTabData.length}
           itemsPerPage={rowsPerPage}
           currentPage={page}
         onPageChange={handleChangePage}
