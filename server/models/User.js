@@ -33,7 +33,7 @@ const customerSchema = new mongoose.Schema({
     completedOn: { type: Date },
     preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
     deadline : {type : Date}
-});
+}, { timestamps: true });
 
 
 const employeeSchema = new mongoose.Schema({

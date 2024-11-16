@@ -16,6 +16,7 @@ import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 import VoiceRecognition from './Voice2.jsx'
 import CheckBoxListPage from "./Customer/CheckBoxList.jsx";
 import EditSalaries from "./Salaries/EditSalaries.jsx";
+import Customer from "./Customers/Customer.jsx";
 // import {VoiceRecognition} from './VoiceRecognition.jsx'
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
@@ -51,6 +52,8 @@ const AdminDashboard = () => {
             <Route path='/salaries/edit-salaries/:id' element={<EditSalaries/>} />
 
             <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/customers/viewDetailsIn" element={<Customer />} />
+            <Route path="/customers/viewDetailsIn/generate-pdf" element={<CheckBoxListPage />} />
           </Routes>
         </div>
         <VoiceRecognition/>
