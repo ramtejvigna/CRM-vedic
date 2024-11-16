@@ -260,7 +260,6 @@ export const createNotification = async (req, res, next) => {
     next(err);
   }
 };
-
 export const markAsRead = async (req, res) => {
   const { id } = req.params;
 
@@ -270,11 +269,14 @@ export const markAsRead = async (req, res) => {
       return res.status(404).json({ message: 'Notification not found' });
     }
 
-    notification.isRead = true;
-    await notification.save();
+    // Delete the notification using its ID
+    await Notification.deleteOne({ _id: id });
 
-    res.json(notification);
+    console.log("Notification deleted");
+    res.status(200).json({ message: 'Notification deleted successfully' });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error.message);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
