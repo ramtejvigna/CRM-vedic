@@ -260,7 +260,8 @@ const Customer = () => {
       </div>
 
       <div className="flex justify-between items-center mb-4">
-    <p className="text-2xl font-medium ml-4">{customerDetails.fatherName}</p>
+    <p className="text-2xl font-medium ml-4">{customerDetails.customerName
+    }</p>
     {customerDetails.customerStatus !== 'completed' && (
         <button
             onClick={() => setShowConfirmModal(true)}
