@@ -21,8 +21,7 @@ import { handleDownload, handleSendMail, handleSendWhatsApp } from './CheckBoxLi
 import { generatePdf } from './pdfDisplayComponent';
 import PDFViewer from './PDFviewer';
 import { ArrowBackIos, ArrowLeft, ExitToApp } from '@mui/icons-material';
-import { api } from '../../../configs/constants';
-
+import { api } from '../../../utils/constants';
 
 
 const Customer = () => {

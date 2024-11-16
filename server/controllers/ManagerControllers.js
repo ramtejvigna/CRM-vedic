@@ -5,35 +5,36 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 export const getNewCustomers = async (req, res) => {
-    try {
-      const newRequests = await Customer.find({ assignedEmployee: undefined, customerStatus: 'newRequests' })
-        .sort({ createdAt: -1 });
-  
-      const inProgress = await Customer.find({ assignedEmployee: undefined, customerStatus: 'inProgress' })
-        .sort({ createdAt: -1 });
-  
-      const completed = await Customer.find({ assignedEmployee: undefined, customerStatus: 'completed' })
-        .sort({ createdAt: -1 });
-  
-      const rejected = await Customer.find({ assignedEmployee: undefined, customerStatus: 'rejected' })
-        .sort({ createdAt: -1 });
-  
-      const workingCustomers = await Customer.find({ assignedEmployee: { $ne: undefined }, customerStatus: 'inWorking' })
+  try {
+    const [
+      newRequests,
+      inProgress,
+      completed,
+      rejected,
+      workingCustomers
+    ] = await Promise.all([
+      Customer.find({ assignedEmployee: undefined, customerStatus: 'newRequests' }).sort({ createdDateTime: -1 }),
+      Customer.find({ assignedEmployee: undefined, customerStatus: 'inProgress' }).sort({ createdDateTime: -1 }),
+      Customer.find({ assignedEmployee: undefined, customerStatus: 'completed' }).sort({ createdDateTime: -1 }),
+      Customer.find({ assignedEmployee: undefined, customerStatus: 'rejected' }).sort({ createdDateTime: -1 }),
+      Customer.find({ assignedEmployee: { $ne: undefined }, customerStatus: 'inWorking' })
         .sort({ createdAt: -1 })
-        .populate('assignedEmployee', 'email firstName lastName');
-        
-      return res.status(200).json({
-        newRequests,
-        inProgress,
-        completed,
-        rejected,
-        assignedTo: workingCustomers
-      });
-    } catch (error) {
-      console.log(error.message);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-  };
+        .populate('assignedEmployee', 'email firstName lastName')
+    ]);
+
+    return res.status(200).json({
+      newRequests,
+      inProgress,
+      completed,
+      rejected,
+      assignedTo: workingCustomers
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
   
 
   
