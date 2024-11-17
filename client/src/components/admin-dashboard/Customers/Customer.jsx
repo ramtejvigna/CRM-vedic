@@ -361,13 +361,13 @@ const Customer = () => {
             </div>
             {
                 customerDetails?.referenceName ? (<div>
-                    <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
+                    <p className="text-sm font-medium text-gray-500">Reference Name:</p>
                     <p className="mt-1 text-gray-900">{customerDetails.referenceName || "N/A"}</p>
                   </div>) : null
             }
             {
                 customerDetails?.additionalPreferences ? (<div>
-                    <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
+                    <p className="text-sm font-medium text-gray-500">Additional Preferences:</p>
                     <p className="mt-1 text-gray-900">{customerDetails.additionalPreferences || "N/A"}</p>
                   </div>) : null
             }
