@@ -31,14 +31,24 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(__filename)
 
 app.use(cors({
-    origin: ["https://vedic-crm.netlify.app", "https://vedic-employee.netlify.app", "https://crm-vedic-manager.netlify.app", "https://vedic-form.netlify.app" ,"http://localhost:5173", '"http://localhost:5174'],
-    credentials : true
-}));
+    origin: [
+      "http://localhost:5173", 
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "https://vedic-crm.netlify.app", 
+      "https://vedic-employee.netlify.app", 
+      "https://crm-vedic-manager.netlify.app", 
+      "https://vedic-form.netlify.app"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true
+  }));
+  
 app.use(express.json({limit : '50mb'}));
-app.use(express.urlencoded({ limit: '100mb', extended: true }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }))
 
 
 app.use(express.json());
