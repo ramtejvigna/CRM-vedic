@@ -339,6 +339,7 @@ const CustomerDetails = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination*/}
 
         <div className="mt-4 flex items-center justify-between">
   {/* Rows per page dropdown on the left */}

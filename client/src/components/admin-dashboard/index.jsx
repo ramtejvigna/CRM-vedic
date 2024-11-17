@@ -7,15 +7,16 @@ import Home from "./Home";
 import AddEmployee from "./Employee/AddEmployee";
 import TaskManagement from "./TaskManagement";
 import EditEmployee from "./Employee/EditEmployee";
-import Customer from "./Customer/Customer"; // Default import
 import ViewEmployee from "./Employee/ViewEmployee";
 import AddExpense from "./Expenses/AddExpense.jsx";
 import Leaves from "./Leaves";
+import Customers from "./Customers/index.jsx";
 import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 // import { VoiceRecognition } from "./VoiceRecognition.jsx";
 import VoiceRecognition from './Voice2.jsx'
 import CheckBoxListPage from "./Customer/CheckBoxList.jsx";
 import EditSalaries from "./Salaries/EditSalaries.jsx";
+import Customer from "./Customers/Customer.jsx";
 // import {VoiceRecognition} from './VoiceRecognition.jsx'
 const AdminDashboard = () => {
   const { activeRoute, isDarkMode } = useStore();
@@ -41,7 +42,7 @@ const AdminDashboard = () => {
             ))}
             <Route path="employees/add-employee" element={<AddEmployee />} />
             <Route path="employees/edit-employee/:id" element={<EditEmployee />} />
-            <Route path="customers/:id" element={<Customer />} /> {/* Ensure correct import */}
+            <Route path="customers/:id" element={<Customers />} /> {/* Ensure correct import */}
             <Route path="customers/:id/generate-pdf" element={<CheckBoxListPage />} />
             <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
@@ -51,6 +52,8 @@ const AdminDashboard = () => {
             <Route path='/salaries/edit-salaries/:id' element={<EditSalaries/>} />
 
             <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/customers/viewDetailsIn" element={<Customer />} />
+            <Route path="/customers/viewDetailsIn/generate-pdf" element={<CheckBoxListPage />} />
           </Routes>
         </div>
         <VoiceRecognition/>
