@@ -19,6 +19,7 @@ import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
 import { fileURLToPath } from 'url';
+import fileUpload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
 import { dirname } from 'path';
 
@@ -41,6 +42,7 @@ app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(fileUpload());
 app.use(cookieParser())
 
 app.use('/api/employees',employeeRoutes);
