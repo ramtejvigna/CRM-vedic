@@ -7,6 +7,7 @@ import "./index.css";
 import { createTheme } from "@mui/material";
 import {ToastContainer} from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
+import { SocketProvider } from "./context/SocketContext";
 const theme = createTheme({
   components: {
     MuiButton: {
@@ -25,8 +26,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-          <App />
-          <ToastContainer/>
+          <SocketProvider>
+            <App />
+            <ToastContainer/>
+          </SocketProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>

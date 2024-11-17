@@ -8,4 +8,7 @@ export const useStore = create((set) => ({
     ...AuthSlice(set) ,
     activeRoute: "Dashboard",  // Default to Dashboard
     setActiveRoute: (route) => set({ activeRoute: route }),
+
+    onlineUsers : [] ,
+    setOnlineUsers : (data) => set((state) => ({...state , onlineUsers : data })),
 }))
