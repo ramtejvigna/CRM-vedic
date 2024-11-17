@@ -32,7 +32,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // middlewares
 app.use(cors({
-    origin: ["https://vedic-crm.netlify.app", "https://vedic-employee.netlify.app", "https://crm-vedic-manager.netlify.app", "https://vedic-form.netlify.app" ,"http://localhost:5174", ],
+    origin: ["https://vedic-crm.netlify.app", "https://vedic-employee.netlify.app", "https://crm-vedic-manager.netlify.app", "https://vedic-form.netlify.app" ,"http://localhost:5173", '"http://localhost:5174'],
     credentials : true
 }));
 app.use(express.json({limit : '50mb'}));
@@ -44,6 +44,8 @@ app.use(bodyParser.json());
 app.use(cookieParser())
 
 app.use('/api/employees',employeeRoutes);
+app.use('/employees',employeeRoutes);
+
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);

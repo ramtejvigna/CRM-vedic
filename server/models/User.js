@@ -33,49 +33,50 @@ const customerSchema = new mongoose.Schema({
     completedOn: { type: Date },
     preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
     deadline : {type : Date}
-});
+}, { timestamps: true });
 
 
 const employeeSchema = new mongoose.Schema({
     // username: { type: String, required: true },
     firstName: { type: String },
     lastName: { type: String },
-    role : {type : String , enum : ["Employee" , "Manager" , "Junior Employee" , "Senior Employee"] , required : true} , 
+    role: { type: String, enum: ["Employee", "Manager"], required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
-    password : {type : String},
+    password: { type: String },
     address: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
 
-    aadharOrPan : {type : String} ,
-    passport : {type : String} ,
-    ssn : {type : String},
-    degrees : {type : String } ,
-    transcripts : {type : String },
+    aadharOrPan: { type: String },
+    passport: { type: String },
+    ssn: { type: String },
+    degrees: { type: String },
+    transcripts: { type: String },
 
-    employerName : {type : String } ,
-    jobTitle : {type : String} ,
+    employerName: { type: String },
+    jobTitle: { type: String },
     startDate: { type: Date },
     endDate: { type: Date },
-    reasonForLeaving : {type : String } ,
+    reasonForLeaving: { type: String },
 
-    cardNumber : {type : String} ,
-    cardholderName : {type : String } ,
-    cvv : {type : String} ,
-    expiryDate : {type : Date} ,
+    accountHolderName: { type: String },
+    bankName: { type: String },
+    branchName: { type: String },
+    bankAccountNumber: { type: String },
+    ifscCode: { type: String },
 
-    isOnline :  {type : Boolean , default : false},
+    isOnline: { type: Boolean, default: false },
     leaveBalance: { type: Number, default: 15 },
     lastLeaveReset: { type: Date, default: new Date() },
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
-    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] ,
+    assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     lastLeaveAcceptedDate: { type: Date, default: null },
 
     isAdmin: { type: Boolean, default: false }
-} ,  {timestamps : true});
+}, { timestamps: true });
 
 
 const adminSchema = new mongoose.Schema({

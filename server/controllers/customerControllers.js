@@ -218,7 +218,8 @@ export const getCustomerPdfs = async (req, res) => {
 export const updateCustomerData = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, feedback, customerStatus, 
-        paymentDate, paymentTime, amountPaid, transactionId, completedOn
+        paymentDate, paymentTime, amountPaid, transactionId ,socialMediaId , leadSource,deadline,
+        completedOn
     } = req.body;
 
     try {
