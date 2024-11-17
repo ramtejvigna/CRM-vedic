@@ -238,7 +238,9 @@ export const updateCustomerData = async (req, res) => {
         customer.amountPaid = amountPaid;
         customer.paymentDate = paymentDate;
         customer.paymentTime = paymentTime;
-
+        customer.leadSource = leadSource;
+        customer.deadline = deadline;
+        customer.socialMediaId = socialMediaId;
         if(completedOn !== undefined) 
             customer.completedOn = completedOn;
 
