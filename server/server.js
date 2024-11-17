@@ -41,8 +41,8 @@ app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(fileUpload());
+app.use(bodyParser.json());
 app.use(cookieParser())
 
 app.use('/api/employees',employeeRoutes);
