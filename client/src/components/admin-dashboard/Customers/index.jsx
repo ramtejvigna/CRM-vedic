@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, Fragment } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   Eye,
   Check,
@@ -43,12 +43,14 @@ import {
 import Loader from "./LoadingState";
 import CustomersTable from "./CustomersTable";
 import CustomerModal from "./CustomerModal";
-
 export const Customers = () => {
+  const {tab, setTab} = useStore()
+  console.log(tab)
+
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [customerData, setCustomerData] = useState({});
-  const [activeTab, setActiveTab] = useState("newRequests");
+  const [activeTab, setActiveTab] = useState(tab);
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [nextSection, setNextSection] = useState("");
@@ -112,6 +114,7 @@ export const Customers = () => {
             customerData: customer, // Pass customer data
             fromSection: fromSection, // Pass current section
             section: nextSection, // Pass section info
+            activeTab: activeTab, // Pass active tab info
           },
         });
         break;
@@ -135,6 +138,7 @@ export const Customers = () => {
           toast.success("Customer successfully assigned to employee");
           setShowModal(false);
           setActiveTab("assignedTo");
+          setTab("assignedTo")
           getNewRequests();
         }
       } catch (error) {
@@ -184,7 +188,11 @@ export const Customers = () => {
 
     axios
       .put(`${api}/customers/${customer._id}`, updatedCustomer)
-      .catch((error) => console.error("Error moving customer:", error));
+      .then(() => toast.success("Customer moved successfully"))
+      .catch((error) => {
+        console.error("Error moving customer:", error);
+        toast.error("Failed to move customer, please try again.");
+      });
   };
 
   const handleAccept = useCallback(() => {
@@ -443,6 +451,7 @@ export const Customers = () => {
               whileTap={{ scale: 0.95 }}
               onClick={() => {
                 setActiveTab(tab);
+                setTab(tab)
 
               }}
               className={`relative px-4 py-2 text-sm rounded-lg transition-colors duration-150 ease-in-out ${
@@ -535,8 +544,10 @@ export const Customers = () => {
         onItemsPerPageChange={handleRowsPerPageChange}
         isDarkMode={isDarkMode}
     />
+    <ToastContainer />
     </div>
   );
 };
 
 export default Customers;
+
