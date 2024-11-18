@@ -36,33 +36,29 @@ export const createSalaryStatement = async (req, res) => {
 };
 export const updateSalaryStatement = async (req, res) => {
     try {
-        // Destructure the necessary fields from req.body
-        const { id, amountPaid, year, month , employee } = req.body;
+        const { id, amountPaid, year, month, employee } = req.body;
 
-        // Ensure all necessary fields are provided
+
         if (!id || !amountPaid || !year || !month) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-
-        // Find the salary statement by ID
         const salaryStatement = await Salaries.findById(id);
 
         if (!salaryStatement) {
             return res.status(404).json({ message: "Salary statement not found." });
         }
 
-        let newBase64 = null;
-
-        if (req.file) {
-            newBase64 = req.file.buffer.toString('base64');  
-        }
+        let newBase64 = null; 
+        if (req.files && req.files.bankStatement) {
+            newBase64 = req.files.bankStatement.data.toString('base64');
+        } 
 
         salaryStatement.employee = employee;
         salaryStatement.amountPaid = amountPaid;
         salaryStatement.year = year;
         salaryStatement.month = month;
-        salaryStatement.bankStatement = newBase64 
+        salaryStatement.bankStatement = newBase64;
 
         const updatedSalaryStatement = await salaryStatement.save();
 
@@ -72,10 +68,12 @@ export const updateSalaryStatement = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error.message);
+        console.error('Error:', error.message);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
 
 
 export const getAllSalaryStatements = async (req, res) => {

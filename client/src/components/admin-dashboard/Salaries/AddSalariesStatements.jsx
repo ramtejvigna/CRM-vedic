@@ -5,7 +5,7 @@ import { CircularProgress, TextField } from '@mui/material';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
-import { ADD_SALARY_STATEMENT } from '../../../utils/constants';
+import { ADD_SALARY_STATEMENT, HOST } from '../../../utils/constants';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -37,7 +37,7 @@ const AddSalariesStatements = () => {
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("https://vedic-backend-neon.vercel.app/api/employees");
+      const response = await axios.get(`${HOST}/api/employees`);
       setEmployees(response.data);
       setIsLoading(false);
     } catch (error) {

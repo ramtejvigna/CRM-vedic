@@ -25,19 +25,30 @@ import { dirname } from 'path';
 
 
 import "./deadlineNotification.js";
+import setUpSocket from './socket.js';
 
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-// middlewares
+const __dirname = dirname(__filename)
+
 app.use(cors({
-    origin: ["https://vedic-crm.netlify.app", "https://vedic-employee.netlify.app", "https://crm-vedic-manager.netlify.app", "https://vedic-form.netlify.app" ,"http://localhost:5173", '"http://localhost:5174'],
-    credentials : true
-}));
+    origin: [
+      "http://localhost:5173", 
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "https://vedic-crm.netlify.app", 
+      "https://vedic-employee.netlify.app", 
+      "https://crm-vedic-manager.netlify.app", 
+      "https://vedic-form.netlify.app"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true
+  }));
+  
 app.use(express.json({limit : '50mb'}));
-app.use(express.urlencoded({ limit: '100mb', extended: true }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }))
 
 
 app.use(express.json());
@@ -62,5 +73,11 @@ app.use('/salaries' , salaryRoutes)
 app.use('/api/expenses', expensesRoutes);   
 app.use('/admin/auth' , AdminAuthRoutes)
 app.use('/api/reports',ReportsRouter)
+
+
+
+
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
+
+setUpSocket(server);
