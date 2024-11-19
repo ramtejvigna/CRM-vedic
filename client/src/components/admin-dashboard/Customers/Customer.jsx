@@ -305,9 +305,9 @@ const Customer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 ">
           {[
             { label: "customer Id", value: customerDetails.customerID },
-            { label: "Requested On", value: new Date(customerDetails.createdDateTime).toLocaleDateString() },
+            { label: "Requested On", value: new Date(customerDetails.createdDateTime).toLocaleString() },
             { label: "Contact No", value: customerDetails.whatsappNumber },
-            { label: "Deadline", value:new Date(customerDetails.deadline).toLocaleDateString() || "N/A" },
+            { label: "Work Deadline", value:new Date(customerDetails.deadline).toLocaleDateString() || "N/A" },
             { label: "Email", value: customerDetails.email || "N/A" }
 
           ].map((item, index) => (

@@ -41,9 +41,9 @@ const CustomersTable = ({
           "S.no",
           "Customer ID",
           "Customer Name",
-         
           "Baby Gender",
           "WhatsApp Number",
+          "Pdfs Generated",
           "Actions",
         ];
         case "assignTo":
@@ -55,7 +55,7 @@ const CustomersTable = ({
           "Baby Gender",
           "Employee Assigned",
           "Pdfs Generated",
-          "Deadline",
+          "Work Deadline",
           "Actions",
           ];
       case "rejected":
@@ -168,6 +168,9 @@ const CustomersTable = ({
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.whatsappNumber}
             </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {customer.pdfGenerated.length || '0'}
+          </td>
             <td className="px-6 py-4 space-x-3 whitespace-nowrap text-sm font-normal relative">
               <motion.button
                 whileHover={{ scale: 1.05 }}
