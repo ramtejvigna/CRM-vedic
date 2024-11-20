@@ -269,7 +269,6 @@ export const markAsRead = async (req, res) => {
       return res.status(404).json({ message: 'Notification not found' });
     }
 
-    // Delete the notification using its ID
     await Notification.deleteOne({ _id: id });
 
     console.log("Notification deleted");
