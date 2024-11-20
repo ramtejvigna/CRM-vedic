@@ -18,22 +18,29 @@ export const uploadCsvNames = async (req, res) => {
 
     // Parse the CSV file
     readableFile
-        .pipe(csvParser({ encoding: 'utf-8' }))
+        .pipe(csvParser({ separator: '\t', encoding: 'utf-8' })) // Specify tab delimiter
         .on('data', (row) => {
-            results.push(row);
+            // Normalize keys to handle stray characters
+            const normalizedRow = Object.fromEntries(
+                Object.entries(row).map(([key, value]) => [
+                    key.trim(), // Trim leading/trailing spaces
+                    value
+                ])
+            );
+            results.push(normalizedRow);
         })
         .on('end', async () => {
             try {
-                console.log(results)
+                console.log("Parsed Rows:", results);
                 await babyNames.insertMany(results);
                 res.status(200).json({ message: "Baby names uploaded successfully" });
             } catch (error) {
-                console.error(error);
+                console.error("Database Insertion Error:", error);
                 res.status(500).json({ error: "Failed to upload baby names" });
             }
         })
         .on('error', (error) => {
-            console.error("CSV file parsing error: ", error);
+            console.error("CSV File Parsing Error:", error);
             res.status(500).json({ error: "Error processing the CSV file" });
         });
 };

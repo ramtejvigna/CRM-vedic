@@ -474,7 +474,7 @@ const Customer = () => {
         {pdfs.map((pdf) => (
           <tr key={pdf._id} className="border-b">
             <td className="px-4 py-2">
-              <button onClick={() => handleShowPdf(pdf.babyNames, pdf._id)}>
+              <button onClick={() => handleShowPdf(pdf.babyNames, pdf.additionalBabyNames)}>
                 <FileText className="h-4 w-4 text-blue-600" />
               </button>
             </td>

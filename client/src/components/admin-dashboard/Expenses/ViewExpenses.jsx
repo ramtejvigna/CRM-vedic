@@ -358,59 +358,76 @@ const ViewExpenses = () => {
               </motion.button>
             </div>
 
-            {showFilters && (
-              <div className="flex gap-5 items-center justify-start">
-                <form className='flex w-full gap-5 flex-wrap'>
-                  <div className='flex gap-2 items-center min-w-[150px]'>
-                    <label htmlFor="month" className="mr-2">Month:</label>
-                    <select
-                      value={selectedMonth}
-                      onChange={(e) => setSelectedMonth(e.target.value)}
-                      id="month"
-                      name="month"
-                      className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+            <AnimatePresence>
+      {showFilters && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="w-full"
+        >
+          <div className="bg-white shadow-sm rounded-lg p-4 border border-gray-200">
+            <div className="flex gap-5 items-center justify-start">
+              <form className="flex w-full gap-5 flex-wrap">
+                <div className="flex gap-2 items-center min-w-[150px]">
+                  <label htmlFor="month" className="mr-2 text-gray-700">
+                    Month:
+                  </label>
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    id="month"
+                    name="month"
+                    className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
                     >
-                      <option value="">Select Month</option>
-                      {months.map((month) => (
-                        <option key={month} value={month}>
-                          {month}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className='flex gap-2 items-center min-w-[150px]'>
-                    <label htmlFor="year" className="mr-2">Year:</label>
-                    <select
-                      value={selectedYear}
-                      onChange={(e) => setSelectedYear(e.target.value)}
-                      id="year"
-                      name="year"
-                      className="p-1 transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white"
+                    <option value="">Select Month</option>
+                    {months.map((month) => (
+                      <option key={month} value={month}>
+                        {month}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="flex gap-2 items-center min-w-[150px]">
+                  <label htmlFor="year" className="mr-2 text-gray-700">
+                    Year:
+                  </label>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    id="year"
+                    name="year"
+                    className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
                     >
-                      <option value="">Select Year</option>
-                      {years.map(year => (
-                        <option key={year} value={year.toString()}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button
-  onClick={() => {
-    setFilteredExpenses(initialExpenses);
-    setSearchTerm("");
-    setSelectedMonth("");
-    setSelectedYear("");
-  }}
-  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors duration-300"
->
-  Reset Filters
-</button>
-                </form>
-              </div>
-            )}
+                    <option value="">Select Year</option>
+                    {years.map(year => (
+                      <option key={year} value={year.toString()}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setFilteredExpenses(initialExpenses);
+                    setSearchTerm("");
+                    setSelectedMonth("");
+                    setSelectedYear("");
+                  }}
+                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors duration-300"
+                >
+                  Reset Filters
+                </button>
+              </form>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
 
           </div>

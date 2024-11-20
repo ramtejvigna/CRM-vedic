@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AiOutlineUserAdd , AiOutlineAlipay } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
-import { Edit, Trash, Eye, SearchCheck } from "lucide-react";
+import { Edit, Trash, Eye, SearchCheck, Loader } from "lucide-react";
 import { useStore } from "../../../store";
+import { CircularProgress } from "@mui/material";
 import { GET_ALL_EMPLOYEES } from "../../../utils/constants";
 import { Search, Upload, User, Users, Filter  } from 'lucide-react';
 import { Link } from "react-router-dom";
@@ -14,14 +15,16 @@ const EmployeeTable = () => {
   const [status , setStatus] = useState("");
   const [showFilters , setShowFilters ] = useState(false)
   const [searchTerm , setSearchTerm] = useState("")
-  const { isDarkMode, toggleDarkMode } = useStore();
+  const { isDarkMode, toggleDarkMode , onlineUsers } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 5;
 
   useEffect(() => {
-    fetchEmployees();
+    if(!employees) {
+      fetchEmployees();
+    }
   }, []);
 
   const fetchEmployees = async () => {
@@ -105,7 +108,7 @@ const EmployeeTable = () => {
           toast.error("Error filtering employees")
         }
     }else {
-      toast.error(error.message)
+      toast.error("Please select Status")
     }
 
   }
@@ -113,14 +116,18 @@ const EmployeeTable = () => {
     filterData();
   } , [status])
 
-  return (
+  return isLoading ? (
+      <div className="h-full w-full flex items-center justify-center">
+        <CircularProgress/>
+      </div>
+  ) :  (
     <div
-      className={`min-h-screen p-8 transition-colors duration-300 ${
+      className={`h-full p-8 transition-colors duration-300 flex flex-col items-center  ${
         isDarkMode ? "bg-gray-900 text-white" : "text-gray-900"
       }`}
       >
-      <h1 className="text-3xl font-bold mb-10">Employee Management</h1>
-      <div className="max-w-7xl mx-auto">
+      <h1 className="text-3xl w-full max-w-7xl  font-bold mb-10">Employee Management</h1>
+      <div className="max-w-7xl gap-1 flex-1 w-full mx-auto flex flex-col  h-full">
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <div className="relative w-full sm:w-64">
@@ -156,30 +163,48 @@ const EmployeeTable = () => {
             <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
                 Showing {employees.length} results
             </div>
-          {
-            showFilters && (
-                <div className="flex py-3">
-                  <form  className='flex w-full flex-wrap' >
-                    <div className='flex gap-x-3  min-w-[250px]'>
-                      <label htmlFor="month" className="capitalize tracking-wider"> status :</label>
-                      <select value={status} onChange={(e) => setStatus(e.target.value)}  id="status" name="status" className="transition duration-200 border border-gray-300 focus:outline-none focus:ring-2 rounded-lg focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white ">
-                        <option value="select status">select status</option>
-                        <option value="online">online</option>
-                        <option value="offline">offline</option>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 70, opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="flex  bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden"
+                >
+                  <form className="flex px-4 py-3 w-full flex-wrap gap-y-4">
+                    <div className="flex gap-x-3 min-w-[250px] items-center">
+                      <label
+                        htmlFor="status"
+                        className="capitalize tracking-wider text-gray-700 font-medium"
+                      >
+                        Status:
+                      </label>
+                      <select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        id="status"
+                        name="status"
+                        className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
+                      >
+                        <option className="cursor-pointer" value="select status" disabled>
+                          Select status
+                        </option>
+                        <option className="cursor-pointer" value="online">
+                          Online
+                        </option>
+                        <option className="cursor-pointer" value="offline">
+                          Offline
+                        </option>
                       </select>
                     </div>
-                    </form>
-                </div>
-            )
-          }
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : (
           <div
-            className={`shadow-xl rounded-lg overflow-hidden transition-colors duration-300 ${
+            className={`border mt-2 rounded-lg overflow-hidden transition-colors duration-300 ${
               isDarkMode ? "bg-gray-800" : "bg-white"
             }`}
           >
@@ -191,7 +216,7 @@ const EmployeeTable = () => {
                   }`}
                 >
                   <tr>
-                    {["Employee", "phone" , "Status", "Actions"].map(
+                    {["Employee" , "Role", "phone" , "Status", "Actions"].map(
                       (header) => (
                         <th
                           key={header}
@@ -269,15 +294,22 @@ const EmployeeTable = () => {
                             isDarkMode ? "text-gray-300" : "text-gray-500"
                           }`}
                         >
+                          {employee.role}
+                        </td>
+                        <td
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            isDarkMode ? "text-gray-300" : "text-gray-500"
+                          }`}
+                        >
                           {employee.phone}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                              employee.isOnline
+                              onlineUsers.includes(employee._id)
                             )}`}
                           >
-                            {employee.isOnline ? "Online" : "Offline"}
+                            {onlineUsers.includes(employee._id)? "Online" : "Offline"}
                           </span>
                         </td>
 
@@ -303,16 +335,7 @@ const EmployeeTable = () => {
                             <Eye size={18} />
                             {/* <MessageCircle size={18} /> */}
                           </button>
-                          {/* <button
-                            onClick={() => handleDelete(employee._id)}
-                            className={`transition-colors duration-300 ${
-                              isDarkMode
-                                ? "text-red-400 hover:text-red-200"
-                                : "text-red-600 hover:text-red-900"
-                            }`}
-                          >
-                            <Trash size={18} />
-                          </button> */}
+    
                         </td>
                       </motion.tr>
                     ))}
@@ -378,7 +401,6 @@ const EmployeeTable = () => {
               </div>
             </div>
           </div>
-        )}
       </div>
     </div>
   );

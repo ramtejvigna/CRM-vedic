@@ -19,4 +19,5 @@ router.put('/:id', updateCustomerData); // Update customer by ID
 router.get('/getCustomerDetails/:id', getCustomerDetails);
 router.get('/getCustomerPdfs/:fatherName', getCustomerPdfs);
 
+
 export default router;
