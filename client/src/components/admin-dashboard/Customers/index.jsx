@@ -50,7 +50,7 @@ export const Customers = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [customerData, setCustomerData] = useState({});
-  const [activeTab, setActiveTab] = useState(tab);
+  const [activeTab, setActiveTab] = useState(tab || "newRequests");
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [nextSection, setNextSection] = useState("");
