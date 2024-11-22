@@ -1,53 +1,77 @@
-import { Card, CardBody, Typography } from "@material-tailwind/react";
+import { Card } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
+import { motion } from 'framer-motion';
 import { useStore } from "../../store";
 
 export function StatisticsChart({ color, chart, title, description, footer, filter }) {
   const { isDarkMode } = useStore();
 
   return (
-    <div className="relative flex flex-col items-center w-full">
-      {/* Chart Card */}
-      <Card
-        className={`relative border border-blue-gray-100 shadow-lg w-full ${
-          isDarkMode ? "bg-black text-white" : "bg-white"
-        }`}
-      >
-        {/* Filter Container */}
-        {filter && (
-          <div className="absolute top-4 flex gap-5 right-8 z-10">
-            {filter}
-          </div>
-        )}
+    <motion.div
+      className="w-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 100,
+        damping: 10
+      }}
+    >
+      {/* Text Content */}
+      <div className="px-6 py-4 bg-opacity-10 backdrop-blur-sm flex flex-row justify-between items-center">
+        <div>
+          <h5 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">
+            {title}
+          </h5>
 
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {description}
+          </p>
+        </div>
+        <div>
+          {/* Filter Container */}
+          {filter && (
+            <motion.div
+              className="flex gap-5"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {filter}
+            </motion.div>
+          )}
+        </div>
+      </div>
+      <Card
+        className={`
+          relative 
+          rounded-xl 
+          overflow-hidden 
+          shadow-lg 
+          transition-all 
+          duration-300 
+          hover:shadow-2xl
+        `}
+      >
         {/* Chart Container */}
         <div
-          className="chart-container mx-auto a"
+          className="chart-container mx-auto transition-transform duration-300"
           style={{
-            width: "90%",
-            height: "250px",
-            marginTop: "10px",
+            width: "100%",
+            height: chart.height || "250px",
             borderRadius: "15px",
             overflow: "hidden",
             position: "relative",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
           }}
         >
           <Chart {...chart} />
         </div>
 
-        {/* Text Content */}
-        <div className="border px-6 pt-2 min-h-24">
-          <div variant="h5" color="blue-gray" className="font-semibold">
-            {title}
-          </div>
 
-          <Typography variant="small" className="font-normal text-blue-gray-600 mb-4">
-            {description}
-          </Typography>
-        </div>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 

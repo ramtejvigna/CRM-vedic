@@ -1,16 +1,54 @@
-import React from 'react'
-import DailyPdfsGenerated from './PdfsGenerated'
-import ExpensesReport from './ExpensesReport'
-import RevenueReport from './RevenueReport'
+import React from 'react';
+import { motion } from 'framer-motion';
+import DailyPdfsGenerated from './PdfsGenerated';
+import ExpensesReport from './ExpensesReport';
+import RevenueReport from './RevenueReport';
 
 function Reports() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.2,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        damping: 12,
+        stiffness: 100
+      }
+    }
+  };
+
   return (
-    <div className='my-10 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 lg:grid-cols-3'>
-        <DailyPdfsGenerated/>
-        <ExpensesReport/>
-        <RevenueReport/>
-    </div>
-  )
+    <motion.div 
+      className='flex flex-col gap-10'
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={itemVariants} className="w-full">
+        <DailyPdfsGenerated />
+      </motion.div>
+      
+      <motion.div variants={itemVariants} className="w-full">
+        <ExpensesReport />
+      </motion.div>
+      
+      <motion.div variants={itemVariants} className="w-full">
+        <RevenueReport />
+      </motion.div>
+    </motion.div>
+  );
 }
 
-export default Reports
+export default Reports;

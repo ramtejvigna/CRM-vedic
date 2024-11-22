@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { chartsConfig } from "../../../configs";
 import { StatisticsChart } from "../../charts";
 import axios from "axios";
@@ -6,35 +7,71 @@ import { HOST } from "../../../utils/constants.js";
 
 function RevenueReport() {
   const [chartData, setChartData] = useState({
-    type: "line", // Changed to line chart
-    height: 250,
+    type: "bar", 
+    height: 400,
     series: [],
     options: {
       ...chartsConfig,
       chart: {
-        background: "#9990FF",
-        toolbar: {
-          show: false,
+        background: "#C9E6F0",
+        toolbar: { show: false },
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 800,
+          animateGradually: {
+            enabled: true,
+            delay: 150
+          }
+        }
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          dataLabels: {
+            position: 'top'
+          }
         },
       },
-      labels: [],
       legend: {
         position: "bottom",
-        labels: {
-          colors: "#FFFFFF",
-        },
+        labels: { colors: "#FFFFFF" },
+        itemMargin: {
+          horizontal: 10,
+          vertical: 5
+        }
       },
       dataLabels: {
         enabled: true,
-        style: {
+        offsetY: -20,
+        style: { 
           colors: ["#FFFFFF"],
-        },
+          fontSize: '12px',
+          fontWeight: 'bold'
+        }
       },
-      tooltip: {
+      tooltip: { 
         theme: "dark",
+        fillSeriesColor: true,
+        style: {
+          fontSize: '12px',
+          fontFamily: undefined
+        }
       },
-      xaxis: {
+      xaxis: { 
         categories: [],
+        tickPlacement: 'between',
+        crosshairs: {
+          show: true,
+          width: 1,
+          position: 'back',
+          opacity: 0.9,
+          stroke: {
+            color: '#b6b6b6',
+            width: 1,
+            dashArray: 3
+          }
+        }
       },
     },
   });
@@ -72,9 +109,9 @@ function RevenueReport() {
         );
 
         if (res.status === 200) {
-          console.log(res.data);
           const categories = res.data.data.map((d) => d.label); 
           const revenueData = res.data.data.map((d) => d.totalRevenue); 
+          
           setChartData((prev) => ({
             ...prev,
             series: [
@@ -98,6 +135,8 @@ function RevenueReport() {
 
     fetchRevenueData();
   }, [timeRange, employeeFilter]);
+
+
   const handleTimeRangeChange = (e) => {
     setTimeRange(e.target.value);
   };
@@ -110,7 +149,7 @@ function RevenueReport() {
     <select
       value={timeRange}
       onChange={handleTimeRangeChange}
-      className="border cursor-pointer border-gray-300 rounded-md px-2 py-1 text-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      className="border cursor-pointer border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
     >
       <option value="monthly">Monthly</option>
       <option value="yearly">Yearly</option>
@@ -122,7 +161,7 @@ function RevenueReport() {
     <select
       value={employeeFilter}
       onChange={handleEmployeeChange}
-      className="border cursor-pointer text-black rounded-md px-2 py-1 text-xs bg-white  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      className="border cursor-pointer text-black rounded-md px-2 py-1 bg-white  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
     >
       <option value="overall">Overall</option>
       {employees.map((employee) => (
@@ -134,32 +173,68 @@ function RevenueReport() {
   );
 
   return (
-    <StatisticsChart
-      filter={(
-        <>
-          {timeRangeFilter}
-          {employeeFilterComponent}
-        </>
-      )}
-      title="Revenue Report"
-      color="blue"
-      chart={chartData}
-      description={`Revenue for the selected time range and employee (${
-        timeRange === "this"
-          ? new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-              new Date()
-            )
-          : timeRange === "last"
-          ? new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-              new Date(new Date().setMonth(new Date().getMonth() - 1))
-            )
-          : timeRange === "yearly"
-          ? new Intl.DateTimeFormat("en-US", { year: "numeric" }).format(
-              new Date()
-            )
-          : "This Week"
-      })`}
-    />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-4 bg-white rounded-lg shadow-md"
+    >
+      <StatisticsChart
+        filter={(
+          <motion.div 
+            className="flex space-x-4 mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <select
+                value={timeRange}
+                onChange={handleTimeRangeChange}
+                className="border cursor-pointer border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="weekly">Weekly</option>
+              </select>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <select
+                value={employeeFilter}
+                onChange={handleEmployeeChange}
+                className="border cursor-pointer text-black rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="overall">Overall</option>
+                <AnimatePresence>
+                  {employees.map((employee) => (
+                    <motion.option 
+                      key={employee._id} 
+                      value={employee._id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {employee.firstName}
+                    </motion.option>
+                  ))}
+                </AnimatePresence>
+              </select>
+            </motion.div>
+          </motion.div>
+        )}
+        title="Revenue Report"
+        color="blue"
+        chart={chartData}
+        description={`Revenue for the selected time range and employee`}
+      />
+    </motion.div>
   );
 }
 
