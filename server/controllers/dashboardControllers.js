@@ -21,8 +21,8 @@ export const getStatistics = async (req, res) => {
                             $convert: {
                                 input: "$amountPaid",
                                 to: "double",
-                                onError: 0,    // Fallback to 0 if parsing fails
-                                onNull: 0      // Fallback to 0 if null
+                                onError: 0,    
+                                onNull: 0      
                             }
                         }
                     }
@@ -83,16 +83,21 @@ export const getCardsData = async (req, res) => {
             assignedEmployee: employee._id,
             createdDateTime: { $gte: today, $lt: tomorrow }
         });
+
+        
         const yesterdayCustomersCount = await Customer.countDocuments({
             assignedEmployee: employee._id,
             createdDateTime: { $gte: new Date(today.getTime() - 86400000), $lt: today }
         });
+
         const customerChangePercent = yesterdayCustomersCount ? ((todayCustomersCount - yesterdayCustomersCount) / yesterdayCustomersCount * 100).toFixed(2) : 0;
 
         const todayPdfsGenerated = await PDF.countDocuments({
             createdAt: { $gte: today, $lt: tomorrow },
             _id: { $in: employee.customers.map(c => c.pdfGenerated).flat() }
         });
+
+
         const yesterdayPdfsGenerated = await PDF.countDocuments({
             createdAt: { $gte: new Date(today.getTime() - 86400000), $lt: today },
             _id: { $in: employee.customers.map(c => c.pdfGenerated).flat() }

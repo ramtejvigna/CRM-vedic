@@ -1,10 +1,12 @@
 import React from 'react'
-import DailyPdfsGenerated from './DailyPdfsGenerated'
+import DailyPdfsGenerated from './PdfsGenerated'
+import ExpensesReport from './ExpensesReport'
 
 function Reports() {
   return (
-    <div className='mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3'>
+    <div className='my-10 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 lg:grid-cols-3'>
         <DailyPdfsGenerated/>
+        <ExpensesReport/>
     </div>
   )
 }

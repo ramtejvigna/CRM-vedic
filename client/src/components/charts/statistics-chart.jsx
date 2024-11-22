@@ -2,39 +2,52 @@ import { Card, CardBody, Typography } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
 import { useStore } from "../../store";
-export function StatisticsChart({ color, chart, title, description, footer }) {
-  const {isDarkMode} = useStore()
+
+export function StatisticsChart({ color, chart, title, description, footer, filter }) {
+  const { isDarkMode } = useStore();
 
   return (
-    <Card className={`relative border border-blue-gray-100 shadow-lg ${isDarkMode ? 'bg-black text-white': 'bg-white'}`}>
-      {/* Chart Container */}
-      <div
-        className="chart-container"
-        style={{
-          width: '90%', // Smaller width for spacing on the sides
-          height: '220px', // Height of the chart
-          position: 'absolute', // Float above the card
-          top: '-1cm', // Adjusted this value to stretch further back
-          left: '50%', // Center horizontally
-          transform: 'translateX(-50%)', // Center alignment correction
-          borderRadius: '15px', // Rounded corners for the chart
-          overflow: 'hidden', // Ensure the content inside respects the rounded corners
-        }}
+    <div className="relative flex flex-col items-center w-full">
+      {/* Chart Card */}
+      <Card
+        className={`relative border border-blue-gray-100 shadow-lg w-full ${
+          isDarkMode ? "bg-black text-white" : "bg-white"
+        }`}
       >
-        <Chart {...chart} />
-      </div>
+        {/* Filter Container */}
+        {filter && (
+          <div className="absolute top-4 right-8 z-10">
+            {filter}
+          </div>
+        )}
 
-      {/* Background Container for Text */}
-      <CardBody className="px-6 pt-48 pb-4 mt-2"> {/* Adjusted padding top (pt) for more space */}
-        <Typography variant="h5" color="blue-gray" className="mb-2"> {/* Space below title for separation */}
-          {title}
-        </Typography>
+        {/* Chart Container */}
+        <div
+          className="chart-container mx-auto a"
+          style={{
+            width: "90%",
+            height: "250px",
+            marginTop: "10px",
+            borderRadius: "15px",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <Chart {...chart} />
+        </div>
 
-        <Typography variant="small" className="font-normal text-blue-gray-600 mb-4"> {/* Added margin bottom for spacing */}
-          {description}
-        </Typography>
-      </CardBody>
-    </Card>
+        {/* Text Content */}
+        <div className="border px-6 pt-2 min-h-24">
+          <div variant="h5" color="blue-gray" className="font-semibold">
+            {title}
+          </div>
+
+          <Typography variant="small" className="font-normal text-blue-gray-600 mb-4">
+            {description}
+          </Typography>
+        </div>
+      </Card>
+    </div>
   );
 }
 
@@ -70,6 +83,7 @@ StatisticsChart.propTypes = {
   title: PropTypes.node.isRequired,
   description: PropTypes.node.isRequired,
   footer: PropTypes.node,
+  filter: PropTypes.node, // Added prop type for the filter
 };
 
 StatisticsChart.displayName = "/src/widgets/charts/statistics-chart.jsx";
