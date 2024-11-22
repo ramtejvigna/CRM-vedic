@@ -16,7 +16,7 @@ export function StatisticsChart({ color, chart, title, description, footer, filt
       >
         {/* Filter Container */}
         {filter && (
-          <div className="absolute top-4 right-8 z-10">
+          <div className="absolute top-4 flex gap-5 right-8 z-10">
             {filter}
           </div>
         )}

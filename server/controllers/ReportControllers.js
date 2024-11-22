@@ -1,5 +1,6 @@
 import {PDF as Pdfs} from '../models/PDF.js'
 import Expenses from "../models/Expenses.js"
+import { Customer } from '../models/User.js';
 export const getPdfsGenByEmployee = async (req , res) => {
     try {
         const { range } = req.query;
@@ -133,6 +134,78 @@ export const getExpensesByMonth = async (req, res) => {
       return res.status(200).json(result);
     } catch (error) {
       console.log(error.message);
+      res.status(500).json({ message: "Internal server error." });
+    }
+  };
+  
+
+  export const getRevenueData = async (req, res) => {
+    try {
+      const { timeRange, employeeFilter } = req.query;
+  
+      // Determine the date range based on the timeRange filter
+      const now = new Date();
+      let startDate, endDate, groupByField;
+  
+      if (timeRange === "yearly") {
+        startDate = new Date(now.getFullYear() - 4, 0, 1); // 4 years back
+        endDate = new Date(now.getFullYear() + 1, 0, 0, 23, 59, 59, 999);
+        groupByField = { $year: "$createdDateTime" };
+      } else if (timeRange === "monthly") {
+        startDate = new Date(now.getFullYear(), 0, 1); // Start of the current year
+        endDate = new Date(now.getFullYear() + 1, 0, 0, 23, 59, 59, 999);
+        groupByField = { $month: "$createdDateTime" };
+      } else if (timeRange === "weekly") {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1); // Start of the current month
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        groupByField = {
+          $week: "$createdDateTime",
+        }; // MongoDB's week-based grouping
+      } else {
+        return res.status(400).json({ message: "Invalid time range specified." });
+      }
+  
+      // Match criteria based on employee filter and payment status
+      const matchCriteria = {
+        createdDateTime: { $gte: startDate, $lte: endDate },
+        paymentStatus: true, // Only include paid customers
+        ...(employeeFilter !== "overall" && { assignedEmployee: employeeFilter }),
+      };
+  
+      const result = await Customer.aggregate([
+        { $match: matchCriteria },
+        {
+          $group: {
+            _id: groupByField,
+            totalRevenue: { $sum: { $toDouble: "$amountPaid" } },
+            customerCount: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } }, 
+      ]);
+  
+
+      const formattedResult = result.map((data) => {
+        let label;
+  
+        if (timeRange === "yearly") {
+          label = `Year ${data._id}`;
+        } else if (timeRange === "monthly") {
+          label = `Month ${data._id}`;
+        } else if (timeRange === "weekly") {
+          label = `Week ${data._id}`;
+        }
+  
+        return {
+          label,
+          totalRevenue: data.totalRevenue,
+          customerCount: data.customerCount,
+        };
+      });
+  
+      res.status(200).json({ data: formattedResult });
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: "Internal server error." });
     }
   };

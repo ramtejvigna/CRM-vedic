@@ -12,7 +12,7 @@ function ExpensesReport() {
         options: {
             ...chartsConfig,  
           chart: {
-            background: "#9990FF", 
+            background: "#A8D5BA", 
             toolbar: {
               show: false, 
             },
