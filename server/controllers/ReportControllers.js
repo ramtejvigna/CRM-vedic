@@ -2,6 +2,7 @@ import { PDF as Pdfs } from '../models/PDF.js'
 import Expenses from "../models/Expenses.js"
 import { Customer } from '../models/User.js';
 import Expense from '../models/Expenses.js';
+import { Employee } from '../models/User.js';
 
 export const getPdfsGenByEmployee = async (req, res) => {
   try {
@@ -9,7 +10,7 @@ export const getPdfsGenByEmployee = async (req, res) => {
     const date1 = new Date();
     const date2 = new Date();
 
-    // Date range calculation remains the same as previous implementation
+    // Set date range based on the query parameter
     if (range === "today") {
       date1.setHours(0, 0, 0, 0);
       date2.setHours(23, 59, 59, 999);
@@ -29,50 +30,113 @@ export const getPdfsGenByEmployee = async (req, res) => {
       return res.status(400).json({ message: "Invalid range. Use 'today', 'week', or 'month'." });
     }
 
-    const results = await Pdfs.aggregate([
+    // Fetch all employees to ensure they are included even if no PDFs are generated
+    const allEmployees = await Employee.find({}, { firstName: 1, role: 1 }).lean();
+
+    // Aggregate PDF data for employees
+    const employeeResults = await Pdfs.aggregate([
       {
-        $match: { createdAt: { $gte: date1, $lte: date2 } }
+        $match: { createdAt: { $gte: date1, $lte: date2 } },
       },
       {
         $group: {
-          _id: "$generatedBy",
-          count: { $sum: 1 }
-        }
+          _id: "$EmployeeGenerated",
+          count: { $sum: 1 },
+        },
       },
       {
         $lookup: {
           from: "employees",
           localField: "_id",
-          foreignField: "firstName",
-          as: "employee"
-        }
+          foreignField: "_id",
+          as: "employee",
+        },
       },
       {
         $unwind: {
           path: "$employee",
-          preserveNullAndEmptyArrays: true
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
-          employeeName: {
-            $ifNull: [
-              { $concat: ["$employee.firstName", " ", "$employee.lastName"] },
-              null
-            ]
-          },
-          count: 1
-        }
-      }
+          name:{ $ifNull: ["$employee.firstName", null] },
+          role: "$employee.role",
+          count: 1,
+        },
+      },
     ]);
 
-    const filteredData = results.filter((data) => data.employeeName);
-    return res.status(200).json(filteredData);
+    console.log("Employee Results: ", employeeResults);
+
+    // Aggregate PDF data for admins
+    const adminResults = await Pdfs.aggregate([
+      {
+        $match: { createdAt: { $gte: date1, $lte: date2 } },
+      },
+      {
+        $group: {
+          _id: "$EmployeeGenerated",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "admins",
+          localField: "_id",
+          foreignField: "_id",
+          as: "admin",
+        },
+      },
+      {
+        $unwind: {
+          path: "$admin",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          name: { $ifNull: ["$admin.email", null] },
+          role: { $literal: "Admin" },
+          count: 1,
+        },
+      },
+    ]);
+
+    console.log("Admin Results: ", adminResults);
+
+    // Create a map for employee PDF counts
+    const employeePdfCounts = employeeResults.reduce((acc, data) => {
+      if (data.name) acc[data.name] = data.count;
+      return acc;
+    }, {});
+
+    // Combine all employees with PDF counts
+    const formattedEmployeeData = allEmployees.map((employee) => ({
+      name: employee.firstName,
+      role: employee.role,
+      count: employeePdfCounts[employee.firstName] || 0,
+    }));
+
+    // Format admin data
+    const formattedAdminData = adminResults
+      .filter((data) => data.name)
+      .map((data) => ({
+        name: "Admin",
+        role: data.role,
+        count: data.count,
+      }));
+
+
+    const combinedData = [...formattedEmployeeData, ...formattedAdminData];
+
+    return res.status(200).json(combinedData);
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
 
 export const getExpensesByMonth = async (req, res) => {
   try {
