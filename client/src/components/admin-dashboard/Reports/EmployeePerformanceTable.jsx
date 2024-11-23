@@ -13,14 +13,13 @@ const EmployeePerformanceTable = () => {
     const [showFromCalendar, setShowFromCalendar] = useState(false);
     const [showToCalendar, setShowToCalendar] = useState(false);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [error, setError] = useState(null);
 
-    // Define column configuration
+    // Updated columns to focus on PDF generation and role
     const columns = [
         { header: 'Employee Name', key: 'employeeName' },
-        { header: 'PDFs Generated', key: 'pdfsGenerated' },
-        { header: 'Expenses', key: 'expenses' },
-        { header: 'Revenue Generated', key: 'revenue' },
-        { header: 'Net Profit', key: 'netProfit', calculated: true }
+        { header: 'Role', key: 'role' },
+        { header: 'PDFs Generated', key: 'count' }
     ];
 
     useEffect(() => {
@@ -30,6 +29,7 @@ const EmployeePerformanceTable = () => {
     const fetchEmployeeData = async () => {
         try {
             setIsLoading(true);
+            setError(null);
             const queryParams = new URLSearchParams();
 
             if (fromDate) {
@@ -39,43 +39,48 @@ const EmployeePerformanceTable = () => {
                 queryParams.append('toDate', toDate.toISOString());
             }
 
-            const [pdfsRes, expensesRes, revenueRes] = await Promise.all([
-                fetch(`http://localhost:8000/api/reports/api/pdfs/generated-by-employee?${queryParams}`),
-                fetch(`http://localhost:8000/api/reports/api/expenses/by-employee?${queryParams}`),
-                fetch(`http://localhost:8000/api/reports/api/revenue/by-employee?${queryParams}`)
-            ]);
+            const response = await fetch(
+                `http://localhost:8000/api/reports/api/pdfs/generated-by-employee?${queryParams}`
+            );
 
-            const [pdfsData, expensesData, revenueData] = await Promise.all([
-                pdfsRes.json(),
-                expensesRes.json(),
-                revenueRes.json()
-            ]);
+            if (!response.ok) {
+                throw new Error('Failed to fetch employee data');
+            }
 
-            const combinedData = pdfsData.map(employee => ({
-                employeeName: employee.employeeName,
-                pdfsGenerated: employee.count,
-                expenses: expensesData.find(e => e.employeeName === employee.employeeName)?.totalAmount || 0,
-                revenue: revenueData.find(e => e.employeeName === employee.employeeName)?.totalRevenue || 0
-            }));
+            const data = await response.json();
 
-            setEmployeeData(combinedData);
+            // Ensure data is an array before setting state
+            if (Array.isArray(data)) {
+                setEmployeeData(data);
+            } else if (data && typeof data === 'object') {
+                // If data is an object, convert it to array
+                setEmployeeData(Object.values(data));
+            } else {
+                // If neither array nor object, set empty array
+                setEmployeeData([]);
+            }
         } catch (error) {
             console.error('Error fetching employee data:', error);
+            setError('Failed to load employee data');
+            setEmployeeData([]);
         } finally {
             setIsLoading(false);
         }
     };
 
     const exportToCSV = () => {
+        if (!Array.isArray(employeeData) || employeeData.length === 0) {
+            return;
+        }
+
         const headers = columns.map(col => col.header);
         const csvContent = [
             headers.join(','),
             ...employeeData.map(employee => [
-                employee.employeeName,
-                employee.pdfsGenerated,
-                employee.expenses,
-                employee.revenue,
-                employee.revenue - employee.expenses
+                employee.employeeName || '',
+                employee.role || '',
+                employee.count || 0,
+                employee.email || ''
             ].join(','))
         ].join('\n');
 
@@ -83,7 +88,7 @@ const EmployeePerformanceTable = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `employee-performance-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+        a.download = `pdf-generation-stats-${format(new Date(), 'yyyy-MM-dd')}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -91,6 +96,10 @@ const EmployeePerformanceTable = () => {
     };
 
     const handleSort = (key) => {
+        if (!Array.isArray(employeeData)) {
+            return;
+        }
+
         let direction = 'ascending';
         if (sortConfig.key === key && sortConfig.direction === 'ascending') {
             direction = 'descending';
@@ -98,9 +107,9 @@ const EmployeePerformanceTable = () => {
         setSortConfig({ key, direction });
 
         const sortedData = [...employeeData].sort((a, b) => {
-            let aValue = key === 'netProfit' ? a.revenue - a.expenses : a[key];
-            let bValue = key === 'netProfit' ? b.revenue - b.expenses : b[key];
-            
+            const aValue = a[key] || '';
+            const bValue = b[key] || '';
+
             if (direction === 'ascending') {
                 return aValue > bValue ? 1 : -1;
             }
@@ -109,45 +118,74 @@ const EmployeePerformanceTable = () => {
         setEmployeeData(sortedData);
     };
 
-    const containerVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.5 }
-        },
-        exit: {
-            opacity: 0,
-            y: -20,
-            transition: { duration: 0.3 }
+    const renderTableContent = () => {
+        if (isLoading) {
+            return (
+                <tr>
+                    <td colSpan="4" className="px-6 py-8 text-center">
+                        <div className="flex justify-center items-center">
+                            <motion.div
+                                className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent"
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                        </div>
+                    </td>
+                </tr>
+            );
         }
-    };
 
-    const tableRowVariants = {
-        hidden: { opacity: 0, x: -20 },
-        visible: {
-            opacity: 1,
-            x: 0,
-            transition: { duration: 0.3 }
+        if (error) {
+            return (
+                <tr>
+                    <td colSpan="4" className="px-6 py-8 text-center text-red-500">
+                        {error}
+                    </td>
+                </tr>
+            );
         }
+
+        if (!Array.isArray(employeeData) || employeeData.length === 0) {
+            return (
+                <tr>
+                    <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
+                        No data available
+                    </td>
+                </tr>
+            );
+        }
+
+        return employeeData.map((employee, index) => (
+            <motion.tr
+                key={index}
+                className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+            >
+                <td className="px-6 py-4 font-medium text-gray-800">
+                    {employee.employeeName || 'N/A'}
+                </td>
+                <td className="px-6 py-4 capitalize">
+                    {employee.role || 'N/A'}
+                </td>
+                <td className="px-6 py-4">
+                    {employee.count || 0}
+                </td>
+            </motion.tr>
+        ));
     };
 
     return (
         <motion.div
             className="w-full bg-white rounded-lg shadow-lg p-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
         >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                <motion.h2
-                    className="text-2xl font-bold text-gray-800 mb-4 md:mb-0"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                    Employee Performance Summary
+                <motion.h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">
+                    PDF Generation Summary
                 </motion.h2>
 
                 <div className="flex flex-col md:flex-row gap-4">
@@ -170,7 +208,6 @@ const EmployeePerformanceTable = () => {
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.2 }}
                                     >
                                         <Calendar
                                             onChange={(date) => {
@@ -203,7 +240,6 @@ const EmployeePerformanceTable = () => {
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.2 }}
                                     >
                                         <Calendar
                                             onChange={(date) => {
@@ -224,10 +260,26 @@ const EmployeePerformanceTable = () => {
                         onClick={exportToCSV}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
+                        disabled={!Array.isArray(employeeData) || employeeData.length === 0}
                     >
                         <Download className="w-4 h-4" />
                         Export CSV
                     </motion.button>
+                    {(fromDate || toDate) && (
+                        <motion.button
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg flex items-center gap-2 hover:bg-gray-700 transition-colors"
+                            onClick={() => {
+                                setFromDate(null);
+                                setToDate(null);
+                                setShowToCalendar(false);
+                                setShowFromCalendar(false);
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            Clear Filters
+                        </motion.button>
+                    )}
                 </div>
             </div>
 
@@ -240,7 +292,6 @@ const EmployeePerformanceTable = () => {
                                     key={column.header}
                                     className="px-6 py-4 font-semibold text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors"
                                     onClick={() => handleSort(column.key)}
-                                    whileHover={{ backgroundColor: '#f3f4f6' }}
                                 >
                                     <div className="flex items-center gap-2">
                                         {column.header}
@@ -259,54 +310,7 @@ const EmployeePerformanceTable = () => {
                     </thead>
                     <tbody>
                         <AnimatePresence>
-                            {isLoading ? (
-                                <motion.tr
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                >
-                                    <td colSpan="5" className="px-6 py-8 text-center">
-                                        <div className="flex justify-center items-center">
-                                            <motion.div
-                                                className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent"
-                                                animate={{ rotate: 360 }}
-                                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                            />
-                                        </div>
-                                    </td>
-                                </motion.tr>
-                            ) : employeeData.length === 0 ? (
-                                <motion.tr
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                >
-                                    <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                                        No data available
-                                    </td>
-                                </motion.tr>
-                            ) : (
-                                employeeData.map((employee, index) => (
-                                    <motion.tr
-                                        key={index}
-                                        className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                                        variants={tableRowVariants}
-                                        initial="hidden"
-                                        animate="visible"
-                                        transition={{ delay: index * 0.1 }}
-                                    >
-                                        <td className="px-6 py-4 font-medium text-gray-800">{employee.firstName}</td>
-                                        <td className="px-6 py-4">{employee.pdfsGenerated}</td>
-                                        <td className="px-6 py-4">₹{employee.expenses.toLocaleString()}</td>
-                                        <td className="px-6 py-4">₹{employee.revenue.toLocaleString()}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`${employee.revenue - employee.expenses >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                ₹{(employee.revenue - employee.expenses).toLocaleString()}
-                                            </span>
-                                        </td>
-                                    </motion.tr>
-                                ))
-                            )}
+                            {renderTableContent()}
                         </AnimatePresence>
                     </tbody>
                 </table>

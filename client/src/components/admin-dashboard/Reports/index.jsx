@@ -31,20 +31,22 @@ function Reports() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className='flex flex-col gap-10'
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      <motion.div variants={itemVariants} className="w-full">
-        <DailyPdfsGenerated />
-      </motion.div>
-      
-      <motion.div variants={itemVariants} className="w-full">
-        <ExpensesReport />
-      </motion.div>
-      
+      <div className='grid grid-cols-2 gap-10'>
+        <motion.div variants={itemVariants} className="w-full">
+          <DailyPdfsGenerated />
+        </motion.div>
+
+        <motion.div variants={itemVariants} className="w-full">
+          <ExpensesReport />
+        </motion.div>
+      </div>
+
       <motion.div variants={itemVariants} className="w-full">
         <RevenueReport />
       </motion.div>
