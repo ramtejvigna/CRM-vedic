@@ -84,7 +84,8 @@ export const login = async (req , res) => {
             admin : {
                 ...admin._doc ,
                 password : undefined
-            }
+            },
+            userId : admin._id
         })
     } catch (error) {
         console.log("Errorin login admin" , error.message)

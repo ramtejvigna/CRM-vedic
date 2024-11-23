@@ -1,8 +1,7 @@
 import { PDF as Pdfs } from '../models/PDF.js'
 import Expenses from "../models/Expenses.js"
 import { Customer } from '../models/User.js';
-
-
+import Expense from '../models/Expenses.js';
 
 export const getPdfsGenByEmployee = async (req, res) => {
   try {
@@ -248,3 +247,193 @@ export const getRevenueData = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+const parseDateParams = (fromDate, toDate) => {
+  const query = {};
+  if (fromDate) {
+    query.createdAt = { $gte: new Date(fromDate) };
+  }
+  if (toDate) {
+    query.createdAt = { ...query.createdAt, $lte: new Date(toDate) };
+  }
+  return query;
+};
+
+export const pdfGeneratedByEmployee = async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.query;
+    const dateQuery = parseDateParams(fromDate, toDate); // Helper to handle date range filtering
+
+    const pdfStats = await Pdfs.aggregate([
+      // Match PDFs within the date range
+      { $match: dateQuery },
+      // Group by EmployeeGenerated and count the PDFs
+      {
+        $group: {
+          _id: '$EmployeeGenerated',
+          count: { $sum: 1 },
+        },
+      },
+      // Lookup employee details from the Employee collection
+      {
+        $lookup: {
+          from: 'employees',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'employeeDetails',
+        },
+      },
+      // Format the response to include necessary employee details
+      {
+        $project: {
+          employeeId: '$_id',
+          count: 1,
+          employeeDetails: {
+            $arrayElemAt: ['$employeeDetails', 0],
+          },
+        },
+      },
+      // Include formatted employee details in the response
+      {
+        $project: {
+          count: 1,
+          employeeName: {
+            $concat: [
+              '$employeeDetails.firstName',
+              ' ',
+              '$employeeDetails.lastName',
+            ],
+          },
+          email: '$employeeDetails.email',
+          phone: '$employeeDetails.phone',
+          city: '$employeeDetails.city',
+          role: '$employeeDetails.role',
+        },
+      },
+    ]);
+
+    res.status(200).json(pdfStats);
+  } catch (error) {
+    console.error('Error fetching PDF statistics:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+export const expensesEmployee = async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.query;
+    const dateQuery = parseDateParams(fromDate, toDate);
+
+    // First get all customers with their assigned employees
+    const customerData = await Customer.find(dateQuery)
+      .populate('assignedEmployee', 'firstName lastName')
+      .select('assignedEmployee amountPaid');
+
+    // Group expenses by employee
+    const expensesByEmployee = {};
+    customerData.forEach(customer => {
+      if (customer.assignedEmployee) {
+        const employeeName = `${customer.assignedEmployee.firstName} ${customer.assignedEmployee.lastName}`;
+        if (!expensesByEmployee[employeeName]) {
+          expensesByEmployee[employeeName] = 0;
+        }
+        // Add any associated expenses
+        if (customer.amountPaid) {
+          expensesByEmployee[employeeName] += parseFloat(customer.amountPaid) * 0.3; // Assuming 30% of revenue goes to expenses
+        }
+      }
+    });
+
+    // Get additional expenses from expense collection
+    const additionalExpenses = await Expense.aggregate([
+      { $match: dateQuery },
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'employeeId',
+          foreignField: '_id',
+          as: 'employee'
+        }
+      },
+      {
+        $group: {
+          _id: {
+            firstName: { $arrayElemAt: ['$employee.firstName', 0] },
+            lastName: { $arrayElemAt: ['$employee.lastName', 0] }
+          },
+          totalAmount: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    // Combine both types of expenses
+    additionalExpenses.forEach(expense => {
+      const employeeName = `${expense._id.firstName} ${expense._id.lastName}`;
+      if (!expensesByEmployee[employeeName]) {
+        expensesByEmployee[employeeName] = 0;
+      }
+      expensesByEmployee[employeeName] += expense.totalAmount;
+    });
+
+    const result = Object.entries(expensesByEmployee).map(([employeeName, totalAmount]) => ({
+      employeeName,
+      totalAmount
+    }));
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching expense data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+export const revenueEmployee = async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.query;
+    const dateQuery = parseDateParams(fromDate, toDate);
+
+    const revenueData = await Customer.aggregate([
+      { $match: dateQuery },
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'assignedEmployee',
+          foreignField: '_id',
+          as: 'employee'
+        }
+      },
+      {
+        $group: {
+          _id: {
+            firstName: { $arrayElemAt: ['$employee.firstName', 0] },
+            lastName: { $arrayElemAt: ['$employee.lastName', 0] }
+          },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $eq: ['$paymentStatus', true] },
+                { $toDouble: '$amountPaid' },
+                0
+              ]
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          employeeName: {
+            $concat: ['$_id.firstName', ' ', '$_id.lastName']
+          },
+          totalRevenue: 1,
+          _id: 0
+        }
+      }
+    ]);
+
+    res.json(revenueData);
+  } catch (error) {
+    console.error('Error fetching revenue data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}

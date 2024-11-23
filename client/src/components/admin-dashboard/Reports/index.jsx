@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import DailyPdfsGenerated from './PdfsGenerated';
 import ExpensesReport from './ExpensesReport';
 import RevenueReport from './RevenueReport';
+import EmployeePerformanceTable from './EmployeePerformanceTable';
 
 function Reports() {
   const containerVariants = {
@@ -46,6 +47,10 @@ function Reports() {
       
       <motion.div variants={itemVariants} className="w-full">
         <RevenueReport />
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="w-full">
+        <EmployeePerformanceTable />
       </motion.div>
     </motion.div>
   );
