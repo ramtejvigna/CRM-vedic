@@ -459,7 +459,7 @@ const handleGeneratePdf = async () => {
 
   try {
       setIsLoading(true);
-      const response = await axios.post("http://localhost:8000/api/create-pdf", {
+      const response = await axios.post("https://vedic-backend-neon.vercel.app/api/create-pdf", {
           names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
           customerId: customerData._id,
           additionalBabyNames: additionalBabyNames,

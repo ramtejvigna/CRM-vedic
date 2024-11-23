@@ -97,10 +97,7 @@ function Salaries() {
         } catch (error) {
           setIsLoading(false);
         }
-    }else {
-      toast.error("Please select year and month")
     }
-
   }
 
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -382,7 +379,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
         
                                     <td className="px-6  py-4 flex gap-3 flex-wrap whitespace-nowrap text-sm font-medium">
                                       <button
-                                        onClick={() =>{ setImage(statement?.bankStatement) , console.log(statement?.bankStatement)}}
+                                        onClick={() =>{ setImage(statement?.bankStatement)}}
                                         className={`mr-4 flex gap-3 items-center justify-center  transition-colors duration-300 ${
                                           isDarkMode
                                             ? "text-green-400 hover:text-green-200"

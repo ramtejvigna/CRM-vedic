@@ -40,7 +40,7 @@ const EmployeePerformanceTable = () => {
             }
 
             const response = await fetch(
-                `http://localhost:8000/api/reports/api/pdfs/generated-by-employee?${queryParams}`
+                `https://vedic-backend-neon.vercel.app/api/reports/api/pdfs/generated-by-employee?${queryParams}`
             );
 
             if (!response.ok) {
