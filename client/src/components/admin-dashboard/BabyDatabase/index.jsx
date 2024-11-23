@@ -646,7 +646,6 @@ const BabyDatabase = () => {
                             onClick={(event, done) => {
                                 const utf8Bom = '\ufeff'; // UTF-8 BOM
                                 const csvContent = utf8Bom + csvData.map(row => row.join(",")).join("\n");
-                                console.log(csv)
                                 const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
                                 const url = URL.createObjectURL(blob);
                                 const link = document.createElement("a");
