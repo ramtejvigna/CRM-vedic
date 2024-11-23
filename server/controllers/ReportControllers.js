@@ -1,8 +1,7 @@
 import { PDF as Pdfs } from '../models/PDF.js'
 import Expenses from "../models/Expenses.js"
-import { Customer } from '../models/User.js';
+import { Customer, Employee } from '../models/User.js';
 import Expense from '../models/Expenses.js';
-import { Employee } from '../models/User.js';
 
 export const getPdfsGenByEmployee = async (req, res) => {
   try {

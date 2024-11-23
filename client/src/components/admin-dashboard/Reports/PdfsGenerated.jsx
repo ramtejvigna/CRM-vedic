@@ -95,11 +95,21 @@ const DailyPdfsGenerated = () => {
             <XAxis dataKey="name" interval={0} angle={-45} textAnchor="end" height={100} />
             <YAxis />
             <Tooltip
-              cursor={{ fill: "rgba(0,0,0,0.01)" }}
+              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
               contentStyle={{
-                background: "#333",
-                color: "white",
-                borderRadius: "10px",
+                background: '#1E293B', // Dark blue-gray background
+                color: 'white',        // White text color
+                borderRadius: '8px',   // Rounded corners
+                boxShadow: '0 4px 8px rgba(0,0,0,0.2)', // Subtle shadow for depth
+                border: 'none',        // Remove border
+              }}
+              itemStyle={{
+                color: '#4CAF50', // Golden text for data labels
+                fontWeight: 'bold', // Bold text
+              }}
+              labelStyle={{
+                color: '#E2E8F0', // Light gray text for the label
+                fontWeight: '600', // Slightly bold text
               }}
             />
 
