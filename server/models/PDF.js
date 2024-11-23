@@ -26,7 +26,15 @@ const PdfSchema = new mongoose.Schema({
         }
     ],
     generatedBy:{type:String,required:true},
-    EmployeeGenerated: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+    EmployeeGenerated: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'EmployeeGeneratedModel' // Dynamic reference based on the value of EmployeeGeneratedModel
+    },
+    EmployeeGeneratedModel: {
+        type: String,
+        required: true,
+        enum: ['Employee', 'Admin']
+    },
     rating: { type: Number, min: 0, max: 5, default: 0 }, 
 });
 

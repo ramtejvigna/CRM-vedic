@@ -16,14 +16,14 @@ const DailyPdfsGenerated = () => {
     '#4CAF50',   // Vibrant Green
     '#FF6B6B',   // Soft Red
     '#4ECDC4',   // Teal
-    '#556270'    // Dark Slate Gray
+    '#D4EBF8'
   ];
 
   useEffect(() => {
     const fetchEmployeesAndPdfData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch all employees first
         const employeesRes = await axios.get(`${HOST}/api/employees`, {
           withCredentials: true,
@@ -64,7 +64,7 @@ const DailyPdfsGenerated = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -75,7 +75,7 @@ const DailyPdfsGenerated = () => {
           <FileText className="text-indigo-600" />
           <h2 className="text-2xl font-bold text-gray-800">PDFs Generated</h2>
         </div>
-        
+
         <motion.select
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -90,7 +90,7 @@ const DailyPdfsGenerated = () => {
       </div>
 
       {loading ? (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="flex justify-center items-center h-64"
@@ -101,22 +101,33 @@ const DailyPdfsGenerated = () => {
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-            <XAxis 
-              dataKey="name" 
-              interval={0} 
-              angle={-45} 
-              textAnchor="end" 
-              height={100} 
+            <XAxis
+              dataKey="name"
+              interval={0}
+              angle={-45}
+              textAnchor="end"
+              height={100}
             />
             <YAxis />
-            <Tooltip 
-              cursor={{ fill: 'rgba(0,0,0,0.01)' }}
-              contentStyle={{ 
-                background: '#333', 
-                color: 'white', 
-                borderRadius: '10px' 
+            <Tooltip
+              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+              contentStyle={{
+                background: '#1E293B', // Dark blue-gray background
+                color: 'white',        // White text color
+                borderRadius: '8px',   // Rounded corners
+                boxShadow: '0 4px 8px rgba(0,0,0,0.2)', // Subtle shadow for depth
+                border: 'none',        // Remove border
+              }}
+              itemStyle={{
+                color: '#4CAF50', // Golden text for data labels
+                fontWeight: 'bold', // Bold text
+              }}
+              labelStyle={{
+                color: '#E2E8F0', // Light gray text for the label
+                fontWeight: '600', // Slightly bold text
               }}
             />
+
             <Bar dataKey="pdfs" name="PDFs">
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />

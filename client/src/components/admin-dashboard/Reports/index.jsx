@@ -32,7 +32,7 @@ function Reports() {
 
   return (
     <motion.div
-      className='flex flex-col gap-10'
+      className='flex flex-col gap-10 mb-20'
       variants={containerVariants}
       initial="hidden"
       animate="visible"
