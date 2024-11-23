@@ -16,10 +16,6 @@ const TaskList = ({
   fetchTasks,
   isDarkMode,
 }) => {
-  const indexOfLastRecord = currentPage * tasksPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstRecord, indexOfLastRecord);
-
   const renderPaginationButtons = () => {
     const buttons = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -33,7 +29,9 @@ const TaskList = ({
           className={`relative inline-flex items-center px-4 py-2 border ${
             isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
           } text-sm font-medium ${
-            currentPage === i ? "text-indigo-600" : "text-gray-500"
+            currentPage === i 
+              ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900" 
+              : "text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700"
           }`}
         >
           {i}
@@ -47,13 +45,14 @@ const TaskList = ({
     <div className="w-full overflow-x-auto">
       {isMobile ? (
         <div className="space-y-4">
-          {currentTasks.map((task) => (
+          {tasks.map((task) => (
             <TaskCard
               key={task._id}
               task={task}
               onView={handleOpenDetailModal}
               onEdit={handleOpenModal}
               onDelete={handleDelete}
+              getStatusColor={getStatusColor}
             />
           ))}
         </div>
@@ -86,7 +85,7 @@ const TaskList = ({
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             <AnimatePresence>
-              {currentTasks.map((task, index) => (
+              {tasks.map((task, index) => (
                 <motion.tr
                   key={task._id}
                   initial={{ opacity: 0 }}
@@ -95,7 +94,7 @@ const TaskList = ({
                   className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {indexOfFirstRecord + index + 1}
+                    {(currentPage - 1) * tasksPerPage + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div
@@ -163,8 +162,9 @@ const TaskList = ({
         <div className="flex-1 flex justify-between sm:hidden">
           <button
             onClick={() => {
-              setCurrentPage((prev) => Math.max(prev - 1, 1));
-              fetchTasks(Math.max(currentPage - 1, 1));
+              const newPage = Math.max(currentPage - 1, 1);
+              setCurrentPage(newPage);
+              fetchTasks(newPage);
             }}
             disabled={currentPage === 1}
             className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
@@ -173,8 +173,9 @@ const TaskList = ({
           </button>
           <button
             onClick={() => {
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-              fetchTasks(Math.min(currentPage + 1, totalPages));
+              const newPage = Math.min(currentPage + 1, totalPages);
+              setCurrentPage(newPage);
+              fetchTasks(newPage);
             }}
             disabled={currentPage === totalPages}
             className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
@@ -185,7 +186,7 @@ const TaskList = ({
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-gray-700 dark:text-gray-400">
-              Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, tasks.length)} of {tasks.length} results
+              Showing {(currentPage - 1) * tasksPerPage + 1} to {Math.min(currentPage * tasksPerPage, tasks.length)} of {tasks.length} results
             </p>
           </div>
           <div>
@@ -195,12 +196,15 @@ const TaskList = ({
             >
               <button
                 onClick={() => {
-                  setCurrentPage((prev) => Math.max(prev - 1, 1));
-                  fetchTasks(Math.max(currentPage - 1, 1));
+                  const newPage = Math.max(currentPage - 1, 1);
+                  setCurrentPage(newPage);
+                  fetchTasks(newPage);
                 }}
                 disabled={currentPage === 1}
                 className={`relative inline-flex items-center px-2 py-2 rounded-l-md border ${
-                  isDarkMode ? "border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700" : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+                  isDarkMode 
+                    ? "border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700" 
+                    : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
                 }`}
               >
                 Previous
@@ -208,12 +212,15 @@ const TaskList = ({
               {renderPaginationButtons()}
               <button
                 onClick={() => {
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-                  fetchTasks(Math.min(currentPage + 1, totalPages));
+                  const newPage = Math.min(currentPage + 1, totalPages);
+                  setCurrentPage(newPage);
+                  fetchTasks(newPage);
                 }}
                 disabled={currentPage === totalPages}
                 className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
-                  isDarkMode ? "border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700" : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+                  isDarkMode 
+                    ? "border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700" 
+                    : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
                 }`}
               >
                 Next
@@ -226,7 +233,8 @@ const TaskList = ({
   );
 };
 
-const TaskCard = ({ task, onView, onEdit, onDelete }) => {
+// Updated TaskCard to include getStatusColor
+const TaskCard = ({ task, onView, onEdit, onDelete, getStatusColor }) => {
   return (
     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
       <div className="px-4 py-5 sm:px-6">
