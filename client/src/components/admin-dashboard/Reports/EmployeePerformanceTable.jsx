@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarIcon, Download, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import Calendar from 'react-calendar';
+import EmptyState from './EmptyState';
 import 'react-calendar/dist/Calendar.css';
 
 const EmployeePerformanceTable = () => {
@@ -80,7 +81,6 @@ const EmployeePerformanceTable = () => {
                 employee.employeeName || '',
                 employee.role || '',
                 employee.count || 0,
-                employee.email || ''
             ].join(','))
         ].join('\n');
 
@@ -148,8 +148,8 @@ const EmployeePerformanceTable = () => {
         if (!Array.isArray(employeeData) || employeeData.length === 0) {
             return (
                 <tr>
-                    <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
-                        No data available
+                    <td colSpan="4" className="px-6 py-8 text-center">
+                        <EmptyState isFiltered={!!(fromDate || toDate)} />
                     </td>
                 </tr>
             );
