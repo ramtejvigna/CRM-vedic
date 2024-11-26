@@ -128,18 +128,27 @@ export const Customers = () => {
   const handleAssignEmployee = async () => {
     if (selectedEmployee && selectedCustomerForAssign) {
       const customerId = selectedCustomerForAssign._id;
-
+  
       try {
         const response = await axios.put(
           `${api}/api/manager/assign/${customerId}/to/${selectedEmployee._id}`,
         );
-
+  
         if (response.status === 200) {
           toast.success("Customer successfully assigned to employee");
           setShowModal(false);
           setActiveTab("assignedTo");
-          setTab("assignedTo")
-          getNewRequests();
+          setTab("assignedTo");
+          // Refresh the customer data after successful assignment
+          getNewRequests(); // Call the function again to refresh the data
+          // Optionally, filter out the assigned customer from the "In Progress" tab data here
+          setCustomerData(prevData => {
+            return {
+              ...prevData,
+              // Assuming the 'inProgress' section is part of the customer data and you want to exclude assigned customers
+              inProgress: prevData.inProgress.filter(customer => customer._id !== customerId),
+            };
+          });
         }
       } catch (error) {
         console.error("Error assigning employee:", error);
@@ -149,7 +158,25 @@ export const Customers = () => {
       toast.error("Please select both an employee and a customer.");
     }
   };
-
+  
+  // Reloading the customer data function
+  const getNewRequests = async () => {
+    try {
+      const response = await axios.get(`${api}/api/manager/newrequests`);
+      setCustomerData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error.message);
+      setLoading(false);
+    }
+  };
+  
+  // Optionally, add a "Refresh" button to manually trigger a reload of data
+  const handleRefreshData = () => {
+    setLoading(true);
+    getNewRequests();
+  };
+  
   const moveCustomer = (customer, fromSection, toSection, details) => {
     const updatedCustomer = { ...customer, additionalDetails: details };
 
