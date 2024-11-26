@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import {CircularProgress} from "@mui/material"
 import {
     Edit,
     FileText,
@@ -53,7 +53,7 @@ const Customer = () => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
   const [selectedPdf, setSelectedPdf]=useState(null);
-
+  const [ mailLoader , setMailLoder] = useState(false);
   const toggleDropdown = (pdfId) => {
     setActiveDropdown(activeDropdown === pdfId ? null : pdfId);
   };
@@ -136,11 +136,15 @@ const Customer = () => {
   useEffect(() => {
     const sendMailAndFetchPdfs = async () => {
       if (mailUrl && pdfId) {
+
         try {
+          setMailLoder(true);
           await handleSendMail(mailUrl, pdfId, customerData.email);
           await fetchPdfs(); // Re-fetch PDFs after sending mail
           toast.success("Email sent successfully");
+          setMailLoder(false);
         } catch (error) {
+          setMailLoder(false);
           console.error("Error sending mail:", error);
           toast.error("Error sending mail");
         }
@@ -517,7 +521,11 @@ const Customer = () => {
         }}
         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
     >
-        <MoreHorizontal className="h-5 w-5" />
+        {mailLoader ? (
+          <CircularProgress size={15}/>
+        ) : (
+          <MoreHorizontal className="h-5 w-5" />
+        )}
     </button>
 
     {activeDropdown === pdf._id && (
