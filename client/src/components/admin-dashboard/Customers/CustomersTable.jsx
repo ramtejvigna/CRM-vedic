@@ -29,6 +29,7 @@ const CustomersTable = ({
       case "newRequests":
         return [
           "S.no",
+          "application ID",
           "Customer ID",
           "Customer Name",
          
@@ -96,6 +97,9 @@ const CustomersTable = ({
           >
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {index + 1}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
+              {customer.applicationID}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.customerID}

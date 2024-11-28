@@ -1,6 +1,8 @@
 import mongoose, { mongo } from 'mongoose';
 
 const customerSchema = new mongoose.Schema({
+    applicationID: { type: String, required: true },
+
     customerID: { type: String, required: true },
     fatherName: { type: String, required: true },
     customerName : {type : String, required : true},

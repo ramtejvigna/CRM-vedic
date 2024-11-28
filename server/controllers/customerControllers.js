@@ -1,5 +1,30 @@
 import { Employee, Customer } from "../models/User.js";
 import { PDF } from "../models/PDF.js";
+import { sendApplicationConfirmationEmail } from "../utils/mailer.utils.js";
+import { format } from 'date-fns';
+import locationService from "../utils/locationService.js";
+export const generateUniqueApplicationId = async (Customer) => {
+    const today = new Date();
+    const datePrefix = format(today, 'ddMMyyHHmmss').slice(0, 10);
+
+    // Check for uniqueness
+    let isUnique = false;
+    let finalApplicationId;
+    
+    while (!isUnique) {
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+        finalApplicationId = `${datePrefix}${randomSuffix}`;
+
+        // Check if this application ID already exists
+        const existingCustomer = await Customer.findOne({ customerID: finalApplicationId });
+        
+        if (!existingCustomer) {
+            isUnique = true;
+        }
+    }
+
+    return finalApplicationId;
+};
 export const addCustomerWithAssignment = async (req, res) => {
     const {
         fatherName,
@@ -36,8 +61,10 @@ export const addCustomerWithAssignment = async (req, res) => {
         const customerCountForMonth = customersAddedThisMonth + 1;
 
         const customerID = `${month}${year}${customerCountForMonth}`;
+        const applicationID = await generateUniqueApplicationId(Customer);
 
         const newCustomer = new Customer({
+            applicationID,
             customerID, 
             fatherName,
             motherName,
@@ -56,14 +83,30 @@ export const addCustomerWithAssignment = async (req, res) => {
         });
 
         await newCustomer.save();
+        await sendApplicationConfirmationEmail(newCustomer);
 
-        res.status(201).json({ customer: newCustomer });
+        res.status(201).json({ applicationId: applicationID  });
     } catch (error) {
         console.error("Error adding customer:", error.message); // Log full error
         res.status(500).json({ error: "Error adding customer" });
     }
 };
 
+export const getLocationSuggestions = async (req, res) => {
+    const { query } = req.query;
+
+    if (!query) {
+        return res.status(400).json({ error: "Query parameter is required" });
+    }
+
+    try {
+        const suggestions = await locationService.getLocationSuggestions(query);
+        res.status(200).json(suggestions);
+    } catch (error) {
+        console.error("Location suggestions error:", error);
+        res.status(500).json({ error: "Error fetching location suggestions" });
+    }
+};
 
 
 export const getCustomers = async (req, res) => {
