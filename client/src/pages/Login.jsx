@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-import {HOST} from '../utils/constants.js'
+import Cookies from 'js-cookie'; // Import js-cookie
+import { HOST } from '../utils/constants.js';
 import { Mail, Phone, ArrowRight, Lock } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import  {useStore} from "../store/index.js"
-import {Link} from 'react-router-dom'
+import { useStore } from "../store/index.js";
+import { Link } from 'react-router-dom';
+
 const Login = () => {
-  const {setAdminInfo , adminInfo} = useStore()
+  const { setAdminInfo, adminInfo } = useStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +48,15 @@ const Login = () => {
         progress: undefined,
         theme: "light",
       });
+
+      // Store userId and username in cookies
+      const userId = response.data.admin._id;
+      Cookies.set('userId', userId, { expires: 1 });
       
-      setAdminInfo(response.data.admin)
+      // Save admin info in state
+      setAdminInfo(response.data.admin);
+
+      // Redirect after a short delay
       setTimeout(() => {
         navigate('/admin-dashboard/home');
       }, 1500);
@@ -55,7 +64,6 @@ const Login = () => {
     } catch (error) {
       // Enhanced error handling based on error type
       if (error.response) {
-        // Errors from the server
         if (error.response.status === 401) {
           toast.error('Unauthorized access. Please check your credentials.', {
             position: "top-right",
@@ -91,7 +99,6 @@ const Login = () => {
           });
         }
       } else if (error.request) {
-        // Network errors
         toast.error('Network error. Please check your connection.', {
           position: "top-right",
           autoClose: 3000,
@@ -103,7 +110,6 @@ const Login = () => {
           theme: "light",
         });
       } else {
-        // Other unexpected errors
         toast.error(`An error occurred: ${error.message}`, {
           position: "top-right",
           autoClose: 3000,
@@ -119,7 +125,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 flex items-center justify-center p-4">
@@ -154,7 +159,6 @@ const Login = () => {
 
           {/* Form Section */}
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Email Input */}
             <div className="relative group">
               <input
                 type="email"
@@ -165,8 +169,6 @@ const Login = () => {
                 required
               />
             </div>
-
-            {/* Phone Input */}
             <div className="relative group">
               <input
                 type="password"
@@ -177,8 +179,6 @@ const Login = () => {
                 required
               />
             </div>
-
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}

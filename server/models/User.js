@@ -72,6 +72,7 @@ const employeeSchema = new mongoose.Schema({
     leaveBalance: { type: Number, default: 15 },
     lastLeaveReset: { type: Date, default: new Date() },
     customers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
+    pdfGenerated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PDF' }],
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     lastLeaveAcceptedDate: { type: Date, default: null },
 
@@ -98,6 +99,7 @@ const adminSchema = new mongoose.Schema({
     
     email: { type: String, required: true },
     password : {type : String , required : true},
+    pdfGenerated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PDF' }],
 
     resetPasswordVerificationToken : String ,
     resetPasswordVerificationTokenExpiresAt : Date,

@@ -26,6 +26,10 @@ const PdfSchema = new mongoose.Schema({
         }
     ],
     generatedBy:{type:String,required:true},
+    EmployeeGenerated: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee'
+    },
     rating: { type: Number, min: 0, max: 5, default: 0 }, 
 });
 

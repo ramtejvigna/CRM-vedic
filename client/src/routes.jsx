@@ -65,12 +65,12 @@ export const routes = [
     icon: <BiSolidBabyCarriage {...icon} />,
     element: <BabyDatabase />,
   },
-  {
-    name: "work day calculation",
-    path: "work-day",
-    icon: <FaNetworkWired {...icon} />,
-    element: <Home />,
-  },
+  // {
+  //   name: "work day calculation",
+  //   path: "work-day",
+  //   icon: <FaNetworkWired {...icon} />,
+  //   element: <Home />,
+  // },
   {
     name: "leave management",
     path: "leave",
@@ -95,12 +95,12 @@ export const routes = [
     icon: <GiExpense {...icon} />,
     element: <ViewExpenses />,
   },
-  {
-    name: 'customization',
-    path: "customize",
-    icon: <BiSolidCustomize {...icon} />,
-    element: <Home />,
-  },
+  // {
+  //   name: 'customization',
+  //   path: "customize",
+  //   icon: <BiSolidCustomize {...icon} />,
+  //   element: <Home />,
+  // },
   {
     name: "settings",
     path: "settings",

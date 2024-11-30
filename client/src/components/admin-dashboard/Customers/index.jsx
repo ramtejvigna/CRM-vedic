@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, Fragment } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   Eye,
   Check,
@@ -43,12 +43,14 @@ import {
 import Loader from "./LoadingState";
 import CustomersTable from "./CustomersTable";
 import CustomerModal from "./CustomerModal";
-
 export const Customers = () => {
+  const {tab, setTab} = useStore()
+  console.log(tab)
+
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [customerData, setCustomerData] = useState({});
-  const [activeTab, setActiveTab] = useState("newRequests");
+  const [activeTab, setActiveTab] = useState(tab || "newRequests");
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [nextSection, setNextSection] = useState("");
@@ -112,6 +114,7 @@ export const Customers = () => {
             customerData: customer, // Pass customer data
             fromSection: fromSection, // Pass current section
             section: nextSection, // Pass section info
+            activeTab: activeTab, // Pass active tab info
           },
         });
         break;
@@ -125,17 +128,27 @@ export const Customers = () => {
   const handleAssignEmployee = async () => {
     if (selectedEmployee && selectedCustomerForAssign) {
       const customerId = selectedCustomerForAssign._id;
-
+  
       try {
         const response = await axios.put(
           `${api}/api/manager/assign/${customerId}/to/${selectedEmployee._id}`,
         );
-
+  
         if (response.status === 200) {
           toast.success("Customer successfully assigned to employee");
           setShowModal(false);
           setActiveTab("assignedTo");
-          getNewRequests();
+          setTab("assignedTo");
+          // Refresh the customer data after successful assignment
+          getNewRequests(); // Call the function again to refresh the data
+          // Optionally, filter out the assigned customer from the "In Progress" tab data here
+          setCustomerData(prevData => {
+            return {
+              ...prevData,
+              // Assuming the 'inProgress' section is part of the customer data and you want to exclude assigned customers
+              inProgress: prevData.inProgress.filter(customer => customer._id !== customerId),
+            };
+          });
         }
       } catch (error) {
         console.error("Error assigning employee:", error);
@@ -145,7 +158,25 @@ export const Customers = () => {
       toast.error("Please select both an employee and a customer.");
     }
   };
-
+  
+  // Reloading the customer data function
+  const getNewRequests = async () => {
+    try {
+      const response = await axios.get(`${api}/api/manager/newrequests`);
+      setCustomerData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error.message);
+      setLoading(false);
+    }
+  };
+  
+  // Optionally, add a "Refresh" button to manually trigger a reload of data
+  const handleRefreshData = () => {
+    setLoading(true);
+    getNewRequests();
+  };
+  
   const moveCustomer = (customer, fromSection, toSection, details) => {
     const updatedCustomer = { ...customer, additionalDetails: details };
 
@@ -184,7 +215,11 @@ export const Customers = () => {
 
     axios
       .put(`${api}/customers/${customer._id}`, updatedCustomer)
-      .catch((error) => console.error("Error moving customer:", error));
+      .then(() => toast.success("Customer moved successfully"))
+      .catch((error) => {
+        console.error("Error moving customer:", error);
+        toast.error("Failed to move customer, please try again.");
+      });
   };
 
   const handleAccept = useCallback(() => {
@@ -443,6 +478,7 @@ export const Customers = () => {
               whileTap={{ scale: 0.95 }}
               onClick={() => {
                 setActiveTab(tab);
+                setTab(tab)
 
               }}
               className={`relative px-4 py-2 text-sm rounded-lg transition-colors duration-150 ease-in-out ${
@@ -535,8 +571,10 @@ export const Customers = () => {
         onItemsPerPageChange={handleRowsPerPageChange}
         isDarkMode={isDarkMode}
     />
+    <ToastContainer />
     </div>
   );
 };
 
 export default Customers;
+

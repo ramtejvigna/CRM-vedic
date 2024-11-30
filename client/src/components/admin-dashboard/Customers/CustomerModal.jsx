@@ -161,7 +161,7 @@ const CustomerModal = ({
                             </p>
                             <div>
                               <label className="text-sm ml-1 font-medium text-gray-700">
-                                Deadline
+                                Work Deadline
                               </label>
                               <input
                                 type="date"

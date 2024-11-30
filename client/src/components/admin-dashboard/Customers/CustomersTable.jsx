@@ -31,8 +31,7 @@ const CustomersTable = ({
           "S.no",
           "Customer ID",
           "Customer Name",
-          "Father Name",
-          "Mother Name",
+         
           "Baby Gender",
           "WhatsApp Number",
           "Actions",
@@ -42,10 +41,9 @@ const CustomersTable = ({
           "S.no",
           "Customer ID",
           "Customer Name",
-          "Father Name",
-          "Mother Name",
           "Baby Gender",
-          "Mobile",
+          "WhatsApp Number",
+          "Pdfs Generated",
           "Actions",
         ];
         case "assignTo":
@@ -53,10 +51,11 @@ const CustomersTable = ({
           "S.no",
           "Customer ID",
           "Customer Name",
-          "Mobile",
+          "WhatsApp Number",
           "Baby Gender",
           "Employee Assigned",
-          "Deadline",
+          "Pdfs Generated",
+          "Work Deadline",
           "Actions",
           ];
       case "rejected":
@@ -64,10 +63,8 @@ const CustomersTable = ({
           "S.no",
           "Customer ID",
           "Customer Name",
-          "Father Name",
-          "Mother Name",
           "Baby Gender",
-          "Mobile",
+          "WhatsApp Number",
           "Actions",
         ];
       default:
@@ -75,8 +72,7 @@ const CustomersTable = ({
           "S.no",
           "Customer ID",
           "Customer Name",
-          "Father Name",
-          "Mobile",
+          "WhatsApp Number",
           "Baby Gender",
           "Employee Assigned",
           "Actions",
@@ -107,12 +103,7 @@ const CustomersTable = ({
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.customerName}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.fatherName}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.motherName}
-            </td>
+           
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.babyGender}
             </td>
@@ -170,18 +161,16 @@ const CustomersTable = ({
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.customerName}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.fatherName}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.motherName}
-            </td>
+           
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.babyGender}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.whatsappNumber}
             </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {customer.pdfGenerated.length || '0'}
+          </td>
             <td className="px-6 py-4 space-x-3 whitespace-nowrap text-sm font-normal relative">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -221,12 +210,7 @@ const CustomersTable = ({
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.customerName}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.fatherName}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.motherName}
-            </td>
+           
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.babyGender}
             </td>
@@ -277,6 +261,9 @@ const CustomersTable = ({
               customer.assignedEmployee?.lastName ||
               customer.assignedEmployee?.email ||
               "Not Assigned"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {customer.pdfGenerated.length || '0'}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
           {customer.deadline ? new Date(customer.deadline).toLocaleDateString() : 'No deadline'}
@@ -331,9 +318,7 @@ const CustomersTable = ({
             <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
               {customer.customerName}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-900 dark:text-gray-100">
-              {customer.fatherName}
-            </td>
+           
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
               {customer.whatsappNumber}
             </td>

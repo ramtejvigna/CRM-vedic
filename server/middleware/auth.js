@@ -68,3 +68,29 @@ export const tokenExpirationMiddleware = async (req, res, next) => {
 //   next();
 // };
 
+// middleware/managerAuth.js
+
+export const isManager = async (req, res, next) => {
+    try {
+        const {employeeId} = req.params;
+        console.log(employeeId)
+        if (!employeeId) {
+            return res.status(401).json({ message: 'Authentication required' });
+        }
+
+        const employee = await Employee.findById(employeeId);
+        
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        if (employee.role !== 'Manager') {
+            return res.status(403).json({ message: 'Access denied. Manager role required' });
+        }
+
+        req.manager = employee;
+        next();
+    } catch (error) {
+        res.status(500).json({ message: 'Error verifying manager role', error: error.message });
+    }
+};

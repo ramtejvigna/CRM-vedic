@@ -15,7 +15,7 @@ const EmployeeTable = () => {
   const [status , setStatus] = useState("");
   const [showFilters , setShowFilters ] = useState(false)
   const [searchTerm , setSearchTerm] = useState("")
-  const { isDarkMode, toggleDarkMode } = useStore();
+  const { isDarkMode, toggleDarkMode , onlineUsers } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -160,9 +160,9 @@ const EmployeeTable = () => {
                   </Link>
                 </motion.button>
             </div>
-            <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
+            {/* <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
                 Showing {employees.length} results
-            </div>
+            </div> */}
             <AnimatePresence>
               {showFilters && (
                 <motion.div
@@ -306,10 +306,10 @@ const EmployeeTable = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                              employee.isOnline
+                              onlineUsers.includes(employee._id)
                             )}`}
                           >
-                            {employee.isOnline ? "Online" : "Offline"}
+                            {onlineUsers.includes(employee._id)? "Online" : "Offline"}
                           </span>
                         </td>
 

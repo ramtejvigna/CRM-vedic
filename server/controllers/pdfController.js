@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
 import admin from 'firebase-admin';
-import { Customer } from '../models/User.js';
+import { Admin, Customer, Employee } from '../models/User.js';
 import { PDF, babyNames } from '../models/PDF.js';
 import dotenv from 'dotenv';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -103,7 +103,7 @@ export const getBabyNames = async (req, res) => {
 // }
 
 export const sendDetails = async (req, res) => {
-    const { names, customerId, additionalBabyNames, generatedBy } = req.body;
+    const { names, customerId, additionalBabyNames, generatedBy, userId } = req.body;
 
     if (!names || names.length === 0) {
         return res.status(400).json({ error: 'No baby names selected' });
@@ -125,10 +125,29 @@ export const sendDetails = async (req, res) => {
             babyNames: selectedNamesIds, // Store baby names' IDs
             additionalBabyNames: additionalBabyNames,
             generatedBy: generatedBy,
+            EmployeeGenerated: userId
         });
 
         const savedPdf = await newPdf.save();
 
+        const employee = await Employee.findById(userId);
+        if(!employee) {
+            await Admin.findByIdAndUpdate(
+                userId,
+                {
+                    $push: { pdfGenerated: savedPdf._id } // Add the PDF document's ID to the customer record
+                },
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            )
+        } else {
+            await employee.updateOne(
+                {
+                    $push: { pdfGenerated: savedPdf._id } // Add the PDF document's ID
+                },
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            )
+        }
+        
         // Store the PDF document ID in the customer's record
         await Customer.findByIdAndUpdate(
             customerId,
@@ -137,7 +156,6 @@ export const sendDetails = async (req, res) => {
             },
             { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is updated/inserted and array created if missing
         );
-
 
         // Send a response indicating success and the stored PDF metadata
         res.status(200).json({

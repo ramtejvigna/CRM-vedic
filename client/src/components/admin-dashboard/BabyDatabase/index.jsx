@@ -4,7 +4,9 @@ import axios from "axios";
 import { Search, Upload, Edit, Save, Filter, Download, Loader2, Plus } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import { CSVLink } from 'react-csv';
+import { LoadingSpinner } from "./LoadingSpinner"
 import 'react-toastify/dist/ReactToastify.css';
+import EmptyBabyNames from './EmptyBabyNames';
 
 const AddNameModal = ({ isOpen, onClose, onAdd }) => {
     const [newName, setNewName] = useState({
@@ -285,6 +287,24 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
     );
 };
 
+const FilterDropdown = ({ label, options = [], value, onChange }) => (
+    <div className="flex flex-col space-y-1">
+        <label className="text-sm font-medium text-gray-700">{label}:</label>
+        <select
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 bg-white"
+        >
+            <option value="">All</option>
+            {options.map((option) => (
+                <option key={option} value={option}>
+                    {option}
+                </option>
+            ))}
+        </select>
+    </div>
+);
+
 const BabyDatabase = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -315,22 +335,27 @@ const BabyDatabase = () => {
             const response = await axios.get("https://vedic-backend-neon.vercel.app/api/names");
             setBabyNames(response.data);
 
+            // Extract unique values with proper null checking and sorting
+            const extractUniqueValues = (field) => {
+                return [...new Set(response.data
+                    .map(item => item[field])
+                    .filter(value => value && value.trim() !== ''))]
+                    .sort((a, b) => a.localeCompare(b));
+            };
+
             const uniqueValues = {
-                zodiacs: [...new Set(response.data.map(name => name.zodiac).filter(Boolean))],
-                nakshatras: [...new Set(response.data.map(name => name.nakshatra).filter(Boolean))],
-                elements: [...new Set(response.data.map(name => name.element).filter(Boolean))],
-                bookNames: [...new Set(response.data.map(name => name.bookName).filter(Boolean))]
+                zodiacs: extractUniqueValues('zodiac'),
+                nakshatras: extractUniqueValues('nakshatra'),
+                elements: extractUniqueValues('element'),
+                bookNames: extractUniqueValues('bookName')
             };
 
             setFilterOptions(uniqueValues);
         } catch (err) {
             console.error(err);
-            toast.error("Failed to fetch baby names", {
-                onClose: () => { }, // Empty callback to prevent undefined error
-                toastId: 'fetch-error' // Unique ID to prevent duplicate toasts
-            });
+            toast.error("Failed to fetch baby names");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -343,43 +368,44 @@ const BabyDatabase = () => {
         };
     }, []);
 
+    const filteredNames = babyNames.filter(baby => {
+        const matchesSearch = !searchTerm ||
+            (baby.nameEnglish?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                baby.nameDevanagari?.includes(searchTerm));
 
-    const FilterDropdown = ({ label, options, value, onChange }) => (
-        <div className="flex items-center space-x-2">
-            <label className="text-gray-700">{label}:</label>
-            <select
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
-            >
-                <option value="">All</option>
-                {options.sort().map((option) => (
-                    <option key={option} value={option}>
-                        {option}
-                    </option>
-                ))}
-            </select>
-        </div>
-    );
+        const matchesGender = genderFilter === 'all' ||
+            baby.gender?.toLowerCase() === genderFilter.toLowerCase();
 
-    const filteredNames = babyNames.filter(
-        (baby) =>
-            (baby.nameEnglish.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                baby.nameDevanagari.includes(searchTerm)) &&
-            (genderFilter === 'all' || baby.gender.toLowerCase() === genderFilter) &&
-            (startingLetterFilter === '' || baby.nameEnglish.toLowerCase().startsWith(startingLetterFilter.toLowerCase())) &&
-            (selectedFilters.zodiac === '' || baby.zodiac === selectedFilters.zodiac) &&
-            (selectedFilters.nakshatra === '' || baby.nakshatra === selectedFilters.nakshatra) &&
-            (selectedFilters.element === '' || baby.element === selectedFilters.element) &&
-            (selectedFilters.bookName === '' || baby.bookName === selectedFilters.bookName)
-    );
+        const matchesStartingLetter = !startingLetterFilter ||
+            baby.nameEnglish?.toLowerCase().startsWith(startingLetterFilter.toLowerCase());
+
+        const matchesZodiac = !selectedFilters.zodiac ||
+            baby.zodiac?.toLowerCase() === selectedFilters.zodiac.toLowerCase();
+
+        const matchesNakshatra = !selectedFilters.nakshatra ||
+            baby.nakshatra?.toLowerCase() === selectedFilters.nakshatra.toLowerCase();
+
+        const matchesElement = !selectedFilters.element ||
+            baby.element?.toLowerCase() === selectedFilters.element.toLowerCase();
+
+        const matchesBookName = !selectedFilters.bookName ||
+            baby.bookName?.toLowerCase() === selectedFilters.bookName.toLowerCase();
+
+        return matchesSearch &&
+            matchesGender &&
+            matchesStartingLetter &&
+            matchesZodiac &&
+            matchesNakshatra &&
+            matchesElement &&
+            matchesBookName;
+    });
 
     const handleFilterChange = (filterType, value) => {
         setSelectedFilters(prev => ({
             ...prev,
             [filterType]: value
         }));
-        setPage(0);
+        setPage(0); // Reset to first page when filter changes
     };
 
     const handleChangePage = (newPage) => {
@@ -490,6 +516,75 @@ const BabyDatabase = () => {
 
     const csvData = filteredNames.map(({ _id, _v, ...rest }) => rest);
 
+    console.log(csvData)
+
+    const renderFilters = () => (
+        <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6 p-4 rounded-lg bg-white shadow-sm"
+        >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Gender Filter */}
+                <div className="flex flex-col space-y-1">
+                    <label className="text-sm font-medium text-gray-700">Gender:</label>
+                    <select
+                        value={genderFilter}
+                        onChange={(e) => handleGenderFilter(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 bg-white"
+                    >
+                        <option value="all">All</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+
+                {/* Starting Letter Filter */}
+                <div className="flex flex-col space-y-1">
+                    <label className="text-sm font-medium text-gray-700">Starting Letter:</label>
+                    <input
+                        type="text"
+                        value={startingLetterFilter}
+                        onChange={handleStartingLetterFilter}
+                        maxLength={1}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+                    />
+                </div>
+
+                {/* Dropdown Filters */}
+                <FilterDropdown
+                    label="Rashi"
+                    options={filterOptions.zodiacs}
+                    value={selectedFilters.zodiac}
+                    onChange={(value) => handleFilterChange('zodiac', value)}
+                />
+
+                <FilterDropdown
+                    label="Nakshatra"
+                    options={filterOptions.nakshatras}
+                    value={selectedFilters.nakshatra}
+                    onChange={(value) => handleFilterChange('nakshatra', value)}
+                />
+
+                <FilterDropdown
+                    label="Element"
+                    options={filterOptions.elements}
+                    value={selectedFilters.element}
+                    onChange={(value) => handleFilterChange('element', value)}
+                />
+
+                <FilterDropdown
+                    label="Book Name"
+                    options={filterOptions.bookNames}
+                    value={selectedFilters.bookName}
+                    onChange={(value) => handleFilterChange('bookName', value)}
+                />
+            </div>
+        </motion.div>
+    );
+
     return (
         <div className="p-4 md:p-8 min-h-screen">
             <ToastContainer
@@ -504,7 +599,9 @@ const BabyDatabase = () => {
                 containerId="main-toast"
             />
             <h1 className="text-2xl md:text-4xl font-bold mb-8 md:mb-12">Baby Names Database</h1>
-
+            {filteredNames.length > 0 && (
+                <h1 className='text-lg pb-5'>Showing {filteredNames.length} results</h1>
+            )}
             <div className="mb-6 space-y-4">
                 {/* Search and Filter Section */}
                 <div className="flex flex-col md:flex-row gap-4">
@@ -546,6 +643,24 @@ const BabyDatabase = () => {
                             data={csvData}
                             filename="filtered_baby_names.csv"
                             className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center justify-center"
+                            enclosingCharacter={`"`}
+                            onClick={(event, done) => {
+                                const utf8Bom = '\ufeff'; // UTF-8 BOM
+                                const csvContent = utf8Bom + csvData.map(row => row.join(",")).join("\n");
+                                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement("a");
+                                link.setAttribute("href", url);
+                                link.setAttribute("download", "filtered_baby_names.csv");
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                done(false); // Prevents default CSVLink action
+                                toast.success("Exported Baby Names successfully", {
+                                    onClose: () => { },
+                                    toastId: 'export-success'
+                                });
+                            }}
                         >
                             <Download className="h-5 w-5 mr-2" />
                             <span className="text-sm md:text-base">Export</span>
@@ -554,8 +669,19 @@ const BabyDatabase = () => {
 
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <a
-                            href="/baby_names_records.csv"
-                            download="baby_names_template.csv"
+                            href="#"
+                            onClick={() => {
+                                const utf8Bom = '\ufeff'; // UTF-8 BOM
+                                const templateData = "bookName,gender,nameEnglish,nameDevanagari,meaning,numerology,zodiac,rashi,nakshatra,planetaryinfluence,element,pageNo,syllableCount,characterSignificance,mantraRef,relatedFestival,extraNote,researchTag"; // Example template content
+                                const blob = new Blob([utf8Bom + templateData], { type: "text/csv;charset=utf-8;" });
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement("a");
+                                link.setAttribute("href", url);
+                                link.setAttribute("download", "baby_names_template.csv");
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }}
                             className="bg-slate-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center justify-center"
                         >
                             <Download className="h-5 w-5 mr-2" />
@@ -573,6 +699,7 @@ const BabyDatabase = () => {
                         <span className="text-sm md:text-base">Add New</span>
                     </motion.button>
                 </div>
+
             </div>
 
             <AddNameModal
@@ -581,69 +708,7 @@ const BabyDatabase = () => {
                 onAdd={handleAddName}
             />
 
-            {showFilters && (
-                <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-6 p-4 rounded-lg bg-white bg-opacity-70 shadow-sm"
-                >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div className="flex flex-col space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Gender:</label>
-                            <select
-                                value={genderFilter}
-                                onChange={(e) => handleGenderFilter(e.target.value)}
-                                className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
-                            >
-                                <option value="all">All</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            </select>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                            <label className="text-gray-700">Starting Letter:</label>
-                            <input
-                                type="text"
-                                value={startingLetterFilter}
-                                onChange={handleStartingLetterFilter}
-                                maxLength={1}
-                                className="w-12 px-2 py-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
-                            />
-                        </div>
-
-                        <FilterDropdown
-                            label="Rashi"
-                            options={filterOptions.zodiacs}
-                            value={selectedFilters.zodiac}
-                            onChange={(value) => handleFilterChange('zodiac', value)}
-                        />
-
-                        <FilterDropdown
-                            label="Nakshatra"
-                            options={filterOptions.nakshatras}
-                            value={selectedFilters.nakshatra}
-                            onChange={(value) => handleFilterChange('nakshatra', value)}
-                        />
-
-                        <FilterDropdown
-                            label="Element"
-                            options={filterOptions.elements}
-                            value={selectedFilters.element}
-                            onChange={(value) => handleFilterChange('element', value)}
-                        />
-
-                        <FilterDropdown
-                            label="Book Name"
-                            options={filterOptions.bookNames}
-                            value={selectedFilters.bookName}
-                            onChange={(value) => handleFilterChange('bookName', value)}
-                        />
-                    </div>
-                </motion.div>
-            )}
+            {showFilters && renderFilters()}
 
             <div className='overflow-x-auto'>
                 <motion.div
@@ -652,237 +717,234 @@ const BabyDatabase = () => {
                     transition={{ duration: 0.5 }}
                     className="bg-white rounded-lg shadow-xl"
                 >
-                    <table className="min-w-full divide-y min-h-full divide-gray-200">
-                        {loading ? (
-                            <div className="absolute inset-0 top-20 flex items-center justify-center bg-white bg-opacity-80 rounded-lg">
-                                <div className="text-center">
-                                    <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        {[
-                                            'Gender',
-                                            'Name (English)',
-                                            'Name (Devanagari)',
-                                            'Meaning',
-                                            'Numerology',
-                                            'Zodiac',
-                                            'Rashi',
-                                            'Nakshatra',
-                                            'Planetary Influence',
-                                            'Element',
-                                            'Book Name',
-                                            'Page No',
-                                            'Syllable Count',
-                                            'Character Significance',
-                                            'Mantra Ref',
-                                            'Related Festival',
-                                            'Extra Note',
-                                            'Research Tag',
-                                            'Actions'
-                                        ].map((header) => (
-                                            <th key={header} className="px-6 py-3 text-left text-sm font-semibold text-gray-500 tracking-wider">
-                                                {header}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y text-sm divide-gray-200">
-                                    {filteredNames
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                        .map((baby, index) => (
-                                            <motion.tr
-                                                key={index}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ duration: 0.3, delay: index * 0.1 }}
-                                                className="hover:bg-gray-50"
-                                            >
-                                                {editingName && editingName._id === baby._id ? (
-                                                    <>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <select
-                                                                value={editingName.gender}
-                                                                onChange={(e) => setEditingName({ ...editingName, gender: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            >
-                                                                <option value="male">Male</option>
-                                                                <option value="female">Female</option>
-                                                                <option value="unisex">Unisex</option>
-                                                            </select>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.nameEnglish}
-                                                                onChange={(e) => setEditingName({ ...editingName, nameEnglish: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.nameDevanagari}
-                                                                onChange={(e) => setEditingName({ ...editingName, nameDevanagari: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.meaning}
-                                                                onChange={(e) => setEditingName({ ...editingName, meaning: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.numerology}
-                                                                onChange={(e) => setEditingName({ ...editingName, numerology: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.zodiac}
-                                                                onChange={(e) => setEditingName({ ...editingName, zodiac: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.rashi}
-                                                                onChange={(e) => setEditingName({ ...editingName, rashi: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.nakshatra}
-                                                                onChange={(e) => setEditingName({ ...editingName, nakshatra: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.planetaryInfluence}
-                                                                onChange={(e) => setEditingName({ ...editingName, planetaryInfluence: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.element}
-                                                                onChange={(e) => setEditingName({ ...editingName, element: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.bookName}
-                                                                onChange={(e) => setEditingName({ ...editingName, bookName: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.pageNo}
-                                                                onChange={(e) => setEditingName({ ...editingName, pageNo: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.syllableCount}
-                                                                onChange={(e) => setEditingName({ ...editingName, syllableCount: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.characterSignificance}
-                                                                onChange={(e) => setEditingName({ ...editingName, characterSignificance: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.mantraRef}
-                                                                onChange={(e) => setEditingName({ ...editingName, mantraRef: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.relatedFestival}
-                                                                onChange={(e) => setEditingName({ ...editingName, relatedFestival: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.extraNote}
-                                                                onChange={(e) => setEditingName({ ...editingName, extraNote: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <input
-                                                                value={editingName.researchTag}
-                                                                onChange={(e) => setEditingName({ ...editingName, researchTag: e.target.value })}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                                            />
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <button
-                                                                className="px-4 py-2 rounded-lg"
-                                                                onClick={saveEdit}
-                                                            >
-                                                                <Save className="h-5 w-5 text-green-600 inline-block mr-2" />
-                                                            </button>
-                                                        </td>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <td className="px-6 py-4 whitespace-nowrap capitalize">{baby.gender}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.nameEnglish}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.nameDevanagari}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.meaning}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.numerology}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.zodiac}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.rashi}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.nakshatra}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.planetaryInfluence}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.element}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.bookName}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.pageNo}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.syllableCount}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.characterSignificance}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.mantraRef}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.relatedFestival}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.extraNote}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">{baby.researchTag}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <button
-                                                                className="px-4 py-2 rounded-lg"
-                                                                onClick={() => startEdit(baby)}
-                                                            >
-                                                                <Edit className="h-5 w-5 text-blue-800 inline-block mr-2" />
-                                                            </button>
-                                                        </td>
-                                                    </>
-                                                )}
-                                            </motion.tr>
-                                        ))}
-                                </tbody>
-                            </>
-                        )}
-                    </table>
+                    {filteredNames.length !== 0 && !loading && (
+                        <table className="min-w-full divide-y min-h-full divide-gray-200">
+                            {loading ? (
+                                <LoadingSpinner />
+                            ) : (
+                                <>
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            {[
+                                                'Name (English)',
+                                                'Name (Devanagari)',
+                                                'Meaning',
+                                                'Gender',
+                                                'Numerology',
+                                                'Zodiac',
+                                                'Rashi',
+                                                'Nakshatra',
+                                                'Planetary Influence',
+                                                'Element',
+                                                'Book Name',
+                                                'Page No',
+                                                'Syllable Count',
+                                                'Character Significance',
+                                                'Mantra Ref',
+                                                'Related Festival',
+                                                'Extra Note',
+                                                'Research Tag',
+                                                'Actions'
+                                            ].map((header) => (
+                                                <th key={header} className="px-6 py-3 text-left text-sm font-semibold text-gray-500 tracking-wider">
+                                                    {header}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y text-sm divide-gray-200">
+                                        {filteredNames
+                                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                            .map((baby, index) => (
+                                                <motion.tr
+                                                    key={index}
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                                                    className="hover:bg-gray-50"
+                                                >
+                                                    {editingName && editingName._id === baby._id ? (
+                                                        <>
+
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.nameEnglish}
+                                                                    onChange={(e) => setEditingName({ ...editingName, nameEnglish: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.nameDevanagari}
+                                                                    onChange={(e) => setEditingName({ ...editingName, nameDevanagari: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.meaning}
+                                                                    onChange={(e) => setEditingName({ ...editingName, meaning: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <select
+                                                                    value={editingName.gender}
+                                                                    onChange={(e) => setEditingName({ ...editingName, gender: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                >
+                                                                    <option value="male">Male</option>
+                                                                    <option value="female">Female</option>
+                                                                    <option value="unisex">Unisex</option>
+                                                                </select>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.numerology}
+                                                                    onChange={(e) => setEditingName({ ...editingName, numerology: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.zodiac}
+                                                                    onChange={(e) => setEditingName({ ...editingName, zodiac: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.rashi}
+                                                                    onChange={(e) => setEditingName({ ...editingName, rashi: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.nakshatra}
+                                                                    onChange={(e) => setEditingName({ ...editingName, nakshatra: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.planetaryInfluence}
+                                                                    onChange={(e) => setEditingName({ ...editingName, planetaryInfluence: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.element}
+                                                                    onChange={(e) => setEditingName({ ...editingName, element: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.bookName}
+                                                                    onChange={(e) => setEditingName({ ...editingName, bookName: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.pageNo}
+                                                                    onChange={(e) => setEditingName({ ...editingName, pageNo: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.syllableCount}
+                                                                    onChange={(e) => setEditingName({ ...editingName, syllableCount: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.characterSignificance}
+                                                                    onChange={(e) => setEditingName({ ...editingName, characterSignificance: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.mantraRef}
+                                                                    onChange={(e) => setEditingName({ ...editingName, mantraRef: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.relatedFestival}
+                                                                    onChange={(e) => setEditingName({ ...editingName, relatedFestival: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.extraNote}
+                                                                    onChange={(e) => setEditingName({ ...editingName, extraNote: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <input
+                                                                    value={editingName.researchTag}
+                                                                    onChange={(e) => setEditingName({ ...editingName, researchTag: e.target.value })}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                                                />
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <button
+                                                                    className="px-4 py-2 rounded-lg"
+                                                                    onClick={saveEdit}
+                                                                >
+                                                                    <Save className="h-5 w-5 text-green-600 inline-block mr-2" />
+                                                                </button>
+                                                            </td>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.nameEnglish}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.nameDevanagari}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.meaning}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap capitalize">{baby.gender}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.numerology}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.zodiac}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.rashi}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.nakshatra}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.planetaryInfluence}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.element}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.bookName}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.pageNo}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.syllableCount}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.characterSignificance}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.mantraRef}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.relatedFestival}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.extraNote}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">{baby.researchTag}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <button
+                                                                    className="px-4 py-2 rounded-lg"
+                                                                    onClick={() => startEdit(baby)}
+                                                                >
+                                                                    <Edit className="h-5 w-5 text-blue-800 inline-block mr-2" />
+                                                                </button>
+                                                            </td>
+                                                        </>
+                                                    )}
+                                                </motion.tr>
+                                            ))}
+                                    </tbody>
+                                </>
+                            )}
+                        </table>
+                    )}
 
                     {filteredNames.length === 0 && !loading && (
-                        <div className="text-center py-12 w-full">
-                            <p className="text-gray-500 text-lg">No baby names found matching your criteria.</p>
-                        </div>
+                        <EmptyBabyNames />
                     )}
                 </motion.div>
             </div>

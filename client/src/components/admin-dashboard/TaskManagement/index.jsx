@@ -50,8 +50,6 @@ const TaskManagement = () => {
     setIsLoadingTasks(true);
     try {
       const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/tasks?page=${page}&limit=${tasksPerPage}`);
-      // const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/tasks?page=${page}&limit=${tasksPerPage}`);
-
       setTasks(response.data.tasks);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -221,8 +219,8 @@ const TaskManagement = () => {
           </div>
         ) : (
           <TaskList
-            tasks={tasks}
-            isMobile={isMobile}
+          tasks={tasks}
+          isMobile={isMobile}
             handleOpenDetailModal={handleOpenDetailModal}
             handleOpenModal={handleOpenModal}
             handleDelete={handleDelete}

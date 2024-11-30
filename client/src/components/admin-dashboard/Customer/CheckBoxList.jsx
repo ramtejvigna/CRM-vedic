@@ -7,6 +7,7 @@ import { Search,Filter } from "lucide-react";
 import { ToastContainer,toast } from "react-toastify";
 import { generatePdf } from './pdfDisplayComponent';
 import 'react-toastify/dist/ReactToastify.css';
+import Cookies from 'js-cookie';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -482,6 +483,7 @@ const handleGeneratePdf = async () => {
           customerId: customerData._id,
           additionalBabyNames: additionalBabyNames,
           generatedBy: "Admin",
+          userId: Cookies.get('userId')
       });
 
       toast.success("PDF Generated Successfully");

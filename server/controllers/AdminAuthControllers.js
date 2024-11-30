@@ -70,21 +70,22 @@ export const login = async (req , res) => {
 
 
         const token = jwt.sign({userId : admin._id} , process.env.JWT_SECRET , {expiresIn : "7d"});
-
-        res.cookie("authToken" , token , {
-            httpOnly : true ,
-            sameSite : "strict" ,
-            secure : process.env.NODE_ENV === "production" ,
-            maxAge : 7 * 24 * 60 * 60 * 1000
-        });
-
+        
+                res.cookie("authToken" , token , {
+                    httpOnly : true ,
+                    sameSite : "strict" ,
+                    secure : process.env.NODE_ENV === "production" ,
+                    maxAge : 7 * 24 * 60 * 60 * 1000
+                });
+        
         return res.status(200).json({
             success : true,
             message : "Logged in successfully" ,
             admin : {
                 ...admin._doc ,
                 password : undefined
-            }
+            },
+            userId : admin._id
         })
     } catch (error) {
         console.log("Errorin login admin" , error.message)

@@ -463,7 +463,8 @@ const handleGeneratePdf = async () => {
           names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
           customerId: customerData._id,
           additionalBabyNames: additionalBabyNames,
-          generatedBy: employee.firstName,
+          generatedBy: "Admin",
+          userId: Cookies.get('userId')
       });
 
       toast.success("PDF Generated Successfully");
@@ -515,10 +516,11 @@ const handleGeneratePdf = async () => {
       
       <button 
         onClick={()=>{navigate(-1)}}
-        className="top-4 left-4 flex items-center text-gray-500 hover:text-gray-700"
+        className="top-4 left-4 flex mb-3 items-center text-gray-500 hover:text-gray-700"
       >
-        <FaArrowLeft size={20} />
-        <span className="ml-2"></span>
+        <FaArrowLeft size={15} />
+        <span className="ml-2">Customer Details</span>
+
       </button>
       <h1 className="text-4xl font-bold mb-20">Baby Names</h1>
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">

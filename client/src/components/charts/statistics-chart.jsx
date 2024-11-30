@@ -1,40 +1,77 @@
-import { Card, CardBody, Typography } from "@material-tailwind/react";
+import { Card } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
+import { motion } from 'framer-motion';
 import { useStore } from "../../store";
-export function StatisticsChart({ color, chart, title, description, footer }) {
-  const {isDarkMode} = useStore()
+
+export function StatisticsChart({ color, chart, title, description, footer, filter }) {
+  const { isDarkMode } = useStore();
 
   return (
-    <Card className={`relative border border-blue-gray-100 shadow-lg ${isDarkMode ? 'bg-black text-white': 'bg-white'}`}>
-      {/* Chart Container */}
-      <div
-        className="chart-container"
-        style={{
-          width: '90%', // Smaller width for spacing on the sides
-          height: '220px', // Height of the chart
-          position: 'absolute', // Float above the card
-          top: '-1cm', // Adjusted this value to stretch further back
-          left: '50%', // Center horizontally
-          transform: 'translateX(-50%)', // Center alignment correction
-          borderRadius: '15px', // Rounded corners for the chart
-          overflow: 'hidden', // Ensure the content inside respects the rounded corners
-        }}
-      >
-        <Chart {...chart} />
+    <motion.div
+      className="w-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 100,
+        damping: 10
+      }}
+    >
+      {/* Text Content */}
+      <div className="px-6 py-4 bg-opacity-10 backdrop-blur-sm flex flex-row justify-between items-center">
+        <div>
+          <h5 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">
+            {title}
+          </h5>
+
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {description}
+          </p>
+        </div>
+        <div>
+          {/* Filter Container */}
+          {filter && (
+            <motion.div
+              className="flex gap-5"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {filter}
+            </motion.div>
+          )}
+        </div>
       </div>
+      <Card
+        className={`
+          relative 
+          rounded-xl 
+          overflow-hidden 
+          shadow-lg 
+          transition-all 
+          duration-300 
+          hover:shadow-2xl
+        `}
+      >
+        {/* Chart Container */}
+        <div
+          className="chart-container mx-auto transition-transform duration-300"
+          style={{
+            width: "100%",
+            height: chart.height || "250px",
+            borderRadius: "15px",
+            overflow: "hidden",
+            position: "relative",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+          }}
+        >
+          <Chart {...chart} />
+        </div>
 
-      {/* Background Container for Text */}
-      <CardBody className="px-6 pt-48 pb-4 mt-2"> {/* Adjusted padding top (pt) for more space */}
-        <Typography variant="h5" color="blue-gray" className="mb-2"> {/* Space below title for separation */}
-          {title}
-        </Typography>
 
-        <Typography variant="small" className="font-normal text-blue-gray-600 mb-4"> {/* Added margin bottom for spacing */}
-          {description}
-        </Typography>
-      </CardBody>
-    </Card>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -70,6 +107,7 @@ StatisticsChart.propTypes = {
   title: PropTypes.node.isRequired,
   description: PropTypes.node.isRequired,
   footer: PropTypes.node,
+  filter: PropTypes.node, // Added prop type for the filter
 };
 
 StatisticsChart.displayName = "/src/widgets/charts/statistics-chart.jsx";
