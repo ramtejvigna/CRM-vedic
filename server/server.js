@@ -17,6 +17,7 @@ import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
+import astroRoutes from './routes/astroRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
@@ -45,7 +46,7 @@ app.use(cookieParser())
 
 app.use('/api/employees',employeeRoutes);
 app.use('/employees',employeeRoutes);
-
+app.use(astroRoutes);
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);

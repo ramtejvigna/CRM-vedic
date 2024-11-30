@@ -22,7 +22,7 @@ import { handleDownload, handleSendMail, handleSendWhatsApp } from './CheckBoxLi
 import { generatePdf } from './pdfDisplayComponent';
 import PDFViewer from './PDFviewer';
 
-
+import CustomerAstroDetails from './CustomerAstroDetails';
 
 const Customer = () => {
   const [pdfsLoading, setPdfsLoading] = useState(false);
@@ -366,47 +366,10 @@ const Customer = () => {
 
             {/* Horizontal Line */}
             <div className="col-span-2 my-4">
-              <hr className="border-t border-gray-200" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-500">Nakshatra:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Ashwini"}</p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-500">Numerology No :</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "3"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky Colour:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "blue"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Gemstone:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Ruby"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Destiny Number:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "7"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky Day:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "friday"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky God:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Lord Shiva"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky Metal:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Gold"}</p>
-            </div>
-          </div>
+        <hr className="border-t border-gray-200" />
+      </div>
+      <CustomerAstroDetails customerId={customerId} />
+    </div>
         </div>
         {/* Right Column */}
         <div className="space-y-6">
@@ -435,7 +398,7 @@ const Customer = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col overflow-y-auto relative" style={{ height: '345px' }} ><div className="flex justify-between items-center mb-4">
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col overflow-y-auto relative" style={{ height: '420px' }} ><div className="flex justify-between items-center mb-4">
     <h2 className="text-lg font-semibold">PDFs Generated</h2>
     {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') && (
       <button
