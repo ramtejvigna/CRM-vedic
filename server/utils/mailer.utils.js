@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
 })
 
 
+
 export async function sendForgotPasswordEmail(data) {
     try {
       
@@ -100,8 +101,9 @@ export async function sendForgotPasswordEmail(data) {
     } catch (error) {
     console.error("Error sending email:", error);
     return false;
-    }}
-    export async function sendResetPasswordEmail(data) {
+}}
+
+export async function sendResetPasswordEmail(data) {
         try {
         
         const info = await transporter.sendMail({
@@ -177,4 +179,4 @@ export async function sendForgotPasswordEmail(data) {
   } catch (error) {
    console.error("Error sending email:", error);
    return false;
- }}
+}}
