@@ -17,6 +17,7 @@ import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
 import { fileURLToPath } from 'url';
 import fileUpload from 'express-fileupload';
@@ -73,6 +74,7 @@ app.use('/salaries' , salaryRoutes)
 app.use('/api/expenses', expensesRoutes);   
 app.use('/admin/auth' , AdminAuthRoutes)
 app.use('/api/reports',ReportsRouter)
+app.use('/categories', categoryRoutes)
 
 
 
