@@ -3,6 +3,7 @@ import { Employee } from "../models/User.js";
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from "mongoose";
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -218,6 +219,132 @@ export const getEmployee = async (req , res) => {
     }
 }
 
+export const requestBabyNames = async (req, res) => {
+    try {
+        const { employeeId } = req.body;
 
+        // Find employee and update requestedBabyNames field
+        const employee = await Employee.findById(employeeId);
+        
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
 
+        // Check if already requested
+        if (employee.requestedBabyNames) {
+            return res.status(400).json({ message: 'Access already requested' });
+        }
 
+        // Update employee document
+        employee.requestedBabyNames = true;
+        await employee.save();
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Baby names access requested successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error in requestBabyNames:', error);
+        return res.status(500).json({ 
+            message: 'Internal server error', 
+            error: error.message 
+        });
+    }
+};
+
+export const didAdminAccept = async (req, res) => {
+    try {
+        const { employeeId } = req.query; // Extract query parameter
+
+        // Find employee and update requestedBabyNames field
+        const employee = await Employee.findById(employeeId);
+
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        if (employee.adminAcceptedRequest) {
+            return res.status(200).json({ accepted: true, message: 'Admin accepted the request' });
+        }
+
+        return res.status(200).json({
+            accepted: false,
+            message: "Admin didn't accept your request"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
+
+export const didRequested = async (req, res) => {
+    try {
+        const { employeeId } = req.query; // Extract query parameter
+
+        // Find employee and update requestedBabyNames field
+        const employee = await Employee.findById(employeeId);
+
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        if (employee.requestedBabyNames) {
+            return res.status(200).json({ requested: true, message: 'Admin accepted the request' });
+        }
+
+        return res.status(200).json({
+            requested: false,
+            message: "Admin didn't accept your request"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+}
+
+export const confirmRequest = async (req, res) => {
+    try {
+        const { employeeId } = req.body;
+
+        // Validate employeeId
+        if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+            return res.status(400).json({ message: 'Invalid employeeId format' });
+        }
+
+        // Find the employee
+        const employee = await Employee.findById(employeeId);
+
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        // Update fields
+        employee.adminAcceptedRequest = true;
+        employee.requestedBabyNames = false;
+
+        // Save employee with error handling
+        await employee.save().catch(err => {
+            console.error("Error during save:", err.message);
+            throw new Error("Failed to update employee data");
+        });
+
+        console.log("Employee updated successfully:", employee);
+
+        return res.status(200).json({ 
+            accepted: true, 
+            message: 'Admin accepted successfully' 
+        });
+
+    } catch (error) {
+        console.error("Error in confirmRequest:", error.message);
+        return res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
