@@ -22,6 +22,7 @@ import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
 import Settings from "./components/admin-dashboard/settings";
 import Reports from "./components/admin-dashboard/Reports"
 import Customers from "./components/admin-dashboard/Customers";
+import Customization from "./components/admin-dashboard/Customization";
 const Component = ({ name }) => {
   return (
     <>
@@ -95,12 +96,12 @@ export const routes = [
     icon: <GiExpense {...icon} />,
     element: <ViewExpenses />,
   },
-  // {
-  //   name: 'customization',
-  //   path: "customize",
-  //   icon: <BiSolidCustomize {...icon} />,
-  //   element: <Home />,
-  // },
+  {
+    name: 'customization',
+    path: "customize",
+    icon: <BiSolidCustomize {...icon} />,
+    element: <Customization />,
+  },
   {
     name: "settings",
     path: "settings",

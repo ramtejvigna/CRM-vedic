@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import { Admin } from "../models/User.js";
+import { Employee } from "../models/User.js";
 import { config } from "dotenv"
 import { sendForgotPasswordEmail, sendResetPasswordEmail } from "../utils/mailer.utils.js";
 config();
@@ -30,9 +31,9 @@ export const signup = async (req ,res ) => {
         const token = jwt.sign({userId : admin._id} , process.env.JWT_SECRET , {expiresIn : "7d"});
 
         res.cookie("authToken" , token , {
-            httpOnly : true ,
-            sameSite : "strict" ,
-            secure : process.env.NODE_ENV === "production" ,
+            httpOnly: true,
+            sameSite: 'None', 
+            secure: true,
             maxAge : 7 * 24 * 60 * 60 * 1000
         });
 
@@ -72,9 +73,9 @@ export const login = async (req , res) => {
         const token = jwt.sign({userId : admin._id} , process.env.JWT_SECRET , {expiresIn : "7d"});
         
                 res.cookie("authToken" , token , {
-                    httpOnly : true ,
-                    sameSite : "strict" ,
-                    secure : process.env.NODE_ENV === "production" ,
+                    httpOnly: true,
+                    sameSite: 'None', 
+                    secure: true,
                     maxAge : 7 * 24 * 60 * 60 * 1000
                 });
         
@@ -96,10 +97,9 @@ export const login = async (req , res) => {
 
 export const logout = async (req  , res) => {
     res.clearCookie("authToken", {
-        httpOnly: true, // Match the cookie's httpOnly option
-        sameSite: "strict", // Same sameSite policy as when setting
-        secure: process.env.NODE_ENV === "production", // Match secure setting
-        path : "/"
+        httpOnly: true,
+        sameSite: 'None', 
+        secure: true,
     });
 
     return res.status(200).json({message : "user logedout succussfully"})
@@ -239,4 +239,38 @@ export const changePassword = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server error' , success : false, error });
     }
+};
+
+
+
+export const updateEmployeePassword = async (req, res) => {
+  try {
+    const { adminPassword, employeeId, newPassword } = req.body;
+
+    const admin = await Admin.findOne({}); 
+    if (!admin) {
+      return res.status(200).json({ message: 'Admin not found' , success : false });
+    }
+
+    const isAdminPasswordCorrect = await bcrypt.compare(adminPassword, admin.password);
+    if (!isAdminPasswordCorrect) {
+      return res.status(200).json({ message: 'Incorrect admin password' , success : false });
+    }
+
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(200).json({ message: 'Employee not found' , success : false });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    employee.password = hashedPassword;
+    await employee.save();
+
+    return res.status(200).json({ message: 'Password updated successfully' , success : true });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' , success : false });
+  }
 };

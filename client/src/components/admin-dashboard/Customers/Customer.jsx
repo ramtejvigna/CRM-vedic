@@ -1,44 +1,51 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {CircularProgress} from "@mui/material"
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-    Edit,
-    FileText,
-    MessageCircle,
-    Mail,
-    ThumbsUp,
-    MoreHorizontal,
-    Check,
-    X,
-    ChevronDown,
-    Eye,
-    AlertCircle,
-    ArrowLeft,
-    Star,
-    FilePlus2,
-} from 'lucide-react';
-import axios, { formToJSON } from 'axios';
-import { handleDownload, handleSendMail, handleSendWhatsApp } from './CheckBoxList';
-import { generatePdf } from './pdfDisplayComponent';
-import PDFViewer from './PDFviewer';
-import { api } from '../../../utils/constants';
+  Edit,
+  FileText,
+  MessageCircle,
+  Mail,
+  ThumbsUp,
+  MoreHorizontal,
+  Check,
+  X,
+  ChevronDown,
+  Eye,
+  AlertCircle,
+  ArrowLeft,
+  Star,
+  FilePlus2,
+} from "lucide-react";
+import axios, { formToJSON } from "axios";
+import {
+  handleDownload,
+  handleSendMail,
+  handleSendWhatsApp,
+} from "./CheckBoxList";
+import { generatePdf } from "./pdfDisplayComponent";
+import PDFViewer from "./PDFviewer";
+import { api } from "../../../utils/constants";
 
-import { toast, ToastContainer } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { toast, ToastContainer } from "react-toastify";
+import { Link } from "react-router-dom";
+
 const Customer = () => {
   const [pdfsLoading, setPdfsLoading] = useState(false);
+  const [pdfViewLoading, setPdfViewLoading] = useState(false); // New state for PDF view loading
   const location = useLocation();
-  const { customerData, section, fromSection, activeTab } = location.state || {};
+  const { customerData, section, fromSection, activeTab } =
+    location.state || {};
   const [customerDetails, setCustomerDetails] = useState(null);
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editData, setEditData] = useState({
-    fatherName: '',
-    motherName: '',
-    email: '',
-    whatsappNumber: '',
-    babyGender: ''
+    fatherName: "",
+    motherName: "",
+    email: "",
+    whatsappNumber: "",
+    babyGender: "",
   });
   const [pdfs, setPdfs] = useState([]);
   const customerId = customerData?._id;
@@ -49,11 +56,12 @@ const Customer = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [mailUrl, setMailUrl] = useState(null);
+  const [whatsappUrl, setWhatsappUrl] = useState(null);
   const [pdfId, setPdfId] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
-  const [selectedPdf, setSelectedPdf]=useState(null);
-  const [ mailLoader , setMailLoder] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState(null);
+
   const toggleDropdown = (pdfId) => {
     setActiveDropdown(activeDropdown === pdfId ? null : pdfId);
   };
@@ -64,21 +72,27 @@ const Customer = () => {
 
   const handleActionClick = async (action, pdf) => {
     setActiveDropdown(null);
-    if (action === 'view') {
-      handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
-    } else if (action === 'mail') {
+    if (action === "view") {
+      setPdfViewLoading(true); // Set loading state to true
+      await handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
+      setPdfViewLoading(false); // Set loading state to false
+    } else if (action === "mail") {
       await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
       setPdfId(pdf._id);
-    } else if (action === 'whatsapp') {
-      // Implement WhatsApp sending logic here
-    } else if (action === 'feedback') {
+    } else if (action === "whatsapp") {
+      console.log("calling.....")
+      await handleSetPdfUrlForWhatsapp(pdf.babyNames, pdf.additionalBabyNames);
+      setPdfId(pdf._id)
+    } else if (action === "feedback") {
       if (pdf.whatsappStatus || pdf.mailStatus) {
         // If at least one status is true, show the feedback modal
         setSelectedPdf(pdf); // Store the PDF object
         setShowFeedbackModal(true); // Show the feedback modal
       } else {
         // If both statuses are false, raise a message
-        toast.error("Feedback can only be given if the PDF has been sent via WhatsApp or email.");
+        toast.error(
+          "Feedback can only be given if the PDF has been sent via WhatsApp or email."
+        );
       }
     }
   };
@@ -90,11 +104,11 @@ const Customer = () => {
       if (customerData) {
         setCustomerDetails(customerData);
         setEditData({
-          fatherName: customerData.fatherName || '',
-          motherName: customerData.motherName || '',
-          email: customerData.email || '',
-          whatsappNumber: customerData.whatsappNumber || '',
-          babyGender: customerData.babyGender || ''
+          fatherName: customerData.fatherName || "",
+          motherName: customerData.motherName || "",
+          email: customerData.email || "",
+          whatsappNumber: customerData.whatsappNumber || "",
+          babyGender: customerData.babyGender || "",
         });
       }
       setLoading(false);
@@ -105,13 +119,15 @@ const Customer = () => {
   const fetchPdfs = async () => {
     try {
       setPdfsLoading(true);
-      const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`);
+      const response = await axios.get(
+        `https://vedic-backend-neon.vercel.app/api/generatedpdf?customerId=${customerId}`
+      );
       if (response.data.length > 0) {
         setPdfs(response.data);
       }
       setPdfsLoading(false);
     } catch (error) {
-      console.error('Error fetching PDFs:', error);
+      console.error("Error fetching PDFs:", error);
       toast.error("Error fetching PDFs");
     }
   };
@@ -131,6 +147,17 @@ const Customer = () => {
       toast.error("Error generating PDF URL");
     }
   };
+
+  const handleSetPdfUrlForWhatsapp = async (babyNames, additionalBabyNames) => {
+    try {
+        const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
+        console.log(generatedPdfUrl)
+        setWhatsappUrl(generatedPdfUrl);
+    } catch (error) {
+        console.error("Error generating PDF URL:", error);
+        alert("Error generating PDF URL");
+    }
+};
 
   // Watch for changes to mailUrl and pdfId and send mail if both are available
   useEffect(() => {
@@ -154,6 +181,22 @@ const Customer = () => {
     sendMailAndFetchPdfs();
   }, [mailUrl, pdfId]);
 
+  useEffect(() => {
+    const sendWhatsappAndFetchPdfs = async () => {
+        if (whatsappUrl && pdfId) {
+            console.log(whatsappUrl)
+            try {
+                await handleSendWhatsApp(whatsappUrl, pdfId, customerDetails.whatsappNumber);
+                await fetchPdfs(); 
+            } catch (error) {
+                console.error("Error sending mail:", error);
+            }
+        }
+    };
+
+    sendWhatsappAndFetchPdfs();
+}, [whatsappUrl, pdfId]);
+
   const handleShowPdf = async (babyNames, additionalBabyNames) => {
     const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames); // Call the generatePdf function
     setPdfUrl(generatedPdfUrl); // Set the URL state
@@ -162,30 +205,33 @@ const Customer = () => {
 
   const handleClose = () => {
     setShowViewer(false); // Hide the PDF viewer
-    setPdfUrl(''); // Reset PDF URL
+    setPdfUrl(""); // Reset PDF URL
     setEnabledRow(null); // Reset enabled row
   };
 
   const moveCustomer = (customer, fromSection, toSection, details) => {
     const updatedCustomer = { ...customer, additionalDetails: details };
 
-    if (toSection === 'completed') {
+    if (toSection === "completed") {
       updatedCustomer.feedback = feedback;
       updatedCustomer.pdfGenerated = generatePdf
         ? customer.pdfGenerated + 1
         : customer.pdfGenerated;
-      updatedCustomer.customerStatus = 'completed';
+      updatedCustomer.customerStatus = "completed";
       updatedCustomer.completedOn = new Date();
     }
 
     axios
-      .put(`https://vedic-backend-neon.vercel.app/customers/${customer._id}`, updatedCustomer)
+      .put(
+        `https://vedic-backend-neon.vercel.app/customers/${customer._id}`,
+        updatedCustomer
+      )
       .then(() => {
         setCustomerDetails(updatedCustomer);
         toast.success("Customer moved successfully");
       })
       .catch((error) => {
-        console.error('Error moving customer:', error);
+        console.error("Error moving customer:", error);
         toast.error("Error moving customer");
       });
   };
@@ -194,7 +240,7 @@ const Customer = () => {
     if (customerDetails) {
       moveCustomer(customerDetails, fromSection, section, feedback);
       setShowEditModal(false);
-      if (section === 'inProgress' || section === 'completed') {
+      if (section === "inProgress" || section === "completed") {
         navigate(-1);
       }
     }
@@ -208,14 +254,14 @@ const Customer = () => {
 
   const handleSubmitFeedback = async () => {
     if (selectedRating > 0 && selectedPdf) {
-      console.log(selectedRating,selectedPdf._id);
+      console.log(selectedRating, selectedPdf._id);
       try {
         // Send pdfId and rating in the body of the PUT request
         const response = await axios.put(
           `https://vedic-backend-neon.vercel.app/api/feedback`, // No need to pass pdfId in the URL
           {
-            pdfId: selectedPdf._id,  // Pass the pdfId in the body
-            rating: selectedRating,   // Pass the selected rating
+            pdfId: selectedPdf._id, // Pass the pdfId in the body
+            rating: selectedRating, // Pass the selected rating
           }
         );
         // Reset form and close modal
@@ -223,11 +269,11 @@ const Customer = () => {
         setShowFeedbackModal(false);
         toast.success("Feedback submitted successfully");
       } catch (error) {
-        console.error('Error submitting feedback:', error.message);
-        toast.error('An error occurred while submitting feedback.');
+        console.error("Error submitting feedback:", error.message);
+        toast.error("An error occurred while submitting feedback.");
       }
     } else {
-      toast.error('Please select a rating');
+      toast.error("Please select a rating");
     }
   };
 
@@ -238,8 +284,6 @@ const Customer = () => {
       },
     });
   };
-
- 
 
   if (loading) {
     return (
@@ -255,372 +299,502 @@ const Customer = () => {
 
   return (
     <>
-    <div className="min-h-screen p-4 sm:p-8">
-      <div className="flex items-center mb-6">
-        <Link to='/admin-dashboard/customers'>
-        <button
-          className="flex items-center text-gray-900 hover:text-blue-500"
-        >
-          <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
-        </button>
-        </Link>
-        <h2 className="text-lg font-semibold">Customer Details</h2>
-      </div>
-
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-2xl font-medium ml-4">{customerDetails.customerName}</p>
-        {customerDetails.customerStatus !== 'completed' && (
-          <button
-            onClick={() => setShowConfirmModal(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Move to Completed
-          </button>
-        )}
-      </div>
-
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col">
-        {showConfirmModal && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-              <h2 className="text-lg font-semibold mb-4">Confirm Action</h2>
-              <p className="mb-6">Are you sure you want to move this Customer to completed?</p>
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => setShowConfirmModal(false)}
-                  className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmMoveToCompleted}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <h2 className="text-lg font-semibold mb-4">Customer Summary</h2>
-
-        {/* Grid Layout for Customer Info */}
-        <div className="grid grid-cols-2 md:grid-cols-5 ">
-          {[
-            { label: "customer Id", value: customerDetails.customerID },
-            { label: "Requested On", value: new Date(customerDetails.createdDateTime).toLocaleString() },
-            { label: "Contact No", value: customerDetails.whatsappNumber },
-            { label: "Work Deadline", value:new Date(customerDetails.deadline).toLocaleDateString() || "N/A" },
-            { label: "Email", value: customerDetails.email || "N/A" }
-
-          ].map((item, index) => (
-            <div key={index} className="flex flex-col">
-              <p className="text-sm font-bold text-gray-500 capitalize">{item.label}</p>
-              <hr className="my-3 border-gray-300 w-full" />
-              <p className=" text-gray-900">{item.value}</p>
-            </div>
-          ))}
+      <div className="min-h-screen p-4 sm:p-8">
+        <div className="flex items-center mb-6">
+          <Link to="/admin-dashboard/customers">
+            <button className="flex items-center text-gray-900 hover:text-blue-500">
+              <ArrowLeft size={20} className="mr-2" /> {/* Back arrow icon */}
+            </button>
+          </Link>
+          <h2 className="text-lg font-semibold">Customer Details</h2>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex justify-between items-center mb-4">
+          <p className="text-2xl font-medium ml-4">
+            {customerDetails.customerName}
+          </p>
+          {customerDetails.customerStatus !== "completed" && (
+            <button
+              onClick={() => setShowConfirmModal(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Move to Completed
+            </button>
+          )}
+        </div>
+
         <div className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col">
-          <h2 className="text-lg font-semibold mb-4">Baby Details</h2>
-          <hr className="my-3 border-gray-300 w-full" />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Gender:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.babyGender || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Place of Birth:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.birthplace || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Date of Birth:</p>
-              <p className="mt-1 text-gray-900">
-                {customerDetails.babyBirthDate
-                  ? new Date(customerDetails.babyBirthDate).toLocaleDateString()
-                  : "N/A"}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-500">Time of Birth:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.babyBirthTime || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Mother's Name:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.motherName || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Father's Name:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.fatherName || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
-            </div>
-            {
-                customerDetails?.referenceName ? (<div>
-                    <p className="text-sm font-medium text-gray-500">Reference Name:</p>
-                    <p className="mt-1 text-gray-900">{customerDetails.referenceName || "N/A"}</p>
-                  </div>) : null
-            }
-            {
-                customerDetails?.additionalPreferences ? (<div>
-                    <p className="text-sm font-medium text-gray-500">Additional Preferences:</p>
-                    <p className="mt-1 text-gray-900">{customerDetails.additionalPreferences || "N/A"}</p>
-                  </div>) : null
-            }
-
-            <div className="col-span-2 my-4">
-              <hr className="border-t border-gray-200" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Zodiac Sign:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Leo"}</p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-500">Nakshatra:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Ashwini"}</p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-500">Numerology No :</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "3"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky Colour:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "blue"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Gemstone:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Ruby"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Destiny Number:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "7"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky Day:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "friday"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky God:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.zodiacSign || "Lord Shiva"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Lucky Metal:</p>
-              <p className="mt-1 text-gray-900">{customerDetails.nakshatra || "Gold"}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
-            <h2 className="text-lg font-medium mb-4">Payment Details</h2>
-            <hr className="my-3 border-gray-300 w-full" />
-
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Payment Date</p>
-                    <p className="mt-1">{customerDetails?.paymentDate ? new Date(customerDetails.paymentDate).toLocaleDateString() : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Payment Time</p>
-                    <p className="mt-1">{customerDetails?.paymentTime || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Amount Paid</p>
-                    <p className="mt-1">{customerDetails?.amountPaid || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Source ({customerDetails?.leadSource})</p>
-                    <p className="mt-1">{customerDetails?.socialMediaId || "N/A"}</p>
-                  </div>
+          {showConfirmModal && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                <h2 className="text-lg font-semibold mb-4">Confirm Action</h2>
+                <p className="mb-6">
+                  Are you sure you want to move this Customer to completed?
+                </p>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmMoveToCompleted}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Confirm
+                  </button>
                 </div>
               </div>
+            </div>
+          )}
 
-              <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col overflow-y-auto relative" style={{ height: '345px' }} ><div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold mb-4">Customer Summary</h2>
+
+          {/* Grid Layout for Customer Info */}
+          <div className="grid grid-cols-2 md:grid-cols-5 ">
+            {[
+              { label: "customer Id", value: customerDetails.customerID },
+              {
+                label: "Requested On",
+                value: new Date(
+                  customerDetails.createdDateTime
+                ).toLocaleString(),
+              },
+              { label: "Contact No", value: customerDetails.whatsappNumber },
+              {
+                label: "Work Deadline",
+                value:
+                  new Date(customerDetails.deadline).toLocaleDateString() ||
+                  "N/A",
+              },
+              { label: "Email", value: customerDetails.email || "N/A" },
+            ].map((item, index) => (
+              <div key={index} className="flex flex-col">
+                <p className="text-sm font-bold text-gray-500 capitalize">
+                  {item.label}
+                </p>
+                <hr className="my-3 border-gray-300 w-full" />
+                <p className=" text-gray-900">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-4  flex flex-col">
+            <h2 className="text-lg font-semibold mb-4">Baby Details</h2>
+            <hr className="my-3 border-gray-300 w-full" />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Gender:</p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.babyGender || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Place of Birth:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.birthplace || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Date of Birth:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.babyBirthDate
+                    ? new Date(
+                        customerDetails.babyBirthDate
+                      ).toLocaleDateString()
+                    : "N/A"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Time of Birth:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.babyBirthTime || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Mother's Name:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.motherName || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Father's Name:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.fatherName || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Preferred Starting Letter:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.preferredStartingLetter || "N/A"}
+                </p>
+              </div>
+              {customerDetails?.referenceName ? (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Reference Name:
+                  </p>
+                  <p className="mt-1 text-gray-900">
+                    {customerDetails.referenceName || "N/A"}
+                  </p>
+                </div>
+              ) : null}
+              {customerDetails?.additionalPreferences ? (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Additional Preferences:
+                  </p>
+                  <p className="mt-1 text-gray-900">
+                    {customerDetails.additionalPreferences || "N/A"}
+                  </p>
+                </div>
+              ) : null}
+
+              <div className="col-span-2 my-4">
+                <hr className="border-t border-gray-200" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Zodiac Sign:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.zodiacSign || "Leo"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-500">Nakshatra:</p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.nakshatra || "Ashwini"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Numerology No :
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.nakshatra || "3"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Lucky Colour:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.zodiacSign || "blue"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Gemstone:</p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.nakshatra || "Ruby"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Destiny Number:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.zodiacSign || "7"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Lucky Day:</p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.nakshatra || "friday"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Lucky God:</p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.zodiacSign || "Lord Shiva"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Lucky Metal:
+                </p>
+                <p className="mt-1 text-gray-900">
+                  {customerDetails.nakshatra || "Gold"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col">
+              <h2 className="text-lg font-medium mb-4">Payment Details</h2>
+              <hr className="my-3 border-gray-300 w-full" />
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Payment Date
+                  </p>
+                  <p className="mt-1">
+                    {customerDetails?.paymentDate
+                      ? new Date(
+                          customerDetails.paymentDate
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Payment Time
+                  </p>
+                  <p className="mt-1">
+                    {customerDetails?.paymentTime || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Amount Paid
+                  </p>
+                  <p className="mt-1">{customerDetails?.amountPaid || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Source ({customerDetails?.leadSource})
+                  </p>
+                  <p className="mt-1">
+                    {customerDetails?.socialMediaId || "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4 flex flex-col overflow-y-auto relative" style={{ height: '345px' }}>
+  <div className="flex justify-between items-center mb-4">
     <h2 className="text-lg font-semibold">PDFs Generated</h2>
     {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') && (
       <button
         onClick={handleNavigate}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-blue-500 text-white px-4 py-2 rounded flex items-center space-x-2 hover:bg-blue-600 transition"
       >
-        <FilePlus2 />
+        <FilePlus2 className="h-5 w-5" />
+        <span>Generate PDF</span>
       </button>
     )}
-
   </div>
-   <div className="overflow-visible">
-    <table className="w-full">
-      <thead>
-        <tr className="border-b">
-          <th className="px-4 py-2 text-gray-500 text-left">PDF</th>
-          <th className="px-4 py-2 text-gray-500 text-left">Generated</th>
-          <th className="px-4 py-2 text-center">
-            <MessageCircle className="inline h-4 w-4" />
-          </th>
-          <th className="px-4 py-2 text-center">
-            <Mail className="inline h-4 w-4" />
-          </th>
-          <th className="px-4 py-2 text-gray-500 text-center">Feedback</th>
-          <th className="px-4 py-2 text-gray-500 text-center">Actions</th>
-        </tr>
-      </thead>
 
-      <tbody>
-        {pdfs.map((pdf) => (
-          <tr key={pdf._id} className="border-b">
-            <td className="px-4 py-2">
-              <button onClick={() => handleShowPdf(pdf.babyNames, pdf.additionalBabyNames)}>
-                <FileText className="h-4 w-4 text-blue-600" />
-              </button>
-            </td>
-            <td className="px-4 py-2">
-              <div className="flex flex-col">
-                <span className="text-sm">{new Date(pdf.createdAt).toLocaleDateString()}</span>
-                <span className="text-xs text-gray-500">
-                  {new Date(pdf.createdAt).toLocaleTimeString()}
-                </span>
-              </div>
-            </td>
-            <td className="px-4 py-2 text-center">
-              <div className={`h-3 w-3 rounded-full ${pdf.whatsappStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
-            </td>
-            <td className="px-4 py-2 text-center">
-              <div className={`h-3 w-3 rounded-full ${pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'} mx-auto`} />
-            </td>
-            <td className="px-4 py-2 text-center">
-              <span className="text-sm font-medium">
-                {pdf.rating === 0
-                  ? "-"
-                  : pdf.rating === 5
-                  ? "Outstanding"
-                  : pdf.rating === 4
-                  ? "Good"
-                  : pdf.rating === 3
-                  ? "Satisfactory"
-                  : pdf.rating === 2
-                  ? "Needs Improvement"
-                  : "Poor"}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right relative">
-              <div className="flex items-center justify-end space-x-2">
-             <div className="relative">
-    <button
-        onClick={(e) => {
-            e.stopPropagation();
-            toggleDropdown(pdf._id);
-        }}
-        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
-    >
-        {mailLoader ? (
-          <CircularProgress size={15}/>
-        ) : (
-          <MoreHorizontal className="h-5 w-5" />
-        )}
-    </button>
+  {pdfsLoading ? (
+    <div className="flex justify-center items-center h-full">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  ) : pdfs.length === 0 ? (
+    <div className="flex flex-col items-center justify-center text-center pt-4 h-full">
 
-    {activeDropdown === pdf._id && (
-        <div
-            className="absolute right-0 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
-            style={{
-                bottom: '-80%',
-                right: '90%',
-                marginBottom: '0.5rem',
-            }}
+      <h3 className="text-lg font-semibold text-gray-700">No PDFs Generated</h3>
+      <p className="text-gray-500 mb-6">You haven’t generated any PDFs yet.</p>
+      {(customerDetails.customerStatus === 'inProgress' || customerDetails.customerStatus === 'inWorking') && (
+        <button
+          onClick={handleNavigate}
+          className="bg-blue-500 text-white px-6 py-3 rounded-lg flex items-center space-x-2 hover:bg-blue-600 transition"
         >
-            {[
-                { icon: FileText, label: 'View PDF', action: 'view' },
-                { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
-                { icon: Mail, label: 'Send to Mail', action: 'mail' },
-                ...(pdf.rating === 0 ? [{ icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' }] : []),
-            ].map((item, i) => (
-                <button
-                    key={i}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleActionClick(item.action, pdf);
-                    }}
-                    className="flex items-center w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    <span>{item.label}</span>
-                </button>
-            ))}
-        </div>
-    )}
-</div>
-
-              </div>
-            </td>
+          <FilePlus2 className="h-5 w-5" />
+          <span>Generate Your First PDF</span>
+        </button>
+      )}
+    </div>
+  ) : (
+    <div className="overflow-visible">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b">
+            <th className="px-4 py-2 text-gray-500 text-left">PDF</th>
+            <th className="px-4 py-2 text-gray-500 text-left">Generated</th>
+            <th className="px-4 py-2 text-center">
+              <MessageCircle className="inline h-4 w-4" />
+            </th>
+            <th className="px-4 py-2 text-center">
+              <Mail className="inline h-4 w-4" />
+            </th>
+            <th className="px-4 py-2 text-gray-500 text-center">Feedback</th>
+            <th className="px-4 py-2 text-gray-500 text-center">Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
-            </div>
-          </div>
+        </thead>
 
-            <div className="mt-8">
-            {showViewer && (
-                <PDFViewer
-                    pdfUrl={pdfUrl}
-                    handleDownload={handleDownload}
-                    handleSendMail={handleSendMail}
-                    email={customerDetails.email}
-                    enabledRow={enabledRow}
-                    pdfId={enabledRow}
-                    onClose={handleClose}
+        <tbody>
+          {pdfs.map((pdf) => (
+            <tr key={pdf._id} className="border-b">
+              <td className="px-4 py-2">
+                <button onClick={() => handleShowPdf(pdf.babyNames, pdf.additionalBabyNames)}>
+                  <FileText className="h-4 w-4 text-blue-600" />
+                </button>
+              </td>
+              <td className="px-4 py-2">
+                <div className="flex flex-col">
+                  <span className="text-sm">{new Date(pdf.createdAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(pdf.createdAt).toLocaleTimeString()}
+                  </span>
+                </div>
+              </td>
+              <td className="px-4 py-2 text-center">
+                <div
+                  className={`h-3 w-3 rounded-full ${
+                    pdf.whatsappStatus ? 'bg-green-500' : 'bg-red-500'
+                  } mx-auto`}
                 />
-            )}
+              </td>
+              <td className="px-4 py-2 text-center">
+                <div
+                  className={`h-3 w-3 rounded-full ${
+                    pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'
+                  } mx-auto`}
+                />
+              </td>
+              <td className="px-4 py-2 text-center">
+                <span className="text-sm font-medium">
+                  {pdf.rating === 0
+                    ? '-'
+                    : pdf.rating === 5
+                    ? 'Outstanding'
+                    : pdf.rating === 4
+                    ? 'Good'
+                    : pdf.rating === 3
+                    ? 'Satisfactory'
+                    : pdf.rating === 2
+                    ? 'Needs Improvement'
+                    : 'Poor'}
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right relative">
+                <div className="flex items-center justify-end space-x-2">
+                  <div className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleDropdown(pdf._id);
+                      }}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                    >
+                      <MoreHorizontal className="h-5 w-5" />
+                    </button>
+
+                    {activeDropdown === pdf._id && (
+                      <div
+                        className="absolute right-0 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+                        style={{
+                          bottom: '-80%',
+                          right: '90%',
+                          marginBottom: '0.5rem',
+                        }}
+                      >
+                        {[
+                          { icon: FileText, label: 'View PDF', action: 'view' },
+                          { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
+                          { icon: Mail, label: 'Send to Mail', action: 'mail' },
+                          ...(pdf.rating === 0 ? [{ icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' }] : []),
+                        ].map((item, i) => (
+                          <button
+                            key={i}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleActionClick(item.action, pdf);
+                            }}
+                            className="flex items-center w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                          >
+                            <item.icon className="h-4 w-4 mr-3" />
+                            <span>{item.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
+          </div>
+        </div>
+
+        <div className="mt-8">
+          {pdfViewLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : showViewer ? (
+            <PDFViewer
+              pdfUrl={pdfUrl}
+              handleDownload={handleDownload}
+              handleSendMail={handleSendMail}
+              email={customerDetails.email}
+              enabledRow={enabledRow}
+              pdfId={enabledRow}
+              onClose={handleClose}
+            />
+          ) : null}
         </div>
 
         {showFeedbackModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white p-6 rounded-lg w-80 text-center relative">
-    <button
-        onClick={() => { setShowFeedbackModal(false); setSelectedRating(0); }}
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1"
-      >
-        ✖
-      </button>
-      <h2 className="text-xl font-semibold mb-4">Feedback For Pdf</h2>
-      <div className="flex justify-center mb-4">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <span
-            key={star}
-            className={`cursor-pointer text-3xl ${star <= selectedRating ? 'text-yellow-500' : 'text-gray-400'}`}
-            onClick={() => handleStarClick(star)}
-          >
-            ★
-          </span>
-        ))}
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg w-80 text-center relative">
+              <button
+                onClick={() => {
+                  setShowFeedbackModal(false);
+                  setSelectedRating(0);
+                }}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1"
+              >
+                ✖
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Feedback For Pdf</h2>
+              <div className="flex justify-center mb-4">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`cursor-pointer text-3xl ${
+                      star <= selectedRating
+                        ? "text-yellow-500"
+                        : "text-gray-400"
+                    }`}
+                    onClick={() => handleStarClick(star)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <div>
+                <button
+                  onClick={handleSubmitFeedback}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md mt-4 w-full hover:bg-blue-600"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      <div>
-        <button
-          onClick={handleSubmitFeedback}
-          className="bg-blue-500 text-white py-2 px-4 rounded-md mt-4 w-full hover:bg-blue-600"
-        >
-          Submit
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-    </div>
-    <ToastContainer />
+      <ToastContainer />
     </>
-    );
+  );
 };
 
 export default Customer;
