@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
 })
 
 
+
 export async function sendForgotPasswordEmail(data) {
     try {
       

@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkAuth, forgotPassword, login, logout, resetPassword, signup , verifyOTP , changePassword } from '../controllers/AdminAuthControllers.js';
+import { checkAuth, forgotPassword, login, logout, resetPassword, signup , verifyOTP , changePassword, updateEmployeePassword } from '../controllers/AdminAuthControllers.js';
 import { verifyToken } from '../middleware/AdminAuth.js';
 
 const router = express.Router();
@@ -12,4 +12,5 @@ router.post('/verify-otp' , verifyOTP)
 router.post('/change-password/:token' , resetPassword)
 router.post('/change-current-password' , verifyToken , changePassword)
 router.post('/logout' , logout)
+router.put('/update-employee-password' , updateEmployeePassword)
 export default router;

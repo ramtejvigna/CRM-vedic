@@ -11,6 +11,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import zlib from 'zlib';
+import { uploadFileToFirebase } from '../utils/firebase.js';
 
 dotenv.config();
 
@@ -24,21 +25,6 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
-
-
-const uploadPdfToFirebase = async (base64Pdf, uniqueId, bucket) => {
-    const buffer = Buffer.from(base64Pdf, 'base64');
-    const file = bucket.file(`${uniqueId}.pdf`);
-
-    await file.save(buffer, {
-        metadata: { contentType: 'application/pdf' },
-    });
-
-    await file.makePublic();
-
-    const publicUrl =` https://storage.googleapis.com/${bucket.name}/${file.name}`;
-    return publicUrl;
-};
 
 export const getBabyNames = async (req, res) => {
     try {
@@ -260,22 +246,29 @@ export const sendPdfEmail = async (req, res) => {
 
 
 
+const validateMimeType = async (base64String) => {
+    const buffer = Buffer.from(base64String, 'base64');
+    const detectedType = await fileType(buffer);
+    
+    if (!detectedType || detectedType.mime !== 'application/pdf') {
+        throw new Error("The uploaded document is not a PDF.");
+    }
+};
+
 export const sendPdfWhatsApp = async (req, res) => {
     const { phoneNumber, base64Pdf, uniqueId } = req.body;
-
+    
     try {
-        const pdfUrl = await uploadPdfToFirebase(base64Pdf, uniqueId, bucket);
 
-        await twilioClient.messages.create({
-            from: 'whatsapp:+14155238886',
-            to: `whatsapp:+${phoneNumber}`,
-            mediaUrl: pdfUrl,
-            body: 'Here is your requested PDF',
-        });
+        const firebasePdfUrl = await uploadFileToFirebase(
+            `${uniqueId}.pdf`,
+            base64Pdf,
+            'application/pdf'
+        );
 
         return res.status(200).json({
             message: `PDF sent to WhatsApp: ${phoneNumber}`,
-            pdfUrl,
+            firebasePdfUrl,
         });
     } catch (error) {
         console.error('Error sending PDF via WhatsApp:', error);
@@ -284,6 +277,7 @@ export const sendPdfWhatsApp = async (req, res) => {
         });
     }
 };
+
 
 export const addBabyName = async (req,res) => {
     try {

@@ -56,6 +56,7 @@ const Customer = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [mailUrl, setMailUrl] = useState(null);
+  const [whatsappUrl, setWhatsappUrl] = useState(null);
   const [pdfId, setPdfId] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
@@ -79,7 +80,9 @@ const Customer = () => {
       await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
       setPdfId(pdf._id);
     } else if (action === "whatsapp") {
-      // Implement WhatsApp sending logic here
+      console.log("calling.....")
+      await handleSetPdfUrlForWhatsapp(pdf.babyNames, pdf.additionalBabyNames);
+      setPdfId(pdf._id)
     } else if (action === "feedback") {
       if (pdf.whatsappStatus || pdf.mailStatus) {
         // If at least one status is true, show the feedback modal
@@ -145,15 +148,30 @@ const Customer = () => {
     }
   };
 
+  const handleSetPdfUrlForWhatsapp = async (babyNames, additionalBabyNames) => {
+    try {
+        const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
+        console.log(generatedPdfUrl)
+        setWhatsappUrl(generatedPdfUrl);
+    } catch (error) {
+        console.error("Error generating PDF URL:", error);
+        alert("Error generating PDF URL");
+    }
+};
+
   // Watch for changes to mailUrl and pdfId and send mail if both are available
   useEffect(() => {
     const sendMailAndFetchPdfs = async () => {
       if (mailUrl && pdfId) {
+
         try {
+          setMailLoder(true);
           await handleSendMail(mailUrl, pdfId, customerData.email);
           await fetchPdfs(); // Re-fetch PDFs after sending mail
           toast.success("Email sent successfully");
+          setMailLoder(false);
         } catch (error) {
+          setMailLoder(false);
           console.error("Error sending mail:", error);
           toast.error("Error sending mail");
         }
@@ -162,6 +180,22 @@ const Customer = () => {
 
     sendMailAndFetchPdfs();
   }, [mailUrl, pdfId]);
+
+  useEffect(() => {
+    const sendWhatsappAndFetchPdfs = async () => {
+        if (whatsappUrl && pdfId) {
+            console.log(whatsappUrl)
+            try {
+                await handleSendWhatsApp(whatsappUrl, pdfId, customerDetails.whatsappNumber);
+                await fetchPdfs(); 
+            } catch (error) {
+                console.error("Error sending mail:", error);
+            }
+        }
+    };
+
+    sendWhatsappAndFetchPdfs();
+}, [whatsappUrl, pdfId]);
 
   const handleShowPdf = async (babyNames, additionalBabyNames) => {
     const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames); // Call the generatePdf function
