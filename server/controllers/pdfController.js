@@ -285,7 +285,7 @@ export const addBabyName = async (req, res) => {
         }
 
         // Ensure babyNames is properly initialized with the correct structure
-        const newBabyName = new babyNames({ name: newName }); // Adjust to schema requirements
+        const newBabyName = new babyNames(newName); // Adjust to schema requirements
 
         // Save the baby name
         const savedName = await newBabyName.save();
