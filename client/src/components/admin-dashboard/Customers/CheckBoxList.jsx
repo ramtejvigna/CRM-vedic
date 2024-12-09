@@ -58,11 +58,8 @@ export const handleSendMail = async (pdfUrl, uniqueId, email) => {
       base64Pdf,
       uniqueId,
     });
-
-    alert("PDF sent to email");
   } catch (error) {
     console.error("Error sending PDF to email", error);
-    alert("Error sending email");
   }
 };
 
@@ -84,7 +81,7 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
     const base64Pdf = await blobToBase64(pdfBlob);
 
     console.log("pdf",base64Pdf);
-    const res = await axios.post("http://localhost:8000/api/send-pdf-whatsapp", {
+    const res = await axios.post("http://localhost:9000/api/send-pdf-whatsapp", {
       phoneNumber,
       base64Pdf,
       uniqueId,
@@ -93,7 +90,6 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
     if(res.status === 200) {
         window.open(`https://wa.me/+919059578959?text=${encodeURIComponent(res.data.firebasePdfUrl)}`);
     }
-    alert("PDF sent to WhatsApp");
   } catch (error) {
     console.error("Error sending PDF via WhatsApp", error);
     alert("Error sending WhatsApp message");
