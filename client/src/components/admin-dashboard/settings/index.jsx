@@ -564,9 +564,12 @@ function Settings() {
                   <Button type="button" variant="outlined" onClick={() => setShowModel(false)} color="primary">
                     Cancel
                   </Button>
-                  <Button type="submit" variant="contained"  autoFocus>
-                    {loading ? <CircularProgress size={10}/> : "change"}
-                  </Button>
+                  {
+                    loading ? <CircularProgress /> :
+                    <Button type="submit" variant="contained"  autoFocus>
+                      { "change"}
+                    </Button>
+                  }
                 </DialogActions>
                 </form>
             </div>

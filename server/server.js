@@ -36,12 +36,12 @@ const __dirname = dirname(__filename)
 
 app.use(cors({
     origin: [
+      "https://crm-vedic-manager.netlify.app", 
       "http://localhost:5173", 
       "http://localhost:5174",
       "http://localhost:5175",
       "https://vedic-crm.netlify.app", 
       "https://vedic-employee.netlify.app", 
-      "https://crm-vedic-manager.netlify.app", 
       "https://vedic-form.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
@@ -79,7 +79,7 @@ app.use('/categories', categoryRoutes)
 
 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 9000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
 
 setUpSocket(server);
