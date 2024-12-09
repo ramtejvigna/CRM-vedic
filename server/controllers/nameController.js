@@ -1,5 +1,6 @@
 import { babyNames } from "../models/PDF.js"; // Import your babyNames model
 import { read, utils } from 'xlsx';
+import { Employee } from "../models/User.js";
 
 export const uploadExcelNames = async (req, res) => {
     // Check if an Excel file is uploaded
@@ -8,6 +9,7 @@ export const uploadExcelNames = async (req, res) => {
     }
 
     const file = req.files.excel;
+    const employeeId = req.body.employeeId;
 
     try {
         // Read the Excel file
@@ -32,6 +34,17 @@ export const uploadExcelNames = async (req, res) => {
         
         // Insert into database
         await babyNames.insertMany(normalizedResults);
+
+        if(employeeId) {
+            const employeeData = await Employee.findById(employeeId);
+
+            if(!employeeData) {
+                return res.status(404).json({ error: "Employee not found" });
+            }
+            employeeData.adminAcceptedRequest = false;
+
+            await employeeData.save();
+        }
         res.status(200).json({ message: "Baby names uploaded successfully" });
     } catch (error) {
         console.error("Error processing Excel file:", error);

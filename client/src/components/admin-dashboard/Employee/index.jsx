@@ -134,6 +134,7 @@ const EmployeeTable = () => {
       if (response.data.accepted) {
         setIsModalOpen(false);
         toast.success("Request accepted");
+        await fetchEmployees();
       }
     } catch (error) {
       toast.error("Failed to accept the request");

@@ -4,8 +4,6 @@ import { Check, X, AlertTriangle } from "lucide-react";
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, employeeId }) => {
 
-    console.log(employeeId);
-
     const handleClick = async () => {
         await onConfirm(employeeId);
     }

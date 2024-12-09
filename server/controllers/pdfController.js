@@ -242,10 +242,6 @@ export const sendPdfEmail = async (req, res) => {
     }
 };
 
-
-
-
-
 const validateMimeType = async (base64String) => {
     const buffer = Buffer.from(base64String, 'base64');
     const detectedType = await fileType(buffer);
@@ -279,15 +275,40 @@ export const sendPdfWhatsApp = async (req, res) => {
 };
 
 
-export const addBabyName = async (req,res) => {
+export const addBabyName = async (req, res) => {
     try {
-        const newBabyName = new babyNames(req.body);
+        const { newName, employeeId } = req.body;
+
+        // Validate the input
+        if (!newName) {
+            return res.status(400).json({ message: 'Baby name is required.' });
+        }
+
+        // Ensure babyNames is properly initialized with the correct structure
+        const newBabyName = new babyNames({ name: newName }); // Adjust to schema requirements
+
+        // Save the baby name
         const savedName = await newBabyName.save();
+
+        if (employeeId) {
+            const employeeData = await Employee.findById(employeeId);
+
+            if (!employeeData) {
+                return res.status(404).json({ message: 'Employee not found.' });
+            }
+
+            // Update employee record
+            employeeData.adminAcceptedRequest = false;
+            await employeeData.save();
+        }
+
         res.status(201).json(savedName);
     } catch (error) {
-        res.status(400).json({ message: 'Error adding baby name', error: error.message });
+        console.error('Error adding baby name:', error); // Log detailed error for debugging
+        res.status(500).json({ message: 'Error adding baby name. Please try again later.' });
     }
-}
+};
+
 
 export const submitFeedback = async (req, res) => {
     const { pdfId, rating } = req.body; // Extract pdfId and rating from request body
@@ -321,24 +342,3 @@ export const submitFeedback = async (req, res) => {
     }
   };
   
-
-
-// export const getPdfsByCustomerId = async (req, res) => {
-//   const { customerId } = req.query;
-  
-//   if (!customerId) {
-//       return res.status(400).json({ error: 'Customer ID is required' });
-//   }
-
-//   try {
-//       const pdfs = await PDF.find({ customer: customerId }).sort({ createdAt: -1 });
-//       if (!pdfs) {
-//           return res.status(404).json({ error: 'No PDFs found for this customer' });
-//       }
-      
-//       res.status(200).json(pdfs);
-//   } catch (error) {
-//       console.error('Error fetching PDFs:', error);
-//       res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
