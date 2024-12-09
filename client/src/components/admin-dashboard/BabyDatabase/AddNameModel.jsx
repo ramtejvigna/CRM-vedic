@@ -9,7 +9,7 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
         nakshatra: [],
         planet: [],
         element: [],
-        bookName: [],
+        bookname: [],
         festival: []
     });
 
@@ -90,7 +90,7 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
                 required={required}
             >
                 <option value="">Select {label}</option>
-                {options.map((option) => (
+                {options?.map((option) => (
                     <option key={option} value={option}>
                         {option}
                     </option>
