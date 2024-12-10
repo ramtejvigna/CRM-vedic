@@ -20,7 +20,7 @@ const modelMap = {
     nakshatra: Nakshatra,
     planet: Planet,
     element: Element,
-    bookName: BookName,
+    bookname: BookName,
     festival: Festival
 };
 

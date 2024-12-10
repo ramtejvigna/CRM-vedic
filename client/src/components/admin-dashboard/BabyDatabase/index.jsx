@@ -8,21 +8,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import EmptyBabyNames from './EmptyBabyNames';
 import ExcelTemplateButton from './ExcelTempleteButton';
 import AddNameModal from './AddNameModel';
-import { utils , writeFile } from "xlsx"
+import { utils, writeFile } from "xlsx"
 
 const ExcelDownloadButton = ({ data }) => {
     const handleDownload = () => {
         try {
             // Convert data to worksheet
             const ws = utils.json_to_sheet(data);
-            
+
             // Create workbook and append worksheet
             const wb = utils.book_new();
             utils.book_append_sheet(wb, ws, "Baby Names");
-            
+
             // Save file
             writeFile(wb, "filtered_baby_names.xlsx");
-            
+
             toast.success("Exported Baby Names successfully", {
                 onClose: () => { },
                 toastId: 'export-success'
@@ -81,16 +81,21 @@ const BabyDatabase = () => {
         zodiacs: [],
         nakshatras: [],
         elements: [],
-        bookNames: []
+        bookNames: [],
+        planetaryInfluence: [],
+        relatedFestival: []
     });
     const [selectedFilters, setSelectedFilters] = useState({
         zodiac: '',
         nakshatra: '',
         element: '',
-        bookName: ''
+        bookName: '',
+        planetaryInfluence: '',
+        relatedFestival: ''
     });
 
     const fetchBabyNames = async () => {
+        setLoading(true);
         try {
             const response = await axios.get("https://vedic-backend-neon.vercel.app/api/names");
             setBabyNames(response.data);
@@ -107,7 +112,9 @@ const BabyDatabase = () => {
                 zodiacs: extractUniqueValues('zodiac'),
                 nakshatras: extractUniqueValues('nakshatra'),
                 elements: extractUniqueValues('element'),
-                bookNames: extractUniqueValues('bookName')
+                bookNames: extractUniqueValues('bookName'),
+                planetaryInfluence: extractUniqueValues('planetaryInfluence'),
+                relatedFestival: extractUniqueValues('relatedFestival')
             };
 
             setFilterOptions(uniqueValues);
@@ -151,13 +158,22 @@ const BabyDatabase = () => {
         const matchesBookName = !selectedFilters.bookName ||
             baby.bookName?.toLowerCase() === selectedFilters.bookName.toLowerCase();
 
+        const matchesPlanetary = !selectedFilters.planetaryInfluence ||
+            baby.planetaryInfluence?.toLowerCase() === selectedFilters.planetaryInfluence.toLowerCase();
+
+        const matchesRelatedFestival = !selectedFilters.relatedFestival ||
+            baby.relatedFestival?.toLowerCase() === selectedFilters.relatedFestival.toLowerCase();
+
+
         return matchesSearch &&
             matchesGender &&
             matchesStartingLetter &&
             matchesZodiac &&
             matchesNakshatra &&
             matchesElement &&
-            matchesBookName;
+            matchesBookName &&
+            matchesPlanetary &&
+            matchesRelatedFestival;
     });
 
     const handleFilterChange = (filterType, value) => {
@@ -189,7 +205,7 @@ const BabyDatabase = () => {
 
     const handleAddName = async (newName) => {
         try {
-            await axios.post("https://vedic-backend-neon.vercel.app/api/names", newName);
+            await axios.post("https://vedic-backend-neon.vercel.app/api/names", { newName: newName });
             await fetchBabyNames();
             toast.success("Name added successfully!", {
                 onClose: () => { },
@@ -344,6 +360,20 @@ const BabyDatabase = () => {
                     value={selectedFilters.bookName}
                     onChange={(value) => handleFilterChange('bookName', value)}
                 />
+
+                <FilterDropdown
+                    label="Planetary Influence"
+                    options={filterOptions.planetaryInfluence}
+                    value={selectedFilters.planetaryInfluence}
+                    onChange={(value) => handleFilterChange('planetaryInfluence', value)}
+                />
+
+                <FilterDropdown
+                    label="Related Festivals"
+                    options={filterOptions.relatedFestival}
+                    value={selectedFilters.relatedFestival}
+                    onChange={(value) => handleFilterChange('relatedFestival', value)}
+                />
             </div>
         </motion.div>
     );
@@ -438,7 +468,7 @@ const BabyDatabase = () => {
                     transition={{ duration: 0.5 }}
                     className="bg-white rounded-lg shadow-xl"
                 >
-                    {filteredNames.length !== 0 && !loading && (
+                    {filteredNames.length !== 0 && (
                         <table className="min-w-full divide-y min-h-full divide-gray-200">
                             {loading ? (
                                 <LoadingSpinner />

@@ -12,7 +12,7 @@ const setUpSocket = (server) => {
         "https://vedic-form.netlify.app",
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:5175"
+        "http://localhost:5175",
       ],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       credentials: true,
@@ -25,18 +25,23 @@ const setUpSocket = (server) => {
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       console.error(`Invalid userId: ${userId}`);
       return;
-  }
+    }
     try {
-      await Employee.findByIdAndUpdate(userId, { isOnline }, { new: true });
-      console.log(`User ${userId} is now ${isOnline ? "online" : "offline"}`);
+      const user = await Employee.findByIdAndUpdate(userId, { isOnline }, { new: true });
+      if (!user) {
+        console.warn(`User not found in database: ${userId}`);
+        return;
+      }
+      console.log(`User ${user?.email} is now ${isOnline ? "online" : "offline"}`);
     } catch (error) {
       console.error(`Failed to update status for user ${userId}:`, error);
     }
   };
 
   const emitOnlineList = () => {
-    const userOnline = Array.from(userSocketMap.keys());
-    io.emit("online-list", userOnline);
+    const onlineUsers = Array.from(userSocketMap.keys());
+    console.log(onlineUsers)
+    io.emit("online-list", onlineUsers);
   };
 
   const handleDisconnect = async (socket) => {
@@ -53,7 +58,6 @@ const setUpSocket = (server) => {
 
     if (disconnectedUser) {
       await updateUserStatusInDB(disconnectedUser, false);
-
       io.emit("user-status", {
         userId: disconnectedUser,
         isOnline: false,
@@ -66,12 +70,11 @@ const setUpSocket = (server) => {
   io.on("connection", async (socket) => {
     const userId = socket.handshake.query.userId;
 
-    if (userId) {
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
       userSocketMap.set(userId, socket.id);
       console.log(`User connected: ${userId} with socket ID: ${socket.id}`);
 
       await updateUserStatusInDB(userId, true);
-
       io.emit("user-status", {
         userId,
         isOnline: true,
@@ -79,11 +82,12 @@ const setUpSocket = (server) => {
 
       emitOnlineList();
     } else {
-      console.log("User ID not provided in handshake query");
+      console.error("Invalid or missing user ID in handshake query");
     }
 
     socket.on("disconnect", () => handleDisconnect(socket));
   });
+
 };
 
 export default setUpSocket;

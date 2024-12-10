@@ -179,38 +179,40 @@ const Customization = () => {
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-2">
-                                    <AnimatePresence>
-                                        {categories[category].map((item, index) => (
-                                            <motion.div
-                                                key={item}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                exit={{ opacity: 0, x: 20 }}
-                                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors"
-                                            >
-                                                <span className="text-gray-700">{item}</span>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.1 }}
-                                                    whileTap={{ scale: 0.9 }}
-                                                    onClick={() => handleDeleteEntry(category, index)}
-                                                    disabled={
-                                                        actionLoading.type === 'delete' &&
-                                                        actionLoading.category === category &&
-                                                        actionLoading.index === index
-                                                    }
-                                                    className="text-gray-400 hover:text-red-500 transition-colors"
+                                    <div className="h-60 overflow-y-auto pr-2">
+                                        <AnimatePresence>
+                                            {categories[category].map((item, index) => (
+                                                <motion.div
+                                                    key={item}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: 20 }}
+                                                    className="flex items-center justify-between p-3 mb-2 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors"
                                                 >
-                                                    {actionLoading.type === 'delete' &&
-                                                        actionLoading.category === category &&
-                                                        actionLoading.index === index ? (
-                                                        <Loader2 className="h-5 w-5 animate-spin" />
-                                                    ) : (
-                                                        <Trash2 className="h-5 w-5 text-red-500 transition-opacity" />
-                                                    )}
-                                                </motion.button>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
+                                                    <span className="text-gray-700">{item}</span>
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.1 }}
+                                                        whileTap={{ scale: 0.9 }}
+                                                        onClick={() => handleDeleteEntry(category, index)}
+                                                        disabled={
+                                                            actionLoading.type === 'delete' &&
+                                                            actionLoading.category === category &&
+                                                            actionLoading.index === index
+                                                        }
+                                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                                    >
+                                                        {actionLoading.type === 'delete' &&
+                                                            actionLoading.category === category &&
+                                                            actionLoading.index === index ? (
+                                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                                        ) : (
+                                                            <Trash2 className="h-5 w-5 text-red-500 transition-opacity" />
+                                                        )}
+                                                    </motion.button>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>

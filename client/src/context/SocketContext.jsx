@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useStore } from "../store";
 import { HOST } from "../utils/constants.js";
@@ -14,10 +14,7 @@ export const SocketProvider = ({ children }) => {
       const socketInstance = io(HOST, {
         withCredentials: true,
         query: { userId: adminInfo._id },
-        path: '/socket',
-        transports:['websocket',"polling"],
-        reconnection: true,
-        reconnectionAttempts: 5,
+        transports: ["websocket"]
       });
 
       socketInstance.on("connect", () => {
@@ -26,8 +23,12 @@ export const SocketProvider = ({ children }) => {
 
       socketInstance.on("online-list", (data) => {
         const { setOnlineUsers } = useStore.getState();
-        console.log(data)
+        console.log(data);
         setOnlineUsers(data);
+      });
+
+      socketInstance.on("connect_error", (error) => {
+        console.error("Socket connection error:", error.message);
       });
 
       setSocket(socketInstance);

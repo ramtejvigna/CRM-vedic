@@ -185,11 +185,6 @@ const SalaryStatementComponent = ({ bankStatement }) => {
     }
   } , [searchTerm]);
 
-
-
-
-
-
   return isLoading ? (
       <div className="h-full w-full flex items-center justify-center">
         <CircularProgress/>
