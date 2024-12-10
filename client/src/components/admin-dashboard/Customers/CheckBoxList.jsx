@@ -88,7 +88,13 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
     } , {withCredentials : true});
 
     if(res.status === 200) {
-        window.open(`https://wa.me/+919059578959?text=${encodeURIComponent(res.data.firebasePdfUrl)}`);
+      const message = `Hello, 
+      This is a message from CRM-Vedics. 
+      Here is your suggested baby names PDF: ${res.data.firebasePdfUrl}. 
+      We hope you find it helpful!`;
+      
+      window.open(`https://wa.me/+919059578959?text=${encodeURIComponent(message)}`);
+      
     }
   } catch (error) {
     console.error("Error sending PDF via WhatsApp", error);

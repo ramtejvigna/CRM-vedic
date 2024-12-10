@@ -82,16 +82,13 @@ const Customer = () => {
       await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
       setPdfId(pdf._id);
     } else if (action === "whatsapp") {
-      console.log("calling.....")
       await handleSetPdfUrlForWhatsapp(pdf.babyNames, pdf.additionalBabyNames);
-      setPdfId(pdf._id)
+      setPdfId(pdf._id);
     } else if (action === "feedback") {
       if (pdf.whatsappStatus || pdf.mailStatus) {
-        // If at least one status is true, show the feedback modal
         setSelectedPdf(pdf); // Store the PDF object
         setShowFeedbackModal(true); // Show the feedback modal
       } else {
-        // If both statuses are false, raise a message
         toast.error(
           "Feedback can only be given if the PDF has been sent via WhatsApp or email."
         );
@@ -153,7 +150,6 @@ const Customer = () => {
   const handleSetPdfUrlForWhatsapp = async (babyNames, additionalBabyNames) => {
     try {
         const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
-        console.log(generatedPdfUrl)
         setWhatsappUrl(generatedPdfUrl);
     } catch (error) {
         console.error("Error generating PDF URL:", error);

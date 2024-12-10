@@ -14,6 +14,10 @@ export const SocketProvider = ({ children }) => {
       const socketInstance = io(HOST, {
         withCredentials: true,
         query: { userId: adminInfo._id },
+        path: '/socket',
+        transports:['websocket',"polling"],
+        reconnection: true,
+        reconnectionAttempts: 5,
       });
 
       socketInstance.on("connect", () => {
