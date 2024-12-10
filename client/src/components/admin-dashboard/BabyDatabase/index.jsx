@@ -3,11 +3,49 @@ import { motion } from 'framer-motion';
 import axios from "axios";
 import { Search, Upload, Edit, Save, Filter, Download, Loader2, Plus } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
-import { CSVLink } from 'react-csv';
 import { LoadingSpinner } from "./LoadingSpinner"
 import 'react-toastify/dist/ReactToastify.css';
 import EmptyBabyNames from './EmptyBabyNames';
+import ExcelTemplateButton from './ExcelTempleteButton';
 import AddNameModal from './AddNameModel';
+import { utils, writeFile } from "xlsx"
+
+const ExcelDownloadButton = ({ data }) => {
+    const handleDownload = () => {
+        try {
+            // Convert data to worksheet
+            const ws = utils.json_to_sheet(data);
+
+            // Create workbook and append worksheet
+            const wb = utils.book_new();
+            utils.book_append_sheet(wb, ws, "Baby Names");
+
+            // Save file
+            writeFile(wb, "filtered_baby_names.xlsx");
+
+            toast.success("Exported Baby Names successfully", {
+                onClose: () => { },
+                toastId: 'export-success'
+            });
+        } catch (error) {
+            console.error("Export error:", error);
+            toast.error("Failed to export data", {
+                onClose: () => { },
+                toastId: 'export-error'
+            });
+        }
+    };
+
+    return (
+        <button
+            onClick={handleDownload}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center justify-center"
+        >
+            <Download className="h-5 w-5 mr-2" />
+            <span className="text-sm md:text-base">Export</span>
+        </button>
+    );
+};
 
 const FilterDropdown = ({ label, options = [], value, onChange }) => (
     <div className="flex flex-col space-y-1">
@@ -43,16 +81,21 @@ const BabyDatabase = () => {
         zodiacs: [],
         nakshatras: [],
         elements: [],
-        bookNames: []
+        bookNames: [],
+        planetaryInfluence: [],
+        relatedFestival: []
     });
     const [selectedFilters, setSelectedFilters] = useState({
         zodiac: '',
         nakshatra: '',
         element: '',
-        bookName: ''
+        bookName: '',
+        planetaryInfluence: '',
+        relatedFestival: ''
     });
 
     const fetchBabyNames = async () => {
+        setLoading(true);
         try {
             const response = await axios.get("https://vedic-backend-neon.vercel.app/api/names");
             setBabyNames(response.data);
@@ -69,7 +112,9 @@ const BabyDatabase = () => {
                 zodiacs: extractUniqueValues('zodiac'),
                 nakshatras: extractUniqueValues('nakshatra'),
                 elements: extractUniqueValues('element'),
-                bookNames: extractUniqueValues('bookName')
+                bookNames: extractUniqueValues('bookName'),
+                planetaryInfluence: extractUniqueValues('planetaryInfluence'),
+                relatedFestival: extractUniqueValues('relatedFestival')
             };
 
             setFilterOptions(uniqueValues);
@@ -113,13 +158,22 @@ const BabyDatabase = () => {
         const matchesBookName = !selectedFilters.bookName ||
             baby.bookName?.toLowerCase() === selectedFilters.bookName.toLowerCase();
 
+        const matchesPlanetary = !selectedFilters.planetaryInfluence ||
+            baby.planetaryInfluence?.toLowerCase() === selectedFilters.planetaryInfluence.toLowerCase();
+
+        const matchesRelatedFestival = !selectedFilters.relatedFestival ||
+            baby.relatedFestival?.toLowerCase() === selectedFilters.relatedFestival.toLowerCase();
+
+
         return matchesSearch &&
             matchesGender &&
             matchesStartingLetter &&
             matchesZodiac &&
             matchesNakshatra &&
             matchesElement &&
-            matchesBookName;
+            matchesBookName &&
+            matchesPlanetary &&
+            matchesRelatedFestival;
     });
 
     const handleFilterChange = (filterType, value) => {
@@ -151,7 +205,7 @@ const BabyDatabase = () => {
 
     const handleAddName = async (newName) => {
         try {
-            await axios.post("https://vedic-backend-neon.vercel.app/api/names", newName);
+            await axios.post("https://vedic-backend-neon.vercel.app/api/names", { newName: newName });
             await fetchBabyNames();
             toast.success("Name added successfully!", {
                 onClose: () => { },
@@ -177,27 +231,30 @@ const BabyDatabase = () => {
     };
 
     // Handle CSV upload
-    const handleCsvUpload = async (event) => {
+    const handleExcelUpload = async (event) => {
         const file = event.target.files[0];
 
-        // Ensure a file is selected and is of type CSV
-        if (!file || file.type !== "text/csv") {
-            toast.error("Please upload a valid CSV file.", {
+        // Check if file is an Excel file
+        const validTypes = [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+            'application/vnd.ms-excel' // .xls
+        ];
+
+        if (!file || !validTypes.includes(file.type)) {
+            toast.error("Please upload a valid Excel file (.xlsx or .xls)", {
                 toastId: 'invalid-file-type'
             });
             return;
         }
 
         const formData = new FormData();
-        formData.append('csv', file);
+        formData.append('excel', file);
 
         try {
-            // Send the POST request with the formData
-            await axios.post("https://vedic-backend-neon.vercel.app/uploadCsvNames", formData, {
+            await axios.post("https://vedic-backend-neon.vercel.app/uploadExcelNames", formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            // Fetch updated data and notify the user
             fetchBabyNames();
             toast.success("File uploaded successfully!", {
                 onClose: () => { },
@@ -236,7 +293,7 @@ const BabyDatabase = () => {
         }
     };
 
-    const csvData = filteredNames.map(({ _id, _v, ...rest }) => rest);
+    const csvData = filteredNames.map(({ _id, __v, ...rest }) => rest);
 
     console.log(csvData)
 
@@ -303,6 +360,20 @@ const BabyDatabase = () => {
                     value={selectedFilters.bookName}
                     onChange={(value) => handleFilterChange('bookName', value)}
                 />
+
+                <FilterDropdown
+                    label="Planetary Influence"
+                    options={filterOptions.planetaryInfluence}
+                    value={selectedFilters.planetaryInfluence}
+                    onChange={(value) => handleFilterChange('planetaryInfluence', value)}
+                />
+
+                <FilterDropdown
+                    label="Related Festivals"
+                    options={filterOptions.relatedFestival}
+                    value={selectedFilters.relatedFestival}
+                    onChange={(value) => handleFilterChange('relatedFestival', value)}
+                />
             </div>
         </motion.div>
     );
@@ -357,59 +428,17 @@ const BabyDatabase = () => {
                     >
                         <Upload className="h-5 w-5 mr-2" />
                         <span className="text-sm md:text-base">Upload</span>
-                        <input type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" />
+                        <input
+                            type="file"
+                            accept=".xlsx,.xls"
+                            onChange={handleExcelUpload}
+                            className="hidden"
+                        />
                     </motion.label>
 
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <CSVLink
-                            data={csvData}
-                            filename="filtered_baby_names.csv"
-                            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center justify-center"
-                            enclosingCharacter={`"`}
-                            onClick={(event, done) => {
-                                const utf8Bom = '\ufeff'; // UTF-8 BOM
-                                const csvContent = utf8Bom + csvData.map(row => row.join(",")).join("\n");
-                                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-                                const url = URL.createObjectURL(blob);
-                                const link = document.createElement("a");
-                                link.setAttribute("href", url);
-                                link.setAttribute("download", "filtered_baby_names.csv");
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                done(false); // Prevents default CSVLink action
-                                toast.success("Exported Baby Names successfully", {
-                                    onClose: () => { },
-                                    toastId: 'export-success'
-                                });
-                            }}
-                        >
-                            <Download className="h-5 w-5 mr-2" />
-                            <span className="text-sm md:text-base">Export</span>
-                        </CSVLink>
-                    </motion.div>
+                    <ExcelDownloadButton data={csvData} />
 
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <a
-                            href="#"
-                            onClick={() => {
-                                const utf8Bom = '\ufeff'; // UTF-8 BOM
-                                const templateData = "bookName,gender,nameEnglish,nameDevanagari,meaning,numerology,zodiac,rashi,nakshatra,planetaryinfluence,element,pageNo,syllableCount,characterSignificance,mantraRef,relatedFestival,extraNote,researchTag"; // Example template content
-                                const blob = new Blob([utf8Bom + templateData], { type: "text/csv;charset=utf-8;" });
-                                const url = URL.createObjectURL(blob);
-                                const link = document.createElement("a");
-                                link.setAttribute("href", url);
-                                link.setAttribute("download", "baby_names_template.csv");
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                            }}
-                            className="bg-slate-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer flex items-center justify-center"
-                        >
-                            <Download className="h-5 w-5 mr-2" />
-                            <span className="text-sm md:text-base">Template</span>
-                        </a>
-                    </motion.div>
+                    <ExcelTemplateButton />
 
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -439,7 +468,7 @@ const BabyDatabase = () => {
                     transition={{ duration: 0.5 }}
                     className="bg-white rounded-lg shadow-xl"
                 >
-                    {filteredNames.length !== 0 && !loading && (
+                    {filteredNames.length !== 0 && (
                         <table className="min-w-full divide-y min-h-full divide-gray-200">
                             {loading ? (
                                 <LoadingSpinner />

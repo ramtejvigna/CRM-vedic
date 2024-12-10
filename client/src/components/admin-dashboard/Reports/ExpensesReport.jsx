@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import axios from "axios";
 import { HOST } from "../../../utils/constants.js";
+import EmptyStateExpenses from "./EmptyStateExpenses.jsx";
 
 const ExpensesReport = () => {
   const [chartData, setChartData] = useState([]);
@@ -49,71 +50,73 @@ const ExpensesReport = () => {
     ? new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date())
     : new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date(new Date().setMonth(new Date().getMonth() - 1)));
 
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-gradient-to-br from-indigo-50 to-emerald-50 p-6 rounded-2xl shadow-xl"
-    >
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Expenses: {monthName}</h2>
-        
-        <motion.select
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          value={timeRange}
-          onChange={handleFilterChange}
-          className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="this">This Month</option>
-          <option value="last">Last Month</option>
-        </motion.select>
-      </div>
-
-      {loading ? (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex justify-center items-center h-64"
-        >
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-500"></div>
-        </motion.div>
-      ) : (
-        <ResponsiveContainer width="100%" height={400}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={140}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip 
-              contentStyle={{ 
-                background: '#333', 
-                color: 'white', 
-                borderRadius: '10px' 
-              }}
-              itemStyle={{ color: 'white' }}
-            />
-            <Legend 
-              layout="horizontal" 
-              verticalAlign="bottom" 
-              align="center"
-              iconType="circle"
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      )}
-    </motion.div>
-  );
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gradient-to-br from-indigo-50 to-emerald-50 p-6 rounded-2xl shadow-xl"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-800">Expenses: {monthName}</h2>
+          
+          <motion.select
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            value={timeRange}
+            onChange={handleFilterChange}
+            className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="this">This Month</option>
+            <option value="last">Last Month</option>
+          </motion.select>
+        </div>
+  
+        {loading ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-center items-center h-64"
+          >
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-500"></div>
+          </motion.div>
+        ) : chartData.length === 0 ? (
+          <EmptyStateExpenses />
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={140}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  background: '#333', 
+                  color: 'white', 
+                  borderRadius: '10px' 
+                }}
+                itemStyle={{ color: 'white' }}
+              />
+              <Legend 
+                layout="horizontal" 
+                verticalAlign="bottom" 
+                align="center"
+                iconType="circle"
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
+      </motion.div>
+    );
 };
 
 export default ExpensesReport;

@@ -9,7 +9,7 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
         nakshatra: [],
         planet: [],
         element: [],
-        bookName: [],
+        bookname: [],
         festival: []
     });
 
@@ -39,6 +39,7 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
             try {
                 const response = await fetch('https://vedic-backend-neon.vercel.app/categories');
                 const data = await response.json();
+                console.log(data);
                 setCategoryData(data);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -90,7 +91,7 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
                 required={required}
             >
                 <option value="">Select {label}</option>
-                {options.map((option) => (
+                {options?.map((option) => (
                     <option key={option} value={option}>
                         {option}
                     </option>
@@ -112,7 +113,7 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
                 <form onSubmit={handleSubmit} className="space-y-6 p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Dropdowns for collections */}
-                        {renderSelect('bookName', 'Book Name', categoryData.bookName, true)}
+                        {renderSelect('bookName', 'Book Name', categoryData.bookname, true)}
                         {renderSelect('gender', 'Gender', categoryData.gender, true)}
                         
                         {/* Text inputs */}

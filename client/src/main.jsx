@@ -7,7 +7,6 @@ import "./index.css";
 import { createTheme } from "@mui/material";
 import {ToastContainer} from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
-import { SocketProvider } from "./context/SocketContext";
 const theme = createTheme({
   components: {
     MuiButton: {

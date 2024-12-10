@@ -105,18 +105,18 @@ const AddExpense = () => {
     }
   };
   return (
-    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
+    <div className={`min-h-screen py-8 px-4 transition-colors duration-300 `}>
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-8">
-      <div className="flex items-center mb-6">
-  <button
-    onClick={() => navigate(-1)}
-    className="flex items-center font-bold  p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
-  >
-    <ArrowLeft size={25} className="mr-2" />
-  </button>
-  <h1 className="text-3xl font-bold mb-2 ml-2 text-center">Add Expense</h1>
-</div>
-        
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center font-bold  p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+          >
+            <ArrowLeft size={25} className="mr-2" />
+          </button>
+          <h1 className="text-3xl font-bold mb-2 ml-2 text-center">Add Expense</h1>
+        </div>
+
         {/* Form Grid Layout */}
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
 
@@ -220,15 +220,15 @@ const AddExpense = () => {
 
           {/* Submit Button */}
           <div className="col-span-2 flex items-center justify-end gap-5">
-          <button
-  type="button"
-  onClick={() => {
-    resetForm();
-  }}
-  className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
->
-  Cancel
-</button>
+            <button
+              type="button"
+              onClick={() => {
+                resetForm();
+              }}
+              className="flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
