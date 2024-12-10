@@ -4,8 +4,9 @@ import { isManager } from "../middleware/auth.js";
 import { getManagerDashboardStats } from "../controllers/ManagerDashboardController.js";
 
 const router = Router();
+
 router.post('/login',login)
-router.post('logout',logout)
+router.post('/logout',logout)
 router.get('/newrequests' ,getNewCustomers )
 router.get('/completed' ,getCompletedReq )
 router.get('/stats/:employeeId',isManager, getManagerDashboardStats);

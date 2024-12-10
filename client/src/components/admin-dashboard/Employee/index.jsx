@@ -12,28 +12,25 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 const EmployeeTable = () => {
   const navigate = useNavigate();
-  const [status , setStatus] = useState("");
-  const [showFilters , setShowFilters ] = useState(false)
-  const [searchTerm , setSearchTerm] = useState("")
-  const { isDarkMode, toggleDarkMode , onlineUsers } = useStore();
+  const [status, setStatus] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { isDarkMode, toggleDarkMode, onlineUsers } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
+  const [originalEmployees, setOriginalEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 5;
 
-  useEffect(() => {
-    if(!employees) {
-      fetchEmployees();
-    }
-  }, []);
-
+  // Fetch Employees Function
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(GET_ALL_EMPLOYEES);
+      const res = await fetch(GET_ALL_EMPLOYEES); // Replace with actual endpoint
       if (!res.ok) throw new Error("Failed to fetch employees");
       const data = await res.json();
       setEmployees(data.employees);
+      setOriginalEmployees(data.employees); 
     } catch (error) {
       toast.error("Error fetching employees!");
     } finally {
@@ -41,80 +38,107 @@ const EmployeeTable = () => {
     }
   };
 
+  // Fetch employees on mount and refresh every 10 minutes
+  useEffect(() => {
+    fetchEmployees();
+    const intervalId = setInterval(fetchEmployees, 10 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Handle Search Term
+  useEffect(() => {
+    if (searchTerm) {
+      const filteredEmployees = originalEmployees.filter(
+        (employee) =>
+          employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.email
+            .split("@")[0]
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+      );
+      setEmployees(filteredEmployees);
+    } else {
+      setEmployees(originalEmployees); 
+    }
+  }, [searchTerm, originalEmployees]);
+
+  // Filter Employees by Status
+  const filterData = async () => {
+    if (status) {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          `https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`
+        );
+        if (response.status === 200) {
+          setEmployees(response.data);
+        }
+      } catch (error) {
+        console.error("Error filtering employees:", error.message);
+        toast.error("Error filtering employees");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      toast.error("Please select a status");
+    }
+  };
+
+  // Trigger filterData when status changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      filterData();
+    }, 300); // Debounce filtering for 300ms
+    return () => clearTimeout(timeoutId);
+  }, [status]);
+
+  // Reset current page when employees list changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [employees]);
+
+  // Pagination logic
+  const indexOfFirstRecord = (currentPage - 1) * recordsPerPage;
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const currentRecords = employees.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(employees.length / recordsPerPage);
+
+  // Utility Functions
+  const getStatusColor = (isOnline) =>
+    `bg-${isOnline ? "green" : "red"}-${isDarkMode ? "800 text-green-100" : "100 text-green-800"}`;
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`relative inline-flex items-center px-4 py-2 border ${
+            isDarkMode
+              ? "border-gray-700 bg-gray-800"
+              : "border-gray-300 bg-white"
+          } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
+            currentPage === i ? "bg-blue-500 text-black" : ""
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return buttons;
+  };
+
+  // Event Handlers
   const handleAddEmployee = () => navigate("add-employee");
   const handleEdit = (id) => navigate(`edit-employee/${id}`);
   const handleView = (id) => navigate(`view-employee/${id}`);
   const handleDelete = (id) => navigate(`delete-employee/${id}`);
-  const indexOfFirstRecord = (currentPage - 1) * recordsPerPage;
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  
-  const currentRecords = employees?.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(employees.length / recordsPerPage);
-
-  const getStatusColor = (isOnline) =>
-    isOnline
-      ? `${isDarkMode ? "bg-green-800 text-green-100" : "bg-green-100 text-green-800"}`
-      : `${isDarkMode ? "bg-red-800 text-red-100" : "bg-red-100 text-red-800"}`;
-
-      const renderPaginationButtons = () => {
-        const buttons = [];
-        for (let i = 1; i <= totalPages; i++) {
-          buttons.push(
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i)}
-              className={`relative inline-flex items-center px-4 py-2 border ${
-                isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
-              } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-                currentPage === i ? "bg-blue-500 text-black" : ""
-              }`}
-            >
-              {i}
-            </button>
-          );
-        }
-        return buttons;
-      };
-      
-
   const handleSearchTerm = (e) => {
     setCurrentPage(1);
-    setSearchTerm(e.target.value)
-  }
-
-  useEffect(() => {
-    if(searchTerm) {
-      const filteredEmployees = employees.filter((employee) => employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || employee.email.slice(0 , employee.email.lastIndexOf("@")).toLowerCase().includes(searchTerm.toLowerCase()) || employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) )
-      setEmployees(filteredEmployees)
-    }else {
-      fetchEmployees();
-    }
-  } , [searchTerm])
-
-  const filterData = async () => {
-
-    if(status) {
-        try {
-          setIsLoading(true)
-          const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
-          if(response.status === 200) {
-            setEmployees(response.data);
-            setIsLoading(false)
-          }
-          
-        } catch (error) {
-          console.error("Error filtering employees:", error.message);
-          setIsLoading(false)
-          toast.error("Error filtering employees")
-        }
-    }else {
-      toast.error("Please select Status")
-    }
-
-  }
-  useEffect(() => {
-    filterData();
-  } , [status])
+    setSearchTerm(e.target.value);
+  };
 
   return isLoading ? (
       <div className="h-full w-full flex items-center justify-center">
@@ -187,7 +211,7 @@ const EmployeeTable = () => {
                         name="status"
                         className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
                       >
-                        <option className="cursor-pointer" value="select status" disabled>
+                        <option className="cursor-pointer" value="select status" >
                           Select status
                         </option>
                         <option className="cursor-pointer" value="online">
@@ -306,10 +330,10 @@ const EmployeeTable = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                              onlineUsers.includes(employee._id)
+                              employee.isOnline
                             )}`}
                           >
-                            {onlineUsers.includes(employee._id)? "Online" : "Offline"}
+                            {employee?.isOnline ? "Online" : "Offline"}
                           </span>
                         </td>
 

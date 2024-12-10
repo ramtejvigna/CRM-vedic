@@ -26,10 +26,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-          <SocketProvider>
             <App />
             <ToastContainer/>
-          </SocketProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>

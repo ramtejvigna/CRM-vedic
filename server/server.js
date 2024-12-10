@@ -82,4 +82,3 @@ app.use('/categories', categoryRoutes)
 const PORT = process.env.PORT || 9000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
 
-setUpSocket(server);

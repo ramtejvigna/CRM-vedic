@@ -1,6 +1,4 @@
-import { Server } from "socket.io";
-import { Employee } from "./models/User.js";
-import mongoose from "mongoose";
+import { Server } from 'socket.io';
 
 const setUpSocket = (server) => {
   const io = new Server(server, {
@@ -21,6 +19,8 @@ const setUpSocket = (server) => {
 
   const userSocketMap = new Map();
 
+
+
   const updateUserStatusInDB = async (userId, isOnline) => {
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       console.error(`Invalid userId: ${userId}`);
@@ -40,14 +40,11 @@ const setUpSocket = (server) => {
 
   const emitOnlineList = () => {
     const onlineUsers = Array.from(userSocketMap.keys());
-    console.log(onlineUsers)
     io.emit("online-list", onlineUsers);
   };
 
   const handleDisconnect = async (socket) => {
-    console.log(`Client disconnected: ${socket.id}`);
     let disconnectedUser = null;
-
     for (const [userId, socketId] of userSocketMap.entries()) {
       if (socketId === socket.id) {
         disconnectedUser = userId;
@@ -58,10 +55,7 @@ const setUpSocket = (server) => {
 
     if (disconnectedUser) {
       await updateUserStatusInDB(disconnectedUser, false);
-      io.emit("user-status", {
-        userId: disconnectedUser,
-        isOnline: false,
-      });
+      io.emit("user-status", { userId: disconnectedUser, isOnline: false });
     }
 
     emitOnlineList();
@@ -69,25 +63,15 @@ const setUpSocket = (server) => {
 
   io.on("connection", async (socket) => {
     const userId = socket.handshake.query.userId;
-
     if (userId && mongoose.Types.ObjectId.isValid(userId)) {
       userSocketMap.set(userId, socket.id);
-      console.log(`User connected: ${userId} with socket ID: ${socket.id}`);
-
       await updateUserStatusInDB(userId, true);
-      io.emit("user-status", {
-        userId,
-        isOnline: true,
-      });
-
+      io.emit("user-status", { userId, isOnline: true });
       emitOnlineList();
-    } else {
-      console.error("Invalid or missing user ID in handshake query");
     }
 
     socket.on("disconnect", () => handleDisconnect(socket));
   });
-
 };
 
 export default setUpSocket;
