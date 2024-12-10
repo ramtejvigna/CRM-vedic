@@ -1,48 +1,55 @@
-import { Readable } from 'stream';
-import csvParser from 'csv-parser';
 import { babyNames } from "../models/PDF.js"; // Import your babyNames model
+import { read, utils } from 'xlsx';
+import { Employee } from "../models/User.js";
 
-export const uploadCsvNames = async (req, res) => {
-    // Check if a CSV file is uploaded
-    if (!req.files || !req.files.csv) {
+export const uploadExcelNames = async (req, res) => {
+    // Check if an Excel file is uploaded
+    if (!req.files || !req.files.excel) {
         return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const file = req.files.csv; // Access the uploaded file
-    const results = [];
+    const file = req.files.excel;
+    const employeeId = req.body.employeeId;
 
-    // Convert the file buffer to a readable stream
-    const readableFile = new Readable();
-    readableFile.push(file.data);
-    readableFile.push(null); // End the stream
+    try {
+        // Read the Excel file
+        const workbook = read(file.data, { type: 'buffer' });
+        
+        // Get the first worksheet
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Convert to JSON
+        const results = utils.sheet_to_json(worksheet);
 
-    // Parse the CSV file
-    readableFile
-        .pipe(csvParser({ separator: '\t', encoding: 'utf-8' })) // Specify tab delimiter
-        .on('data', (row) => {
-            // Normalize keys to handle stray characters
-            const normalizedRow = Object.fromEntries(
+        // Normalize the data
+        const normalizedResults = results.map(row => {
+            return Object.fromEntries(
                 Object.entries(row).map(([key, value]) => [
-                    key.trim(), // Trim leading/trailing spaces
+                    key.trim(),
                     value
                 ])
             );
-            results.push(normalizedRow);
-        })
-        .on('end', async () => {
-            try {
-                console.log("Parsed Rows:", results);
-                await babyNames.insertMany(results);
-                res.status(200).json({ message: "Baby names uploaded successfully" });
-            } catch (error) {
-                console.error("Database Insertion Error:", error);
-                res.status(500).json({ error: "Failed to upload baby names" });
-            }
-        })
-        .on('error', (error) => {
-            console.error("CSV File Parsing Error:", error);
-            res.status(500).json({ error: "Error processing the CSV file" });
         });
+        
+        // Insert into database
+        await babyNames.insertMany(normalizedResults);
+
+        if(employeeId) {
+            const employeeData = await Employee.findById(employeeId);
+
+            if(!employeeData) {
+                return res.status(404).json({ error: "Employee not found" });
+            }
+            employeeData.adminAcceptedRequest = false;
+
+            await employeeData.save();
+        }
+        res.status(200).json({ message: "Baby names uploaded successfully" });
+    } catch (error) {
+        console.error("Error processing Excel file:", error);
+        res.status(500).json({ error: "Failed to process Excel file" });
+    }
 };
 
 // Update a baby name entry by ID

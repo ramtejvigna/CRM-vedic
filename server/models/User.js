@@ -1,6 +1,8 @@
 import mongoose, { mongo } from 'mongoose';
 
 const customerSchema = new mongoose.Schema({
+    applicationID: { type: String, required: true },
+
     customerID: { type: String, required: true },
     fatherName: { type: String, required: true },
     customerName : {type : String, required : true},
@@ -76,7 +78,10 @@ const employeeSchema = new mongoose.Schema({
     assignedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     lastLeaveAcceptedDate: { type: Date, default: null },
 
-    isAdmin: { type: Boolean, default: false }
+    isAdmin: { type: Boolean, default: false },
+    requestedBabyNames: { type: Boolean, default: false },
+    adminAcceptedRequest: { type: Boolean, default: false },
+
 }, { timestamps: true });
 
 const astroSchema = new mongoose.Schema(

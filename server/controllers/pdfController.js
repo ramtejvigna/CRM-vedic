@@ -11,6 +11,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import zlib from 'zlib';
+import { uploadFileToFirebase } from '../utils/firebase.js';
 
 dotenv.config();
 
@@ -24,21 +25,6 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
-
-
-const uploadPdfToFirebase = async (base64Pdf, uniqueId, bucket) => {
-    const buffer = Buffer.from(base64Pdf, 'base64');
-    const file = bucket.file(`${uniqueId}.pdf`);
-
-    await file.save(buffer, {
-        metadata: { contentType: 'application/pdf' },
-    });
-
-    await file.makePublic();
-
-    const publicUrl =` https://storage.googleapis.com/${bucket.name}/${file.name}`;
-    return publicUrl;
-};
 
 export const getBabyNames = async (req, res) => {
     try {
@@ -230,10 +216,7 @@ export const sendPdfEmail = async (req, res) => {
             ],
         };
 
-        // Log important details for debugging
-        console.log('Email:', email);
-        console.log('Unique ID:', uniqueId);
-        console.log('PDF Buffer Length:', pdfBuffer.length);
+
 
         // Send the email with the attachment
         await transporter.sendMail(mailOptions);
@@ -256,26 +239,39 @@ export const sendPdfEmail = async (req, res) => {
     }
 };
 
-
-
-
+const validateMimeType = async (base64String) => {
+    const buffer = Buffer.from(base64String, 'base64');
+    const detectedType = await fileType(buffer);
+    
+    if (!detectedType || detectedType.mime !== 'application/pdf') {
+        throw new Error("The uploaded document is not a PDF.");
+    }
+};
 
 export const sendPdfWhatsApp = async (req, res) => {
     const { phoneNumber, base64Pdf, uniqueId } = req.body;
-
+    
     try {
-        const pdfUrl = await uploadPdfToFirebase(base64Pdf, uniqueId, bucket);
 
-        await twilioClient.messages.create({
-            from: 'whatsapp:+14155238886',
-            to: `whatsapp:+${phoneNumber}`,
-            mediaUrl: pdfUrl,
-            body: 'Here is your requested PDF',
-        });
+        const firebasePdfUrl = await uploadFileToFirebase(
+            `${uniqueId}.pdf`,
+            base64Pdf,
+            'application/pdf'
+        );
+
+        const updatedPdf = await PDF.findByIdAndUpdate(
+            uniqueId,
+            { whatsappStatus: true },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedPdf) {
+            return res.status(404).json({ error: 'PDF document not found' });
+        }
 
         return res.status(200).json({
             message: `PDF sent to WhatsApp: ${phoneNumber}`,
-            pdfUrl,
+            firebasePdfUrl,
         });
     } catch (error) {
         console.error('Error sending PDF via WhatsApp:', error);
@@ -285,15 +281,41 @@ export const sendPdfWhatsApp = async (req, res) => {
     }
 };
 
-export const addBabyName = async (req,res) => {
+
+export const addBabyName = async (req, res) => {
     try {
-        const newBabyName = new babyNames(req.body);
+        const { newName, employeeId } = req.body;
+
+        // Validate the input
+        if (!newName) {
+            return res.status(400).json({ message: 'Baby name is required.' });
+        }
+
+        // Ensure babyNames is properly initialized with the correct structure
+        const newBabyName = new babyNames(newName); // Adjust to schema requirements
+
+        // Save the baby name
         const savedName = await newBabyName.save();
+
+        if (employeeId) {
+            const employeeData = await Employee.findById(employeeId);
+
+            if (!employeeData) {
+                return res.status(404).json({ message: 'Employee not found.' });
+            }
+
+            // Update employee record
+            employeeData.adminAcceptedRequest = false;
+            await employeeData.save();
+        }
+
         res.status(201).json(savedName);
     } catch (error) {
-        res.status(400).json({ message: 'Error adding baby name', error: error.message });
+        console.error('Error adding baby name:', error); // Log detailed error for debugging
+        res.status(500).json({ message: 'Error adding baby name. Please try again later.' });
     }
-}
+};
+
 
 export const submitFeedback = async (req, res) => {
     const { pdfId, rating } = req.body; // Extract pdfId and rating from request body
@@ -327,24 +349,3 @@ export const submitFeedback = async (req, res) => {
     }
   };
   
-
-
-// export const getPdfsByCustomerId = async (req, res) => {
-//   const { customerId } = req.query;
-  
-//   if (!customerId) {
-//       return res.status(400).json({ error: 'Customer ID is required' });
-//   }
-
-//   try {
-//       const pdfs = await PDF.find({ customer: customerId }).sort({ createdAt: -1 });
-//       if (!pdfs) {
-//           return res.status(404).json({ error: 'No PDFs found for this customer' });
-//       }
-      
-//       res.status(200).json(pdfs);
-//   } catch (error) {
-//       console.error('Error fetching PDFs:', error);
-//       res.status(500).json({ error: 'Internal server error' });
-//   }
-// };

@@ -1,5 +1,5 @@
 import { requirePropFactory } from '@mui/material';
-
+import scrollabarHide from "tailwind-scrollbar-hide"
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -12,6 +12,6 @@ export default {
   darkMode: 'class', // Enables class-based dark mode
 
   plugins: [
-    require('tailwind-scrollbar-hide')
+    scrollabarHide
   ],
 }

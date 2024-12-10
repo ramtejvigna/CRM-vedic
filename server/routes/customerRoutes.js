@@ -6,7 +6,8 @@ import {
   getCustomerData,
   getCustomers,
   getCustomersBasedOnRequests,
-  updateCustomerData 
+  updateCustomerData, 
+  getLocationSuggestions
 } from "../controllers/customerControllers.js";
 
 const router = express.Router();
@@ -18,6 +19,6 @@ router.get('/employees/:employeeId/customers', getCustomersBasedOnRequests);
 router.put('/:id', updateCustomerData); // Update customer by ID
 router.get('/getCustomerDetails/:id', getCustomerDetails);
 router.get('/getCustomerPdfs/:fatherName', getCustomerPdfs);
-
+router.get('/locations', getLocationSuggestions)
 
 export default router;

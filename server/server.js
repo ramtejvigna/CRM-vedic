@@ -17,6 +17,7 @@ import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import astroRoutes from './routes/astroRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
 import { fileURLToPath } from 'url';
@@ -26,7 +27,6 @@ import { dirname } from 'path';
 
 
 import "./deadlineNotification.js";
-import setUpSocket from './socket.js';
 
 dotenv.config();
 const app = express();
@@ -36,12 +36,12 @@ const __dirname = dirname(__filename)
 
 app.use(cors({
     origin: [
+      "https://crm-vedic-manager.netlify.app", 
       "http://localhost:5173", 
       "http://localhost:5174",
       "http://localhost:5175",
       "https://vedic-crm.netlify.app", 
       "https://vedic-employee.netlify.app", 
-      "https://crm-vedic-manager.netlify.app", 
       "https://vedic-form.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
@@ -74,11 +74,11 @@ app.use('/salaries' , salaryRoutes)
 app.use('/api/expenses', expensesRoutes);   
 app.use('/admin/auth' , AdminAuthRoutes)
 app.use('/api/reports',ReportsRouter)
+app.use('/categories', categoryRoutes)
 
 
 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 9000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
 
-setUpSocket(server);

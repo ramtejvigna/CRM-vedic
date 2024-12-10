@@ -2,7 +2,9 @@
 import { Customer, Employee } from "../models/User.js"
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+
 dotenv.config();
+
 
 export const getNewCustomers = async (req, res) => {
   try {
@@ -104,8 +106,7 @@ export const login = async (req, res) => {
   try {
     // Find user by username
     const { email, phone } = req.body;
-
-    // Find employee by username and phone
+    
     const employee = await Employee.findOne({ email, phone });
     if (employee.role !== 'Manager') {
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -114,7 +115,6 @@ export const login = async (req, res) => {
     employee.isOnline = true;
 
     await employee.save();
-    // Generate JWT token with employee ObjectId and isAdmin flag
     const token = jwt.sign(
       {
         id: employee._id,
@@ -124,7 +124,6 @@ export const login = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    // Return token in response
     res.status(200).json({
       token,
       userId: employee._id,
@@ -138,11 +137,10 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    console.log(token)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { token } = req.body;
 
-    // Update isOnline status to false
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
     await Employee.findOneAndUpdate({ _id: decoded.id }, { isOnline: false });
 
     res.status(200).json({ message: 'Logged out successfully' });
@@ -150,4 +148,5 @@ export const logout = async (req, res) => {
     console.log(error.message);
     res.status(500).json({ message: 'Server error' });
   }
-}
+};
+

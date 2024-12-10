@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer"
-
+import { htmlToText } from "html-to-text";
 const transporter = nodemailer.createTransport({
     service: 'gmail',  
     auth: {
@@ -9,6 +9,7 @@ const transporter = nodemailer.createTransport({
         rejectUnauthorized : false
     }
 })
+
 
 
 export async function sendForgotPasswordEmail(data) {
@@ -101,6 +102,7 @@ export async function sendForgotPasswordEmail(data) {
     console.error("Error sending email:", error);
     return false;
     }}
+
     export async function sendResetPasswordEmail(data) {
         try {
         
@@ -178,3 +180,84 @@ export async function sendForgotPasswordEmail(data) {
    console.error("Error sending email:", error);
    return false;
  }}
+
+ export async function sendApplicationConfirmationEmail(customer) {
+    const emailTemplate = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Application Confirmation</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { 
+                max-width: 600px; 
+                margin: 0 auto; 
+                padding: 20px; 
+                background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+                border-radius: 10px;
+            }
+            .header { 
+                background-color: #6a11cb; 
+                color: white; 
+                text-align: center; 
+                padding: 20px; 
+                border-radius: 10px 10px 0 0;
+            }
+            .content { 
+                background: white; 
+                padding: 20px; 
+                border-radius: 0 0 10px 10px;
+            }
+            .application-id {
+                background-color: #f1f1f1;
+                padding: 10px;
+                text-align: center;
+                font-size: 1.2em;
+                font-weight: bold;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Application Confirmation</h1>
+            </div>
+            <div class="content">
+                <p>Dear ${customer.customerName},</p>
+                <p>Your application for Vedic Name Selection has been successfully submitted!</p>
+                
+                <div class="application-id">
+                    Application ID: ${customer.customerID}
+                </div>
+
+                <p>We will process your request and get back to you soon.</p>
+                <p>Thank you for choosing our Vedic Name Selection Service.</p>
+
+                <p>Best Regards,<br>Vedic Name Selection Team</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: customer.email,
+        subject: 'Vedic Name Selection - Application Confirmation',
+        html: emailTemplate,
+        text: htmlToText(emailTemplate)
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent:', info.response);
+        return true;
+    } catch (error) {
+        console.error('Email sending failed:', error);
+        return false;
+    }
+}
