@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Star,
   FilePlus2,
+  CloudCog,
 } from "lucide-react";
 import axios, { formToJSON } from "axios";
 import {
@@ -184,7 +185,6 @@ const Customer = () => {
   useEffect(() => {
     const sendWhatsappAndFetchPdfs = async () => {
         if (whatsappUrl && pdfId) {
-            console.log(whatsappUrl)
             try {
                 setWhatsappLoader(pdfId);
                 await handleSendWhatsApp(whatsappUrl, pdfId, customerDetails.whatsappNumber);

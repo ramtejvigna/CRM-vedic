@@ -52,7 +52,6 @@ export const handleSendMail = async (pdfUrl, uniqueId, email) => {
             }
             const pdfBlob = await response.blob();
             const base64Pdf = await blobToBase64(pdfBlob);
-            console.log("pdf",base64Pdf);
     await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-email", {
       email,
       base64Pdf,
@@ -80,7 +79,6 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
     const pdfBlob = await response.blob();
     const base64Pdf = await blobToBase64(pdfBlob);
 
-    console.log("pdf",base64Pdf);
     const res = await axios.post("http://localhost:9000/api/send-pdf-whatsapp", {
       phoneNumber,
       base64Pdf,
@@ -88,12 +86,19 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
     } , {withCredentials : true});
 
     if(res.status === 200) {
-      const message = `Hello, 
-      This is a message from CRM-Vedics. 
-      Here is your suggested baby names PDF: ${res.data.firebasePdfUrl}. 
-      We hope you find it helpful!`;
-      
-      window.open(`https://wa.me/+919059578959?text=${encodeURIComponent(message)}`);
+      const message = `Dear User,
+
+Greetings from CRM-Vedics!
+
+We are pleased to share your suggested baby names PDF. You can access it using the following link: ${res.data.firebasePdfUrl}
+
+Thank you for choosing CRM-Vedics. We hope this information meets your expectations. If you have any questions or need further assistance, please do not hesitate to contact us.
+
+Warm regards,  
+CRM-Vedics Team`;
+
+window.open(`https://wa.me/+919059578959?text=${encodeURIComponent(message)}`);
+
       
     }
   } catch (error) {
@@ -481,6 +486,7 @@ const handleGeneratePdf = async () => {
           generatedBy: "Admin",
           userId: Cookies.get('userId')
       });
+      console.log(selectedItems);
 
       toast.success("PDF Generated Successfully");
 
