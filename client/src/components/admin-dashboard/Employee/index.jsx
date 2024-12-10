@@ -18,14 +18,16 @@ import ConfirmationModal from "./ConfirmationModal";
 const EmployeeTable = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
-  const [showFilters, setShowFilters] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { isDarkMode, toggleDarkMode, onlineUsers } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
+  const [originalEmployees, setOriginalEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const recordsPerPage = 5;
+  
 
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 
@@ -43,10 +45,11 @@ const EmployeeTable = () => {
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(GET_ALL_EMPLOYEES);
+      const res = await fetch(GET_ALL_EMPLOYEES); // Replace with actual endpoint
       if (!res.ok) throw new Error("Failed to fetch employees");
       const data = await res.json();
       setEmployees(data.employees);
+      setOriginalEmployees(data.employees); 
     } catch (error) {
       toast.error("Error fetching employees!");
     } finally {
@@ -54,6 +57,67 @@ const EmployeeTable = () => {
     }
   };
 
+  // Fetch employees on mount and refresh every 10 minutes
+  useEffect(() => {
+    fetchEmployees();
+    const intervalId = setInterval(fetchEmployees, 10 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Handle Search Term
+  useEffect(() => {
+    if (searchTerm) {
+      const filteredEmployees = originalEmployees.filter(
+        (employee) =>
+          employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.email
+            .split("@")[0]
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+      );
+      setEmployees(filteredEmployees);
+    } else {
+      setEmployees(originalEmployees); 
+    }
+  }, [searchTerm, originalEmployees]);
+
+  // Filter Employees by Status
+  const filterData = async () => {
+    if (status) {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          `https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`
+        );
+        if (response.status === 200) {
+          setEmployees(response.data);
+        }
+      } catch (error) {
+        console.error("Error filtering employees:", error.message);
+        toast.error("Error filtering employees");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      toast.error("Please select a status");
+    }
+  };
+
+  // Trigger filterData when status changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      filterData();
+    }, 300); // Debounce filtering for 300ms
+    return () => clearTimeout(timeoutId);
+  }, [status]);
+
+  // Reset current page when employees list changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [employees]);
+
+  // Event Handlers
   const handleAddEmployee = () => navigate("add-employee");
   const handleEdit = (id) => navigate(`edit-employee/${id}`);
   const handleView = (id) => navigate(`view-employee/${id}`);
@@ -92,39 +156,7 @@ const EmployeeTable = () => {
     setCurrentPage(1);
     setSearchTerm(e.target.value)
   }
-
-  useEffect(() => {
-    if (searchTerm) {
-      const filteredEmployees = employees.filter((employee) => employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || employee.email.slice(0, employee.email.lastIndexOf("@")).toLowerCase().includes(searchTerm.toLowerCase()) || employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()))
-      setEmployees(filteredEmployees)
-    } else {
-      fetchEmployees();
-    }
-  }, [searchTerm])
-
-  const filterData = async () => {
-
-    if (status) {
-      try {
-        setIsLoading(true)
-        const response = await axios.get(`https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`);
-        if (response.status === 200) {
-          setEmployees(response.data);
-          setIsLoading(false)
-        }
-
-      } catch (error) {
-        console.error("Error filtering employees:", error.message);
-        setIsLoading(false)
-        toast.error("Error filtering employees")
-      }
-    }
-
-  }
-  useEffect(() => {
-    filterData();
-  }, [status])
-
+  
   const handleConfirm = async (employeeId) => {
     try {
       const response = await axios.post('https://vedic-backend-neon.vercel.app/employees/confirmRequest', {
@@ -322,10 +354,10 @@ const EmployeeTable = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                              onlineUsers.includes(employee._id)
+                              employee.isOnline
                             )}`}
                           >
-                            {onlineUsers.includes(employee._id) ? "Online" : "Offline"}
+                            {employee.isOnline ? "Online" : "Offline"}
                           </span>
                         </td>
 

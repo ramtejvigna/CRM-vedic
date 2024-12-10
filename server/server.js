@@ -26,7 +26,6 @@ import { dirname } from 'path';
 
 
 import "./deadlineNotification.js";
-import setUpSocket from './socket.js';
 
 dotenv.config();
 const app = express();
@@ -82,4 +81,3 @@ app.use('/categories', categoryRoutes)
 const PORT = process.env.PORT || 9000;
 server.listen(PORT, connectToMongoDB(), () => console.log(`Server running on port ${PORT}`));
 
-setUpSocket(server);

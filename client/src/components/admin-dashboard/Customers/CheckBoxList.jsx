@@ -78,7 +78,6 @@ export const handleSendWhatsApp = async (pdfUrl, uniqueId, phoneNumber) => {
     const pdfBlob = await response.blob();
     const base64Pdf = await blobToBase64(pdfBlob);
 
-    console.log("pdf",base64Pdf);
     const res = await axios.post("https://vedic-backend-neon.vercel.app/api/send-pdf-whatsapp", {
       phoneNumber,
       base64Pdf,
