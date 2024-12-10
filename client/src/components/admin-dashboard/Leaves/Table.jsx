@@ -75,15 +75,15 @@ const LeaveRequestTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {leaves.map((leave) => (
+            {leaves?.map((leave) => (
               <tr key={leave._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">{leave.employee.firstName}</td>
-                <td className="px-6 py-4">{leave.leaveType}</td>
+                <td className="px-6 py-4">{leave.employee?.firstName}</td>
+                <td className="px-6 py-4">{leave?.leaveType}</td>
                 <td className="px-6 py-4">
-                  {new Date(leave.startDate).toLocaleDateString()}
+                  {new Date(leave?.startDate).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">
-                  {new Date(leave.endDate).toLocaleDateString()}
+                  {new Date(leave?.endDate).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">
                   {Math.ceil(
