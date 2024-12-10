@@ -26,7 +26,6 @@ import { dirname } from 'path';
 
 
 import "./deadlineNotification.js";
-import setUpSocket from './socket.js';
 
 dotenv.config();
 const app = express();

@@ -29,7 +29,19 @@ const EmployeeTable = () => {
   const recordsPerPage = 5;
   
 
-  // Fetch Employees Function
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+
+  const handleOpenModal = (employeeId) => {
+    setSelectedEmployeeId(employeeId);
+    setIsModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (!employees) {
+      fetchEmployees();
+    }
+  }, []);
+
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
@@ -105,15 +117,21 @@ const EmployeeTable = () => {
     setCurrentPage(1);
   }, [employees]);
 
-  // Pagination logic
+  // Event Handlers
+  const handleAddEmployee = () => navigate("add-employee");
+  const handleEdit = (id) => navigate(`edit-employee/${id}`);
+  const handleView = (id) => navigate(`view-employee/${id}`);
+  const handleDelete = (id) => navigate(`delete-employee/${id}`);
   const indexOfFirstRecord = (currentPage - 1) * recordsPerPage;
   const indexOfLastRecord = currentPage * recordsPerPage;
-  const currentRecords = employees.slice(indexOfFirstRecord, indexOfLastRecord);
+
+  const currentRecords = employees?.slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(employees.length / recordsPerPage);
 
-  // Utility Functions
   const getStatusColor = (isOnline) =>
-    `bg-${isOnline ? "green" : "red"}-${isDarkMode ? "800 text-green-100" : "100 text-green-800"}`;
+    isOnline
+      ? `${isDarkMode ? "bg-green-800 text-green-100" : "bg-green-100 text-green-800"}`
+      : `${isDarkMode ? "bg-red-800 text-red-100" : "bg-red-100 text-red-800"}`;
 
   const renderPaginationButtons = () => {
     const buttons = [];
@@ -122,13 +140,9 @@ const EmployeeTable = () => {
         <button
           key={i}
           onClick={() => setCurrentPage(i)}
-          className={`relative inline-flex items-center px-4 py-2 border ${
-            isDarkMode
-              ? "border-gray-700 bg-gray-800"
-              : "border-gray-300 bg-white"
-          } text-sm font-medium text-gray-500 hover:bg-gray-50 ${
-            currentPage === i ? "bg-blue-500 text-black" : ""
-          }`}
+          className={`relative inline-flex items-center px-4 py-2 border ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-300 bg-white"
+            } text-sm font-medium text-gray-500 hover:bg-gray-50 ${currentPage === i ? "bg-blue-500 text-black" : ""
+            }`}
         >
           {i}
         </button>
@@ -137,15 +151,27 @@ const EmployeeTable = () => {
     return buttons;
   };
 
-  // Event Handlers
-  const handleAddEmployee = () => navigate("add-employee");
-  const handleEdit = (id) => navigate(`edit-employee/${id}`);
-  const handleView = (id) => navigate(`view-employee/${id}`);
-  const handleDelete = (id) => navigate(`delete-employee/${id}`);
+
   const handleSearchTerm = (e) => {
     setCurrentPage(1);
-    setSearchTerm(e.target.value);
-  };
+    setSearchTerm(e.target.value)
+  }
+  
+  const handleConfirm = async (employeeId) => {
+    try {
+      const response = await axios.post('https://vedic-backend-neon.vercel.app/employees/confirmRequest', {
+        employeeId
+      });
+
+      if (response.data.accepted) {
+        setIsModalOpen(false);
+        toast.success("Request accepted");
+        await fetchEmployees();
+      }
+    } catch (error) {
+      toast.error("Failed to accept the request");
+    }
+  }
 
   return isLoading ? (
     <div className="h-full w-full flex items-center justify-center">
@@ -193,45 +219,45 @@ const EmployeeTable = () => {
         {/* <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
                 Showing {employees.length} results
             </div> */}
-            <AnimatePresence>
-              {showFilters && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 70, opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="flex  bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden"
-                >
-                  <form className="flex px-4 py-3 w-full flex-wrap gap-y-4">
-                    <div className="flex gap-x-3 min-w-[250px] items-center">
-                      <label
-                        htmlFor="status"
-                        className="capitalize tracking-wider text-gray-700 font-medium"
-                      >
-                        Status:
-                      </label>
-                      <select
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        id="status"
-                        name="status"
-                        className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
-                      >
-                        <option className="cursor-pointer" value="select status" >
-                          Select status
-                        </option>
-                        <option className="cursor-pointer" value="online">
-                          Online
-                        </option>
-                        <option className="cursor-pointer" value="offline">
-                          Offline
-                        </option>
-                      </select>
-                    </div>
-                  </form>
-                </motion.div>
-              )}
-            </AnimatePresence>
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 70, opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="flex  bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden"
+            >
+              <form className="flex px-4 py-3 w-full flex-wrap gap-y-4">
+                <div className="flex gap-x-3 min-w-[250px] items-center">
+                  <label
+                    htmlFor="status"
+                    className="capitalize tracking-wider text-gray-700 font-medium"
+                  >
+                    Status:
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    id="status"
+                    name="status"
+                    className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
+                  >
+                    <option className="cursor-pointer" value="select status" disabled>
+                      Select status
+                    </option>
+                    <option className="cursor-pointer" value="online">
+                      Online
+                    </option>
+                    <option className="cursor-pointer" value="offline">
+                      Offline
+                    </option>
+                  </select>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div
           className={`border mt-2 rounded-lg overflow-hidden transition-colors duration-300 ${isDarkMode ? "bg-gray-800" : "bg-white"
@@ -331,7 +357,7 @@ const EmployeeTable = () => {
                               employee.isOnline
                             )}`}
                           >
-                            {employee?.isOnline ? "Online" : "Offline"}
+                            {employee.isOnline ? "Online" : "Offline"}
                           </span>
                         </td>
 
