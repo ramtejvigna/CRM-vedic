@@ -216,10 +216,7 @@ export const sendPdfEmail = async (req, res) => {
             ],
         };
 
-        // Log important details for debugging
-        console.log('Email:', email);
-        console.log('Unique ID:', uniqueId);
-        console.log('PDF Buffer Length:', pdfBuffer.length);
+
 
         // Send the email with the attachment
         await transporter.sendMail(mailOptions);
@@ -261,6 +258,16 @@ export const sendPdfWhatsApp = async (req, res) => {
             base64Pdf,
             'application/pdf'
         );
+
+        const updatedPdf = await PDF.findByIdAndUpdate(
+            uniqueId,
+            { whatsappStatus: true },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedPdf) {
+            return res.status(404).json({ error: 'PDF document not found' });
+        }
 
         return res.status(200).json({
             message: `PDF sent to WhatsApp: ${phoneNumber}`,

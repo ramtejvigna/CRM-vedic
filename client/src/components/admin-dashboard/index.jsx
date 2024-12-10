@@ -14,7 +14,7 @@ import Customers from "./Customers/index.jsx";
 import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 // import { VoiceRecognition } from "./VoiceRecognition.jsx";
 import VoiceRecognition from './Voice2.jsx'
-import CheckBoxListPage from "./Customer/CheckBoxList.jsx";
+import CheckBoxListPage from "./Customers/CheckBoxList.jsx";
 import EditSalaries from "./Salaries/EditSalaries.jsx";
 import Customer from "./Customers/Customer.jsx";
 // import {VoiceRecognition} from './VoiceRecognition.jsx'
