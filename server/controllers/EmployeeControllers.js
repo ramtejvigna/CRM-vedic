@@ -111,22 +111,17 @@ export const updateEmployee = async (req, res) => {
             accountHolderName, bankName, branchName, bankAccountNumber, ifscCode
         } = req.body;
 
+        // Find employee by ID
         const employee = await Employee.findById(id);
         if (!employee) {
             return res.status(404).json({ message: "Employee with provided ID does not exist" });
         }
 
         // Handling file uploads and existing file paths
-        const passportFile = req.files && req.files.passport ? req.files.passport[0] : null;
-        const aadharOrPanFile = req.files && req.files.aadharOrPan ? req.files.aadharOrPan[0] : null;
-        const degreesFile = req.files && req.files.degrees ? req.files.degrees[0] : null;
-        const transcriptsFile = req.files && req.files.transcripts ? req.files.transcripts[0] : null;
-
-        // Set file paths or keep existing paths if no new file uploaded
-        const passportFileBase64 = passportFile ? passportFile.buffer.toString("base64") : employee.passport;
-        const aadharOrPanFileBase64 = aadharOrPanFile ? aadharOrPanFile.buffer.toString("base64") : employee.aadharOrPan;
-        const degreesFileBase64 = degreesFile ? degreesFile.buffer.toString("base64") : employee.degrees;
-        const transcriptsFileBase64 = transcriptsFile ? transcriptsFile.buffer.toString("base64") : employee.transcripts;
+        const passportFileBase64 = req.files?.passport?.data?.toString("base64") || employee.passport;
+        const aadharOrPanFileBase64 = req.files?.aadharOrPan?.data?.toString("base64") || employee.aadharOrPan;
+        const degreesFileBase64 = req.files?.degrees?.data?.toString("base64") || employee.degrees;
+        const transcriptsFileBase64 = req.files?.transcripts?.data?.toString("base64") || employee.transcripts;
 
         // Update employee data
         const updatedEmployee = await Employee.findByIdAndUpdate(
@@ -161,17 +156,18 @@ export const updateEmployee = async (req, res) => {
             { new: true, runValidators: true }
         );
 
+        // Handle update result
         if (!updatedEmployee) {
             return res.status(400).json({ message: "Failed to update employee details" });
         }
 
         return res.status(200).json({ message: "Employee details updated", employee: updatedEmployee });
-
     } catch (error) {
-        console.error('Error updating employee:', error.message);
-        return res.status(500).json({ message: 'Internal server error', error: error.message });
+        console.error("Error updating employee:", error.message);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+
 
 // @desc Filtering employees by status and role
 // @route GET /api/employees/filter
