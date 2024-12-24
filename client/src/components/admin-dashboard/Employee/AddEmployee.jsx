@@ -219,8 +219,8 @@ const AddEmployee = () => {
                 toast.success("Employee created");
                 navigate('/admin-dashboard/employees');
             } catch (error) {
-                console.error("Error:", error.message);
                 toast.error(error.message);
+                console.error("Error:", error.message);
             } finally {
                 setIsLoading(false);
             }
