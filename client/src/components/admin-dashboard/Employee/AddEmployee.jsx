@@ -172,56 +172,61 @@ const AddEmployee = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+    
         if (validateForm()) {
             const formDataToSend = new FormData();
-
-            // personale info
+    
+            // Personal Info
             Object.keys(formData.personalInfo).forEach((key) => {
-                formDataToSend.append(key, formData.personalInfo[key])
-            })
-
-            // idDocuments
+                formDataToSend.append(key, formData.personalInfo[key]);
+            });
+    
+            // ID Documents
             formDataToSend.append("aadharOrPan", formData.idDocuments.aadharOrPan);
             formDataToSend.append("passport", formData.idDocuments.passport);
             formDataToSend.append("ssn", formData.idDocuments.ssn);
-
-            // degree and transcripts
-            formDataToSend.append('degrees', formData.education.degrees);
-            formDataToSend.append('transcripts', formData.education.transcripts);
-
-            // previous employements
+    
+            // Degrees and Transcripts
+            formDataToSend.append("degrees", formData.education.degrees);
+            formDataToSend.append("transcripts", formData.education.transcripts);
+    
+            // Previous Employment
             Object.keys(formData.employment).forEach((key) => {
-                formDataToSend.append(key, formData.employment[key])
-            })
-
-            // payment details
+                formDataToSend.append(key, formData.employment[key]);
+            });
+    
+            // Payment Details
             formDataToSend.append("accountHolderName", formData.paymentDetails.accountHolderName);
             formDataToSend.append("bankName", formData.paymentDetails.bankName);
             formDataToSend.append("branchName", formData.paymentDetails.branchName);
             formDataToSend.append("bankAccountNumber", formData.paymentDetails.bankAccountNumber);
             formDataToSend.append("ifscCode", formData.paymentDetails.ifscCode);
-
+    
             try {
                 setIsLoading(true);
+    
                 const res = await fetch(`${ADD_EMPLOYEE_ROUTE}`, {
                     method: "POST",
-                    body: formDataToSend
+                    body: formDataToSend,
                 });
-
+    
                 if (!res.ok) {
-                    throw new Error("NetWork issue");
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Network issue");
                 }
-
+    
                 const data = await res.json();
-                setIsLoading(false);
-
-                toast.success("employee created");
-                navigate('/admin-dashboard/employees')
+                toast.success("Employee created");
+                navigate('/admin-dashboard/employees');
             } catch (error) {
+                console.error("Error:", error.message);
                 toast.error(error.message);
+            } finally {
+                setIsLoading(false);
             }
         }
-    }
+    };
+    
 
     const renderForm = () => {
         switch (activeStep) {

@@ -57,8 +57,6 @@ app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(cookieParser())
 
-app.use('/api/employees',employeeRoutes);
-app.use('/employees',employeeRoutes);
 app.use(astroRoutes);
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
@@ -75,6 +73,7 @@ app.use('/api/expenses', expensesRoutes);
 app.use('/admin/auth' , AdminAuthRoutes)
 app.use('/api/reports',ReportsRouter)
 app.use('/categories', categoryRoutes)
+app.use('/api/employees',employeeRoutes);
 
 
 

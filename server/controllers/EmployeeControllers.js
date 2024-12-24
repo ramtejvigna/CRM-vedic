@@ -38,21 +38,32 @@ export const addEmployee = async (req, res) => {
             ifscCode,
         } = req.body;
 
-        if (!req.files) {
-            return res.status(400).json({ message: "Files are missing" });
+        // Validate required fields
+        if (!firstName || !lastName || !email) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        // Validate files
+        const { aadharOrPan, passport, degrees, transcripts } = req.files || {};
+        if (!aadharOrPan || !passport) {
+            return res.status(400).json({ message: "Required files are missing" });
         }
 
         // Check if employee already exists
         const isExist = await Employee.findOne({ email });
         if (isExist) {
-            return res.status(400).json({ message: "Employee already exists with this email" });
+            return res.status(409).json({ message: "Employee already exists with this email" });
         }
 
-        const aadharOrPanBase64 = req.files ? req.files.aadharOrPan[0].buffer.toString("base64") : "";
-        const passportBase64 = req.files ? req.files.passport[0].buffer.toString("base64") : '';
-        const degreesBase64 = req.files ? req.files.degrees[0].buffer.toString("base64") : "";
-        const transcriptsBase64 = req.files ? req.files.transcripts[0].buffer.toString("base64") : "";
+        // Convert files to Base64
+        const aadharOrPanBase64 = aadharOrPan[0]?.buffer?.toString("base64") || "";
+        const passportBase64 = passport[0]?.buffer?.toString("base64") || "";
+        const degreesBase64 = degrees?.[0]?.buffer?.toString("base64") || "";
+        const transcriptsBase64 = transcripts?.[0]?.buffer?.toString("base64") || "";
 
+
+
+        // Create employee
         const newEmployee = await Employee.create({
             firstName,
             lastName,
@@ -81,12 +92,13 @@ export const addEmployee = async (req, res) => {
             transcripts: transcriptsBase64,
         });
 
-        return res.status(200).json({ message: "Employee added successfully", newEmployee });
+        return res.status(201).json({ message: "Employee added successfully", newEmployee });
     } catch (err) {
         console.error(err.message);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 // @desc updating employee
 // @route PUT api/employees/update-employee
