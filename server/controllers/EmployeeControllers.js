@@ -39,12 +39,14 @@ export const addEmployee = async (req, res) => {
         } = req.body;
 
         // Validate required fields
-        if (!firstName || !lastName || !email) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
+        // if (!firstName || !lastName || !email) {
+        //     return res.status(400).json({ message: "Missing required fields" });
+        // }
 
         // Validate files
-        const { aadharOrPan, passport, degrees, transcripts } = req.files || {};
+        const { aadharOrPan, passport, degrees, transcripts } = req.files;
+
+        
         if (!aadharOrPan || !passport) {
             return res.status(400).json({ message: "Required files are missing" });
         }
@@ -54,14 +56,12 @@ export const addEmployee = async (req, res) => {
         if (isExist) {
             return res.status(409).json({ message: "Employee already exists with this email" });
         }
-
+        
         // Convert files to Base64
-        const aadharOrPanBase64 = aadharOrPan[0]?.buffer?.toString("base64") || "";
-        const passportBase64 = passport[0]?.buffer?.toString("base64") || "";
-        const degreesBase64 = degrees?.[0]?.buffer?.toString("base64") || "";
-        const transcriptsBase64 = transcripts?.[0]?.buffer?.toString("base64") || "";
-
-
+        const aadharOrPanBase64 = aadharOrPan?.data?.toString("base64") || "";
+        const passportBase64 = passport?.data?.toString("base64") || "";
+        const degreesBase64 = degrees?.data?.toString("base64") || "";
+        const transcriptsBase64 = transcripts?.data?.toString("base64") || "";
 
         // Create employee
         const newEmployee = await Employee.create({
