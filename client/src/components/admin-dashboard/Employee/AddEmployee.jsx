@@ -4,7 +4,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField, InputLabel, Typography , Select  , MenuItem} from '@mui/material';
+import { TextField, InputLabel} from '@mui/material';
 import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
 import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
@@ -219,8 +219,8 @@ const AddEmployee = () => {
                 toast.success("Employee created");
                 navigate('/admin-dashboard/employees');
             } catch (error) {
-                console.error("Error:", error.message);
                 toast.error(error.message);
+                console.error("Error:", error.message);
             } finally {
                 setIsLoading(false);
             }
