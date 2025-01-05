@@ -5,9 +5,8 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Filter, Download, Eye, Trash, Search } from "lucide-react";
 import { useStore } from "../../../store";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AiOutlineDownload, AiOutlinePrinter, AiOutlineClose } from 'react-icons/ai';
-
+import EmptyState from './EmptyState';
 // Delete Modal Component
 const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
@@ -180,6 +179,7 @@ const ViewExpenses = () => {
     handleFilterAndSearch();
   }, [searchTerm, selectedMonth, selectedYear]);
 
+  
   const handlePayslip = async (expenseId) => {
     try {
       const response = await fetch(`https://vedic-backend-neon.vercel.app/api/expenses/file/${expenseId}`);
@@ -433,59 +433,62 @@ const ViewExpenses = () => {
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : (
-          <div className={` rounded-lg overflow-hidden transition-colors duration-300 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
-                  <tr>
-                    {["S.No", "Expense Name", "Amount", "Date", "Actions"].map((header) => (
-                      <th key={header} className={`px-6 py-3 text-left text-xs font-medium  tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}>
-                  {currentRecords.map((expense, index) => (
-                    <tr key={expense._id} className={`${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"} transition-colors duration-150`}>
-                      <td className="px-6 py-4 text-sm whitespace-nowrap">
-                        {indexOfFirstRecord + index + 1}
-                      </td>
-                      <td className="px-6 py-4 text-sm whitespace-nowrap">{expense.expense_name}</td>
-                      <td className="px-6 py-4 text-sm whitespace-nowrap">{expense.amount}</td>
-                      <td className="px-6 py-4 text-smwhitespace-nowrap">
-                        {new Date(expense.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center">
-
-                          <button
-                            onClick={() => handlePayslip(expense._id)}
-                            className={`mr-7 flex gap-2 transition-colors duration-300 ${isDarkMode
-                                ? "text-green-400 hover:text-green-200"
-                                : "text-green-600 hover:text-green-900"
-                              }`}
-                          >
-                            <Eye size={18} />
-                          </button>
-                          <button
-                            onClick={() => initiateDelete(expense._id)}
-                            className={`mr-3 flex gap-2 transition-colors duration-300 ${isDarkMode
-                                ? "text-red-400 hover:text-red-200"
-                                : "text-red-600 hover:text-red-900"
-                              }`}
-                          >
-                            <Trash size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+        { isLoading ? (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  ) : (
+    <div className={`rounded-lg overflow-hidden transition-colors duration-300 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
+            <tr>
+              {["S.No", "Expense Name", "Amount", "Date", "Actions"].map((header) => (
+                <th key={header} className={`px-6 py-3 text-left text-xs font-medium tracking-wider ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}>
+            {currentRecords.length === 0 ? (
+              <EmptyState message="No expenses available" />
+            ) : (
+              currentRecords.map((expense, index) => (
+                <tr key={expense._id} className={`${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"} transition-colors duration-150`}>
+                  <td className="px-6 py-4 text-sm whitespace-nowrap">
+                    {indexOfFirstRecord + index + 1}
+                  </td>
+                  <td className="px-6 py-4 text-sm whitespace-nowrap">{expense.expense_name}</td>
+                  <td className="px-6 py-4 text-sm whitespace-nowrap">{expense.amount}</td>
+                  <td className="px-6 py-4 text-sm whitespace-nowrap">
+                    {new Date(expense.date).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => handlePayslip(expense._id)}
+                        className={`mr-7 flex gap-2 transition-colors duration-300 ${isDarkMode
+                          ? "text-green-400 hover:text-green-200"
+                          : "text-green-600 hover:text-green-900"
+                        }`}
+                      >
+                        <Eye size={18} />
+                      </button>
+                      <button
+                        onClick={() => initiateDelete(expense._id)}
+                        className={`mr-3 flex gap-2 transition-colors duration-300 ${isDarkMode
+                          ? "text-red-400 hover:text-red-200"
+                          : "text-red-600 hover:text-red-900"
+                        }`}
+                      >
+                        <Trash size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
                 </tbody>
               </table>
               <div className="mt-4 flex items-center justify-between">

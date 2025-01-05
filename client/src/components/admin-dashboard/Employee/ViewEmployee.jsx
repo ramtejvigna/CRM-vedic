@@ -30,8 +30,7 @@ const ViewEmployee = () => {
 
                 const data = await res.json();
                 setIsLoading(false);
-                setEmployee(data.employee)
-                console.log(data.employee)
+                setEmployee(data.employee)  
             } catch (error) {
                 toast.error(error.message);
             }
@@ -47,11 +46,8 @@ const ViewEmployee = () => {
         link.download = 'document.jpg'; // Name of the downloaded file
         link.click();
     };
-    useEffect(() => {
-        console.log(image)
-    } , image)
-    
-    
+
+        
     const printImage = (base64String) => {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`

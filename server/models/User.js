@@ -84,6 +84,21 @@ const employeeSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+const astroSchema = new mongoose.Schema(
+    {
+      customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
+      zodiacSign: { type: String, required: true },
+      nakshatra: { type: String, required: true },
+      numerologyNo: { type: Number, required: true },
+      luckyColour: { type: String, required: true },
+      gemstone: { type: String, required: true },
+      destinyNumber: { type: Number, required: true },
+      luckyDay: { type: String, required: true },
+      luckyGod: { type: String, required: true },
+      luckyMetal: { type: String, required: true },
+    },
+    { timestamps: true }
+  );
 
 const adminSchema = new mongoose.Schema({
     
@@ -98,6 +113,7 @@ const adminSchema = new mongoose.Schema({
 
 export const Employee = mongoose.model('Employee', employeeSchema);
 
+export const Astro = mongoose.model('Astro', astroSchema);
 
 export const Customer = mongoose.model('Customer', customerSchema);
 export const Admin = mongoose.model('Admin', adminSchema);

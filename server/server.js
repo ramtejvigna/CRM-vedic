@@ -18,6 +18,7 @@ import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import astroRoutes from './routes/astroRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
 import { fileURLToPath } from 'url';
 import fileUpload from 'express-fileupload';
@@ -51,14 +52,13 @@ app.use(express.json({limit : '50mb'}));
 app.use(express.urlencoded({ limit: '100mb', extended: true }))
 
 
-app.use(express.json());
 app.use(fileUpload());
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser())
 
+app.use(astroRoutes);
 app.use('/api/employees',employeeRoutes);
-app.use('/employees',employeeRoutes);
-
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
 app.use('/api/', authRoutes);

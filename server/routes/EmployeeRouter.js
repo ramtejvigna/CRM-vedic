@@ -7,7 +7,6 @@ import { auth } from "../middleware/auth.js";
 
 
 router.post('/add-employee' , addEmployee);
-
 router.get('/get-employees' , getEmployees);
 router.get('/get-employee' , getEmployee);
 
