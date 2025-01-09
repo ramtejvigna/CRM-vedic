@@ -34,7 +34,22 @@ const customerSchema = new mongoose.Schema({
     assignedOn: { type: Date },
     completedOn: { type: Date },
     preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
-    deadline : {type : Date}
+    deadline : {type : Date},
+    isTwins: { 
+      type: String, 
+      enum: ['yes', 'no'], 
+      required: true,
+      default: 'no'
+  },
+  selectedServices: [{
+      type: String,
+      enum: ['astro', 'numerology'],
+      required: true
+  }],
+  totalPrice: {
+      type: Number,
+      required: true
+  }
 }, { timestamps: true });
 
 
