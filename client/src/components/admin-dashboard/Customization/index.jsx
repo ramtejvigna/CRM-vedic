@@ -41,7 +41,7 @@ const ImageManagement = ({ onError }) => {
     const fetchImages = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:9000/images');
+            const response = await fetch('https://vedic-backend-neon.vercel.app/images');
             if (!response.ok) throw new Error('Failed to fetch images');
             const data = await response.json();
             setImages(data);
@@ -72,7 +72,7 @@ const ImageManagement = ({ onError }) => {
 
         try {
             setActionLoading({ type: 'add', id: null });
-            const response = await fetch('http://localhost:9000/images', {
+            const response = await fetch('https://vedic-backend-neon.vercel.app/images', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -100,7 +100,7 @@ const ImageManagement = ({ onError }) => {
 
         try {
             setActionLoading({ type: 'update', id });
-            const response = await fetch(`http://localhost:9000/images/${id}`, {
+            const response = await fetch(`https://vedic-backend-neon.vercel.app/images/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -127,7 +127,7 @@ const ImageManagement = ({ onError }) => {
     const handleDeleteImage = async (id) => {
         try {
             setActionLoading({ type: 'delete', id });
-            const response = await fetch(`http://localhost:9000/images/${id}`, {
+            const response = await fetch(`https://vedic-backend-neon.vercel.app/images/${id}`, {
                 method: 'DELETE',
             });
 
