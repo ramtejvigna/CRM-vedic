@@ -18,7 +18,7 @@ import PropTypes from "prop-types";
 
 export function StatisticsCard({ color, icon, title, value, footer }) {
   return (
-    <Card className={`relative border border-blue-gray-100 shadow-lg -translate-y-4`}>
+    <Card className={`relative border pb-5 border-blue-gray-100 shadow-lg -translate-y-4`}>
       {/* Floating Container */}
       <div className={`absolute top-[-1rem] left-4 ${color} p-5 rounded-2xl flex items-center justify-center shadow-lg`}>
         {icon}
@@ -31,11 +31,6 @@ export function StatisticsCard({ color, icon, title, value, footer }) {
           {value}
         </Typography>
       </CardBody>
-      {footer && (
-        <CardFooter className="border-t p-4 opacity-70">
-          {footer}
-        </CardFooter>
-      )}
     </Card>
   );
 }
@@ -77,7 +72,7 @@ export function Statistics() {
     {
       color: "bg-[#303030]",
       icon: <CurrencyRupeeIcon className="h-8 w-8 text-white" />,
-      title: "Today's Revenue",
+      title: "Monthly Revenue",
       value: statistics.revenue,
       footer: (
         <span className="text-green-500">
