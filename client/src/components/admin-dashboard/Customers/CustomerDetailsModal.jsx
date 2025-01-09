@@ -235,7 +235,7 @@ const CustomerDetailsModal = ({
                               type="text"
                               value={socialMediaId}
                               onChange={(e) => setSocialMediaId(e.target.value)}
-                              placeholder={`Enter your ${leadSource} ID`}
+                              placeholder={`Enter Customer's ${leadSource} ID`}
                               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
                             />
                           </motion.div>
