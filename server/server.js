@@ -18,8 +18,10 @@ import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import imageRoutes from './routes/formRoutes.js'
 import astroRoutes from './routes/astroRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
+import { validateImageSize } from './middleware/imageMiddleware.js';
 import { fileURLToPath } from 'url';
 import fileUpload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
@@ -56,6 +58,7 @@ app.use(fileUpload());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser())
+app.use(validateImageSize);
 
 app.use(astroRoutes);
 app.use('/api/employees',employeeRoutes);
@@ -74,6 +77,7 @@ app.use('/api/expenses', expensesRoutes);
 app.use('/admin/auth' , AdminAuthRoutes)
 app.use('/api/reports',ReportsRouter)
 app.use('/categories', categoryRoutes)
+app.use('/images', imageRoutes);
 
 
 
