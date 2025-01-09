@@ -41,6 +41,9 @@ export const addCustomerWithAssignment = async (req, res) => {
         preferredGod,
         referenceName,
         additionalPreferences,
+        isTwins,
+        selectedServices,
+        totalPrice
     } = req.body;
 
     try {
@@ -79,13 +82,17 @@ export const addCustomerWithAssignment = async (req, res) => {
             preferredStartingLetterType,
             preferredGod,
             referenceName,
-            additionalPreferences
+            additionalPreferences,
+            isTwins,
+            selectedServices,
+            totalPrice
         });
 
         await newCustomer.save();
         await sendApplicationConfirmationEmail(newCustomer);
 
-        res.status(201).json({ applicationId: applicationID  });
+        res.status(201).json({ applicationId: applicationID,totalPrice: totalPrice,
+            selectedServices: selectedServices  });
     } catch (error) {
         console.error("Error adding customer:", error.message); // Log full error
         res.status(500).json({ error: "Error adding customer" });

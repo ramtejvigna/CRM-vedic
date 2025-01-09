@@ -410,6 +410,20 @@ const Customer = () => {
               <p className="text-sm font-medium text-gray-500">Preferred Starting Letter:</p>
               <p className="mt-1 text-gray-900">{customerDetails.preferredStartingLetter || "N/A"}</p>
             </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Is Twin : </p>
+              <p className="mt-1 text-gray-900">{customerDetails.isTwins.toUpperCase() || "N/A"}</p>
+            </div>
+        <h2 className="text-sm font-medium mb-2">Selected Services</h2>
+        <hr className="my-1 border-gray-300 w-full" />
+
+          {customerDetails.selectedServices.map((service, index) => (
+            <div key={index} className="flex items-center">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+              <p className="text-sm text-gray-700">{service}</p>
+            </div>
+          ))}
+     
 
             {/* Horizontal Line */}
             <div className="col-span-2 my-4">
