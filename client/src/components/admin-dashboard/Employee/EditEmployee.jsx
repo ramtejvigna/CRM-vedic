@@ -33,7 +33,7 @@ const EditEmployee = () => {
             country: '',
             pincode: '',
         },
-        idDocuments: { aadharOrPan : '', passport: '', ssn: '' },
+        idDocuments: { aadharOrPan : ''},
         education: { degrees: null, transcripts: null },
         employment: { employerName: '', jobTitle: '', startDate: Date, endDate: Date, reasonForLeaving: '' },
         paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: Date },
@@ -78,8 +78,6 @@ const EditEmployee = () => {
                     idDocuments: {
                         ...prev.idDocuments,
                         aadharOrPan: data.employee?.aadharOrPan || "",
-                        passport: data.employee?.passport || "",
-                        ssn: data.employee?.ssn || "",
                     },
                     education: {
                         ...prev.education,
@@ -117,9 +115,7 @@ const EditEmployee = () => {
     const handleNext = () => {
         if (validateForm()) {
             setActiveStep((prev) => prev + 1);
-        } else {
-            console.log("form errors")
-        }
+        } 
     };
 
     const handleBack = () => {
@@ -167,54 +163,7 @@ const EditEmployee = () => {
             if (!form.role) formErrors.role = 'Role of employee is required';
         }
     
-        if (activeStep === 1) {
-            if (!form.aadharOrPan) {
-                formErrors.aadharOrPan = 'Aadhar Card or PAN Card is required';
-            }
-            if (!form.passport) formErrors.passport = 'Passport/Driving License is required';
-            if (!form.ssn) {
-                formErrors.ssn = 'Social Security Number is required';
-            } else if (!ssnRegex.test(form.ssn)) {
-                formErrors.ssn = 'Invalid SSN format. Use XXX XX XXXX';
-            }
-        }
-    
-        if (activeStep === 2) {
-            if (!form.degrees) formErrors.degrees = 'Please upload your degrees/certificates';
-            if (!form.transcripts) formErrors.transcripts = 'Please upload your transcripts';
-        }
-    
-        if (activeStep === 3) {
-            if (!form.employerName) formErrors.employerName = 'Employer Name is required';
-            if (!form.jobTitle) formErrors.jobTitle = 'Job title is required';
-            if (!form.startDate) {
-                formErrors.startDate = 'Start date is required';
-            }
-            if (!form.endDate) {
-                formErrors.endDate = 'End date is required';
-            }
-            if (!form.reasonForLeaving) formErrors.reasonForLeaving = 'Reason for leaving is required';
-        }
-    
-        if (activeStep === 4) {
-            if (!form.accountHolderName) {
-                formErrors.accountHolderName = 'Account Holder Name is required';
-            }
-            if (!form.bankName) {
-                formErrors.bankName = 'Bank Name is required';
-            }
-            if (!form.branchName) {
-                formErrors.branchName = 'Branch Name is required';
-            }
-            if (!form.bankAccountNumber) {
-                formErrors.bankAccountNumber = 'Bank Account Number is required';
-            } else if (!/^\d+$/.test(form.bankAccountNumber)) {
-                formErrors.bankAccountNumber = 'Bank Account Number should contain only digits';
-            }
-            if (!form.ifscCode) {
-                formErrors.ifscCode = 'IFSC Code is required';
-            }
-        }
+        
     
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
@@ -462,7 +411,7 @@ const EditEmployee = () => {
                     {/* Aadhar or PAN section */}
                     {!formData.idDocuments.aadharOrPan ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Aadhar or Pan <span className='text-red-500'>*</span> </InputLabel>
+                        <InputLabel className="text-gray-700">Aadhar or Pan  </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex gap-2 items-center">
@@ -478,11 +427,10 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
-                        {errors.aadharOrPan ? <span className='text-xs text-red-500'>aadhar or Pan is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Aadhar or Pan <span className='text-red-500'>*</span> </InputLabel>
+                        <InputLabel className="text-gray-700">Aadhar or Pan  </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40 border-gray-300 rounded-lg  bg-gray-50 flex items-center justify-center">
                             <img
                             src={typeof formData.idDocuments.aadharOrPan === "string" ? `data:image/jpeg;base64,${formData.idDocuments.aadharOrPan}` : URL.createObjectURL(formData.idDocuments.aadharOrPan)} 
@@ -499,64 +447,6 @@ const EditEmployee = () => {
                         </div>
                     )}
 
-                    {/* Passport or Driving License section */}
-                    {!formData.idDocuments.passport ? (
-                        <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Passport <span className='text-red-500'>*</span></InputLabel>
-                        <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
-                            <label className="w-full h-full flex flex-col items-center justify-center">
-                            <span className="text-gray-500 flex gap-2 items-center">
-                                <AiOutlineUpload /> Upload File
-                            </span>
-                            <input
-                                type="file"
-                                accept=".jpg,.png,.jpeg"
-                                onChange={(e) => handleFileChange(e, 'idDocuments', 'passport')}
-                                error={!!errors.passport}
-                                helperText={errors.passport}
-                                className="hidden"
-                            />
-                            </label>
-                        </div>
-                        {errors.passport ? <span className='text-xs text-red-500'>passport is required</span> : ""}
-
-                        </div>
-                    ) : (
-                        <div className="flex flex-col">
-                            <InputLabel className="text-gray-700">Passport <span className='text-red-500'>*</span></InputLabel>
-                            <div className="mt-2 h-40 w-40 p-4 border-dashed border-2 border-gray-300  rounded-lg bg-gray-50 flex items-center justify-center">
-                                <img
-                            src={typeof formData.idDocuments.passport === "string" ? `data:image/jpeg;base64,${formData.idDocuments.passport}` : URL.createObjectURL(formData.idDocuments.passport)} 
-                            alt="Passport or Driving License"
-                                className="object-cover"
-                                />
-                            </div>
-                            <button
-                                onClick={() => handleFileClear('idDocuments', 'passport')}
-                                className="text-red-500 mt-2 flex items-center gap-2"
-                            >
-                                <AiOutlineDelete /> Clear Upload
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Social Security Number input */}
-                    <TextField
-                        label="Social Security Number"
-                        name="ssn"
-                        value={formData.idDocuments.ssn}
-                        onChange={handleChange}
-                        className="rounded-md shadow-sm bg-gray-50"
-                        fullWidth
-                        error={!!errors.ssn}
-                        helperText={errors.ssn }
-                        required
-                        InputLabelProps={{
-                            sx: {
-                                '& .MuiInputLabel-asterisk': { color: 'red' },
-                            },
-                        }}
-                    />
                     </div>
                 );
 
@@ -568,7 +458,7 @@ const EditEmployee = () => {
                     {/* Degrees/Certificates Section */}
                     {!formData.education.degrees ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Degrees Certificates <span className='text-red-500'>*</span> </InputLabel>
+                        <InputLabel className="text-gray-700">Degrees </InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex items-center gap-2">
@@ -584,12 +474,11 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
-                        {errors.degrees ? <span className='text-xs text-red-500'>degree certificate is required</span> : ""}
 
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Degrees Certificates <span className='text-red-500'>*</span></InputLabel>
+                        <InputLabel className="text-gray-700">Degrees Certificates</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
                             src={typeof formData.education.degrees === "string" ? `data:image/jpeg;base64,${formData.education.degrees}` : URL.createObjectURL(formData.education.degrees)} 
@@ -609,7 +498,7 @@ const EditEmployee = () => {
                     {/* Transcripts Section */}
                     {!formData.education.transcripts ? (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Transcripts <span className='text-red-500'>*</span></InputLabel>
+                        <InputLabel className="text-gray-700">Transcripts</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center cursor-pointer">
                             <label className="w-full h-full flex flex-col items-center justify-center">
                             <span className="text-gray-500 flex items-center gap-2">
@@ -625,11 +514,10 @@ const EditEmployee = () => {
                             />
                             </label>
                         </div>
-                        {errors.transcripts ? <span className='text-xs text-red-500'>transcript is required</span> : ""}
                         </div>
                     ) : (
                         <div className="flex flex-col">
-                        <InputLabel className="text-gray-700">Transcripts <span className='text-red-500'>*</span></InputLabel>
+                        <InputLabel className="text-gray-700">Transcripts</InputLabel>
                         <div className="mt-2 p-4 border-dashed border-2 h-40 w-40  border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
                             <img
                                 src={typeof formData.education.transcripts === "string" ? `data:image/jpeg;base64,${formData.education.transcripts}` : URL.createObjectURL(formData.education.transcripts)} 
@@ -659,12 +547,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
                         <TextField
                             label="Job Title"
@@ -673,19 +555,13 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
                         <div className="grid gap-2">
                              <label 
                                 htmlFor="startDate" 
                                  className="block capitalize text-sm font-medium "
                             >
-                                start date <span className='text-red-500'>*</span>
+                                start date 
                             </label>
                             <TextField
                                 name="startDate"
@@ -702,7 +578,7 @@ const EditEmployee = () => {
                                 htmlFor="endDate" 
                                  className="block capitalize text-sm font-medium "
                             >
-                                end date <span className='text-red-500'>*</span>
+                                end date 
 
                             </label>
                             <TextField
@@ -712,12 +588,6 @@ const EditEmployee = () => {
                                 onChange={handleChange}
                                 className="rounded-md shadow-sm bg-gray-50"
                                 fullWidth
-                                required
-                                InputLabelProps={{
-                                    sx: {
-                                        '& .MuiInputLabel-asterisk': { color: 'red' },
-                                    },
-                                }}
                             />
                         </div>
                         <TextField
@@ -727,12 +597,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
                     </div>
                 );
@@ -750,14 +614,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            error={!!errors.accountHolderName}
-                            helperText={errors.accountHolderName}
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
 
                         <TextField
@@ -767,14 +623,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            error={!!errors.bankName}
-                            helperText={errors.bankName}
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
 
                         <TextField
@@ -784,14 +632,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            error={!!errors.branchName}
-                            helperText={errors.branchName}
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
 
                         <TextField
@@ -801,14 +641,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            error={!!errors.bankAccountNumber}
-                            helperText={errors.bankAccountNumber}
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
 
                         <TextField
@@ -818,14 +650,6 @@ const EditEmployee = () => {
                             onChange={handleChange}
                             className="rounded-md shadow-sm bg-gray-50"
                             fullWidth
-                            required
-                            error={!!errors.ifscCode}
-                            helperText={errors.ifscCode}
-                            InputLabelProps={{
-                                sx: {
-                                    '& .MuiInputLabel-asterisk': { color: 'red' },
-                                },
-                            }}
                         />
                     </div>
                 );
@@ -856,19 +680,19 @@ const EditEmployee = () => {
                             disabled={activeStep === 0}
                             color="inherit"
                             className="mr-1"
-                            sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black" }}
+                            sx={{ fontSize: "1.1rem", padding: "6px 15px", border: "1px solid black", borderRadius : 5 }}
                             onClick={handleBack}
                         >
-                            <span className="capitalize">Previous</span>
+                            <span className="capitalize">{"< "}Previous</span>
                         </Button>
                         {activeStep === steps.length - 1 ? (
                             <Button
                                 sx={{
-                                    border: "1px solid blue",
-                                    backgroundColor: "green",
+                                    backgroundColor: "#11ff11",
                                     color: "white",
-                                    padding: "6px 15px",
+                                    padding: "6px 30px",
                                     fontWeight: "700",
+                                    borderRadius : 5
                                 }}
                                 onClick={handleSubmit}
                             >
@@ -878,23 +702,22 @@ const EditEmployee = () => {
                             <div className="flex gap-10 capitalize">
                                 <Button
                                     sx={{
-                                        border: "1px solid red",
-                                        color: "red",
-                                        padding: "6px 15px",
+                                        color: "black",
+                                        padding: "6px 30px",
                                         fontWeight: "400",
+                                        borderRadius : 5
                                     }}
                                     onClick={() => navigate("/admin-dashboard/employees")}
-                                    className="hover:bg-red-600 hover:text-white capitalize"
                                 >
                                     <span className="capitalize">cancel</span>
                                 </Button>
                                 <Button
                                     sx={{
-                                        border: "1px solid blue",
                                         backgroundColor: "#3B82F6",
                                         color: "white",
-                                        padding: "6px 15px",
+                                        padding: "6px 30px",
                                         fontWeight: "700",
+                                        borderRadius : 5
                                     }}
                                     onClick={handleNext}
                                 >

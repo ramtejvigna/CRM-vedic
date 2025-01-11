@@ -26,6 +26,7 @@ const EmployeeTable = () => {
   const [originalEmployees, setOriginalEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [role , setRole] = useState("");
   const recordsPerPage = 5;
   
 
@@ -84,33 +85,28 @@ const EmployeeTable = () => {
 
   // Filter Employees by Status
   const filterData = async () => {
-    if (status) {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}`
+          `https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}&role=${role}`
         );
         if (response.status === 200) {
           setEmployees(response.data);
         }
       } catch (error) {
-        console.error("Error filtering employees:", error.message);
         toast.error("Error filtering employees");
       } finally {
         setIsLoading(false);
       }
-    } else {
-      toast.error("Please select a status");
-    }
   };
 
   // Trigger filterData when status changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       filterData();
-    }, 300); // Debounce filtering for 300ms
+    }, 300);
     return () => clearTimeout(timeoutId);
-  }, [status]);
+  }, [status,role]);
 
   // Reset current page when employees list changes
   useEffect(() => {
@@ -119,8 +115,8 @@ const EmployeeTable = () => {
 
   // Event Handlers
   const handleAddEmployee = () => navigate("add-employee");
-  const handleEdit = (id) => navigate(`edit-employee/${id}`);
   const handleView = (id) => navigate(`view-employee/${id}`);
+  const handleEdit = (id) => navigate(`edit-employee/${id}`)
   const handleDelete = (id) => navigate(`delete-employee/${id}`);
   const indexOfFirstRecord = (currentPage - 1) * recordsPerPage;
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -216,9 +212,7 @@ const EmployeeTable = () => {
             </Link>
           </motion.button>
         </div>
-        {/* <div className="mb-4 ml-2 font-mono text-gray-600 text-sm">
-                Showing {employees.length} results
-            </div> */}
+
         <AnimatePresence>
           {showFilters && (
             <motion.div
@@ -234,6 +228,31 @@ const EmployeeTable = () => {
                     htmlFor="status"
                     className="capitalize tracking-wider text-gray-700 font-medium"
                   >
+                    Role :
+                  </label>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    id="role"
+                    name="Role"
+                    className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
+                  >
+                    <option className="cursor-pointer" value="all" >
+                      All
+                    </option>
+                    <option className="cursor-pointer" value="employee">
+                      Employee
+                    </option>
+                    <option className="cursor-pointer" value="manager">
+                      Manager
+                    </option>
+                  </select>
+                </div>
+                <div className="flex gap-x-3 min-w-[250px] items-center">
+                  <label
+                    htmlFor="status"
+                    className="capitalize tracking-wider text-gray-700 font-medium"
+                  >
                     Status:
                   </label>
                   <select
@@ -243,8 +262,8 @@ const EmployeeTable = () => {
                     name="status"
                     className="transition cursor-pointer duration-200 border border-gray-300 bg-gray-50 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-white hover:shadow-md"
                   >
-                    <option className="cursor-pointer" value="select status" disabled>
-                      Select status
+                    <option className="cursor-pointer" value="all" >
+                      All
                     </option>
                     <option className="cursor-pointer" value="online">
                       Online

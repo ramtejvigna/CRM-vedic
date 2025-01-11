@@ -54,9 +54,8 @@ const customerSchema = new mongoose.Schema({
 
 
 const employeeSchema = new mongoose.Schema({
-    // username: { type: String, required: true },
-    firstName: { type: String },
-    lastName: { type: String },
+    firstName: { type: String , required : true },
+    lastName: { type: String  , required : true},
     role: { type: String, enum: ["Employee", "Manager"], required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
@@ -68,8 +67,6 @@ const employeeSchema = new mongoose.Schema({
     pincode: { type: String, required: true },
 
     aadharOrPan: { type: String },
-    passport: { type: String },
-    ssn: { type: String },
     degrees: { type: String },
     transcripts: { type: String },
 
@@ -97,6 +94,7 @@ const employeeSchema = new mongoose.Schema({
     requestedBabyNames: { type: Boolean, default: false },
     adminAcceptedRequest: { type: Boolean, default: false },
 
+    password : {type : String , required : true}
 }, { timestamps: true });
 
 const astroSchema = new mongoose.Schema(

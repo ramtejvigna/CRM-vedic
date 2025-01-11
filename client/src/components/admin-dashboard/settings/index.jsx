@@ -15,6 +15,13 @@ function Settings() {
   const [employees , setEmployees] = useState([]);
   const navigate = useNavigate()
 
+  const [errors, setErrors] = useState({
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
   const [formData1 , setFormData1] = useState({
     currentPassword : '',
     newPassword : '',
@@ -403,6 +410,40 @@ function Settings() {
       setLoading(false);
     }
   };
+
+  const handleChange = (e) => {
+    setFormData2((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const validatePassword = () => {
+    const password = formData2.newPassword;
+    const confirmPassword = formData2.confirmNewPassword;
+    const passwordErrors = {};
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Password must have at least 8 chars, a letter, a number, and a special character
+
+    // Validate new password
+    if (!password) {
+      passwordErrors.newPassword = "Password is required";
+    } else if (!passwordRegex.test(password)) {
+      passwordErrors.newPassword = "Password must be at least 8 characters, with a letter, number, and special character";
+    }
+
+    // Validate confirm password
+    if (!confirmPassword) {
+      passwordErrors.confirmNewPassword = "Please confirm the password";
+    } else if (confirmPassword !== password) {
+      passwordErrors.confirmNewPassword = "Passwords do not match";
+    }
+
+    setErrors(passwordErrors);
+    setIsPasswordValid(Object.keys(passwordErrors).length === 0);
+  };
+
+  // Call this function whenever the user types in the password or confirmPassword fields
+  useEffect(() => {
+    validatePassword();
+  }, [formData2.newPassword, formData2.confirmNewPassword])
   
 
   return (
@@ -587,63 +628,88 @@ function Settings() {
         >
           <DialogTitle   variant="h5" id="alert-dialog-title">{"Employee Password Change"}</DialogTitle>
           <DialogContent >
-            <div className="w-full  p-2 max-w-4xl flex flex-col gap-2">
-                <div className="space-y-4">
-                  <select
-                    name="employee" 
-                    value={formData2.employee}
-                    onChange={(e) => setFormData2((prev) => ({...prev , [(e.target.name)] : e.target.value}))}
-                    className={`w-full p-2 rounded-lg border  
-                      focus:ring-2 border-gray-500 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-                  >
-                    <option value="select employee">Select Employee</option>
-                    {employees.map((employee, index) => (
-                      <option key={index} value={employee._id}>
-                        {employee.firstName || employee?.name}
-                      </option>
-                    ))}
-                </select>
+          <div className="w-full p-2 max-w-4xl flex flex-col gap-2">
+      <div className="space-y-4">
+        {/* Employee Select */}
+        <select
+          name="employee"
+          value={formData2.employee}
+          onChange={(e) =>
+            setFormData2((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+          }
+          className={`w-full p-2 rounded-lg border focus:ring-2 border-gray-500 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+        >
+          <option value="select employee">Select Employee</option>
+          {/* Assuming employees are passed as props */}
+          {employees.map((employee, index) => (
+            <option key={index} value={employee._id}>
+              {employee.firstName || employee?.name}
+            </option>
+          ))}
+        </select>
 
-                  <div className="relative flex items-center w-full group mt-4">
-                    <span className="absolute left-3 text-gray-500 group-focus-within:text-blue-500">
-                      <FaLock/>
-                    </span>
-                    <input
-                      name="newPassword"
-                      type="password"
-                      value={formData2.newPassword}
-                      onChange={(e) => setFormData2((prev) => ({...prev , [(e.target.name)] : e.target.value}))}
-                      className="w-full p-2 pl-10 rounded-md border border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200 bg-white/50 "
-                      placeholder="New Password"
-                      required
-                    />
-                  </div>
+        {/* New Password */}
+        <div className="relative flex items-center w-full group mt-4">
+          <span className="absolute left-3 text-gray-500 group-focus-within:text-blue-500">
+            <FaLock />
+          </span>
+          <input
+            name="newPassword"
+            type="password"
+            value={formData2.newPassword}
+            onChange={handleChange}
+            className="w-full p-2 pl-10 rounded-md border border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200 bg-white/50"
+            placeholder="New Password"
+            required
+          />
+        </div>
+        {errors.newPassword && (
+          <div className="text-sm text-red-500">{errors.newPassword}</div>
+        )}
 
-                    <div className="relative flex items-center group w-full">
-                      <span className="absolute left-3 text-gray-500 group-focus-within:text-blue-500">
-                        <FaLock/>
-                      </span>
-                      <input
-                        name="confirmNewPassword"
-                        type="password"
-                        value={formData2.confirmNewPassword}
-                        onChange={(e) => setFormData2((prev) => ({...prev , [(e.target.name)] : e.target.value}))}
-                        className="w-full p-2 pl-10 rounded-md border border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200 bg-white/50 "
-                        placeholder="Confirm New Password"
-                        required
-                      />
-                    </div>
-                  
-                <DialogActions>
-                  <Button type="button" variant="outlined" onClick={() => {setShowModal2(null) , handleClose()}} color="primary">
-                    Cancel
-                  </Button>
-                  <Button onClick={() => handleMoveNext()} type="submit" variant="contained"  autoFocus>
-                    Next
-                  </Button>
-                </DialogActions>
-                </div>
-            </div>
+        {/* Confirm New Password */}
+        <div className="relative flex items-center group w-full">
+          <span className="absolute left-3 text-gray-500 group-focus-within:text-blue-500">
+            <FaLock />
+          </span>
+          <input
+            name="confirmNewPassword"
+            type="password"
+            value={formData2.confirmNewPassword}
+            onChange={handleChange}
+            className="w-full p-2 pl-10 rounded-md border border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200 bg-white/50"
+            placeholder="Confirm New Password"
+            required
+          />
+        </div>
+        {errors.confirmNewPassword && (
+          <div className="text-sm text-red-500">{errors.confirmNewPassword}</div>
+        )}
+
+        <DialogActions>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => {
+              setShowModal2(null);
+              handleClose();
+            }}
+            color="primary"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleMoveNext}
+            type="submit"
+            variant="contained"
+            autoFocus
+            disabled={!isPasswordValid}
+          >
+            change
+          </Button>
+        </DialogActions>
+      </div>
+    </div>
           </DialogContent>
       </Dialog>
 
