@@ -1,6 +1,6 @@
 import { chartsConfig } from "../configs";
 
-// Website Views Chart Configuration
+// Website Views Chart Configuration (static)
 const websiteViewsChart = {
   type: "bar",
   height: 220,
@@ -13,70 +13,54 @@ const websiteViewsChart = {
   options: {
     ...chartsConfig,
     chart: {
-      background: "#1E90FF", // Blue background for Website Views
-      toolbar: {
-        show: false, // Remove menu (three lines)
-      },
+      background: "#1E90FF",
+      toolbar: { show: false },
     },
-    colors: ["#FFFFFF"], // White bars and text
+    colors: ["#FFFFFF"],
     plotOptions: {
       bar: {
-        columnWidth: "20%", // Reduced bar width
-        borderRadius: 5, // Rounded bars
+        columnWidth: "20%",
+        borderRadius: 5,
       },
     },
     xaxis: {
       categories: ["M", "T", "W", "T", "F", "S", "S"],
       labels: {
-        style: {
-          colors: "#FFFFFF", // White text for x-axis labels
-        },
+        style: { colors: "#FFFFFF" },
       },
     },
     yaxis: {
       labels: {
-        style: {
-          colors: "#FFFFFF", // White text for y-axis labels
-        },
+        style: { colors: "#FFFFFF" },
       },
     },
     grid: {
-      show: true, // Show grid for clearer graph lines
-      borderColor: "rgba(255, 255, 255, 0.3)", // Light white grid lines with 30% opacity
-      strokeDashArray: 4, // Dashed grid lines
-      yaxis: {
-        lines: {
-          show: true, // Show grid lines for y-axis (horizontal lines)
-        },
-      },
-      xaxis: {
-        lines: {
-          show: true, // Disable vertical grid lines for x-axis
-        },
-      },
+      show: true,
+      borderColor: "rgba(255, 255, 255, 0.3)",
+      strokeDashArray: 4,
+      yaxis: { lines: { show: true } },
+      xaxis: { lines: { show: true } },
     },
   },
 };
 
-// Daily Sales Chart Configuration
-const dailySalesChart = {
+// Create initial empty charts for customer requests and PDFs
+const createEmptyChart = (type, color) => ({
   type: "line",
   height: 220,
   series: [
     {
-      name: "Sales",
-      data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+      name: type === "customers" ? "Requests" : "PDFs",
+      data: [],
     },
   ],
   options: {
     ...chartsConfig,
     chart: {
-      background: "#28a745", // Green background for Daily Sales
-      toolbar: {
-        show: false, // Remove menu (three lines)
-      },
+      background: color,
+      toolbar: { show: false },
     },
-    colors: ["#FFFFFF"], // White line and text
+    colors: ["#FFFFFF"],
     stroke: {
       lineCap: "round",
       width: 2,
@@ -85,97 +69,83 @@ const dailySalesChart = {
       size: 5,
     },
     xaxis: {
-      categories: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      categories: [],
       labels: {
-        style: {
-          colors: "#FFFFFF", // White text for x-axis labels
-        },
+        style: { colors: "#FFFFFF" },
       },
     },
     yaxis: {
       labels: {
-        style: {
-          colors: "#FFFFFF", // White text for y-axis labels
-        },
+        style: { colors: "#FFFFFF" },
       },
     },
     grid: {
-      show: true, // Enable grid for Daily Sales
-      borderColor: "rgba(255, 255, 255, 0.3)", // Light white grid lines with 30% opacity
-      strokeDashArray: 4, // Dashed grid lines
-      yaxis: {
-        lines: {
-          show: true, // Show grid lines for y-axis (horizontal lines)
-        },
-      },
-      xaxis: {
-        lines: {
-          show: false, // Disable vertical grid lines for x-axis
-        },
-      },
+      show: true,
+      borderColor: "rgba(255, 255, 255, 0.3)",
+      strokeDashArray: 4,
+      yaxis: { lines: { show: true } },
+      xaxis: { lines: { show: false } },
     },
   },
-};
+});
 
-// Completed Tasks Chart Configuration
-const completedTasksChart = {
-  type: "line",
-  height: 220,
-  series: [
+// Initial empty charts
+const customerRequestsChart = createEmptyChart("customers", "#28a745");
+const pdfGeneratedChart = createEmptyChart("pdfs", "#333333");
+
+// Function to update charts with API data
+export const updateChartsWithData = (apiData) => {
+  const { dayLabels, customerData, pdfData } = apiData;
+
+  // Create new chart objects with updated data
+  const updatedCustomerChart = {
+    ...customerRequestsChart,
+    series: [{ ...customerRequestsChart.series[0], data: customerData }],
+    options: {
+      ...customerRequestsChart.options,
+      xaxis: {
+        ...customerRequestsChart.options.xaxis,
+        categories: dayLabels,
+      },
+    },
+  };
+
+  const updatedPdfChart = {
+    ...pdfGeneratedChart,
+    series: [{ ...pdfGeneratedChart.series[0], data: pdfData }],
+    options: {
+      ...pdfGeneratedChart.options,
+      xaxis: {
+        ...pdfGeneratedChart.options.xaxis,
+        categories: dayLabels,
+      },
+    },
+  };
+
+  // Return the full array of charts
+  return [
     {
-      name: "Tasks",
-      data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+      color: "blue",
+      title: "Social-media stats",
+      description: "Platforms Analytics to know our reach in Social Media platforms",
+      chart: websiteViewsChart,
     },
-  ],
-  options: {
-    ...chartsConfig,
-    chart: {
-      background: "#333333", // Black background for Completed Tasks
-      toolbar: {
-        show: false, // Remove menu (three lines)
-      },
+    {
+      color: "green",
+      title: "Customer Requests",
+      description: "Last 7 days of customer requests",
+      chart: updatedCustomerChart,
     },
-    colors: ["#FFFFFF"], // White line and text
-    stroke: {
-      lineCap: "round",
-      width: 2,
+    {
+      color: "black",
+      title: "Generated PDFs",
+      description: "Last 7 days of generated PDFs",
+      chart: updatedPdfChart,
     },
-    markers: {
-      size: 5,
-    },
-    xaxis: {
-      categories: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-      labels: {
-        style: {
-          colors: "#FFFFFF", // White text for x-axis labels
-        },
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: "#FFFFFF", // White text for y-axis labels
-        },
-      },
-    },
-    grid: {
-      show: true, // Enable grid for Completed Tasks
-      borderColor: "rgba(255, 255, 255, 0.3)", // Light white grid lines with 30% opacity
-      strokeDashArray: 4, // Dashed grid lines
-      yaxis: {
-        lines: {
-          show: true, // Show grid lines for y-axis (horizontal lines)
-        },
-      },
-      xaxis: {
-        lines: {
-          show: false, // Disable vertical grid lines for x-axis
-        },
-      },
-    },
-  },
+  ];
 };
 
+// Export initial data for first render
 export const statisticsChartsData = [
   {
     color: "blue",
@@ -186,14 +156,14 @@ export const statisticsChartsData = [
   {
     color: "green",
     title: "Customer Requests",
-    description: "About the Requests we get from Customers day to day",
-    chart: dailySalesChart,
+    description: "Last 7 days of customer requests",
+    chart: customerRequestsChart,
   },
   {
     color: "black",
     title: "Generated PDFs",
-    description: "Analytics of PDFs generated on this day",
-    chart: completedTasksChart,
+    description: "Last 7 days of generated PDFs",
+    chart: pdfGeneratedChart,
   },
 ];
 
