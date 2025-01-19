@@ -209,8 +209,8 @@ const CheckBoxListPage = () => {
     customPaging: (i) => (
       <div
         className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-300 ease-in-out ${currentStep === i
-            ? "bg-gray-800"  // Current dot color
-            : "bg-gray-300 opacity-75"  // Previous and next dots color
+          ? "bg-gray-800"  // Current dot color
+          : "bg-gray-300 opacity-75"  // Previous and next dots color
           }`}
       />
     ),
@@ -222,13 +222,54 @@ const CheckBoxListPage = () => {
   const navigate = useNavigate();
 
   const handleSearch = (event) => {
-    const value = event.target.value;
-    setSearchTerm(value);
+    const searchValue = event.target.value;
+    setSearchTerm(searchValue);
 
-    // Filter names based on the search term
-    const filtered = filteredNames.filter(babyName =>
-      babyName.name.toLowerCase().includes(value.toLowerCase())
-    );
+    // If search is empty, restore the filtered names based on current filters
+    if (!searchValue) {
+      filterNames({ allNames: names, filters });
+      return;
+    }
+
+    // Apply search on names that already match the current filters
+    const searchFiltered = names.filter(babyName => {
+      // First apply all current filters
+      const matchesFilters = Object.entries(filters).every(([key, value]) => {
+        if (!value) return true; // Skip empty filters
+        if (key === "startingLetter") {
+          return babyName.nameEnglish.charAt(0).toLowerCase() === value.toLowerCase();
+        }
+        return babyName[key]?.toLowerCase().includes(value.toLowerCase());
+      });
+
+      // Then apply search term
+      const matchesSearch = babyName.nameEnglish.toLowerCase().includes(searchValue.toLowerCase());
+
+      return matchesFilters && matchesSearch;
+    });
+
+    setFilteredNames(searchFiltered);
+  };
+
+  // Update filterNames function to handle search term
+  const filterNames = ({ allNames, filters }) => {
+    const filtered = allNames.filter(item => {
+      // Apply all filters
+      const matchesFilters = Object.entries(filters).every(([key, value]) => {
+        if (!value) return true; // Skip empty filters
+        if (key === "startingLetter") {
+          return item.nameEnglish.charAt(0).toLowerCase() === value.toLowerCase();
+        }
+        return item[key]?.toLowerCase().includes(value.toLowerCase());
+      });
+
+      // Apply search term if it exists
+      const matchesSearch = !searchTerm ||
+        item.nameEnglish.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return matchesFilters && matchesSearch;
+    });
+
     setFilteredNames(filtered);
   };
 
@@ -261,26 +302,10 @@ const CheckBoxListPage = () => {
 
         setNames(allNames);
         setUniqueValues(uniqueValues);
-        filterNames({ allNames, filters })
+        filterNames({ allNames, filters });
       })
       .catch((error) => console.error("Error fetching names:", error));
   }, [customerData?.babyGender, customerData?.preferredStartingLetter]);
-
-
-  const filterNames = ({ allNames, filters }) => {
-    const filtered = Object.keys(filters).reduce((result, key) => {
-      if (!filters[key]) return result; // Skip if no filter value
-      if (key === "startingLetter") {
-        return result.filter((item) =>
-          item.nameEnglish.charAt(0).toLowerCase() === filters[key].toLowerCase()
-        );
-      }
-      return result.filter((item) =>
-        item[key]?.toLowerCase().includes(filters[key].toLowerCase())
-      );
-    }, allNames);
-    setFilteredNames(filtered);
-  };
 
 
   useEffect(() => {
@@ -308,13 +333,14 @@ const CheckBoxListPage = () => {
 
 
   const handleFilterChange = (key, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
+    const newFilters = {
+      ...filters,
       [key]: value,
-    }));
+    };
+    setFilters(newFilters);
     filterNames({
       allNames: names,
-      filters: { ...filters, [key]: value },
+      filters: newFilters,
     });
   };
 
