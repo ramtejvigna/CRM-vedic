@@ -1,4 +1,4 @@
-import { Employee, Customer } from "../models/User.js";
+import { Employee, Customer, Astro } from "../models/User.js";
 import { PDF } from "../models/PDF.js";
 import { sendApplicationConfirmationEmail } from "../utils/mailer.utils.js";
 import { format } from 'date-fns';
@@ -71,21 +71,23 @@ export const addCustomerWithAssignment = async (req, res) => {
         const apiKey = process.env.GOOGLE_MAP_API_KEY;
 
         // Step 1: Fetch latitude and longitude from Google Maps API
-        const geoResponse = await axios.get(
-            `https://maps.googleapis.com/maps/api/geocode/json`,
-            {
-                params: {
-                    address: birthplace,
-                    key: apiKey,
-                },
-            }
-        );
+        // const geoResponse = await axios.get(
+        //     `https://maps.googleapis.com/maps/api/geocode/json`,
+        //     {
+        //         params: {
+        //             address: birthplace,
+        //             key: apiKey,
+        //         },
+        //     }
+        // );
 
-        if (geoResponse.data.status !== 'OK') {
-            return res.status(400).json({ error: 'Location not found' });
-        }
+        // if (geoResponse.data.status !== 'OK') {
+        //     return res.status(400).json({ error: 'Location not found' });
+        // }
 
-        const { lat: latitude, lng: longitude } = geoResponse.data.results[0].geometry.location;
+        // const { lat: latitude, lng: longitude } = geoResponse.data.results[0].geometry.location;
+        const latitude = 16.544893
+        const longitude = 81.521241
 
         // Step 2: Call the Astrology API with the longitude, latitude, and other data
         const babyBirthDateObj = new Date(babyBirthDate);
@@ -154,10 +156,10 @@ export const addCustomerWithAssignment = async (req, res) => {
             zodiacSign: horoscopeData?.sign,
             nakshatra: horoscopeData?.Naksahtra,
             numerologyNo: horoscopeData?.Charan,
-            luckyColour: horoscopeData?.lucky_color,
-            gemstone: horoscopeData?.gemstone,
-            destinyNumber: horoscopeData?.destiny_number,
-            luckyDay: horoscopeData?.lucky_day,
+            luckyColour: 'Blue',
+            gemstone: 'Blue Sapphire',
+            destinyNumber: 1,
+            luckyDay: 'Mars',
             luckyGod: horoscopeData?.SignLord,
             luckyMetal: horoscopeData?.paya,
         });
