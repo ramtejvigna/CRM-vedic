@@ -1,4 +1,5 @@
 import { Astro, Customer } from '../models/User.js';
+import axios from 'axios';
 
 export const fetchAndStoreAstroData = async (req, res) => {
   const { customerId } = req.params;
@@ -79,3 +80,44 @@ export const updateAstroData = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const fetchAstroData = async (req, res) => {
+  const { day, month, year, hour, min, lat, lon, tzone } = req.body;
+
+    // Define the API URL and credentials
+    const apiUrl = 'https://json.astrologyapi.com/v1/astro_details';
+    const username = process.env.ASTRO_USER_ID;
+    const password = process.env.ASTRO_API_KEY;
+
+    try {
+        // Make a POST request to the Astrology API
+        const response = await axios.post(
+            apiUrl,
+            {
+                day,
+                month,
+                year,
+                hour,
+                min,
+                lat,
+                lon,
+                tzone,
+            },
+            {
+                auth: {
+                    username,
+                    password,
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+
+        // Send the response back to the React frontend
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error fetching horoscope:', error);
+        res.status(500).json({ error: 'Failed to fetch horoscope' });
+    }
+}

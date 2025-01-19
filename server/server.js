@@ -60,7 +60,7 @@ app.use(bodyParser.json());
 app.use(cookieParser())
 app.use(validateImageSize);
 
-app.use(astroRoutes);
+app.use('/', astroRoutes);
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
