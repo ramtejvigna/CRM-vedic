@@ -300,3 +300,32 @@ export const updateCustomerData = async (req, res) => {
         res.status(500).json({ message: 'Error updating customer', error: err });
     }
 };
+
+export const getCustomersByEmployeeId = async (req, res) => {
+    const { employeeId } = req.params;
+
+    try {
+        // Query customers with the matching assignedEmployee._id
+        const customers = await Customer.find({ 'assignedEmployee._id': employeeId });
+
+        // Handle no results
+        if (!customers || customers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No customers found for this employee',
+            });
+        }
+
+        // Return the customers
+        res.status(200).json({
+            success: true,
+            data: customers,
+        });
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching customers',
+        });
+    }
+};
