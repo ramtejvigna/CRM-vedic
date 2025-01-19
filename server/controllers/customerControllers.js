@@ -2,6 +2,7 @@ import { Employee, Customer } from "../models/User.js";
 import { PDF } from "../models/PDF.js";
 import { sendApplicationConfirmationEmail } from "../utils/mailer.utils.js";
 import { format } from 'date-fns';
+import axios from 'axios';
 import locationService from "../utils/locationService.js";
 export const generateUniqueApplicationId = async (Customer) => {
     const today = new Date();
@@ -25,6 +26,7 @@ export const generateUniqueApplicationId = async (Customer) => {
 
     return finalApplicationId;
 };
+
 export const addCustomerWithAssignment = async (req, res) => {
     const {
         fatherName,
@@ -43,22 +45,22 @@ export const addCustomerWithAssignment = async (req, res) => {
         additionalPreferences,
         isTwins,
         selectedServices,
-        totalPrice
+        totalPrice,
     } = req.body;
 
     try {
         console.log("Creating new customer with data:", req.body);
 
         const today = new Date();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); 
+        const month = String(today.getMonth() + 1).padStart(2, '0');
         const year = today.getFullYear();
         const dateString = `${month}-${year}`;
 
-        const monthStart = new Date(year, today.getMonth(), 1); 
-        const monthEnd = new Date(year, today.getMonth() + 1, 1); 
+        const monthStart = new Date(year, today.getMonth(), 1);
+        const monthEnd = new Date(year, today.getMonth() + 1, 1);
 
         const customersAddedThisMonth = await Customer.countDocuments({
-            createdDateTime: { $gte: monthStart, $lt: monthEnd }
+            createdDateTime: { $gte: monthStart, $lt: monthEnd },
         });
 
         const customerCountForMonth = customersAddedThisMonth + 1;
@@ -66,9 +68,65 @@ export const addCustomerWithAssignment = async (req, res) => {
         const customerID = `${month}${year}${customerCountForMonth}`;
         const applicationID = await generateUniqueApplicationId(Customer);
 
+        const apiKey = process.env.GOOGLE_MAP_API_KEY;
+
+        // Step 1: Fetch latitude and longitude from Google Maps API
+        const geoResponse = await axios.get(
+            `https://maps.googleapis.com/maps/api/geocode/json`,
+            {
+                params: {
+                    address: birthplace,
+                    key: apiKey,
+                },
+            }
+        );
+
+        if (geoResponse.data.status !== 'OK') {
+            return res.status(400).json({ error: 'Location not found' });
+        }
+
+        const { lat: latitude, lng: longitude } = geoResponse.data.results[0].geometry.location;
+
+        // Step 2: Call the Astrology API with the longitude, latitude, and other data
+        const babyBirthDateObj = new Date(babyBirthDate);
+        const day = babyBirthDateObj.getDate();
+        const bornMonth = babyBirthDateObj.getMonth() + 1; // Months are 0-indexed
+        const bornYear = babyBirthDateObj.getFullYear();
+        const [hour, min] = babyBirthTime.split(':').map(Number); // Extract hour and minute from time string
+        const tzone = 5.5; // Adjust timezone as required (e.g., IST = +5:30)
+
+        const astroApiUrl = 'https://json.astrologyapi.com/v1/astro_details';
+        const username = process.env.ASTRO_USER_ID;
+        const password = process.env.ASTRO_API_KEY;
+
+        const astroResponse = await axios.post(
+            astroApiUrl,
+            {
+                day,
+                month: bornMonth,
+                year: bornYear,
+                hour,
+                min,
+                lat: latitude,
+                lon: longitude,
+                tzone,
+            },
+            {
+                auth: { username, password },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            }
+        );
+
+        if (!astroResponse.data) {
+            return res.status(500).json({ error: 'Failed to fetch horoscope data' });
+        }
+
+        const horoscopeData = astroResponse.data;
+
+        // Step 3: Save the customer details in the database
         const newCustomer = new Customer({
             applicationID,
-            customerID, 
+            customerID,
             fatherName,
             motherName,
             customerName,
@@ -85,19 +143,42 @@ export const addCustomerWithAssignment = async (req, res) => {
             additionalPreferences,
             isTwins,
             selectedServices,
-            totalPrice
+            totalPrice,
         });
 
         await newCustomer.save();
+
+        // Step 4: Save the horoscope details in the Astro collection
+        const newAstroRecord = new Astro({
+            customerId: newCustomer._id,
+            zodiacSign: horoscopeData?.sign,
+            nakshatra: horoscopeData?.Naksahtra,
+            numerologyNo: horoscopeData?.Charan,
+            luckyColour: horoscopeData?.lucky_color,
+            gemstone: horoscopeData?.gemstone,
+            destinyNumber: horoscopeData?.destiny_number,
+            luckyDay: horoscopeData?.lucky_day,
+            luckyGod: horoscopeData?.SignLord,
+            luckyMetal: horoscopeData?.paya,
+        });
+
+        await newAstroRecord.save();
+
+        // Step 5: Send confirmation email and respond to the client
         await sendApplicationConfirmationEmail(newCustomer);
 
-        res.status(201).json({ applicationId: applicationID,totalPrice: totalPrice,
-            selectedServices: selectedServices  });
+        res.status(201).json({
+            applicationId: applicationID,
+            totalPrice,
+            selectedServices,
+            astroDetails: horoscopeData,
+        });
     } catch (error) {
-        console.error("Error adding customer:", error.message); // Log full error
+        console.error("Error adding customer:", error.message);
         res.status(500).json({ error: "Error adding customer" });
     }
 };
+
 
 export const getLocationSuggestions = async (req, res) => {
     const { query } = req.query;
