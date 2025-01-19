@@ -21,6 +21,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import imageRoutes from './routes/formRoutes.js'
 import astroRoutes from './routes/astroRoutes.js';
 import ReportsRouter from "./routes/ReportsRouter.js"
+import homeRoutes from './routes/HomeRoutes.js'
 import { validateImageSize } from './middleware/imageMiddleware.js';
 import { fileURLToPath } from 'url';
 import fileUpload from 'express-fileupload';
@@ -78,8 +79,7 @@ app.use('/admin/auth' , AdminAuthRoutes)
 app.use('/api/reports',ReportsRouter)
 app.use('/categories', categoryRoutes)
 app.use('/images', imageRoutes);
-
-
+app.use('/api/home',homeRoutes)
 
 
 const PORT = process.env.PORT || 9000;

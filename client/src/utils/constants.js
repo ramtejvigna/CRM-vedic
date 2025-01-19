@@ -8,4 +8,5 @@ export const UPDATE_EMPLOYEE = `${EMPLOYEE_ROUTE}/update-employee`
 
 export const ADD_SALARY_STATEMENT = `${HOST}/salaries/`
 export const GET_ALL_SALARIES = `${HOST}/salaries/`
-export const api = "https://vedic-backend-neon.vercel.app"
+// export const api = "https://vedic-backend-neon.vercel.app"
+export const api = "http://localhost:9000"
