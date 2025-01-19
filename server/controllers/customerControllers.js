@@ -306,11 +306,11 @@ export const getCustomersByEmployeeId = async (req, res) => {
 
     try {
         // Query customers with the matching assignedEmployee._id
-        const customers = await Customer.find({ 'assignedEmployee._id': employeeId });
+        const customers = await Customer.find({ 'assignedEmployee': employeeId });
 
         // Handle no results
         if (!customers || customers.length === 0) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
                 message: 'No customers found for this employee',
             });
