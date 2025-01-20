@@ -442,12 +442,19 @@ const Customer = () => {
               <div>
                 <h2 className="text-sm font-medium text-gray-500 mb-2">Selected Services</h2>
 
-                {customerDetails.selectedServices.map((service, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                    <p className="text-sm capitalize text-gray-700">{service}</p>
-                  </div>
-                ))}
+                <div className='flex flex-row items-center w-1/2 justify-between'>
+                {customerDetails.selectedServices && customerDetails.selectedServices.length > 0 ? (
+                  customerDetails.selectedServices.map((service, index) => (
+                    <div key={index} className="flex items-center">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                      <p className="text-sm capitalize text-gray-700">{service}</p>
+                    </div>
+                  ))
+                ) : (
+                  <h1>No services selected</h1>
+                )}
+                </div>
+
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Source (Instagram Lead)</p>
