@@ -260,10 +260,9 @@ const CustomersTable = ({
             {customer.babyGender}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-            {customer.assignedEmployee?.firstName +
+            {customer.assignedEmployee.firstName +
               " " +
-              customer.assignedEmployee?.lastName ||
-              customer.assignedEmployee?.email ||
+              customer.assignedEmployee.lastName ||
               "Not Assigned"}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
@@ -330,10 +329,9 @@ const CustomersTable = ({
               {customer.babyGender}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-              {customer.assignedEmployee?.firstName +
+              {customer.assignedEmployee ? customer.assignedEmployee?.firstName +
                 " " +
-                customer.assignedEmployee?.lastName ||
-                customer.assignedEmployee?.email ||
+                customer.assignedEmployee?.lastName :
                 "Not Assigned"}
             </td>
            
