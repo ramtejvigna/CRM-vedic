@@ -5,7 +5,8 @@ import {toast , ToastContainer} from "react-toastify";
 import axios from "axios";
 import { HOST } from "../../../utils/constants.js";
 import {FaLock} from "react-icons/fa"
-import {  Button, Edit,CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material"
+import {  Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material"
+import { Edit } from 'lucide-react'
 //import EditIcon from '@mui/icons-material/Edit';
 
 function Settings() {
