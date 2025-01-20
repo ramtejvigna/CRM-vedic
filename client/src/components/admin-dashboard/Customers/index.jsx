@@ -24,17 +24,19 @@ const SearchAndFilterBar = ({
       <div className="relative w-full sm:w-96">
         <input
           type="text"
-          placeholder="Search by Customer ID"
+          placeholder="Search by ID, name, or phone number..."
           value={searchTerm}
           onChange={handleSearch}
-          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${isDarkMode
+          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+            isDarkMode
               ? 'bg-gray-800 border-gray-700 text-gray-200'
               : 'bg-white border-gray-300'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
         />
         <Search
-          className={`absolute left-3 top-2.5 h-5 w-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}
+          className={`absolute left-3 top-2.5 h-5 w-5 ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}
         />
       </div>
     </div>
@@ -110,17 +112,32 @@ export const Customers = () => {
   };
 
   // Updated filtering logic that filters based on active tab
+  // const getFilteredData = () => {
+  //   const currentTabData = customerData[activeTab] || [];
+    
+  //   return currentTabData.filter((row) => {
+  //     const searchMatch = 
+  //       row.customerID?.toLowerCase().includes(searchTerm) ||
+  //       (activeTab === "assignedTo" && row.assignedEmployeeName?.toLowerCase().includes(searchTerm)) ||
+  //       (["inProgress", "completed"].includes(activeTab) && row.whatsappNumber?.toLowerCase().includes(searchTerm)) ||
+  //       (["newRequests", "completed"].includes(activeTab) && row.fatherName?.toLowerCase().includes(searchTerm));
+
+  //     return searchMatch;
+  //   });
+  // };
   const getFilteredData = () => {
     const currentTabData = customerData[activeTab] || [];
     
     return currentTabData.filter((row) => {
-      const searchMatch = 
-        row.customerID?.toLowerCase().includes(searchTerm) ||
-        (activeTab === "assignedTo" && row.assignedEmployeeName?.toLowerCase().includes(searchTerm)) ||
-        (["inProgress", "completed"].includes(activeTab) && row.whatsappNumber?.toLowerCase().includes(searchTerm)) ||
-        (["newRequests", "completed"].includes(activeTab) && row.fatherName?.toLowerCase().includes(searchTerm));
-
-      return searchMatch;
+      const searchFields = [
+        row.customerID,
+        row.applicationID,
+        row.customerName,
+        row.whatsappNumber,
+      ].map(field => field?.toLowerCase() || '');
+  
+      // Check if any of the fields include the search term
+      return searchTerm === '' || searchFields.some(field => field.includes(searchTerm.toLowerCase()));
     });
   };
 
