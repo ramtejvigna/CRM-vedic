@@ -12,8 +12,9 @@ export const createSalaryStatement = async (req, res) => {
         }
 
         let bankStatement = ''
-        if(req.file) {
-            bankStatement = req.file.buffer.toString('base64')
+
+        if(req.files) {
+            bankStatement = req.files?.bankStatement?.data?.toString('base64')
         }
 
         const newSalaryStatement = await Salaries.create({
@@ -34,6 +35,9 @@ export const createSalaryStatement = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
+
 export const updateSalaryStatement = async (req, res) => {
     try {
         const { id, amountPaid, year, month, employee } = req.body;
@@ -58,7 +62,7 @@ export const updateSalaryStatement = async (req, res) => {
         salaryStatement.amountPaid = amountPaid;
         salaryStatement.year = year;
         salaryStatement.month = month;
-        salaryStatement.bankStatement = newBase64;
+        salaryStatement.bankStatement = newBase64 ||  salaryStatement?.bankStatement;
 
         const updatedSalaryStatement = await salaryStatement.save();
 
@@ -78,7 +82,7 @@ export const updateSalaryStatement = async (req, res) => {
 
 export const getAllSalaryStatements = async (req, res) => {
     try {
-        const salaryStatements = await Salaries.find().populate("employee");
+        const salaryStatements = await Salaries.find().populate("employee","firstName email lastName");
         return res.status(200).json(salaryStatements);
     } catch (error) {
         console.error(error.message);

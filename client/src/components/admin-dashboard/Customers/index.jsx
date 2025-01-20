@@ -1,51 +1,52 @@
 import React, { useState, useEffect, useCallback, Fragment } from "react";
 import axios from "axios";
-import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
 import {
-  Eye,
-  Check,
-  X,
-  MoreHorizontal,
-  FileText,
-  MessageCircle,
-  User,
-  AlignVerticalJustifyCenter,
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle,
-  Briefcase,
-  AlertCircle,
-  Clock,
-  XCircle,
-  Filter,
   Search,
 } from "lucide-react";
 import { useStore } from "../../../store"; // Assuming you have a store for dark mode
 import { useNavigate } from "react-router-dom";
 import CheckBoxListPage from "./CheckBoxList";
-import { FaAvianex } from "react-icons/fa";
-import { Dialog, Transition } from "@headlessui/react";
 import { api } from "../../../utils/constants";
 import CustomPagination from "./Pagination";
-import {
-  X as CloseIcon,
-  Calendar,
-  Clock as ClockIcon,
-  FileText as FileIcon,
-  AlertCircle as AlertCircleIcon,
-  CalendarDays,
-  CheckCircle2,
-  XCircle as XCircleIcon,
-  Clock4,
-} from "lucide-react";
 import Loader from "./LoadingState";
 import CustomersTable from "./CustomersTable";
 import CustomerModal from "./CustomerModal";
+
+const SearchAndFilterBar = ({
+  searchTerm,
+  handleSearch,
+  isDarkMode
+}) => {
+  return (
+    <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="relative w-full sm:w-96">
+        <input
+          type="text"
+          placeholder="Search by ID, name, or phone number..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+            isDarkMode
+              ? 'bg-gray-800 border-gray-700 text-gray-200'
+              : 'bg-white border-gray-300'
+          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+        />
+        <Search
+          className={`absolute left-3 top-2.5 h-5 w-5 ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}
+        />
+      </div>
+    </div>
+  );
+};
+
+
+
 export const Customers = () => {
-  const {tab, setTab} = useStore()
-  console.log(tab)
+  const { tab, setTab } = useStore()
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -80,7 +81,6 @@ export const Customers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const getEmployees = async () => {
@@ -106,6 +106,46 @@ export const Customers = () => {
     getEmployees();
   }, []);
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
+    setPage(0); // Reset to first page when searching
+  };
+
+  // Updated filtering logic that filters based on active tab
+  // const getFilteredData = () => {
+  //   const currentTabData = customerData[activeTab] || [];
+    
+  //   return currentTabData.filter((row) => {
+  //     const searchMatch = 
+  //       row.customerID?.toLowerCase().includes(searchTerm) ||
+  //       (activeTab === "assignedTo" && row.assignedEmployeeName?.toLowerCase().includes(searchTerm)) ||
+  //       (["inProgress", "completed"].includes(activeTab) && row.whatsappNumber?.toLowerCase().includes(searchTerm)) ||
+  //       (["newRequests", "completed"].includes(activeTab) && row.fatherName?.toLowerCase().includes(searchTerm));
+
+  //     return searchMatch;
+  //   });
+  // };
+  const getFilteredData = () => {
+    const currentTabData = customerData[activeTab] || [];
+    
+    return currentTabData.filter((row) => {
+      const searchFields = [
+        row.customerID,
+        row.applicationID,
+        row.customerName,
+        row.whatsappNumber,
+      ].map(field => field?.toLowerCase() || '');
+  
+      // Check if any of the fields include the search term
+      return searchTerm === '' || searchFields.some(field => field.includes(searchTerm.toLowerCase()));
+    });
+  };
+
+  const filteredAndPaginatedData = getFilteredData().slice(
+    page * rowsPerPage,
+    (page + 1) * rowsPerPage
+  );
+
   const handleActionClick = (action, customer, fromSection, nextSection) => {
     switch (action) {
       case "view":
@@ -128,12 +168,12 @@ export const Customers = () => {
   const handleAssignEmployee = async () => {
     if (selectedEmployee && selectedCustomerForAssign) {
       const customerId = selectedCustomerForAssign._id;
-  
+
       try {
         const response = await axios.put(
           `${api}/api/manager/assign/${customerId}/to/${selectedEmployee._id}`,
         );
-  
+
         if (response.status === 200) {
           toast.success("Customer successfully assigned to employee");
           setShowModal(false);
@@ -158,7 +198,7 @@ export const Customers = () => {
       toast.error("Please select both an employee and a customer.");
     }
   };
-  
+
   // Reloading the customer data function
   const getNewRequests = async () => {
     try {
@@ -170,13 +210,13 @@ export const Customers = () => {
       setLoading(false);
     }
   };
-  
+
   // Optionally, add a "Refresh" button to manually trigger a reload of data
   const handleRefreshData = () => {
     setLoading(true);
     getNewRequests();
   };
-  
+
   const moveCustomer = (customer, fromSection, toSection, details) => {
     const updatedCustomer = { ...customer, additionalDetails: details };
 
@@ -258,11 +298,6 @@ export const Customers = () => {
     deadline
   ]);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
-    setPage(0); // Reset to first page when searching
-  };
-
   const handleGenderChange = (event) => {
     setFilteredGender(event.target.value);
     setPage(0); // Reset to first page when filter changes
@@ -301,115 +336,32 @@ export const Customers = () => {
   });
 
   const activeTabData = customerData[`${activeTab}`] || [];
-  const paginatedData = activeTabData.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
   const renderContent = () => {
     switch (activeTab) {
       case "newRequests":
-        return (
-          <AnimatePresence>
-          <CustomersTable
-            customers={paginatedData}
-            fromSection="newRequests"
-            nextSection="inProgress"
-            handleActionClick={handleActionClick}
-            moveCustomer={moveCustomer}
-            activeTab={activeTab}
-            setSelectedCustomer={setSelectedCustomer}
-            setNextSection={setNextSection}
-            setShowModal={setShowModal}
-            setPaymentStatus={setPaymentStatus}
-            setSelectedCustomerForAssign={setSelectedCustomerForAssign}
-            setActiveDropdown={setActiveDropdown}
-            activeDropdown={activeDropdown}
-            isDarkMode={isDarkMode}
-          />
-          </AnimatePresence>
-        );
       case "inProgress":
-        return (
-          <AnimatePresence>
-          <CustomersTable
-            customers={paginatedData}
-            fromSection="inProgress"
-            nextSection="completed"
-            handleActionClick={handleActionClick}
-            moveCustomer={moveCustomer}
-            activeTab={activeTab}
-            setSelectedCustomer={setSelectedCustomer}
-            setNextSection={setNextSection}
-            setShowModal={setShowModal}
-            setPaymentStatus={setPaymentStatus}
-            setSelectedCustomerForAssign={setSelectedCustomerForAssign}
-            setActiveDropdown={setActiveDropdown}
-            activeDropdown={activeDropdown}
-            isDarkMode={isDarkMode}
-          />
-          </AnimatePresence>
-        );
       case "assignedTo":
-        return (
-          <AnimatePresence>
-          <CustomersTable
-            customers={paginatedData}
-            fromSection="assignTo"
-            nextSection="completed"
-            handleActionClick={handleActionClick}
-            moveCustomer={moveCustomer}
-            activeTab={activeTab}
-            setSelectedCustomer={setSelectedCustomer}
-            setNextSection={setNextSection}
-            setShowModal={setShowModal}
-            setPaymentStatus={setPaymentStatus}
-            setSelectedCustomerForAssign={setSelectedCustomerForAssign}
-            setActiveDropdown={setActiveDropdown}
-            activeDropdown={activeDropdown}
-            isDarkMode={isDarkMode}
-          />
-          </AnimatePresence>
-        );
       case "completed":
-        return (
-          <motion.div>
-          <AnimatePresence>
-          <CustomersTable
-            customers={paginatedData}
-            fromSection="completed"
-            nextSection="inProgress"
-            handleActionClick={handleActionClick}
-            moveCustomer={moveCustomer}
-            activeTab={activeTab}
-            setSelectedCustomer={setSelectedCustomer}
-            setNextSection={setNextSection}
-            setShowModal={setShowModal}
-            setPaymentStatus={setPaymentStatus}
-            setSelectedCustomerForAssign={setSelectedCustomerForAssign}
-            setActiveDropdown={setActiveDropdown}
-            activeDropdown={activeDropdown}
-            isDarkMode={isDarkMode}
-          />
-          </AnimatePresence>
-          </motion.div>
-        );
       case "rejected":
         return (
           <AnimatePresence>
-          <CustomersTable
-            customers={paginatedData}
-            fromSection="rejected"
-            nextSection="newRequests"
-            handleActionClick={handleActionClick}
-            moveCustomer={moveCustomer}
-            activeTab={activeTab}
-            setSelectedCustomer={setSelectedCustomer}
-            setNextSection={setNextSection}
-            setShowModal={setShowModal}
-            setPaymentStatus={setPaymentStatus}
-            setSelectedCustomerForAssign={setSelectedCustomerForAssign}
-            setActiveDropdown={setActiveDropdown}
-            activeDropdown={activeDropdown}
-            isDarkMode={isDarkMode}
-          />
+            <CustomersTable
+              customers={filteredAndPaginatedData}
+              fromSection={activeTab}
+              nextSection={getNextSection(activeTab)}
+              handleActionClick={handleActionClick}
+              moveCustomer={moveCustomer}
+              activeTab={activeTab}
+              setSelectedCustomer={setSelectedCustomer}
+              setNextSection={setNextSection}
+              setShowModal={setShowModal}
+              setPaymentStatus={setPaymentStatus}
+              setSelectedCustomerForAssign={setSelectedCustomerForAssign}
+              setActiveDropdown={setActiveDropdown}
+              activeDropdown={activeDropdown}
+              isDarkMode={isDarkMode}
+            />
           </AnimatePresence>
         );
       default:
@@ -440,7 +392,20 @@ export const Customers = () => {
     },
   };
 
-  const totalPages = Math.ceil(activeTabData.length / rowsPerPage);
+  const getNextSection = (currentTab) => {
+    const sections = {
+      newRequests: "inProgress",
+      inProgress: "completed",
+      assignedTo: "completed",
+      completed: "inProgress",
+      rejected: "newRequests"
+    };
+    return sections[currentTab] || "";
+  };
+
+  // Update pagination calculations
+  const totalFilteredItems = getFilteredData().length;
+  const totalPages = Math.ceil(totalFilteredItems / rowsPerPage);
 
   // Reset pagination when tab changes
   useEffect(() => {
@@ -464,6 +429,12 @@ export const Customers = () => {
           <h1 className="text-3xl font-bold text-slate-600 mb-3">Customer Management</h1>
         </div>
 
+        <SearchAndFilterBar
+          searchTerm={searchTerm}
+          handleSearch={handleSearch}
+          isDarkMode={isDarkMode}
+        />
+
         <div className="flex p-2 mb-6 justify-center space-x-2 overflow-x-auto">
           {[
             "newRequests",
@@ -481,11 +452,10 @@ export const Customers = () => {
                 setTab(tab)
 
               }}
-              className={`relative px-4 py-2 text-sm rounded-lg transition-colors duration-150 ease-in-out ${
-                activeTab === tab
+              className={`relative px-4 py-2 text-sm rounded-lg transition-colors duration-150 ease-in-out ${activeTab === tab
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              }`}
+                }`}
             >
               {tab.charAt(0).toUpperCase() +
                 tab.slice(1).replace(/([A-Z])/g, " $1")}
@@ -563,18 +533,17 @@ export const Customers = () => {
           </motion.div>
         </div>
       )}
-    <CustomPagination
-          totalItems={activeTabData.length}
-          itemsPerPage={rowsPerPage}
-          currentPage={page}
+      <CustomPagination
+        totalItems={totalFilteredItems}
+        itemsPerPage={rowsPerPage}
+        currentPage={page}
         onPageChange={handleChangePage}
         onItemsPerPageChange={handleRowsPerPageChange}
         isDarkMode={isDarkMode}
-    />
-    <ToastContainer />
+      />
+      <ToastContainer />
     </div>
   );
 };
 
 export default Customers;
-

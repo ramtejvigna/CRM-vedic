@@ -244,33 +244,140 @@ export const changePassword = async (req, res) => {
 
 
 export const updateEmployeePassword = async (req, res) => {
-  try {
-    const { adminPassword, employeeId, newPassword } = req.body;
-
-    const admin = await Admin.findOne({}); 
-    if (!admin) {
-      return res.status(200).json({ message: 'Admin not found' , success : false });
+    try {
+      const { adminPassword, employeeId, newPassword } = req.body;
+  
+      // Find admin details
+      const admin = await Admin.findOne({});
+      if (!admin) {
+        return res.status(200).json({ message: 'Admin not found', success: false });
+      }
+  
+      // Verify admin password (hashed comparison)
+      const isAdminPasswordCorrect = await bcrypt.compare(adminPassword, admin.password);
+      if (!isAdminPasswordCorrect) {
+        return res.status(200).json({ message: 'Incorrect admin password', success: false });
+      }
+  
+      // Find employee by ID
+      const employee = await Employee.findById(employeeId);
+      if (!employee) {
+        return res.status(200).json({ message: 'Employee not found', success: false });
+      }
+  
+      // Update the password directly without hashing
+      employee.password = newPassword; // Store as plain text
+      await employee.save();
+  
+      return res.status(200).json({ message: 'Password updated successfully', success: true });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Server error', success: false });
     }
+  };
 
-    const isAdminPasswordCorrect = await bcrypt.compare(adminPassword, admin.password);
-    if (!isAdminPasswordCorrect) {
-      return res.status(200).json({ message: 'Incorrect admin password' , success : false });
+  export const viewEmployeePasswords = async (req, res) => {
+    try {
+      const { adminPassword } = req.body;
+      
+      // Validate admin
+      const admin = await Admin.findOne({});
+      if (!admin) {
+        return res.status(200).json({
+          message: 'Admin not found',
+          success: false
+        });
+      }
+  
+      // Check admin's password using bcrypt
+      const isAdminPasswordCorrect = await bcrypt.compare(adminPassword, admin.password);
+      if (!isAdminPasswordCorrect) {
+        return res.status(200).json({
+          message: 'Incorrect admin password',
+          success: false
+        });
+      }
+  
+      // Retrieve employees with passwords
+      const employees = await Employee.find({}, 'firstName lastName email password');
+      if (!employees || employees.length === 0) {
+        return res.status(200).json({
+          message: 'No employees found',
+          success: false
+        });
+      }
+  
+      // Send response with employee data
+      return res.status(200).json({
+        message: 'Employee passwords retrieved successfully',
+        data: employees,
+        success: true,
+      });
+  
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: 'Server error',
+        success: false
+      });
     }
+  };
 
-    const employee = await Employee.findById(employeeId);
-    if (!employee) {
-      return res.status(200).json({ message: 'Employee not found' , success : false });
+  export const editEmployeePasswordInline = async (req, res) => {
+    try {
+        const { employeeId, newPassword, adminPassword } = req.body;
+        
+        // Validate inputs
+        if (!employeeId || !newPassword || !adminPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
+        }
+
+        // Find admin
+        const admin = await Admin.findOne();
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: "Admin not found"
+            });
+        }
+
+        // Verify admin password
+        const isPasswordValid = await bcrypt.compare(adminPassword, admin.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid admin password"
+            });
+        }
+
+        // Find employee
+        const employee = await Employee.findById(employeeId);
+        if (!employee) {
+            return res.status(404).json({
+                success: false,
+                message: "Employee not found"
+            });
+        }
+
+        employee.password = newPassword;  
+        
+
+        await employee.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Password updated successfully"
+        });
+
+    } catch (error) {
+        console.error('Error in updateEmployeePasswordInline:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
     }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    employee.password = hashedPassword;
-    await employee.save();
-
-    return res.status(200).json({ message: 'Password updated successfully' , success : true });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Server error' , success : false });
-  }
 };

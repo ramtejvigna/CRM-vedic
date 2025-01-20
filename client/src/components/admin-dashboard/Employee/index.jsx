@@ -45,68 +45,81 @@ const EmployeeTable = () => {
 
   const fetchEmployees = async () => {
     try {
-      setIsLoading(true);
-      const res = await fetch(GET_ALL_EMPLOYEES); // Replace with actual endpoint
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      const data = await res.json();
-      setEmployees(data.employees);
-      setOriginalEmployees(data.employees); 
+        setIsLoading(true);
+        const res = await fetch(GET_ALL_EMPLOYEES);
+        if (!res.ok) throw new Error("Failed to fetch employees");
+        const data = await res.json();
+        if (data?.employees) {
+            setEmployees(data.employees);
+            setOriginalEmployees(data.employees);
+        } else {
+            throw new Error("Invalid data format");
+        }
     } catch (error) {
-      toast.error("Error fetching employees!");
+        console.error('Fetch error:', error);
+        toast.error("Error fetching employees!");
+        setEmployees([]);
+        setOriginalEmployees([]);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
-
+};
   // Fetch employees on mount and refresh every 10 minutes
   useEffect(() => {
     fetchEmployees();
     const intervalId = setInterval(fetchEmployees, 10 * 60 * 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+    return () => {
+        clearInterval(intervalId);
+    };
+}, []);
+
+useEffect(() => {
+    const timeoutId = setTimeout(() => {
+        filterData();
+    }, 300);
+    return () => clearTimeout(timeoutId);
+}, [status, role]);
 
   // Handle Search Term
   useEffect(() => {
     if (searchTerm) {
-      const filteredEmployees = originalEmployees.filter(
-        (employee) =>
-          employee.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.email
-            .split("@")[0]
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-      );
-      setEmployees(filteredEmployees);
+        const filteredEmployees = originalEmployees?.filter(
+            (employee) =>
+                employee?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setEmployees(filteredEmployees);
+        setCurrentPage(1); // Reset to first page when searching
     } else {
-      setEmployees(originalEmployees); 
+        setEmployees(originalEmployees);
     }
-  }, [searchTerm, originalEmployees]);
+}, [searchTerm, originalEmployees]);
 
   // Filter Employees by Status
   const filterData = async () => {
-      try {
+    if (status === 'all' && role === 'all') {
+        setEmployees(originalEmployees);
+        return;
+    }
+    
+    try {
         setIsLoading(true);
         const response = await axios.get(
-          `https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}&role=${role}`
+            `https://vedic-backend-neon.vercel.app/api/employees/search?status=${status}&role=${role}`
         );
         if (response.status === 200) {
-          setEmployees(response.data);
+            setEmployees(response.data);
         }
-      } catch (error) {
+    } catch (error) {
+        console.error('Filter error:', error);
         toast.error("Error filtering employees");
-      } finally {
+        setEmployees(originalEmployees);
+    } finally {
         setIsLoading(false);
-      }
-  };
+    }
+};
 
-  // Trigger filterData when status changes
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      filterData();
-    }, 300);
-    return () => clearTimeout(timeoutId);
-  }, [status,role]);
 
   // Reset current page when employees list changes
   useEffect(() => {
@@ -121,8 +134,12 @@ const EmployeeTable = () => {
   const indexOfFirstRecord = (currentPage - 1) * recordsPerPage;
   const indexOfLastRecord = currentPage * recordsPerPage;
 
-  const currentRecords = employees?.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(employees.length / recordsPerPage);
+  const currentRecords = employees?.slice(
+    (currentPage - 1) * recordsPerPage,
+    currentPage * recordsPerPage
+) || [];
+
+const totalPages = Math.ceil((employees?.length || 0) / recordsPerPage);
 
   const getStatusColor = (isOnline) =>
     isOnline
@@ -155,19 +172,20 @@ const EmployeeTable = () => {
   
   const handleConfirm = async (employeeId) => {
     try {
-      const response = await axios.post('https://vedic-backend-neon.vercel.app/employees/confirmRequest', {
-        employeeId
-      });
+        const response = await axios.post('https://vedic-backend-neon.vercel.app/employees/confirmRequest', {
+            employeeId
+        });
 
-      if (response.data.accepted) {
-        setIsModalOpen(false);
-        toast.success("Request accepted");
-        await fetchEmployees();
-      }
+        if (response?.data?.accepted) {
+            setIsModalOpen(false);
+            toast.success("Request accepted");
+            await fetchEmployees(); // Refresh the data
+        }
     } catch (error) {
-      toast.error("Failed to accept the request");
+        console.error('Confirmation error:', error);
+        toast.error("Failed to accept the request");
     }
-  }
+};
 
   return isLoading ? (
     <div className="h-full w-full flex items-center justify-center">
@@ -307,10 +325,10 @@ const EmployeeTable = () => {
                   }`}
               >
                 <AnimatePresence>
-                  {currentRecords.map((employee) => (
+                  {currentRecords.map((employee , i) => (
                     <>
                       <motion.tr
-                        key={employee._id}
+                        key={employee.email}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}

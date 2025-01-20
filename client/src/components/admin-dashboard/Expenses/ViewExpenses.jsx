@@ -7,30 +7,40 @@ import { X, Filter, Download, Eye, Trash, Search } from "lucide-react";
 import { useStore } from "../../../store";
 import { AiOutlineDownload, AiOutlinePrinter, AiOutlineClose } from 'react-icons/ai';
 import EmptyState from './EmptyState';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
 // Delete Modal Component
 const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" onClick={onClose} />
-      <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0, opacity: 0 }}
-        transition={{ duration: 0.5, ease: "backInOut" }}
-        className="bg-white rounded-xl shadow-2xl p-7 min-w-[400px] flex flex-col justify-between"
-      >
-        <div className='text-3xl font-bold uppercase text-center'>ARE YOU SURE</div>
-        <div className='text-xs text-center'>you want to delete this expense?</div>
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className='rounded-lg border border-gray-200 uppercase px-3 py-2'>Cancel</button>
-          <button onClick={onConfirm} className="px-4 rounded-lg flex items-center justify-center bg-red-500 text-white py-2 hover:bg-red-600">Delete</button>
-        </div>
-      </motion.div>
-    </div>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title" className="text-3xl font-bold uppercase text-center">
+        Are You Sure
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description" className="text-xs text-center">
+          You want to delete this expense?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions className="flex justify-end gap-2">
+        <Button onClick={onClose} className="uppercase px-3 py-2">
+          Cancel
+        </Button>
+        <Button
+          onClick={onConfirm}
+          color="secondary"
+          className="text-violet-500 border-violet-500 uppercase px-3 py-2 hover:bg-violet-100"
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
+
 
 const PayslipModal = ({ isOpen, onClose, payslipData, fileType }) => {
   if (!isOpen) return null;
@@ -256,17 +266,15 @@ const ViewExpenses = () => {
         prevFiltered.filter((expense) => expense._id !== expenseToDelete)
       );
 
-      toast.success("Expense deleted successfully");
+      toast.success("Expense deleted successfully"); // Show success toast
     } catch (error) {
       console.error("Error deleting expense:", error);
-      toast.error(error.message || "Failed to delete expense");
+      toast.error(error.message || "Failed to delete expense"); // Show error toast
     } finally {
       setDeleteModalOpen(false);
       setExpenseToDelete(null);
     }
   };
-
-
 
   const handleAddExpense = () => navigate("add-expense");
   const handleEdit = (id) => navigate(`edit-expense/${id}`);

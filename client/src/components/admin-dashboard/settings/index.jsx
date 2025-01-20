@@ -6,6 +6,9 @@ import axios from "axios";
 import { HOST } from "../../../utils/constants.js";
 import {FaLock} from "react-icons/fa"
 import {  Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material"
+import { Edit } from 'lucide-react'
+//import EditIcon from '@mui/icons-material/Edit';
+
 function Settings() {
   const {setAdminInfo} = useStore();
   const [showModel , setShowModel] = useState(false);
@@ -14,7 +17,12 @@ function Settings() {
   const [loading , setLoading] = useState(false); // for changing password 
   const [employees , setEmployees] = useState([]);
   const navigate = useNavigate()
-
+  const [showViewPasswordModal, setShowViewPasswordModal] = useState(false);
+  const [adminPasswordForView, setAdminPasswordForView] = useState("");
+  const [employeePasswords, setEmployeePasswords] = useState([]);
+  const [loadingPasswords, setLoadingPasswords] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editingAdminPassword, setEditingAdminPassword] = useState('');
   const [errors, setErrors] = useState({
     newPassword: "",
     confirmNewPassword: "",
@@ -39,8 +47,85 @@ function Settings() {
 
 
   const [adminPassword, setAdminPassword] = useState("");
-
-
+  const handleEdit = (employee) => {
+    // Pre-fill the employee in formData2
+    setFormData2({
+      employee: employee._id,
+      newPassword: '',
+      confirmNewPassword: '',
+      adminPassword: ''
+    });
+    // Open the existing update employee password modal
+    setShowModal2("section1");
+    // Close the view passwords modal
+    setShowViewPasswordModal(false);
+  };
+  const handleViewEmployeePasswords = async (e) => {
+    e.preventDefault();
+    
+    if (!adminPasswordForView) {
+      toast.error("Admin password is required!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
+  
+    setLoadingPasswords(true);
+    try {
+      const response = await axios.post(
+        `https://vedic-backend-neon.vercel.app/admin/auth/view-employee-passwords`,
+        {
+          adminPassword: adminPasswordForView
+        },
+        { withCredentials: true }
+      );
+  
+      if (!response.data.success) {
+        toast.error(response.data.message || "Failed to fetch passwords", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        return;
+      }
+  
+      // Use response.data.data instead of response.data.employees
+      setEmployeePasswords(response.data.data);
+      setShowViewPasswordModal("showTable");
+      
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An unexpected error occurred!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } finally {
+      setLoadingPasswords(false);
+      setAdminPasswordForView("");
+    }
+  };  
+  const handleCloseViewPassword = () => {
+    setShowViewPasswordModal(false);
+    setEmployeePasswords([]);
+    setAdminPasswordForView("");
+  };
 
   const handleLogout = async () => {
     try {
@@ -410,7 +495,42 @@ function Settings() {
       setLoading(false);
     }
   };
+  // Function to handle saving the modified password
+const handleSavePassword = async (employee) => {
+  if (!editingAdminPassword) {
+    toast.error("Admin password is required!");
+    return;
+  }
 
+  try {
+    // Find the current employee's updated password from employeePasswords array
+    const currentEmployee = employeePasswords.find(emp => emp._id === employee._id);
+    if (!currentEmployee) {
+      toast.error("Employee not found!");
+      return;
+    }
+
+    const response = await axios.put(
+      `${HOST}/admin/auth/edit-employee-password`,
+      {
+        employeeId: employee._id,
+        newPassword: currentEmployee.password, // Using the password from employeePasswords
+        adminPassword: editingAdminPassword
+      },
+      { withCredentials: true }
+    );
+
+    if (response.data.success) {
+      toast.success("Password updated successfully");
+      setEditingId(null);
+      setEditingAdminPassword('');
+    } else {
+      toast.error(response.data.message || "Failed to update password");
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || "An error occurred while updating the password");
+  }
+};
   const handleChange = (e) => {
     setFormData2((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -486,7 +606,156 @@ function Settings() {
           >
             {"Update employee password"}
           </Button>
+          <Button 
+            fullWidth 
+            onClick={() => setShowViewPasswordModal("enterPassword")}
+          >
+            View Employee Passwords
+          </Button>
         </div>
+        <Dialog
+        open={showViewPasswordModal === "enterPassword"}
+        onClose={handleCloseViewPassword}
+        aria-labelledby="view-password-dialog-title"
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle id="view-password-dialog-title">
+          <div className="flex justify-center flex-col items-center">
+            <FaLock size={64} className="text-blue-500" />
+            Require Admin Password
+          </div>
+        </DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleViewEmployeePasswords}>
+            <input
+              type="password"
+              value={adminPasswordForView}
+              onChange={(e) => setAdminPasswordForView(e.target.value)}
+              className="w-full p-3 rounded-md mb-5 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200 bg-gray-100"
+              placeholder="Enter Admin Password"
+              required
+            />
+            <DialogActions>
+              <Button type="button" variant="outlined" onClick={handleCloseViewPassword} color="primary">
+                Cancel
+              </Button>
+              {loadingPasswords ? (
+                <CircularProgress size={30} />
+              ) : (
+                <Button type="submit" variant="contained" color="primary">
+                  View Passwords
+                </Button>
+              )}
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
+     <Dialog
+  open={showViewPasswordModal === "showTable"}
+  onClose={handleCloseViewPassword}
+  aria-labelledby="password-table-dialog-title"
+  fullWidth
+  maxWidth="md"
+>
+  <DialogTitle id="password-table-dialog-title" className="flex justify-between items-center">
+    Employee Passwords
+    <Button 
+      onClick={handleCloseViewPassword} 
+      className="absolute right-2 top-2"
+      sx={{ minWidth: '40px', padding: '6px' }}
+    >
+<span className="font-bold text-black hover:text-red-700 text-2xl hover:text-3xl transition-transform">✕</span>
+</Button>
+  </DialogTitle>
+  <DialogContent>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="py-2 px-4 border-b text-left">Employee Name</th>
+            <th className="py-2 px-4 border-b text-left">Password</th>
+            <th className="py-2 px-4 border-b text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {employeePasswords.map((employee, index) => (
+            <tr key={index} className="hover:bg-gray-50">
+              <td className="py-2 px-4 border-b">
+                {`${employee.firstName || ''} ${employee.lastName || ''}`}
+              </td>
+              <td className="py-2 px-4 border-b font-mono">
+                {editingId === employee._id ? (
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="text"
+                      defaultValue={employee.password}
+                      onChange={(e) => {
+                        const updatedPasswords = employeePasswords.map(emp => 
+                          emp._id === employee._id ? {...emp, password: e.target.value} : emp
+                        );
+                        setEmployeePasswords(updatedPasswords);
+                      }}
+                      className="w-full p-1 border rounded"
+                    />
+                    <input
+                      type="password"
+                      value={editingAdminPassword}
+                      onChange={(e) => setEditingAdminPassword(e.target.value)}
+                      className="w-full p-1 border rounded"
+                      placeholder="Admin password required"
+                    />
+                  </div>
+                ) : (
+                  employee.password
+                )}
+              </td>
+              <td className="py-2 px-4 border-b">
+                {editingId === employee._id ? (
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => handleSavePassword(employee)}
+                      color="primary"
+                      variant="contained"
+                      size="small"
+                    >
+                      Save
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditingAdminPassword('');
+                        // Revert any changes
+                        const originalPasswords = [...employeePasswords];
+                        setEmployeePasswords(originalPasswords);
+                      }}
+                      color="secondary"
+                      variant="outlined"
+                      size="small"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={() => {
+                      setEditingId(employee._id);
+                      setEditingAdminPassword('');
+                    }}
+                    color="primary"
+                    startIcon={<Edit />}
+                  >
+                    
+                  </Button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </DialogContent>
+</Dialog>
       </div>
 
       <div className="w-full bg-white shadow-lg border border-gray-300 rounded-2xl md:p-6 p-2 max-w-4xl flex flex-col gap-6">

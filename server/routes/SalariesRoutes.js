@@ -6,10 +6,10 @@ import multer from "multer";
 const uploads = multer({
     limits : {fileSize : 1 * 1024 * 1024}
 })
-router.post("" , createSalaryStatement )
+router.post("/" , createSalaryStatement )
 router.put("/edit-salary" , updateSalaryStatement );
 router.get("/:id"  ,getSalaryById );
-router.get(""  , getAllSalaryStatements );
+router.get("/"  , getAllSalaryStatements );
 router.put(""  , updateSalaryStatement )
 router.delete("/delete/:id"  , deleteSalaryStatement )
 router.post("/filter" , filterSalariesByYearAndMonth)
