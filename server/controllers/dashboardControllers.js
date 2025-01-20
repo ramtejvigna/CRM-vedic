@@ -109,11 +109,11 @@ export const getCardsData = async (req, res) => {
         const taskChangePercent = yesterdayTasks ? ((totalTasks - yesterdayTasks) / yesterdayTasks * 100).toFixed(2) : 0;
 
         const statisticsCardsData = [
-            { title: "Today's Revenue", value: `₹${currentMonthRevenue.toFixed(2)}`, icon: "CurrencyRupeeIcon", color: "gray", footer: {
-                color: revenueChangePercent >= 0 ? "text-green-500" : "text-red-500",
-                value: `${revenueChangePercent}%`,
-                label: "than last month",
-            }},
+            // { title: "Today's Revenue", value: `₹${currentMonthRevenue.toFixed(2)}`, icon: "CurrencyRupeeIcon", color: "gray", footer: {
+            //     color: revenueChangePercent >= 0 ? "text-green-500" : "text-red-500",
+            //     value: `${revenueChangePercent}%`,
+            //     label: "than last month",
+            // }},
             { title: "Today's Customers", value: todayCustomersCount, icon: "UsersIcon", color: "gray", footer: {
                 color: customerChangePercent >= 0 ? "text-green-500" : "text-red-500",
                 value: `${customerChangePercent}%`,
