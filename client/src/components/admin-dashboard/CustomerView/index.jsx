@@ -83,7 +83,7 @@ function CustomerTable() {
             [customerID]: updatedNotes, // Ensure empty string when cleared
         }));
     };
-    
+    wk
     const handleEditToggle = (customerID) => {
         if (isEditingNote[customerID]) {
             // When editing is toggled off, save the note to the customer
@@ -116,7 +116,7 @@ function CustomerTable() {
         try {
             // Make API request to update the note in the database
             await axios.patch(`${api}/customers/updateNote/${customerID}`, { note: updatedNote });
-    
+    wk
             // Update the customer data locally
             setCustomers((prevCustomers) =>
                 prevCustomers.map((customer) =>
