@@ -17,6 +17,7 @@ import adminLeaveRoutes from './routes/adminLeaveRoutes.js'
 import adminNotifications from "./routes/adminNotifications.js"
 import managerRoutes from "./routes/ManagerRoutes.js"
 import expensesRoutes from './routes/expensesRoutes.js';
+import PostRoutes from './routes/PostRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import imageRoutes from './routes/formRoutes.js'
 import astroRoutes from './routes/astroRoutes.js';
@@ -65,6 +66,7 @@ app.use('/', astroRoutes);
 app.use('/api/employees',employeeRoutes);
 app.use('/api',taskRoutes)
 app.use('/api/', pdfRoutes);
+app.use('/api',PostRoutes);
 app.use('/api/', authRoutes);
 app.use('/',nameRoutes);
 app.use('/', authRoutes);
