@@ -97,8 +97,8 @@ export const addCustomerWithAssignment = async (req, res) => {
         const tzone = 5.5; // Adjust timezone as required (e.g., IST = +5:30)
 
         const astroApiUrl = 'https://json.astrologyapi.com/v1/astro_details';
-        const username = process.env.ASTRO_USER_ID;
-        const password = process.env.ASTRO_API_KEY;
+        const username = '637021';
+        const password = '06fbcbab818b35cb983ef592b2df5661247d88ba';
 
         const astroResponse = await axios.post(
             astroApiUrl,
@@ -150,20 +150,24 @@ export const addCustomerWithAssignment = async (req, res) => {
         await newCustomer.save();
 
         // Step 4: Save the horoscope details in the Astro collection
-        const newAstroRecord = new Astro({
-            customerId: newCustomer._id,
-            zodiacSign: horoscopeData?.sign,
-            nakshatra: horoscopeData?.Naksahtra,
-            numerologyNo: horoscopeData?.Charan,
-            luckyColour: 'Blue',
-            gemstone: 'Blue Sapphire',
-            destinyNumber: 1,
-            luckyDay: 'Mars',
-            luckyGod: horoscopeData?.SignLord,
-            luckyMetal: horoscopeData?.paya,
-        });
-
-        await newAstroRecord.save();
+        try {
+            const newAstroRecord = new Astro({
+                customerId: newCustomer._id,
+                zodiacSign: horoscopeData?.sign || 'Unknown',
+                nakshatra: horoscopeData?.Naksahtra || 'Unknown',
+                numerologyNo: horoscopeData?.Charan || 0,
+                luckyColour: 'Blue',
+                gemstone: 'Blue Sapphire',
+                destinyNumber: 1,
+                luckyDay: 'Mars',
+                luckyGod: horoscopeData?.SignLord || 'Unknown',
+                luckyMetal: horoscopeData?.paya || 'Unknown',
+            });
+            await newAstroRecord.save();
+        } catch (astroError) {
+            console.error("Error saving Astro data:", astroError.message);
+            return res.status(500).json({ error: "Failed to save horoscope data" });
+        }
 
         // Step 5: Send confirmation email and respond to the client
         await sendApplicationConfirmationEmail(newCustomer);
