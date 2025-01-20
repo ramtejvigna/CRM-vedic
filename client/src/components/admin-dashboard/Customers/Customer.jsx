@@ -14,7 +14,7 @@ import {
   Eye,
   AlertCircle,
   ArrowLeft,
-  Star,
+  Search,
   FilePlus2,
 } from 'lucide-react';
 import axios, { formToJSON } from 'axios';
@@ -443,16 +443,16 @@ const Customer = () => {
                 <h2 className="text-sm font-medium text-gray-500 mb-2">Selected Services</h2>
 
                 <div className='flex flex-row items-center w-1/2 justify-between'>
-                {customerDetails.selectedServices && customerDetails.selectedServices.length > 0 ? (
-                  customerDetails.selectedServices.map((service, index) => (
-                    <div key={index} className="flex items-center">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                      <p className="text-sm capitalize text-gray-700">{service}</p>
-                    </div>
-                  ))
-                ) : (
-                  <h1>No services selected</h1>
-                )}
+                  {customerDetails.selectedServices && customerDetails.selectedServices.length > 0 ? (
+                    customerDetails.selectedServices.map((service, index) => (
+                      <div key={index} className="flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                        <p className="text-sm capitalize text-gray-700">{service}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <h1>No services selected</h1>
+                  )}
                 </div>
 
               </div>
@@ -476,131 +476,151 @@ const Customer = () => {
 
           </div>
             <div className="overflow-visible"> {/* Changed this to allow dropdowns to overflow */}
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="px-4 py-2 text-gray-500 text-left">PDF</th>
-                    <th className="px-4 py-2 text-gray-500 text-left">Generated</th>
-                    <th className="px-4 py-2 text-center">
-                      <MessageCircle className="inline h-4 w-4" />
-                    </th>
-                    <th className="px-4 py-2 text-center">
-                      <Mail className="inline h-4 w-4" />
-                    </th>
-                    <th className="px-4 py-2 text-gray-500 text-center">Feedback</th>
-                    <th className="px-4 py-2 text-gray-500 text-center">Actions</th>
-                  </tr>
-                </thead>
+              {pdfs.length == 0 ? (
+                <div className="w-full mt-10 flex items-center justify-center">
+                  <div className="flex flex-col items-center text-center p-8">
+                    <div className="relative mb-6">
+                      {/* Animated search icon with pulsing circle */}
+                      <div className="absolute -inset-4 bg-blue-50 rounded-full animate-pulse" />
+                      <Search className="h-12 w-12 text-blue-500 relative" />
+                    </div>
 
-                <tbody>
-                  {pdfs.map((pdf) => (
-                    <tr key={pdf._id} className="border-b">
-                      <td className="px-4 py-2">
-                        <button onClick={() => handleShowPdf(pdf.babyNames, pdf._id)}>
-                          <FileText className="h-4 w-4 text-blue-600" />
-                        </button>
-                      </td>
-                      <td className="px-4 py-2">
-                        <div className="flex flex-col">
-                          <span className="text-sm">{new Date(pdf.createdAt).toLocaleDateString()}</span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(pdf.createdAt).toLocaleTimeString()}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <div className="h-3 w-3 mx-auto">
-                          {whatsapploader === pdf._id ? (
-                            // Blue loader
-                            <div className="h-3 w-3 rounded-full animate-spin border-2 border-blue-500 border-t-transparent"></div>
-                          ) : (
-                            // Status indicator based on pdf.mailStatus
-                            <div
-                              className={`h-3 w-3 rounded-full ${pdf.whatsappStatus ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <div className="h-3 w-3 mx-auto">
-                          {mailLoader === pdf._id ? (
-                            // Blue loader
-                            <div className="h-3 w-3 rounded-full animate-spin border-2 border-blue-500 border-t-transparent"></div>
-                          ) : (
-                            // Status indicator based on pdf.mailStatus
-                            <div
-                              className={`h-3 w-3 rounded-full ${pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'
-                                }`}
-                            />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="text-sm font-medium">
-                          {pdf.rating === 0
-                            ? "-"
-                            : pdf.rating === 5
-                              ? "Outstanding"
-                              : pdf.rating === 4
-                                ? "Good"
-                                : pdf.rating === 3
-                                  ? "Satisfactory"
-                                  : pdf.rating === 2
-                                    ? "Needs Improvement"
-                                    : "Poor"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right relative">
-                        <div className="flex items-center justify-end space-x-2">
-                          <div className="relative">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleDropdown(pdf._id);
-                              }}
-                              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
-                            >
-                              <MoreHorizontal className="h-5 w-5" />
-                            </button>
+                    <h3 className="text-xl font-semibold mb-2 animate-fade-in">
+                      No PDFs Found
+                    </h3>
+                    <p className="text-gray-500 max-w-sm mb-6">
+                      You can view, share, and manage all your documents here.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="px-4 py-2 text-gray-500 text-left">PDF</th>
+                      <th className="px-4 py-2 text-gray-500 text-left">Generated</th>
+                      <th className="px-4 py-2 text-center">
+                        <MessageCircle className="inline h-4 w-4" />
+                      </th>
+                      <th className="px-4 py-2 text-center">
+                        <Mail className="inline h-4 w-4" />
+                      </th>
+                      <th className="px-4 py-2 text-gray-500 text-center">Feedback</th>
+                      <th className="px-4 py-2 text-gray-500 text-center">Actions</th>
+                    </tr>
+                  </thead>
 
-                            {activeDropdown === pdf._id && (
+                  <tbody>
+                    {pdfs.map((pdf) => (
+                      <tr key={pdf._id} className="border-b">
+                        <td className="px-4 py-2">
+                          <button onClick={() => handleShowPdf(pdf.babyNames, pdf._id)}>
+                            <FileText className="h-4 w-4 text-blue-600" />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex flex-col">
+                            <span className="text-sm">{new Date(pdf.createdAt).toLocaleDateString()}</span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(pdf.createdAt).toLocaleTimeString()}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <div className="h-3 w-3 mx-auto">
+                            {whatsapploader === pdf._id ? (
+                              // Blue loader
+                              <div className="h-3 w-3 rounded-full animate-spin border-2 border-blue-500 border-t-transparent"></div>
+                            ) : (
+                              // Status indicator based on pdf.mailStatus
                               <div
-                                className="absolute right-0 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
-                                style={{
-                                  bottom: '-80%',
-                                  right: '90%',
-                                  marginBottom: '0.5rem',
-                                }}
-                              >
-                                {[
-                                  { icon: FileText, label: 'View PDF', action: 'view' },
-                                  { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
-                                  { icon: Mail, label: 'Send to Mail', action: 'mail' },
-                                  ...(pdf.rating === 0 ? [{ icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' }] : []),
-                                ].map((item, i) => (
-                                  <button
-                                    key={i}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleActionClick(item.action, pdf);
-                                    }}
-                                    className="flex items-center w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                                  >
-                                    <item.icon className="h-4 w-4 mr-3" />
-                                    <span>{item.label}</span>
-                                  </button>
-                                ))}
-                              </div>
+                                className={`h-3 w-3 rounded-full ${pdf.whatsappStatus ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                              />
                             )}
                           </div>
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <div className="h-3 w-3 mx-auto">
+                            {mailLoader === pdf._id ? (
+                              // Blue loader
+                              <div className="h-3 w-3 rounded-full animate-spin border-2 border-blue-500 border-t-transparent"></div>
+                            ) : (
+                              // Status indicator based on pdf.mailStatus
+                              <div
+                                className={`h-3 w-3 rounded-full ${pdf.mailStatus ? 'bg-green-500' : 'bg-red-500'
+                                  }`}
+                              />
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <span className="text-sm font-medium">
+                            {pdf.rating === 0
+                              ? "-"
+                              : pdf.rating === 5
+                                ? "Outstanding"
+                                : pdf.rating === 4
+                                  ? "Good"
+                                  : pdf.rating === 3
+                                    ? "Satisfactory"
+                                    : pdf.rating === 2
+                                      ? "Needs Improvement"
+                                      : "Poor"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right relative">
+                          <div className="flex items-center justify-end space-x-2">
+                            <div className="relative">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleDropdown(pdf._id);
+                                }}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                              >
+                                <MoreHorizontal className="h-5 w-5" />
+                              </button>
 
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                              {activeDropdown === pdf._id && (
+                                <div
+                                  className="absolute right-0 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+                                  style={{
+                                    bottom: '-80%',
+                                    right: '90%',
+                                    marginBottom: '0.5rem',
+                                  }}
+                                >
+                                  {[
+                                    { icon: FileText, label: 'View PDF', action: 'view' },
+                                    { icon: MessageCircle, label: 'Send to WhatsApp', action: 'whatsapp' },
+                                    { icon: Mail, label: 'Send to Mail', action: 'mail' },
+                                    ...(pdf.rating === 0 ? [{ icon: ThumbsUp, label: 'Give Feedback', action: 'feedback' }] : []),
+                                  ].map((item, i) => (
+                                    <button
+                                      key={i}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleActionClick(item.action, pdf);
+                                      }}
+                                      className="flex items-center w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                                    >
+                                      <item.icon className="h-4 w-4 mr-3" />
+                                      <span>{item.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
             </div>
           </div>
         </div>
