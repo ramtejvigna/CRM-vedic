@@ -53,9 +53,11 @@ const Customer = () => {
   const [pdfId, setPdfId] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
-  const [selectedPdf, setSelectedPdf] = useState(null);
-  const [mailLoader, setMailLoder] = useState(null);
-  const [whatsapploader, setWhatsappLoader] = useState(null);
+  const [selectedPdf, setSelectedPdf]=useState(null);
+  const [mailLoader,setMailLoder]=useState(null);
+  const [whatsapploader,setWhatsappLoader]=useState(null);
+  const [astroDetails, setAstroDetails] = useState(null);
+
 
 
 
@@ -70,12 +72,12 @@ const Customer = () => {
   const handleActionClick = async (action, pdf) => {
     setActiveDropdown(null);
     if (action === 'view') {
-      handleShowPdf(pdf.babyNames, pdf.additionalBabyNames);
+      handleShowPdf(pdf.babyNames, pdf.additionalBabyNames,customerDetails,astroDetails);
     } else if (action === 'mail') {
-      await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames);
+      await handleSetPdfUrl(pdf.babyNames, pdf.additionalBabyNames,customerDetails,astroDetails);
       setPdfId(pdf._id);
     } else if (action === 'whatsapp') {
-      await handleSetPdfUrlForWhatsapp(pdf.babyNames, pdf.additionalBabyNames);
+      await handleSetPdfUrlForWhatsapp(pdf.babyNames, pdf.additionalBabyNames,customerDetails,astroDetails);
       setPdfId(pdf._id);
     } else if (action === 'feedback') {
       if (pdf.whatsappStatus || pdf.mailStatus) {
@@ -131,9 +133,9 @@ const Customer = () => {
 
 
 
-  const handleSetPdfUrl = async (babyNames, additionalBabyNames) => {
+  const handleSetPdfUrl = async (babyNames, additionalBabyNames,customerDetails,astroDetails) => {
     try {
-      const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
+      const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames,customerDetails,astroDetails);
       setMailUrl(generatedPdfUrl);
     } catch (error) {
       console.error("Error generating PDF URL:", error);
@@ -141,14 +143,14 @@ const Customer = () => {
     }
   };
 
-  const handleSetPdfUrlForWhatsapp = async (babyNames, additionalBabyNames) => {
-    try {
-      const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames);
-      setWhatsappUrl(generatedPdfUrl);
-    } catch (error) {
-      console.error("Error generating PDF URL:", error);
-      alert("Error generating PDF URL");
-    }
+  const handleSetPdfUrlForWhatsapp = async (babyNames, additionalBabyNames,customerDetails,astroDetails) => {
+      try {
+          const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames,customerDetails,astroDetails);
+          setWhatsappUrl(generatedPdfUrl);
+      } catch (error) {
+          console.error("Error generating PDF URL:", error);
+          alert("Error generating PDF URL");
+      }
   };
 
   // Watch for changes to mailUrl and pdfId and send mail if both are available
@@ -160,7 +162,7 @@ const Customer = () => {
           await handleSendMail(mailUrl, pdfId, customerData.email);
           toast.success("Email Sent Successfully");
           setMailUrl(null);
-          setMailLoder(false);
+          setMailLoder(null);
           await fetchPdfs(); // Re-fetch PDFs after sending mail
         } catch (error) {
           setMailLoder(null);
@@ -195,8 +197,8 @@ const Customer = () => {
     sendWhatsappAndFetchPdfs();
   }, [whatsappUrl, pdfId]);
 
-  const handleShowPdf = async (babyNames, additionalBabyNames) => {
-    const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames); // Call the generatePdf function
+  const handleShowPdf = async (babyNames, additionalBabyNames,customerDetails,astroDetails) => {
+    const generatedPdfUrl = await generatePdf(babyNames, additionalBabyNames,customerDetails,astroDetails); // Call the generatePdf function
     setPdfUrl(generatedPdfUrl); // Set the URL state
     setShowViewer(true);
   };
@@ -273,6 +275,10 @@ const Customer = () => {
         customerDetails,
       },
     });
+  };
+
+  const handleAstroDetailsUpdate = (details) => {
+    setAstroDetails(details);
   };
 
   if (loading) {
@@ -418,10 +424,10 @@ const Customer = () => {
 
             {/* Horizontal Line */}
             <div className="col-span-2 my-4">
-              <hr className="border-t border-gray-200" />
-            </div>
-            <CustomerAstroDetails customerId={customerId} />
-          </div>
+        <hr className="border-t border-gray-200" />
+      </div>
+      <CustomerAstroDetails customerId={customerId}  onAstroDetailsFetched={handleAstroDetailsUpdate} />
+    </div>
         </div>
         {/* Right Column */}
         <div className="space-y-6">
