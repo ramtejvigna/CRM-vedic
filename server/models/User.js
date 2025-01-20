@@ -60,11 +60,11 @@ const employeeSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
-    password: { type: String },
     address: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },
     pincode: { type: String, required: true },
+    password : {type : String , required : true},
 
     aadharOrPan: { type: String },
     degrees: { type: String },
@@ -94,7 +94,6 @@ const employeeSchema = new mongoose.Schema({
     requestedBabyNames: { type: Boolean, default: false },
     adminAcceptedRequest: { type: Boolean, default: false },
 
-    password : {type : String , required : true}
 }, { timestamps: true });
 
 const astroSchema = new mongoose.Schema(
