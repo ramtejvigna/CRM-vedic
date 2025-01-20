@@ -102,7 +102,7 @@ function Salaries() {
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = salaryStatements.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = salaryStatements?.slice(indexOfFirstRecord, indexOfLastRecord) || [];
   const totalPages = Math.ceil(salaryStatements.length / recordsPerPage);
 
 
@@ -323,7 +323,7 @@ const SalaryStatementComponent = ({ bankStatement }) => {
                           >
                             <AnimatePresence>
                               { 
-                                currentRecords.map((statement, index) =>  (
+                                currentRecords?.map((statement, index) =>  (
                                   <motion.tr
                                     key={index}
                                     initial={{ opacity: 0, y: 20 }}

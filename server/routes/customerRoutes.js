@@ -9,7 +9,8 @@ import {
   updateCustomerData, 
   getLocationSuggestions,
   getCustomersByEmployeeId,
-  getAllCustomers
+  getAllCustomers,
+  updateNote
 } from "../controllers/customerControllers.js";
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.get('/getAllCustomers', getAllCustomers);
 router.get('/assigned/:employeeId', getCustomersByEmployeeId);
 router.get('/getCustomerPdfs/:fatherName', getCustomerPdfs);
 router.get('/locations', getLocationSuggestions)
+router.patch('/updateNote/:customerID',updateNote);
 
 export default router;

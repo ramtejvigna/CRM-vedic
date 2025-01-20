@@ -9,17 +9,21 @@ import {
   InputLabel,
   CircularProgress,
   FormHelperText,
+  InputAdornment,
+  IconButton
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineUpload, AiOutlineDelete } from "react-icons/ai";
 import { ADD_EMPLOYEE_ROUTE } from "../../../utils/constants";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+
 const steps = [
   "Personal Information",
   "Identification Documents",
   "Educational Qualifications",
   "Previous Employment Details",
-  "Financial Information",
+  "Account Information",
   "Password Generation",
 ];
 const formKeys = [
@@ -32,6 +36,8 @@ const formKeys = [
 ];
 
 const AddEmployee = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [passwordMatchError, setPasswordMatchError] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
@@ -75,13 +81,21 @@ const AddEmployee = () => {
   });
 
   const handleNext = () => {
-    if (true) {
+    if (validateForm()) {
       setActiveStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
     setActiveStep((prev) => prev - 1);
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleChange = (e) => {
@@ -123,6 +137,7 @@ const AddEmployee = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[6789]\d{9}$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; 
+    const pincodeRegex = /^\d{6}$/
 
     if (activeStep === 0) {
       if (!form.firstName) formErrors.firstName = "First name is required";
@@ -139,8 +154,14 @@ const AddEmployee = () => {
       } else if (!phoneRegex.test(form.phone)) {
         formErrors.phone = "Enter a valid 10-digit phone number";
       }
-      if (!form.state) formErrors.state = "State is required";
-      if (!form.pincode) formErrors.pincode = "Pincode is required";
+      if (!form.state) {
+        formErrors.state = "State is required";
+      }
+      if (!form.pincode) {
+        formErrors.pincode = "Pincode is required";
+      }else if(!pincodeRegex.test(form.pincode)) {
+        formErrors.pincode = "Enter a valid pincode";
+      }
       if (!form.country) formErrors.country = "Country is required";
       if (!form.role) formErrors.role = "Role of employee is required";
     }
@@ -159,7 +180,6 @@ const AddEmployee = () => {
         }
       }
       console.log(formErrors)
-
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
@@ -191,7 +211,6 @@ const AddEmployee = () => {
     if (validateForm()) {
       const formDataToSend = new FormData();
 
-      // Personal Info
       const combinedFormData = {
         ...formData.personalInfo,
         aadharOrPan: formData.idDocuments.aadharOrPan,
@@ -610,7 +629,7 @@ const AddEmployee = () => {
         return (
           <div className="space-y-6 p-2 sm:p-5">
             <h2 className="text-2xl font-semibold text-gray-700">
-              Payment Details
+              Account Details
             </h2>
             <p className="text-sm text-gray-500">
               Please provide your bank details for payment processing.
@@ -672,12 +691,12 @@ const AddEmployee = () => {
             <p className="text-sm text-gray-500">
               Generate a password for the employee and confirm the setup.
             </p>
-
+      
             {/* Password Input */}
             <TextField
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.setPasswordSection.password}
               onChange={handleChange}
               className="rounded-md shadow-sm bg-gray-50"
@@ -689,8 +708,21 @@ const AddEmployee = () => {
                   ? "Password does not meet the requirements"
                   : ""
               }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
-
+      
             {/* Password Strength Indicator */}
             {passwordStrength && (
               <div
@@ -705,12 +737,12 @@ const AddEmployee = () => {
                 {`Password Strength: ${passwordStrength}`}
               </div>
             )}
-
+      
             {/* Confirm Password Input */}
             <TextField
               label="Confirm Password"
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               value={formData.setPasswordSection.confirmPassword}
               onChange={handleChange}
               className="rounded-md shadow-sm bg-gray-50"
@@ -718,8 +750,21 @@ const AddEmployee = () => {
               required
               error={passwordMatchError}
               helperText={passwordMatchError ? "Passwords do not match" : ""}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={handleClickShowConfirmPassword}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
-
+      
             {/* Optional: You can also add a little reminder about password strength here */}
             <FormHelperText className="text-sm text-gray-500">
               Password should be at least 8 characters long, include numbers and

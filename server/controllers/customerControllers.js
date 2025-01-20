@@ -184,6 +184,25 @@ export const addCustomerWithAssignment = async (req, res) => {
     }
 };
 
+export const updateNote= async (req, res) => {
+    const { customerID } = req.params;
+    const { note } = req.body;
+
+    try {
+        const customer = await Customer.findOne({ customerID });
+        if (!customer) {
+            return res.status(404).send('Customer not found');
+        }
+
+        customer.note = note;
+        await customer.save();
+
+        res.status(200).send('Note updated successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating note');
+    }
+};
 
 export const getLocationSuggestions = async (req, res) => {
     const { query } = req.query;

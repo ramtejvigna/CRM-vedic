@@ -64,7 +64,6 @@ export const addEmployee = async (req, res) => {
     const transcriptsBase64 =
       req.files?.transcripts?.data?.toString("base64") || "";
 
-    //const hashedPassword = await bcrypt.hash(password, 10);
 
     const newEmployee = await Employee.create({
       firstName,
@@ -90,7 +89,7 @@ export const addEmployee = async (req, res) => {
       aadharOrPan: aadharOrPanBase64,
       degrees: degreesBase64,
       transcripts: transcriptsBase64,
-      password
+      password,
     });
 
     return res

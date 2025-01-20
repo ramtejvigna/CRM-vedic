@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, Loader2, Users, Calendar, FileText, Check, X } from 'lucide-react';
+import { Search, Filter, Loader2, Users, Calendar, FileText, Check, X , Edit, CircleArrowRight } from 'lucide-react';
 import axios from 'axios';
 import { api } from '../../../utils/constants';
 
@@ -12,6 +12,10 @@ function CustomerTable() {
         hasPdf: 'all',
     });
     const [filteredCustomers, setFilteredCustomers] = useState([]);
+    const [editedNotes, setEditedNotes] = useState({});
+    const [isEditingNote, setIsEditingNote] = useState({});
+
+
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -69,6 +73,70 @@ function CustomerTable() {
 
         applyFiltersAndSearch();
     }, [searchTerm, filters, customers]);
+
+
+
+    const handleNoteChange = (e, customerID) => {
+        const updatedNotes = e.target.value;
+        setEditedNotes(prev => ({
+            ...prev,
+            [customerID]: updatedNotes, // Ensure empty string when cleared
+        }));
+    };
+    wk
+    const handleEditToggle = (customerID) => {
+        if (isEditingNote[customerID]) {
+            // When editing is toggled off, save the note to the customer
+            const updatedCustomers = customers.map((customer) =>
+                customer.customerID === customerID
+                    ? { ...customer, note: editedNotes[customerID] || '' } // Save empty string if cleared
+                    : customer
+            );
+            setCustomers(updatedCustomers);
+    
+            // Clear the local edit state for that customer (optional)
+            setEditedNotes(prev => {
+                const newState = { ...prev };
+                delete newState[customerID]; // Optionally, clear the edited note
+                return newState;
+            });
+        }
+    
+        // Toggle the editing state for this customer
+        setIsEditingNote(prev => ({ ...prev, [customerID]: !prev[customerID] }));
+    };
+    
+
+    
+    
+    const handleUpdateNote = async (customerID) => {
+        const updatedNote = editedNotes[customerID];
+        if (!updatedNote) return;
+    
+        try {
+            // Make API request to update the note in the database
+            await axios.patch(`${api}/customers/updateNote/${customerID}`, { note: updatedNote });
+    wk
+            // Update the customer data locally
+            setCustomers((prevCustomers) =>
+                prevCustomers.map((customer) =>
+                    customer.customerID === customerID
+                        ? { ...customer, note: updatedNote }
+                        : customer
+                )
+            );
+    
+            // Optionally, you can also clear the editedNotes state for this customer
+            setEditedNotes((prevNotes) => {
+                const updatedNotes = { ...prevNotes };
+                delete updatedNotes[customerID];
+                return updatedNotes;
+            });
+        } catch (error) {
+            console.error('Error updating note:', error);
+        }
+    };
+    
 
     const renderStatusIcon = (status) => {
         return status ? (
@@ -187,6 +255,7 @@ function CustomerTable() {
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Payment Date</th>
                                 <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 border-b border-gray-200">PDFs</th>
                                 <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 border-b border-gray-200">Status</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Note</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -221,8 +290,40 @@ function CustomerTable() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {renderStatusIcon(customer.customerStatus === "completed")}
+                                        {customer.customerStatus}
                                     </td>
+                                    <td className="px-6 py-4">
+    {/* Note Display/Edit Section */}
+    <div className="flex items-center gap-2">
+        {isEditingNote[customer.customerID] ? (
+            // Edit mode - input field
+            <input
+                type="text"
+                value={editedNotes[customer.customerID] || ''} // Ensure it uses empty string when cleared
+                onChange={(e) => handleNoteChange(e, customer.customerID)} // Correct change handling
+                className="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            />
+        ) : (
+            // Display mode - static note text
+            <span className="text-gray-700">{customer.note || '-'}</span>
+        )}
+        {/* Edit/Save button */}
+        <button
+            onClick={() => handleEditToggle(customer.customerID)} // Toggle between edit and save mode
+            className="px-3 py-1 text-blue-500 rounded-full text-xs hover:text-blue-600 transition-all duration-200"
+        >
+            {isEditingNote[customer.customerID] ? (
+                <CircleArrowRight /> // Save icon
+            ) : (
+                <Edit /> // Edit icon
+            )}
+        </button>
+    </div>
+</td>
+
+
+
+
                                 </tr>
                             ))}
                         </tbody>

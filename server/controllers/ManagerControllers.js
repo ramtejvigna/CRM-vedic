@@ -105,9 +105,10 @@ export const assignCustomerToEmployee = async (req, res) => {
 export const login = async (req, res) => {
   try {
     // Find user by username
-    const { email, phone } = req.body;
+    const { email, password } = req.body;
     
-    const employee = await Employee.findOne({ email, phone });
+    const employee = await Employee.findOne({ email, password });
+    console.log(employee.role)
     if (employee.role !== 'Manager') {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
