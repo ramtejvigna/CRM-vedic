@@ -49,7 +49,6 @@ export const addCustomerWithAssignment = async (req, res) => {
     } = req.body;
 
     try {
-        console.log("Creating new customer with data:", req.body);
 
         const today = new Date();
         const month = String(today.getMonth() + 1).padStart(2, '0');
