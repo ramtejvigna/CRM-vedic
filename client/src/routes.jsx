@@ -5,6 +5,7 @@ import { MdOutlineTaskAlt } from "react-icons/md";
 import { TbReportAnalytics } from "react-icons/tb";
 import { BiSolidBabyCarriage, BiSolidCustomize } from "react-icons/bi";
 import { GiExpense } from "react-icons/gi";
+import { TiSocialInstagram } from "react-icons/ti";
 import { AiOutlineFileDone } from "react-icons/ai";
 import { TbMoneybag } from "react-icons/tb";
 import { GiThreeLeaves } from "react-icons/gi";
@@ -19,6 +20,7 @@ import Salaries from "./components/admin-dashboard/Salaries";
 import TaskManagement from "./components/admin-dashboard/TaskManagement";
 import Leaves from "./components/admin-dashboard/Leaves";
 import BabyDatabase from "./components/admin-dashboard/BabyDatabase";
+import PostForm from "./components/admin-dashboard/SocialMediaManagement";
 import Settings from "./components/admin-dashboard/settings";
 import Reports from "./components/admin-dashboard/Reports"
 import Customers from "./components/admin-dashboard/Customers";
@@ -65,6 +67,12 @@ export const routes = [
     path: "babyDatabase",
     icon: <BiSolidBabyCarriage {...icon} />,
     element: <BabyDatabase />,
+  },
+  {
+    name: "Social Media",
+    path: "socialMediaManagement",
+    icon: <TiSocialInstagram {...icon} />,
+    element: <PostForm />
   },
   // {
   //   name: "work day calculation",

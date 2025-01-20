@@ -10,6 +10,7 @@ import EditEmployee from "./Employee/EditEmployee";
 import ViewEmployee from "./Employee/ViewEmployee";
 import AddExpense from "./Expenses/AddExpense.jsx";
 import Leaves from "./Leaves";
+import PostForm from "./SocialMediaManagement"
 import Customers from "./Customers/index.jsx";
 import AddSalariesStatements from "./Salaries/AddSalariesStatements";
 // import { VoiceRecognition } from "./VoiceRecognition.jsx";
@@ -51,6 +52,7 @@ const AdminDashboard = () => {
             <Route path='/salaries/add-salaries' element={<AddSalariesStatements />} />
             <Route path='/salaries/edit-salaries/:id' element={<EditSalaries/>} />
 
+            <Route path="/socialMediaManagement" element={<PostForm />} />
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/customers/viewDetailsIn" element={<Customer />} />
             <Route path="/customers/viewDetailsIn/generate-pdf" element={<CheckBoxListPage />} />
