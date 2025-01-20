@@ -94,13 +94,13 @@ const ImageManagement = ({ onError }) => {
         }
     };
 
-    const handleUpdateImage = async (id) => {
-        const imageToUpdate = images.find(img => img.id === id);
+    const handleUpdateImage = async (imageId) => {
+        const imageToUpdate = images.find(img => img._id === imageId);
         if (!imageToUpdate) return;
 
         try {
-            setActionLoading({ type: 'update', id });
-            const response = await fetch(`https://vedic-backend-neon.vercel.app/images/${id}`, {
+            setActionLoading({ type: 'update', id: imageId });
+            const response = await fetch(`https://vedic-backend-neon.vercel.app/images/${imageId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -114,7 +114,7 @@ const ImageManagement = ({ onError }) => {
 
             const updatedImage = await response.json();
             setImages(prev => prev.map(img =>
-                img.id === id ? updatedImage : img
+                img._id === imageId ? updatedImage : img
             ));
             setEditMode(null);
         } catch (err) {
@@ -124,22 +124,31 @@ const ImageManagement = ({ onError }) => {
         }
     };
 
-    const handleDeleteImage = async (id) => {
+    const handleDeleteImage = async (imageId) => {
         try {
-            setActionLoading({ type: 'delete', id });
-            const response = await fetch(`https://vedic-backend-neon.vercel.app/images/${id}`, {
+            setActionLoading({ type: 'delete', id: imageId });
+            const response = await fetch(`https://vedic-backend-neon.vercel.app/images/${imageId}`, {
                 method: 'DELETE',
             });
 
             if (!response.ok) throw new Error('Failed to delete image');
 
-            setImages(prev => prev.filter(img => img.id !== id));
-            fetchImages();
+            setImages(prev => prev.filter(img => img._id !== imageId));
         } catch (err) {
             onError(err.message);
         } finally {
             setActionLoading({ type: null, id: null });
         }
+    };
+
+    const handleEditField = (imageId, field, value) => {
+        setImages(prev =>
+            prev.map(img =>
+                img._id === imageId
+                    ? { ...img, [field]: value }
+                    : img
+            )
+        );
     };
 
 
@@ -318,25 +327,13 @@ const ImageManagement = ({ onError }) => {
                                                 <input
                                                     type="text"
                                                     value={image.title}
-                                                    onChange={(e) => setImages(prev =>
-                                                        prev.map(img =>
-                                                            img.id === image._id
-                                                                ? { ...img, title: e.target.value }
-                                                                : img
-                                                        )
-                                                    )}
+                                                    onChange={(e) => handleEditField(image._id, 'title', e.target.value)}
                                                     className="w-full px-3 py-2 rounded border border-gray-200"
                                                     placeholder="Title"
                                                 />
                                                 <textarea
                                                     value={image.caption}
-                                                    onChange={(e) => setImages(prev =>
-                                                        prev.map(img =>
-                                                            img.id === image._id
-                                                                ? { ...img, caption: e.target.value }
-                                                                : img
-                                                        )
-                                                    )}
+                                                    onChange={(e) => handleEditField(image._id, 'caption', e.target.value)}
                                                     className="w-full px-3 py-2 rounded border border-gray-200"
                                                     placeholder="Caption"
                                                     rows={3}
