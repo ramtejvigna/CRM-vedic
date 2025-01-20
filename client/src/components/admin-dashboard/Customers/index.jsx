@@ -111,20 +111,6 @@ export const Customers = () => {
     setPage(0); // Reset to first page when searching
   };
 
-  // Updated filtering logic that filters based on active tab
-  // const getFilteredData = () => {
-  //   const currentTabData = customerData[activeTab] || [];
-    
-  //   return currentTabData.filter((row) => {
-  //     const searchMatch = 
-  //       row.customerID?.toLowerCase().includes(searchTerm) ||
-  //       (activeTab === "assignedTo" && row.assignedEmployeeName?.toLowerCase().includes(searchTerm)) ||
-  //       (["inProgress", "completed"].includes(activeTab) && row.whatsappNumber?.toLowerCase().includes(searchTerm)) ||
-  //       (["newRequests", "completed"].includes(activeTab) && row.fatherName?.toLowerCase().includes(searchTerm));
-
-  //     return searchMatch;
-  //   });
-  // };
   const getFilteredData = () => {
     const currentTabData = customerData[activeTab] || [];
     

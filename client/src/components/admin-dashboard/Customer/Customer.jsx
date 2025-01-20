@@ -455,7 +455,7 @@ const Customer = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">Source (Instagram Lead)</p>
-                    <p className="mt-1">{customerDetails?.otherSource || "N/A"}</p>
+                    <p className="mt-1">{customerDetails?.leadSource || "N/A"}</p>
                   </div>
                 </div>
               </div>
