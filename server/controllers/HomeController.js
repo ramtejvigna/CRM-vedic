@@ -21,6 +21,9 @@ const getDayName = (date) => {
 export const getWeeklyStats = async (req, res) => {
   try {
     const last7Days = getLast7Days();
+    const startOfWeek = last7Days[0];
+    const endOfWeek = new Date(last7Days[6]);
+    endOfWeek.setDate(endOfWeek.getDate() + 1);
 
     // Initialize data arrays
     const customerData = new Array(7).fill(0);
@@ -53,6 +56,34 @@ export const getWeeklyStats = async (req, res) => {
       return { customerCount, pdfCount, index };
     });
 
+    // Get social media lead source statistics for the week
+    const socialMediaStats = await Customer.aggregate([
+      {
+        $match: {
+          createdDateTime: {
+            $gte: startOfWeek,
+            $lt: endOfWeek
+          },
+          leadSource: { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: "$leadSource",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    // Format social media stats
+    const socialMediaData = {
+      labels: socialMediaStats.map(stat => stat._id),
+      values: socialMediaStats.map(stat => stat.count)
+    };
+
     // Wait for all queries to complete
     const results = await Promise.all(statsPromises);
 
@@ -76,6 +107,7 @@ export const getWeeklyStats = async (req, res) => {
         dayLabels,
         customerData,
         pdfData,
+        socialMediaData,
         weeklyTotals
       }
     });

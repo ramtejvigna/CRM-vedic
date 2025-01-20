@@ -1,49 +1,5 @@
 import { chartsConfig } from "../configs";
 
-// Website Views Chart Configuration (static)
-const websiteViewsChart = {
-  type: "bar",
-  height: 220,
-  series: [
-    {
-      name: "Views",
-      data: [50, 20, 10, 22, 50, 10, 40],
-    },
-  ],
-  options: {
-    ...chartsConfig,
-    chart: {
-      background: "#1E90FF",
-      toolbar: { show: false },
-    },
-    colors: ["#FFFFFF"],
-    plotOptions: {
-      bar: {
-        columnWidth: "20%",
-        borderRadius: 5,
-      },
-    },
-    xaxis: {
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
-      labels: {
-        style: { colors: "#FFFFFF" },
-      },
-    },
-    yaxis: {
-      labels: {
-        style: { colors: "#FFFFFF" },
-      },
-    },
-    grid: {
-      show: true,
-      borderColor: "rgba(255, 255, 255, 0.3)",
-      strokeDashArray: 4,
-      yaxis: { lines: { show: true } },
-      xaxis: { lines: { show: true } },
-    },
-  },
-};
-
 // Create initial empty charts for customer requests and PDFs
 const createEmptyChart = (type, color) => ({
   type: "line",
@@ -89,13 +45,73 @@ const createEmptyChart = (type, color) => ({
   },
 });
 
+// Create empty social media chart
+const createEmptySocialMediaChart = () => ({
+  type: "bar",
+  height: 220,
+  series: [
+    {
+      name: "Leads",
+      data: [],
+    },
+  ],
+  options: {
+    ...chartsConfig,
+    chart: {
+      background: "#1E90FF",
+      toolbar: { show: false },
+    },
+    colors: ["#FFFFFF"],
+    plotOptions: {
+      bar: {
+        columnWidth: "20%",
+        borderRadius: 5,
+      },
+    },
+    xaxis: {
+      categories: [],
+      labels: {
+        style: { colors: "#FFFFFF" },
+        rotate: -45,
+        maxHeight: 60
+      },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: "#FFFFFF" },
+      },
+    },
+    grid: {
+      show: true,
+      borderColor: "rgba(255, 255, 255, 0.3)",
+      strokeDashArray: 4,
+      yaxis: { lines: { show: true } },
+      xaxis: { lines: { show: true } },
+    },
+  },
+});
+
 // Initial empty charts
+const socialMediaChart = createEmptySocialMediaChart();
 const customerRequestsChart = createEmptyChart("customers", "#28a745");
 const pdfGeneratedChart = createEmptyChart("pdfs", "#333333");
 
 // Function to update charts with API data
 export const updateChartsWithData = (apiData) => {
-  const { dayLabels, customerData, pdfData } = apiData;
+  const { dayLabels, customerData, pdfData, socialMediaData } = apiData;
+
+  // Update social media chart
+  const updatedSocialMediaChart = {
+    ...socialMediaChart,
+    series: [{ ...socialMediaChart.series[0], data: socialMediaData.values }],
+    options: {
+      ...socialMediaChart.options,
+      xaxis: {
+        ...socialMediaChart.options.xaxis,
+        categories: socialMediaData.labels,
+      },
+    },
+  };
 
   // Create new chart objects with updated data
   const updatedCustomerChart = {
@@ -126,9 +142,9 @@ export const updateChartsWithData = (apiData) => {
   return [
     {
       color: "blue",
-      title: "Social-media stats",
-      description: "Platforms Analytics to know our reach in Social Media platforms",
-      chart: websiteViewsChart,
+      title: "Social Media Lead Sources",
+      description: "Last week's customer requests by lead source",
+      chart: updatedSocialMediaChart,
     },
     {
       color: "green",
@@ -149,9 +165,9 @@ export const updateChartsWithData = (apiData) => {
 export const statisticsChartsData = [
   {
     color: "blue",
-    title: "Social-media stats",
-    description: "Platforms Analytics to know our reach in Social Media platforms",
-    chart: websiteViewsChart,
+    title: "Social Media Lead Sources",
+    description: "Last week's customer requests by lead source",
+    chart: socialMediaChart,
   },
   {
     color: "green",
