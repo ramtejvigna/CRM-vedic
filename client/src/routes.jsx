@@ -1,5 +1,4 @@
 import { MdSpaceDashboard } from "react-icons/md";
-import { FaNetworkWired } from "react-icons/fa";
 import { VscFileSubmodule } from "react-icons/vsc";
 import { MdOutlineTaskAlt } from "react-icons/md";
 import { TbReportAnalytics } from "react-icons/tb";
@@ -7,6 +6,7 @@ import { BiSolidBabyCarriage, BiSolidCustomize } from "react-icons/bi";
 import { GiExpense } from "react-icons/gi";
 import { TiSocialInstagram } from "react-icons/ti";
 import { AiOutlineFileDone } from "react-icons/ai";
+import { FaUsers } from "react-icons/fa";
 import { TbMoneybag } from "react-icons/tb";
 import { GiThreeLeaves } from "react-icons/gi";
 
@@ -24,6 +24,7 @@ import PostForm from "./components/admin-dashboard/SocialMediaManagement";
 import Settings from "./components/admin-dashboard/settings";
 import Reports from "./components/admin-dashboard/Reports"
 import Customers from "./components/admin-dashboard/Customers";
+import CustomerTable from "./components/admin-dashboard/CustomerView";
 import Customization from "./components/admin-dashboard/Customization";
 const Component = ({ name }) => {
   return (
@@ -74,12 +75,12 @@ export const routes = [
     icon: <TiSocialInstagram {...icon} />,
     element: <PostForm />
   },
-  // {
-  //   name: "work day calculation",
-  //   path: "work-day",
-  //   icon: <FaNetworkWired {...icon} />,
-  //   element: <Home />,
-  // },
+  {
+    name: "Customer's View",
+    path: "customersView",
+    icon:<FaUsers {...icon}/>,
+    element: <CustomerTable />,
+  },
   {
     name: "leave management",
     path: "leave",

@@ -11,7 +11,7 @@ function CustomerTable() {
     useEffect(() => {
         const fetchCustomers = async () => {
             try {
-                const response = await axios.get(`${api}/customers/getCustomers`); // Adjust API endpoint as necessary
+                const response = await axios.get(`${api}/customers/getAllCustomers`); // Adjust API endpoint as necessary
                 const filteredCustomers = response.data.data.filter(
                     (customer) => customer.customerStatus !== 'newRequests'  &&
                         customer.customerStatus !== 'rejected'

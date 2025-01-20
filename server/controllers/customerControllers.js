@@ -415,3 +415,24 @@ export const getCustomersByEmployeeId = async (req, res) => {
         });
     }
 };
+
+export const getAllCustomers = async (req, res) => {
+    try {
+        const customers = await Customer.find()
+            .populate('assignedEmployee', 'name email') // Populate employee details (adjust fields as necessary)
+            .populate('pdfGenerated', 'title url') // Populate PDF details (adjust fields as necessary)
+            .sort({ createdAt: -1 }); // Sort by most recently created
+
+        res.status(200).json({
+            success: true,
+            data: customers,
+        });
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch customers',
+            error: error.message,
+        });
+    }
+};
