@@ -669,92 +669,96 @@ const handleSavePassword = async (employee) => {
 </Button>
   </DialogTitle>
   <DialogContent>
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="py-2 px-4 border-b text-left">Employee Name</th>
-            <th className="py-2 px-4 border-b text-left">Password</th>
-            <th className="py-2 px-4 border-b text-left">Actions</th>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-300 table-fixed">
+        <thead>
+           <tr className="bg-gray-100">
+            <th className="py-2 px-2 border-b text-left w-1/4">Employee Name</th>
+            <th className="py-2 px-2 border-b text-left w-1/3">Email</th>
+            <th className="py-2 px-2 border-b text-left w-1/5">Password</th>
+            <th className="py-2 px-2 border-b text-left w-1/6">Actions</th>
           </tr>
-        </thead>
-        <tbody>
-          {employeePasswords.map((employee, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="py-2 px-4 border-b">
-                {`${employee.firstName || ''} ${employee.lastName || ''}`}
-              </td>
-              <td className="py-2 px-4 border-b font-mono">
-                {editingId === employee._id ? (
-                  <div className="flex flex-col gap-2">
-                    <input
-                      type="text"
-                      defaultValue={employee.password}
-                      onChange={(e) => {
-                        const updatedPasswords = employeePasswords.map(emp => 
-                          emp._id === employee._id ? {...emp, password: e.target.value} : emp
-                        );
-                        setEmployeePasswords(updatedPasswords);
-                      }}
-                      className="w-full p-1 border rounded"
-                    />
-                    <input
-                      type="password"
-                      value={editingAdminPassword}
-                      onChange={(e) => setEditingAdminPassword(e.target.value)}
-                      className="w-full p-1 border rounded"
-                      placeholder="Admin password required"
-                    />
-                  </div>
-                ) : (
-                  employee.password
-                )}
-              </td>
-              <td className="py-2 px-4 border-b">
-                {editingId === employee._id ? (
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={() => handleSavePassword(employee)}
-                      color="primary"
-                      variant="contained"
-                      size="small"
-                    >
-                      Save
-                    </Button>
-                    <Button 
-                      onClick={() => {
-                        setEditingId(null);
-                        setEditingAdminPassword('');
-                        // Revert any changes
-                        const originalPasswords = [...employeePasswords];
-                        setEmployeePasswords(originalPasswords);
-                      }}
-                      color="secondary"
-                      variant="outlined"
-                      size="small"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <Button 
-                    onClick={() => {
-                      setEditingId(employee._id);
-                      setEditingAdminPassword('');
-                    }}
-                    color="primary"
-                    startIcon={<Edit />}
-                  >
-                    
-                  </Button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </DialogContent>
+        </thead>
+        <tbody>
+          {employeePasswords.map((employee, index) => (
+            <tr key={index} className="hover:bg-gray-50">
+              <td className="py-2 px-2 border-b whitespace-nowrap overflow-hidden text-ellipsis">
+                {`${employee.firstName || ''} ${employee.lastName || ''}`}
+              </td>
+              <td className="py-2 px-2 border-b whitespace-nowrap overflow-hidden text-ellipsis">
+                {employee.email || ''}
+              </td>
+              <td className="py-2 px-2 border-b font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+                {editingId === employee._id ? (
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="text"
+                      defaultValue={employee.password}
+                      onChange={(e) => {
+                        const updatedPasswords = employeePasswords.map(emp =>
+                          emp._id === employee._id ? { ...emp, password: e.target.value } : emp
+                        );
+                        setEmployeePasswords(updatedPasswords);
+                      }}
+                      className="w-full p-1 border rounded"
+                    />
+                    <input
+                      type="password"
+                      value={editingAdminPassword}
+                      onChange={(e) => setEditingAdminPassword(e.target.value)}
+                      className="w-full p-1 border rounded"
+                      placeholder="Admin password required"
+                    />
+                  </div>
+                ) : (
+                  employee.password
+                )}
+              </td>
+              <td className="py-2 px-2 border-b whitespace-nowrap overflow-hidden text-ellipsis">
+                {editingId === employee._id ? (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleSavePassword(employee)}
+                      color="primary"
+                      variant="contained"
+                      size="small"
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditingAdminPassword('');
+                        const originalPasswords = [...employeePasswords];
+                        setEmployeePasswords(originalPasswords);
+                      }}
+                      color="secondary"
+                      variant="outlined"
+                      size="small"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setEditingId(employee._id);
+                      setEditingAdminPassword('');
+                    }}
+                    color="primary"
+                    startIcon={<Edit />}
+                  >
+                    
+                  </Button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+</DialogContent>
+
 </Dialog>
       </div>
 
