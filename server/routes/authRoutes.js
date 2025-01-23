@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
         '/login',
         [
-                body('phone').notEmpty().withMessage('Phone is required')
+                body('password').notEmpty().withMessage('Password is required')
         ],
         login
 );
