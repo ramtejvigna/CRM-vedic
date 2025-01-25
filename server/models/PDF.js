@@ -38,7 +38,7 @@ const PdfSchema = new mongoose.Schema({
 const NameSchema = new mongoose.Schema({
     bookName: { type: String, required: true },
     gender: { type: String, required: true },
-    nameEnglish: { type: String, required: true },
+    nameEnglish: { type: String, required: true, unique: true },
     nameDevanagari: { type: String, required: true },
     meaning: { type: String, required: true },
     numerology: { type: String, required: false },

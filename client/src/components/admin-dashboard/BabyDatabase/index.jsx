@@ -381,7 +381,7 @@ const BabyDatabase = () => {
     return (
         <div className="p-4 md:p-8 min-h-screen">
             <ToastContainer
-                position="bottom-right"
+                position="top-right"
                 autoClose={3000}
                 hideProgressBar={false}
                 newestOnTop={false}
