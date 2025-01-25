@@ -41,3 +41,14 @@ export const createNotification = async (employeeId, message) => {
       res.status(500).json({ message: 'Error marking notification as read' });
     }
   };
+
+  export const deleteAllNotifications = async (req, res) => {
+    try {
+      await NotificationAdmin.deleteMany({});
+      res.status(200).json({ message: 'All notifications cleared successfully' });
+    } catch (error) {
+      console.error('Error deleting notifications:', error);
+      res.status(500).json({ message: 'Error deleting notifications' });
+    }
+  };
+  
