@@ -96,6 +96,7 @@ export const Customers = () => {
       try {
         const response = await axios.get(`${api}/api/manager/newrequests`);
         setCustomerData(response.data);
+        console.log(response.data)
         setLoading(false);
       } catch (error) {
         console.log(error.message);

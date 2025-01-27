@@ -15,28 +15,56 @@ export const getNewCustomers = async (req, res) => {
       rejected,
       workingCustomers
     ] = await Promise.all([
-      Customer.find({ assignedEmployee: undefined, customerStatus: 'newRequests' }).sort({ createdDateTime: -1 }),
-      Customer.find({ assignedEmployee: undefined, customerStatus: 'inProgress' }).sort({ createdDateTime: -1 }),
-      Customer.find({ assignedEmployee: undefined, customerStatus: 'completed' }).sort({ createdDateTime: -1 }),
-      Customer.find({ assignedEmployee: undefined, customerStatus: 'rejected' }).sort({ createdDateTime: -1 }),
-      Customer.find({ assignedEmployee: { $ne: undefined }, customerStatus: 'inWorking' })
+      Customer.find({ customerStatus: 'newRequests' })
+        .sort({ createdDateTime: -1 })
+        .populate('assignedEmployee', 'firstName lastName email'),
+        
+      Customer.find({ customerStatus: 'inProgress' })
+        .sort({ createdDateTime: -1 })
+        .populate('assignedEmployee', 'firstName lastName email'),
+        
+      Customer.find({ customerStatus: 'completed' })
+        .sort({ createdDateTime: -1 })
+        .populate('assignedEmployee', 'firstName lastName email'),
+        
+      Customer.find({ customerStatus: 'rejected' })
+        .sort({ createdDateTime: -1 })
+        .populate('assignedEmployee', 'firstName lastName email'),
+        
+      Customer.find({ 
+        assignedEmployee: { $ne: null }, 
+        customerStatus: 'inWorking' 
+      })
         .sort({ createdAt: -1 })
-        .populate('assignedEmployee', 'email firstName lastName')
+        .populate('assignedEmployee', 'firstName lastName email')
     ]);
 
+    // Transform the data to include formatted employee names
+    const formatCustomerList = (customers) => {
+      return customers.map(customer => {
+        const formatted = customer.toObject();
+        if (formatted.assignedEmployee) {
+          const { firstName, lastName } = formatted.assignedEmployee;
+          formatted.assignedEmployeeName = `${firstName} ${lastName}`.trim();
+        } else {
+          formatted.assignedEmployeeName = 'Unassigned';
+        }
+        return formatted;
+      });
+    };
+
     return res.status(200).json({
-      newRequests,
-      inProgress,
-      completed,
-      rejected,
-      assignedTo: workingCustomers
+      newRequests: formatCustomerList(newRequests),
+      inProgress: formatCustomerList(inProgress),
+      completed: formatCustomerList(completed),
+      rejected: formatCustomerList(rejected),
+      assignedTo: formatCustomerList(workingCustomers)
     });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
   
 
 
