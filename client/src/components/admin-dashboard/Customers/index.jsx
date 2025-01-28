@@ -17,33 +17,65 @@ import CustomerModal from "./CustomerModal";
 const SearchAndFilterBar = ({
   searchTerm,
   handleSearch,
+  startDate,
+  handleStartDateChange,
+  sortOrder,
+  handleSortOrderChange,
   isDarkMode
 }) => {
   return (
-    <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-      <div className="relative w-full sm:w-96">
-        <input
-          type="text"
-          placeholder="Search by ID, name, or phone number..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-            isDarkMode
-              ? 'bg-gray-800 border-gray-700 text-gray-200'
-              : 'bg-white border-gray-300'
-          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-        />
-        <Search
-          className={`absolute left-3 top-2.5 h-5 w-5 ${
-            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}
-        />
+    <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center">
+      <div className="flex flex-wrap items-center gap-4 w-full">
+        <div className="relative w-full sm:w-96">
+          <input
+            type="text"
+            placeholder="Search by ID, name, or phone number..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+              isDarkMode
+                ? 'bg-gray-800 border-gray-700 text-gray-200'
+                : 'bg-white border-gray-300'
+            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          />
+          <Search
+            className={`absolute left-3 top-2.5 h-5 w-5 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}
+          />
+        </div>
+
+        <div className="relative w-full sm:w-48">
+          <input
+            type="date"
+            value={startDate}
+            onChange={handleStartDateChange}
+            className={`w-full pl-3 pr-2 py-2 rounded-lg border ${
+              isDarkMode
+                ? 'bg-gray-800 border-gray-700 text-gray-200'
+                : 'bg-white border-gray-300'
+            }`}
+          />
+        </div>
+
+        <div className="relative w-full sm:w-48">
+          <select
+            value={sortOrder}
+            onChange={handleSortOrderChange}
+            className={`w-full pl-3 pr-8 py-2 rounded-lg border ${
+              isDarkMode
+                ? 'bg-gray-800 border-gray-700 text-gray-200'
+                : 'bg-white border-gray-300'
+            }`}
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
       </div>
     </div>
   );
 };
-
-
 
 export const Customers = () => {
   const { tab, setTab } = useStore()
@@ -81,6 +113,8 @@ export const Customers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [startDate, setStartDate] = useState('');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     const getEmployees = async () => {
@@ -111,27 +145,82 @@ export const Customers = () => {
     setSearchTerm(event.target.value.toLowerCase());
     setPage(0); // Reset to first page when searching
   };
+const handleStartDateChange = (event) => {
+  setStartDate(event.target.value);
+  setPage(0);
+};
 
-  const getFilteredData = () => {
-    const currentTabData = customerData[activeTab] || [];
-    
-    return currentTabData.filter((row) => {
-      const searchFields = [
-        row.customerID,
-        row.applicationID,
-        row.customerName,
-        row.whatsappNumber,
-      ].map(field => field?.toLowerCase() || '');
+const handleSortOrderChange = (event) => {
+  setSortOrder(event.target.value);
+  setPage(0);
+};
+const filterByDate = (data) => {
+  if (!startDate) return data;
   
-      // Check if any of the fields include the search term
-      return searchTerm === '' || searchFields.some(field => field.includes(searchTerm.toLowerCase()));
-    });
-  };
+  // Convert selected date to start and end of day for accurate comparison
+  const selectedDate = new Date(startDate);
+  selectedDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(startDate);
+  endDate.setHours(23, 59, 59, 999);
 
-  const filteredAndPaginatedData = getFilteredData().slice(
-    page * rowsPerPage,
-    (page + 1) * rowsPerPage
-  );
+  return data.filter(customer => {
+    // Always use createdDateTime for filtering regardless of section
+    const creationDate = new Date(customer.createdDateTime);
+    return creationDate >= selectedDate && creationDate <= endDate;
+  });
+};
+
+const sortCustomers = (data) => {
+  return [...data].sort((a, b) => {
+    const dateA = new Date(a.createdDateTime);
+    const dateB = new Date(b.createdDateTime);
+    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+  });
+};
+
+const getFilteredData = () => {
+  const currentTabData = customerData[activeTab] || [];
+  
+  // Apply search filter
+  const searchFiltered = currentTabData.filter((row) => {
+    const searchFields = [
+      row.customerID,
+      row.applicationID,
+      row.customerName,
+      row.whatsappNumber,
+    ].map(field => field?.toLowerCase() || '');
+
+    return searchTerm === '' || searchFields.some(field => field.includes(searchTerm.toLowerCase()));
+  });
+
+  // Apply date filter based on creation date
+  const dateFiltered = filterByDate(searchFiltered);
+
+  // Apply sorting based on creation date
+  const sortedData = sortCustomers(dateFiltered);
+
+  return sortedData.map(customer => ({
+    ...customer,
+    hiddenFields: {
+      email: customer.email,
+      referenceName: customer.referenceName,
+      additionalPreferences: customer.additionalPreferences,
+      pdfGenerated: customer.pdfGenerated,
+      preferredStartingLetterType: customer.preferredStartingLetterType,
+      isTwins: customer.isTwins,
+      selectedServices: customer.selectedServices,
+    }
+  }));
+};
+
+const filteredAndPaginatedData = getFilteredData().slice(
+  page * rowsPerPage,
+  (page + 1) * rowsPerPage
+);
+
+
+
+// Add new function for sorting
 
   const handleActionClick = (action, customer, fromSection, nextSection) => {
     switch (action) {
@@ -151,7 +240,8 @@ export const Customers = () => {
         break;
     }
   };
-
+  
+  
   const handleAssignEmployee = async () => {
     if (selectedEmployee && selectedCustomerForAssign) {
       const customerId = selectedCustomerForAssign._id;
@@ -419,6 +509,10 @@ export const Customers = () => {
         <SearchAndFilterBar
           searchTerm={searchTerm}
           handleSearch={handleSearch}
+          startDate={startDate}
+          handleStartDateChange={handleStartDateChange}
+          sortOrder={sortOrder}
+          handleSortOrderChange={handleSortOrderChange}
           isDarkMode={isDarkMode}
         />
 

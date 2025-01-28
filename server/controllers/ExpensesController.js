@@ -1,7 +1,5 @@
 // controllers/ExpensesController.js
 import Expense from '../models/Expenses.js';
-import path from 'path';
-import fs from 'fs';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -34,18 +32,6 @@ export const getExpenseFile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get a specific expense by ID
-export const getExpenseById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const expense = await Expense.findById(id);
-    if (!expense) return res.status(404).json({ message: 'Expense not found' });
-    res.status(200).json(expense);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch expense' });
-  }
-};
-
 
 // Add new expense
 export const addExpense = async (req, res) => {
