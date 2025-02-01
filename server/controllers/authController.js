@@ -6,8 +6,8 @@ dotenv.config();
 
 export const login = async (req, res) => {
     try {
-      const { email, phone } = req.body;  
-      const employee = await Employee.findOne({ email, phone });
+      const { email, password } = req.body;  
+      const employee = await Employee.findOne({ email, password });
       employee.isOnline = true;
       await employee.save();
       const token = jwt.sign(

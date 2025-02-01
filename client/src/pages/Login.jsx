@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie
-import { HOST } from '../utils/constants.js';
+import { api, HOST } from '../utils/constants.js';
 import { Mail, Phone, ArrowRight, Lock } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,7 +21,7 @@ const Login = () => {
     setIsLoading(true);
   
     try {
-      const response = await axios.post(`${HOST}/admin/auth/login`, { email, password }, { withCredentials: true });
+      const response = await axios.post(`${api}/admin/auth/login`, { email, password }, { withCredentials: true });
   
       if (response.status === 200 && !response.data.success) {
         toast.error(response.data.message, {

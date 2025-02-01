@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route,Navigate} from "react-router-dom";
 import {toast} from "react-toastify"
 import axios from "axios"
-import {HOST} from './utils/constants.js'
+import {HOST,api} from './utils/constants.js'
 // admin-dashboard
 import AdminDashboard from "./components/admin-dashboard";
 import { useStore } from "./store";
@@ -29,7 +29,7 @@ function App() {
     const getAdminInfo = async () => {
   
       try {
-        const response = await axios.get(`${HOST}/admin/auth/check-auth`, { withCredentials: true });
+        const response = await axios.get(`${api}/admin/auth/check-auth`, { withCredentials: true });
 
         if(response.status === 200) {
           setAdminInfo(response.data.admin)

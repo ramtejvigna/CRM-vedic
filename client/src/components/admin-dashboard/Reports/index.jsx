@@ -4,6 +4,7 @@ import DailyPdfsGenerated from './PdfsGenerated';
 import ExpensesReport from './ExpensesReport';
 import RevenueReport from './RevenueReport';
 import EmployeePerformanceTable from './EmployeePerformanceTable';
+import RegionalPdfReport from './RegionalPDF';
 
 function Reports() {
   const containerVariants = {
@@ -49,6 +50,10 @@ function Reports() {
 
       <motion.div variants={itemVariants} className="w-full">
         <RevenueReport />
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="w-full">
+        <RegionalPdfReport />
       </motion.div>
 
       <motion.div variants={itemVariants} className="w-full">

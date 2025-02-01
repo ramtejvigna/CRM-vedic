@@ -366,3 +366,110 @@ export const pdfGeneratedByEmployee = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const getRegionalDistribution = async (req, res) => {
+  try {
+      const { timeRange } = req.query;
+      const dateFilter = getDateFilter(timeRange);
+
+      const allRegions = await Customer.aggregate([
+          { 
+              $match: { 
+                  ...dateFilter,
+                  pdfGenerated: { $exists: true, $ne: [] },
+                  birthplace: { $exists: true, $ne: "" }
+              }
+          },
+          {
+              $addFields: {
+                  cleanLocation: {
+                      $trim: {
+                          input: {
+                              $arrayElemAt: [
+                                  { $split: [{ $trim: { input: "$birthplace" } }, ","] },
+                                  0
+                              ]
+                          }
+                      }
+                  }
+              }
+          },
+          {
+              $match: {
+                  cleanLocation: {
+                      $nin: ["AP", "MH", "TN", "KA", "MP", "UP", "TS", "KL", "GJ", "RJ", "India", "Bharat"],
+                      $regex: /^.{3,}$/
+                  }
+              }
+          },
+          {
+              $group: {
+                  _id: { $toLower: "$cleanLocation" },
+                  pdfCount: { $sum: { $size: "$pdfGenerated" } },
+                  originalName: { $first: "$cleanLocation" }
+              }
+          },
+          {
+              $project: {
+                  _id: 0,
+                  region: "$originalName",
+                  pdfCount: 1
+              }
+          },
+          { $sort: { pdfCount: -1 } }
+      ]);
+
+      const totalPDFs = allRegions.reduce((sum, item) => sum + item.pdfCount, 0);
+      const threshold = Math.max(totalPDFs * 0.05, 1); // 5% threshold or at least 1 PDF
+
+      // Split regions into main and others
+      const mainRegions = [];
+      const otherRegions = [];
+
+      allRegions.forEach(region => {
+          if (mainRegions.length < 4 && region.pdfCount >= threshold) {
+              mainRegions.push(region);
+          } else {
+              otherRegions.push({
+                  region: region.region,
+                  pdfCount: region.pdfCount,
+                  percentage: ((region.pdfCount / totalPDFs) * 100).toFixed(1)
+              });
+          }
+      });
+
+      const othersTotal = otherRegions.reduce((sum, item) => sum + item.pdfCount, 0);
+
+      res.json({
+          mainRegions,
+          otherRegions: otherRegions.sort((a, b) => b.pdfCount - a.pdfCount),
+          othersTotal,
+          totalPDFs
+      });
+  } catch (error) {
+      console.error('Error in getRegionalDistribution:', error);
+      res.status(500).json({ message: 'Error fetching regional distribution data' });
+  }
+};
+function getDateFilter(timeRange) {
+  const now = new Date();
+  const filters = {
+      'this': {
+          $gte: new Date(now.getFullYear(), now.getMonth(), 1),
+          $lt: new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      },
+      'last': {
+          $gte: new Date(now.getFullYear(), now.getMonth() - 1, 1),
+          $lt: new Date(now.getFullYear(), now.getMonth(), 0)
+      },
+      'quarter': {
+          $gte: new Date(now.getFullYear(), now.getMonth() - 3, 1),
+          $lt: new Date()
+      },
+      'year': {
+          $gte: new Date(now.getFullYear(), 0, 1),
+          $lt: new Date(now.getFullYear() + 1, 0, 1)
+      }
+  };
+  return { createdDateTime: filters[timeRange] };
+}

@@ -27,6 +27,36 @@ export const generateUniqueApplicationId = async (Customer) => {
     return finalApplicationId;
 };
 
+async function getCoordinates(birthplace) {
+    try {
+        const response = await axios.get(
+            `https://nominatim.openstreetmap.org/search`,
+            {
+                params: {
+                    q: birthplace,
+                    format: 'json',
+                    limit: 1
+                },
+                headers: {
+                    'User-Agent': 'Vedic-Names'
+                }
+            }
+        );
+        
+        if (response.data.length === 0) {
+            throw new Error('Location not found');
+        }
+        
+        return {
+            latitude: parseFloat(response.data[0].lat),
+            longitude: parseFloat(response.data[0].lon)
+        };
+    } catch (error) {
+        console.error('Error fetching coordinates:', error.message);
+        return { latitude: null, longitude: null };
+    }
+}
+
 export const addCustomerWithAssignment = async (req, res) => {
     const {
         fatherName,
@@ -67,26 +97,10 @@ export const addCustomerWithAssignment = async (req, res) => {
         const customerID = `${month}${year}${customerCountForMonth}`;
         const applicationID = await generateUniqueApplicationId(Customer);
 
-        const apiKey = process.env.GOOGLE_MAP_API_KEY;
-
-        // Step 1: Fetch latitude and longitude from Google Maps API
-        // const geoResponse = await axios.get(
-        //     `https://maps.googleapis.com/maps/api/geocode/json`,
-        //     {
-        //         params: {
-        //             address: birthplace,
-        //             key: apiKey,
-        //         },
-        //     }
-        // );
-
-        // if (geoResponse.data.status !== 'OK') {
-        //     return res.status(400).json({ error: 'Location not found' });
-        // }
-
-        // const { lat: latitude, lng: longitude } = geoResponse.data.results[0].geometry.location;
-        const latitude = 16.544893
-        const longitude = 81.521241
+        const { latitude, longitude } = await getCoordinates(birthplace);
+        if (!latitude || !longitude) {
+            return res.status(400).json({ error: 'Invalid birthplace provided' });
+        }
 
         // Step 2: Call the Astrology API with the longitude, latitude, and other data
         const babyBirthDateObj = new Date(babyBirthDate);

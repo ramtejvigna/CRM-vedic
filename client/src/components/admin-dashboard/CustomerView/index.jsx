@@ -170,30 +170,34 @@ function CustomerTable() {
 
   const handleUpdateNote = async (customerID) => {
     const updatedNote = editedNotes[customerID];
-    if (!updatedNote) return;
-
-    try {
-      await axios.patch(`${api}/customers/updateNote/${customerID}`, {
-        note: updatedNote,
-      });
-
-      setCustomers((prevCustomers) =>
-        prevCustomers.map((customer) =>
-          customer.customerID === customerID
-            ? { ...customer, note: updatedNote }
-            : customer
-        )
-      );
-
-      setEditedNotes((prevNotes) => {
-        const updatedNotes = { ...prevNotes };
-        delete updatedNotes[customerID];
-        return updatedNotes;
-      });
-    } catch (error) {
-      console.error("Error updating note:", error);
+    if (!updatedNote) {
+        return;
     }
-  };
+    try {
+        // Make API request to update the note in the database
+        const response=await axios.patch(`${api}/customers/updateNote/${customerID}`, { note: updatedNote });
+        // Update the customer data locally
+        setCustomers((prevCustomers) =>
+            prevCustomers.map((customer) =>
+                customer.customerID === customerID
+                    ? { ...customer, note: updatedNote }
+                    : customer
+            )
+        );
+
+        // Optionally, you can also clear the editedNotes state for this customer
+        setEditedNotes((prevNotes) => {
+            const updatedNotes = { ...prevNotes };
+            delete updatedNotes[customerID];
+            return updatedNotes;
+        });
+    } catch (error) {
+        console.error('Error updating note:', error);
+    } finally{
+        setIsEditingNote(prev => ({ ...prev, [customerID]: !prev[customerID] }));
+
+    }
+};
 
   const convertToCSV = (data) => {
     // Define headers based on the table columns
@@ -539,33 +543,37 @@ function CustomerTable() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {isEditingNote[customer.customerID] ? (
-                        <input
-                          type="text"
-                          value={editedNotes[customer.customerID] || ""}
-                          onChange={(e) =>
-                            handleNoteChange(e, customer.customerID)
-                          }
-                          className="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                        />
-                      ) : (
-                        <span className="text-gray-700">
-                          {customer.note || "-"}
-                        </span>
-                      )}
-                      <button
-                        onClick={() => handleEditToggle(customer.customerID)}
-                        className="px-3 py-1 text-blue-500 rounded-full text-xs hover:text-blue-600 transition-all duration-200"
-                      >
-                        {isEditingNote[customer.customerID] ? (
-                          <CircleArrowRight className="w-4 h-4" />
-                        ) : (
-                          <Edit className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
+                        <div className="flex items-center gap-2">
+                            {isEditingNote[customer.customerID] ? (
+                                // Edit mode - input field
+                                <input
+                                    type="text"
+                                    value={editedNotes[customer.customerID] || ''} // Ensure it uses empty string when cleared
+                                    onChange={(e) => handleNoteChange(e, customer.customerID)} // Correct change handling
+                                    className="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                />
+                            ) : (
+                                // Display mode - static note text
+                                <span className="text-gray-700">{customer.note || '-'}</span>
+                            )}
+
+                            {/* Edit/Save button */}
+                            <button
+                                onClick={() =>
+                                    isEditingNote[customer.customerID]
+                                        ? handleUpdateNote(customer.customerID) // Save note
+                                        : handleEditToggle(customer.customerID) // Toggle edit mode
+                                }
+                                className="px-3 py-1 text-blue-500 rounded-full text-xs hover:text-blue-600 transition-all duration-200"
+                            >
+                                {isEditingNote[customer.customerID] ? (
+                                    <CircleArrowRight /> // Save icon
+                                ) : (
+                                    <Edit /> // Edit icon
+                                )}
+                            </button>
+                        </div>
+                    </td>
                 </tr>
               ))}
             </tbody>
