@@ -58,48 +58,6 @@ const Navbar = () => {
               >
                 <FaCog className="h-6 w-4" />
               </Link>
-              <div className="relative">
-                {/* User Icon */}
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} // Toggle the user menu dropdown
-                  className="focus:outline-none"
-                >
-                  <FaUserCircle />
-                </button>
-
-                {/* User Dropdown */}
-                <Transition
-                  show={isUserMenuOpen}
-                  enter="transition ease-out duration-100 transform"
-                  enterFrom="opacity-0 scale-95"
-                  enterTo="opacity-100 scale-100"
-                  leave="transition ease-in duration-75 transform"
-                  leaveFrom="opacity-100 scale-100"
-                  leaveTo="opacity-0 scale-95"
-                >
-                  <div
-                    className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} absolute right-0 mt-2 w-48 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50`}
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="user-menu"
-                  >
-                    <Link
-                      to="/profile"
-                      className={`block px-4 py-2 text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'} hover:bg-gray-100`}
-                      role="menuitem"
-                    >
-                      Profile
-                    </Link>
-                    <p
-                      onClick={handleLogout}
-                      className={`block px-4 py-2 text-sm cursor-pointer ${isDarkMode ? 'text-white' : 'text-gray-700'} hover:bg-gray-100`}
-                      role="menuitem"
-                    >
-                      Logout
-                    </p>
-                  </div>
-                </Transition>
-              </div>
             </div>
           </div>
 
