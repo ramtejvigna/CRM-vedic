@@ -448,6 +448,9 @@ const ViewExpenses = () => {
   ) : (
     <div className={`rounded-lg overflow-hidden transition-colors duration-300 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
       <div className="overflow-x-auto">
+      {currentRecords.length === 0 ? (
+              <EmptyState message="No expenses available" />
+            ) : (
         <table className="w-full">
           <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
             <tr>
@@ -458,11 +461,10 @@ const ViewExpenses = () => {
               ))}
             </tr>
           </thead>
+          
           <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}>
-            {currentRecords.length === 0 ? (
-              <EmptyState message="No expenses available" />
-            ) : (
-              currentRecords.map((expense, index) => (
+            
+              {currentRecords.map((expense, index) => (
                 <tr key={expense._id} className={`${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-100"} transition-colors duration-150`}>
                   <td className="px-6 py-4 text-sm whitespace-nowrap">
                     {indexOfFirstRecord + index + 1}
@@ -495,10 +497,10 @@ const ViewExpenses = () => {
                     </div>
                   </td>
                 </tr>
-              ))
-            )}
+              ))}
                 </tbody>
               </table>
+            )}
               <div className="mt-4 flex items-center justify-between">
                 {/* Rows per page dropdown on the left */}
                 <div className="flex items-center">
