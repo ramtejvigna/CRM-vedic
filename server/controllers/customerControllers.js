@@ -111,8 +111,8 @@ export const addCustomerWithAssignment = async (req, res) => {
         const tzone = 5.5; // Adjust timezone as required (e.g., IST = +5:30)
 
         const astroApiUrl = 'https://json.astrologyapi.com/v1/astro_details';
-        const username = '637021';
-        const password = '06fbcbab818b35cb983ef592b2df5661247d88ba';
+        const username = '637826';
+        const password = 'b78bd9f36a2e5a81c4df2082f4ea166f2207bb3e';
 
         const astroResponse = await axios.post(
             astroApiUrl,
