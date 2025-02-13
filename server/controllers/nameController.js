@@ -22,6 +22,7 @@ export const uploadExcelNames = async (req, res) => {
         // Convert to JSON
         const results = utils.sheet_to_json(worksheet);
 
+
         // Normalize the data
         const normalizedResults = results.map(row => {
             return Object.fromEntries(
