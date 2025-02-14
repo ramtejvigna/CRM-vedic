@@ -385,7 +385,7 @@ const CheckBoxListPage = () => {
         names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
         customerId: customerData._id,
         additionalBabyNames: additionalBabyNames,
-        generatedBy: "Manager",
+        generatedBy: "Admin",
         userId: Cookies.get('employeeId')
       });
       toast.success("PDF Generated Successfully");
