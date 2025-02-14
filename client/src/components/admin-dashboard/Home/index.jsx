@@ -20,7 +20,6 @@ export function Home() {
     try {
       setLoading(true);
       const response = await axios.get(`${api}/api/home/weekly-stats`); 
-      console.log(response)
       // Adjust the endpoint as per your API route
       const data = await response.data;
       

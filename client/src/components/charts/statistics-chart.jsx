@@ -2,10 +2,9 @@ import { Card } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import Chart from "react-apexcharts";
 import { motion } from 'framer-motion';
-import { useStore } from "../../store";
+
 
 export function StatisticsChart({ color, chart, title, description, footer, filter }) {
-  const { isDarkMode } = useStore();
 
   return (
     <motion.div

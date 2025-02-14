@@ -1,8 +1,6 @@
 import {
   Card,
-  CardHeader,
   CardBody,
-  CardFooter,
   Typography,
 } from "@material-tailwind/react";
 import { useState, useEffect } from 'react';
@@ -16,7 +14,7 @@ import {
 
 import PropTypes from "prop-types";
 
-export function StatisticsCard({ color, icon, title, value, footer }) {
+export function StatisticsCard({ color, icon, title, value }) {
   return (
     <Card className={`relative border pb-5 border-blue-gray-100 shadow-lg -translate-y-4`}>
       {/* Floating Container */}
@@ -37,7 +35,6 @@ export function StatisticsCard({ color, icon, title, value, footer }) {
 
 StatisticsCard.defaultProps = {
   color: "blue",
-  footer: null,
 };
 
 StatisticsCard.propTypes = {
@@ -45,7 +42,6 @@ StatisticsCard.propTypes = {
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
-  footer: PropTypes.node,
 };
 
 export function Statistics() {
@@ -74,44 +70,24 @@ export function Statistics() {
       icon: <CurrencyRupeeIcon className="h-8 w-8 text-white" />,
       title: "Monthly Revenue",
       value: statistics.revenue,
-      footer: (
-        <span className="text-green-500">
-          +55% <span className="font-normal opacity-70">than last week</span>
-        </span>
-      ),
     },
     {
       color: "bg-blue-500",
       icon: <UsersIcon className="h-8 w-8 text-white" />,
       title: "Today's customers",
       value: statistics.customersToday,
-      footer: (
-        <span className="text-green-500">
-          +3% <span className="font-normal opacity-70">than last month</span>
-        </span>
-      ),
     },
     {
       color: "bg-green-500",
       icon: <DocumentTextIcon className="h-8 w-8 text-white" />,
       title: "PDFs generated Today",
       value: statistics.pdfsGeneratedToday,
-      footer: (
-        <span className="text-red-500">
-          -2% <span className="font-normal opacity-70">than yesterday</span>
-        </span>
-      ),
     },
     {
       color: "bg-pink-500",
       icon: <ClipboardDocumentListIcon className="h-8 w-8 text-white" />,
       title: "Total Employees",
       value: statistics.totalEmployees,
-      footer: (
-        <span className="text-green-500">
-          +5% <span className="font-normal opacity-70">than yesterday</span>
-        </span>
-      ),
     },
   ];
 
@@ -124,7 +100,6 @@ export function Statistics() {
           icon={data.icon}
           title={data.title}
           value={data.value}
-          footer={data.footer}
         />
       ))}
     </div>
