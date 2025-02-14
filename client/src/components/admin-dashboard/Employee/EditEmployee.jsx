@@ -8,7 +8,7 @@ import {toast} from "react-toastify"
 import { Input } from '@material-tailwind/react';
 import {AiOutlineUpload , AiOutlineDelete} from "react-icons/ai"
 import { TextField, InputLabel, Typography } from '@mui/material';
-import {Link, Navigate} from 'react-router-dom';
+import {Link, Navigate, useLocation} from 'react-router-dom';
 import { useNavigate , useParams } from 'react-router-dom';
 import { GET_EMPLOYEE_BY_ID, UPDATE_EMPLOYEE } from '../../../utils/constants';
 const steps = ['Personal Information', 'Identification Documents', 'Educational Qualifications', 'Previous Employment Details', 'Financial Information'];
@@ -16,7 +16,7 @@ const formKeys = ['personalInfo', 'idDocuments', 'education', 'employment', 'pay
 const EditEmployee = () => {
     const [image , setImage] = useState(null);
     const navigate = useNavigate();
-    const {id} = useParams();
+    const location = useLocation();
     const [activeStep, setActiveStep] = useState(0);
     const [errors, setErrors] = useState({});
     const [isLoading , setIsLoading] = useState(false);
@@ -38,6 +38,8 @@ const EditEmployee = () => {
         employment: { employerName: '', jobTitle: '', startDate: Date, endDate: Date, reasonForLeaving: '' },
         paymentDetails: { cardNumber: '', cardholderName: '', cvv: '', expiryDate: Date },
     });
+
+    const id = location.state.employee_id;
 
     useEffect(() =>{ 
         const getEmployee = async () => {

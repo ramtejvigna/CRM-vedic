@@ -42,10 +42,10 @@ const AdminDashboard = () => {
               />
             ))}
             <Route path="employees/add-employee" element={<AddEmployee />} />
-            <Route path="employees/edit-employee/:id" element={<EditEmployee />} />
+            <Route path="employees/edit-employee" element={<EditEmployee />} />
             <Route path="customers/:id" element={<Customers />} /> {/* Ensure correct import */}
             <Route path="customers/:id/generate-pdf" element={<CheckBoxListPage />} />
-            <Route path="employees/view-employee/:id" element={<ViewEmployee />} />
+            <Route path="employees/view-employee" element={<ViewEmployee />} />
             <Route path='/tasks' element={<TaskManagement />} />
             <Route path="/expenses/add-expense" element={<AddExpense />} />
             <Route path='/leaves' element={<Leaves />} />

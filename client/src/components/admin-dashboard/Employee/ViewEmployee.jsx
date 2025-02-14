@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HOST, GET_EMPLOYEE_BY_ID } from "../../../utils/constants";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, Card, Button, Box, CircularProgress } from "@mui/material";
 import { GiCrossMark } from "react-icons/gi";
 import { format } from "date-fns";
@@ -28,7 +28,9 @@ const ViewEmployee = () => {
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [employee, setEmployee] = useState({});
-  const { id } = useParams();
+  const location = useLocation();
+
+  const id = location.state.employee_id;
 
   useEffect(() => {
     const getEmployee = async () => {
