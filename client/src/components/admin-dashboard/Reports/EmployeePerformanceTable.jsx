@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import Calendar from "react-calendar";
 import EmptyState from "./EmptyState";
 import "react-calendar/dist/Calendar.css";
+import { HOST } from "../../../utils/constants";
 
 const EmployeePerformanceTable = () => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -44,7 +45,7 @@ const EmployeePerformanceTable = () => {
       }
 
       const response = await fetch(
-        `http://localhost:9000/api/reports/api/pdfs/generated-by-employee?${queryParams}`
+        `${HOST}/api/reports/api/pdfs/generated-by-employee?${queryParams}`
       );
 
       if (!response.ok) {
