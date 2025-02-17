@@ -179,7 +179,6 @@ const AddEmployee = () => {
           formErrors.confirmPassword = "Passwords do not match";
         }
       }
-      console.log(formErrors)
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };

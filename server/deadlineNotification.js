@@ -4,7 +4,6 @@ import { Notification } from "./models/Notification.js";
 
 const checkCustomerDeadlines = async () => {
     try {
-        console.log("hello");
       const oneDayInMillis = 1 * 24 * 60 * 60 * 1000; // Two days in milliseconds
       const now = new Date();
   
@@ -21,7 +20,6 @@ const checkCustomerDeadlines = async () => {
             const daysLeft = Math.floor(timeRemaining / (24 * 60 * 60 * 1000));
             const message = `Hurry up! Customer ${customer.customerName} has a deadline approaching in ${daysLeft} day(s) and ${hoursLeft} hour(s).`;
             const employeeId = customer.assignedEmployee;
-            console.log(employeeId,message);
             const notification = new Notification({
                 employee: employeeId,
                 message,

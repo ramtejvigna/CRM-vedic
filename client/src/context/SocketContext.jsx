@@ -21,12 +21,10 @@ export const SocketProvider = ({ children }) => {
       });
 
       socketInstance.on("connect", () => {
-        console.log("Connected to socket server");
       });
 
       socketInstance.on("online-list", (data) => {
         const { setOnlineUsers } = useStore.getState();
-        console.log(data)
         setOnlineUsers(data);
       });
 

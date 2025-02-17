@@ -58,9 +58,6 @@ const Customer = () => {
   const [whatsapploader,setWhatsappLoader]=useState(null);
   const [astroDetails, setAstroDetails] = useState(null);
 
-
-
-
   const toggleDropdown = (pdfId) => {
     setActiveDropdown(activeDropdown === pdfId ? null : pdfId);
   };
@@ -247,7 +244,6 @@ const Customer = () => {
 
   const handleSubmitFeedback = async () => {
     if (selectedRating > 0 && selectedPdf) {
-      console.log(selectedRating, selectedPdf._id);
       try {
         // Send pdfId and rating in the body of the PUT request
         const response = await axios.put(
@@ -426,7 +422,7 @@ const Customer = () => {
             <div className="col-span-2 my-4">
         <hr className="border-t border-gray-200" />
       </div>
-      <CustomerAstroDetails customerId={customerId}  onAstroDetailsFetched={handleAstroDetailsUpdate} />
+      <CustomerAstroDetails customerDetails={customerDetails}  onAstroDetailsFetched={handleAstroDetailsUpdate} />
     </div>
         </div>
         {/* Right Column */}

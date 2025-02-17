@@ -139,7 +139,6 @@ const CheckBoxListPage = () => {
     };
 
     const handleSubmit = () => {
-        console.log("Submitted baby names:", additionalBabyNames);
         setModalOpen(false);
 
 
@@ -390,7 +389,6 @@ const handleMeaningChange = (e) => {
 
   // Function to remove a tag and its associated filter
   const handleResetFilters = () => {
-    console.log("Resetting filters...");
     // Reset additional filters
     setBookFilter("");
     setMeaningFilter("");
@@ -405,11 +403,9 @@ const handleMeaningChange = (e) => {
         { label: `Starting Letter: ${customerData?.preferredStartingLetter}`, type: "startingLetter" },
     ];
     setTags(defaultTags);
-    console.log("Tags after reset:", defaultTags);
 
     // Reset selected items
     setSelectedItems([]);
-    console.log("Selected items after reset:", []);
 
     // Reapply filters
     filterNames({
@@ -469,8 +465,6 @@ const handleMeaningChange = (e) => {
 // };
 
 const handleGeneratePdf = async () => {
-  console.log(additionalBabyNames);
-  console.log(selectedItems);
   if (selectedItems.length === 0) {
       alert("No items selected!");
       return;
@@ -492,7 +486,6 @@ const handleGeneratePdf = async () => {
 
       // Delay navigation to allow the toast to be visible
       setTimeout(() => {
-          console.log("Navigating back");
           navigate(-1);
       }, 3000); // Adjust the timeout duration as needed (3000 ms = 3 seconds)
   } catch (error) {

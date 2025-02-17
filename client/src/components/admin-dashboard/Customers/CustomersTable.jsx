@@ -82,7 +82,6 @@ const CustomersTable = ({
   };
 
   const renderTableRows = (customer, index) => {
-    console.log(fromSection)
 
     switch (fromSection) {
       case "newRequests":

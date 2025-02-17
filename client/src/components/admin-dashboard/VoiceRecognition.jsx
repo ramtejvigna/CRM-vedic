@@ -30,7 +30,6 @@ export const VoiceRecognition = () => {
                 }
             });
             const route = response.data.transcript.toLowerCase();
-            console.log(route)
 
             handleCommand(route);
         } catch (error) {

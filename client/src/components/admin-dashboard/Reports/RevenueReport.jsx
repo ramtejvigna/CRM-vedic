@@ -87,7 +87,6 @@ function RevenueReport() {
       setIsLoading(true);
       const response = await axios.get(`${HOST}/api/employees`);
       setEmployees(response.data);
-      console.log(response.data)
       setIsLoading(false);
     } catch (error) {
       console.error(error.message);

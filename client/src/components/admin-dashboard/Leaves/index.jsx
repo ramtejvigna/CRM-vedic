@@ -58,7 +58,6 @@ const Leaves = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  console.log(pendingCount)
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);

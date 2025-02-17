@@ -296,8 +296,6 @@ const BabyDatabase = () => {
 
     const csvData = filteredNames.map(({ _id, __v, ...rest }) => rest);
 
-    console.log(csvData)
-
     const renderFilters = () => (
         <motion.div
             initial={{ opacity: 0, height: 0 }}

@@ -3,7 +3,6 @@ import { NotificationAdmin } from "../models/Notification.js";
 import { Employee } from "../models/User.js";
 export const createNotification = async (employeeId, message) => {
     try {
-      console.log(employeeId,message)
       const notification = new NotificationAdmin({
         employee: employeeId,
         message,

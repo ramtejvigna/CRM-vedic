@@ -17,26 +17,31 @@ export const getNewCustomers = async (req, res) => {
     ] = await Promise.all([
       Customer.find({ customerStatus: 'newRequests' })
         .sort({ createdDateTime: -1 })
-        .populate('assignedEmployee', 'firstName lastName email'),
-        
+        .populate('assignedEmployee', 'firstName lastName email')
+        .populate('astroDetails'),
+      
       Customer.find({ customerStatus: 'inProgress' })
         .sort({ createdDateTime: -1 })
-        .populate('assignedEmployee', 'firstName lastName email'),
-        
+        .populate('assignedEmployee', 'firstName lastName email')
+        .populate('astroDetails'), // Populate astroDetails
+      
       Customer.find({ customerStatus: 'completed' })
         .sort({ createdDateTime: -1 })
-        .populate('assignedEmployee', 'firstName lastName email'),
-        
+        .populate('assignedEmployee', 'firstName lastName email')
+        .populate('astroDetails'), // Populate astroDetails
+      
       Customer.find({ customerStatus: 'rejected' })
         .sort({ createdDateTime: -1 })
-        .populate('assignedEmployee', 'firstName lastName email'),
-        
+        .populate('assignedEmployee', 'firstName lastName email')
+        .populate('astroDetails'), // Populate astroDetails
+      
       Customer.find({ 
         assignedEmployee: { $ne: null }, 
         customerStatus: 'inWorking' 
       })
         .sort({ createdAt: -1 })
         .populate('assignedEmployee', 'firstName lastName email')
+        .populate('astroDetails') // Populate astroDetails
     ]);
 
     // Transform the data to include formatted employee names
@@ -65,8 +70,6 @@ export const getNewCustomers = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-  
-
 
 export const getCompletedReq = async (req, res) => {
   try {

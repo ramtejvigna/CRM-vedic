@@ -39,7 +39,6 @@ const AddNameModal = ({ isOpen, onClose, onAdd }) => {
             try {
                 const response = await fetch('https://vedic-backend-neon.vercel.app/categories');
                 const data = await response.json();
-                console.log(data);
                 setCategoryData(data);
             } catch (error) {
                 console.error('Error fetching categories:', error);

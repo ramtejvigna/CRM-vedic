@@ -112,7 +112,6 @@ const Customer = () => {
   
   const handleSubmitFeedback = async () => {
     if (selectedRating > 0 && selectedPdf) {
-      console.log(selectedRating,selectedPdf._id);
       try {
         // Send pdfId and rating in the body of the PUT request
         const response = await axios.put(

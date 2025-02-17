@@ -181,7 +181,6 @@ const CheckBoxListPage = () => {
   };
 
   const handleSubmit = () => {
-    console.log(additionalBabyNames);
     setModalOpen(false);
 
 

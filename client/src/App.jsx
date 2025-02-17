@@ -16,7 +16,6 @@ const PrivateRoute = ({children}) => {
 }
 const AuthRoute = ({children}) => {
   const {adminInfo} = useStore();
-  console.log(adminInfo)
   return !!adminInfo ? <Navigate to={"/admin-dashboard/home"} /> : children ;
 }
 

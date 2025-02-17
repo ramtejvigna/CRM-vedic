@@ -22,7 +22,6 @@ const TaskModal = ({
   getStatusColor,
   isDetailModal = false,
 }) => {
-  console.log(selectedTask);
   return (
     <Transition appear show={isModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={handleCloseModal}>
