@@ -449,3 +449,108 @@ export const getRegionalDistribution = async (req, res) => {
     });
   }
 };
+
+export const getAnalyticsData = async (req, res) => {
+  try {
+    const { startDate, endDate, category } = req.query;
+
+    if (!startDate || !endDate || !category) {
+      return res.status(400).json({ message: "Start date, end date, and category are required." });
+    }
+
+    const date1 = new Date(startDate);
+    const date2 = new Date(endDate);
+    date1.setHours(0, 0, 0, 0);
+    date2.setHours(23, 59, 59, 999);
+
+    let groupField;
+    let matchStage = {
+      createdDateTime: { $gte: date1, $lte: date2 }
+    };
+
+    switch (category) {
+      case 'leadSource':
+        groupField = '$leadSource';
+        break;
+        
+      case 'babyGender':
+        groupField = '$babyGender';
+        break;
+      
+      case 'month':
+        groupField = { $month: '$createdDateTime' };
+        break;
+      
+      default:
+        return res.status(400).json({ message: "Invalid category" });
+    }
+
+    const pipeline = [
+      { $match: matchStage },
+      {
+        $group: {
+          _id: groupField,
+          leadCount: { $sum: 1 },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $eq: ['$paymentStatus', true] },
+                { $toDouble: '$totalPrice' },
+                0
+              ]
+            }
+          },
+          paidLeads: {
+            $sum: {
+              $cond: [
+                { $eq: ['$paymentStatus', true] },
+                1,
+                0
+              ]
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          category: '$_id',
+          leadCount: 1,
+          totalRevenue: 1,
+          paidLeads: 1,
+          averageRevenue: {
+            $cond: [
+              { $eq: ['$paidLeads', 0] },
+              0,
+              { $divide: ['$totalRevenue', '$paidLeads'] }
+            ]
+          }
+        }
+      },
+      { $sort: { leadCount: -1 } }
+    ];
+
+    const results = await Customer.aggregate(pipeline);
+
+    // Format month names if category is 'month'
+    if (category === 'month') {
+      results.forEach(item => {
+        item.category = new Date(0, item.category - 1).toLocaleString('default', { month: 'long' });
+      });
+    }
+
+    return res.status(200).json({
+      data: results,
+      summary: {
+        totalLeads: results.reduce((sum, item) => sum + item.leadCount, 0),
+        totalRevenue: results.reduce((sum, item) => sum + item.totalRevenue, 0),
+        totalPaidLeads: results.reduce((sum, item) => sum + item.paidLeads, 0)
+      }
+    });
+  } catch (error) {
+    console.error('Error in getAnalyticsData:', error);
+    return res.status(500).json({
+      message: "An error occurred while fetching analytics data.",
+      error: error.message
+    });
+  }
+};

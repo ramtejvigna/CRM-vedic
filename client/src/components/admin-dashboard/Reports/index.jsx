@@ -5,6 +5,7 @@ import ExpensesReport from './ExpensesReport';
 import RevenueReport from './RevenueReport';
 import EmployeePerformanceTable from './EmployeePerformanceTable';
 import RegionalPdfReport from './RegionalPDF';
+import AnalyticsDashboard from './AnalyticsDashboard';
 
 function Reports() {
   const containerVariants = {
@@ -58,6 +59,10 @@ function Reports() {
 
       <motion.div variants={itemVariants} className="w-full">
         <EmployeePerformanceTable />
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="w-full">
+        <AnalyticsDashboard />
       </motion.div>
     </motion.div>
   );
