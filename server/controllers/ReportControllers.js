@@ -475,7 +475,20 @@ export const getAnalyticsData = async (req, res) => {
         break;
 
       case 'zodiac':
-        groupField = '$astroDetails.zodiacSign'; // Fetching zodiac sign from Astro details
+        // Add a $lookup stage to join with the Astro collection
+        matchStage = [
+          { $match: { createdDateTime: { $gte: date1, $lte: date2 } } },
+          {
+            $lookup: {
+              from: 'astros', // The name of the Astro collection
+              localField: 'astroDetails',
+              foreignField: '_id',
+              as: 'astroDetails'
+            }
+          },
+          { $unwind: '$astroDetails' } // Unwind the joined array
+        ];
+        groupField = '$astroDetails.zodiacSign'; // Now we can access zodiacSign
         break;
 
       case 'babyGender':
@@ -491,7 +504,7 @@ export const getAnalyticsData = async (req, res) => {
     }
 
     const pipeline = [
-      { $match: matchStage },
+      ...(category === 'zodiac' ? matchStage : [{ $match: matchStage }]), // Conditionally add the $lookup stage
       {
         $group: {
           _id: groupField,
