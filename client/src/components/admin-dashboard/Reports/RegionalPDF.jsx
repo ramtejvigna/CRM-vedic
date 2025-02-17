@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { Calendar } from "lucide-react";
 import axios from "axios";
-import { api } from "../../../utils/constants.js";
+import { HOST } from "../../../utils/constants";
 
 const RegionalPdfReport = () => {
   const [chartData, setChartData] = useState([]);
-  const [timeRange, setTimeRange] = useState("this");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [showOthers, setShowOthers] = useState(false);
   const [othersData, setOthersData] = useState([]);
@@ -18,36 +20,50 @@ const RegionalPdfReport = () => {
   };
 
   useEffect(() => {
+    // Set default date range to current month
+    if (!startDate && !endDate) {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      
+      setStartDate(firstDayOfMonth.toISOString().split('T')[0]);
+      setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
+      if (!startDate || !endDate) return;
+
       try {
         setLoading(true);
-        const res = await axios.get(`${api}/api/reports/regional-distribution?timeRange=${timeRange}`,
-          { withCredentials: true }
+        const res = await axios.get(
+          `${HOST}/api/reports/regional-distribution-range?startDate=${startDate}&endDate=${endDate}`,
+          { credentials: 'include' }
         );
 
-        if (res.status === 200) {
-          const { mainRegions, otherRegions, othersTotal, totalPDFs } = res.data;
-          
-          const processedData = [
-            ...mainRegions.map((d, index) => ({
-              name: d.region,
-              value: d.pdfCount,
-              color: COLORS.main[index]
-            }))
-          ];
+        const data = res.data;
+        const { mainRegions, otherRegions, othersTotal, totalPDFs } = data;
+        
+        const processedData = [
+          ...mainRegions.map((d, index) => ({
+            name: d.region,
+            value: d.pdfCount,
+            color: COLORS.main[index]
+          }))
+        ];
 
-          if (othersTotal > 0) {
-            processedData.push({
-              name: 'Others',
-              value: othersTotal,
-              color: COLORS.others
-            });
-          }
-
-          setChartData(processedData);
-          setOthersData(otherRegions);
-          setTotalPDFs(totalPDFs);
+        if (othersTotal > 0) {
+          processedData.push({
+            name: 'Others',
+            value: othersTotal,
+            color: COLORS.others
+          });
         }
+
+        setChartData(processedData);
+        setOthersData(otherRegions);
+        setTotalPDFs(totalPDFs);
       } catch (error) {
         console.error(error);
       } finally {
@@ -56,7 +72,7 @@ const RegionalPdfReport = () => {
     };
 
     fetchData();
-  }, [timeRange]);
+  }, [startDate, endDate]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
@@ -89,7 +105,7 @@ const RegionalPdfReport = () => {
             <p className="text-gray-500 mt-1">Distribution of PDFs across different regions</p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             {othersData.length > 0 && (
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -104,21 +120,30 @@ const RegionalPdfReport = () => {
               </motion.button>
             )}
             
-            <motion.select
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="border-2 border-indigo-300 rounded-lg px-4 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="this">This Month</option>
-              <option value="last">Last Month</option>
-              <option value="quarter">Last 3 Months</option>
-              <option value="year">This Year</option>
-            </motion.select>
+            <div className="flex items-center gap-2">
+              <Calendar className="text-indigo-600 w-5 h-5" />
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <span className="text-gray-500">to</span>
+            <div className="flex items-center gap-2">
+              <Calendar className="text-indigo-600 w-5 h-5" />
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
           </div>
         </div>
 
+        {/* Rest of the component remains the same */}
+        {/* ... Loading state, Chart, and Stats grid ... */}
         {loading ? (
           <motion.div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-500" />
@@ -181,6 +206,7 @@ const RegionalPdfReport = () => {
         </div>
       </motion.div>
 
+      {/* Others Modal */}
       <AnimatePresence>
         {showOthers && (
           <motion.div

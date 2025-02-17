@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import axios from "axios";
-import { HOST } from "../../../utils/constants.js";
-import { FileText } from "lucide-react";
+import { FileText, Calendar } from "lucide-react";
+import axios from "axios"
+import { HOST } from "../../../utils/constants.js"
 
 const DailyPdfsGenerated = () => {
   const [chartData, setChartData] = useState([]);
-  const [timeRange, setTimeRange] = useState("today");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
 
   const COLORS = [
@@ -21,22 +22,35 @@ const DailyPdfsGenerated = () => {
   ];
 
   useEffect(() => {
+    // Set default date range to current month
+    if (!startDate && !endDate) {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      
+      setStartDate(firstDayOfMonth.toISOString().split('T')[0]);
+      setEndDate(lastDayOfMonth.toISOString().split('T')[0]);
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchPdfData = async () => {
+      if (!startDate || !endDate) return;
+
       try {
         setLoading(true);
-
-        // Fetch combined employee and admin data
-        const res = await axios.get(`${HOST}/api/reports/pdf-gen-today?range=${timeRange}`, {
-          withCredentials: true,
+        
+        // Update API endpoint to accept date range
+        const res = await axios.get(`${HOST}/api/reports/pdf-gen-range?startDate=${startDate}&endDate=${endDate}`, {
+          credentials: 'include'
         });
 
-        console.log("API Response:", res.data);
+        const data = res.data;
 
-        // Process the response to format for the chart
-        const processedData = res.data.map((item, index) => ({
-          name: item.name || "Unknown", // Fallback for missing names
-          pdfs: item.count || 0, // Fallback for missing counts
-          color: COLORS[index % COLORS.length], // Assign colors cyclically
+        const processedData = data.map((item, index) => ({
+          name: item.name || "Unknown",
+          pdfs: item.count || 0,
+          color: COLORS[index % COLORS.length],
         }));
 
         setChartData(processedData);
@@ -48,11 +62,7 @@ const DailyPdfsGenerated = () => {
     };
 
     fetchPdfData();
-  }, [timeRange]);
-
-  const handleFilterChange = (e) => {
-    setTimeRange(e.target.value);
-  };
+  }, [startDate, endDate]);
 
   return (
     <motion.div
@@ -61,23 +71,33 @@ const DailyPdfsGenerated = () => {
       transition={{ duration: 0.5 }}
       className="bg-gradient-to-br from-indigo-50 to-emerald-50 p-6 rounded-2xl shadow-xl"
     >
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col justify-between items-center gap-4 mb-6">
         <div className="flex items-center space-x-3">
           <FileText className="text-indigo-600" />
           <h2 className="text-2xl font-bold text-gray-800">PDFs Generated</h2>
         </div>
 
-        <motion.select
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          value={timeRange}
-          onChange={handleFilterChange}
-          className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="today">Today</option>
-          <option value="week">Weekly</option>
-          <option value="month">Monthly</option>
-        </motion.select>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="text-indigo-600 w-5 h-5" />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <span className="text-gray-500">to</span>
+          <div className="flex items-center gap-2">
+            <Calendar className="text-indigo-600 w-5 h-5" />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border-2 border-indigo-300 rounded-lg px-3 py-2 bg-white text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -97,22 +117,21 @@ const DailyPdfsGenerated = () => {
             <Tooltip
               cursor={{ fill: 'rgba(0,0,0,0.05)' }}
               contentStyle={{
-                background: '#1E293B', // Dark blue-gray background
-                color: 'white',        // White text color
-                borderRadius: '8px',   // Rounded corners
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)', // Subtle shadow for depth
-                border: 'none',        // Remove border
+                background: '#1E293B',
+                color: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                border: 'none',
               }}
               itemStyle={{
-                color: '#4CAF50', // Golden text for data labels
-                fontWeight: 'bold', // Bold text
+                color: '#4CAF50',
+                fontWeight: 'bold',
               }}
               labelStyle={{
-                color: '#E2E8F0', // Light gray text for the label
-                fontWeight: '600', // Slightly bold text
+                color: '#E2E8F0',
+                fontWeight: '600',
               }}
             />
-
             <Bar dataKey="pdfs" name="PDFs">
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />

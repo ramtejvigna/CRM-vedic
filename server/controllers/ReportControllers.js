@@ -5,31 +5,20 @@ import Expense from '../models/Expenses.js';
 
 export const getPdfsGenByEmployee = async (req, res) => {
   try {
-    const { range } = req.query;
-    const date1 = new Date();
-    const date2 = new Date();
-
-    // Set date range based on the query parameter
-    if (range === "today") {
-      date1.setHours(0, 0, 0, 0);
-      date2.setHours(23, 59, 59, 999);
-    } else if (range === "week") {
-      const startOfWeek = date1.getDate() - date1.getDay();
-      date1.setDate(startOfWeek);
-      date1.setHours(0, 0, 0, 0);
-      date2.setDate(startOfWeek + 6);
-      date2.setHours(23, 59, 59, 999);
-    } else if (range === "month") {
-      date1.setDate(1);
-      date1.setHours(0, 0, 0, 0);
-      date2.setMonth(date1.getMonth() + 1);
-      date2.setDate(0);
-      date2.setHours(23, 59, 59, 999);
-    } else {
-      return res.status(400).json({ message: "Invalid range. Use 'today', 'week', or 'month'." });
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: "Start date and end date are required." });
     }
 
-    // Fetch all employees to ensure they are included even if no PDFs are generated
+    const date1 = new Date(startDate);
+    const date2 = new Date(endDate);
+    
+    // Set time to beginning and end of days
+    date1.setHours(0, 0, 0, 0);
+    date2.setHours(23, 59, 59, 999);
+
+    // Fetch all employees
     const allEmployees = await Employee.find({}, { firstName: 1, role: 1 }).lean();
 
     // Aggregate PDF data for employees
@@ -59,14 +48,12 @@ export const getPdfsGenByEmployee = async (req, res) => {
       },
       {
         $project: {
-          name:{ $ifNull: ["$employee.firstName", null] },
+          name: { $ifNull: ["$employee.firstName", null] },
           role: "$employee.role",
           count: 1,
         },
       },
     ]);
-
-    console.log("Employee Results: ", employeeResults);
 
     // Aggregate PDF data for admins
     const adminResults = await Pdfs.aggregate([
@@ -102,8 +89,6 @@ export const getPdfsGenByEmployee = async (req, res) => {
       },
     ]);
 
-    console.log("Admin Results: ", adminResults);
-
     // Create a map for employee PDF counts
     const employeePdfCounts = employeeResults.reduce((acc, data) => {
       if (data.name) acc[data.name] = data.count;
@@ -126,7 +111,6 @@ export const getPdfsGenByEmployee = async (req, res) => {
         count: data.count,
       }));
 
-
     const combinedData = [...formattedEmployeeData, ...formattedAdminData];
 
     return res.status(200).json(combinedData);
@@ -137,33 +121,25 @@ export const getPdfsGenByEmployee = async (req, res) => {
 };
 
 
-export const getExpensesByMonth = async (req, res) => {
+export const getExpensesByDateRange = async (req, res) => {
   try {
-    const now = new Date();
-    const { month = "this" } = req.query;
-
-    let startDate, endDate;
-    if (month === "this") {
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    } else if (month === "last") {
-      startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-    } else {
-      return res.status(400).json({ message: "Invalid month query. Use 'this' or 'last'." });
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: "Start date and end date are required." });
     }
+
+    const date1 = new Date(startDate);
+    const date2 = new Date(endDate);
+    
+    // Set time to beginning and end of days
+    date1.setHours(0, 0, 0, 0);
+    date2.setHours(23, 59, 59, 999);
 
     const result = await Expenses.aggregate([
       {
         $match: {
-          date: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $addFields: {
-          month: {
-            $dateToString: { format: "%Y-%m", date: "$date" },
-          },
+          date: { $gte: date1, $lte: date2 },
         },
       },
       {
@@ -198,7 +174,7 @@ export const getExpensesByMonth = async (req, res) => {
 
     return res.status(200).json(result);
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -369,107 +345,107 @@ export const pdfGeneratedByEmployee = async (req, res) => {
 
 export const getRegionalDistribution = async (req, res) => {
   try {
-      const { timeRange } = req.query;
-      const dateFilter = getDateFilter(timeRange);
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ 
+        message: "Start date and end date are required." 
+      });
+    }
 
-      const allRegions = await Customer.aggregate([
-          { 
-              $match: { 
-                  ...dateFilter,
-                  pdfGenerated: { $exists: true, $ne: [] },
-                  birthplace: { $exists: true, $ne: "" }
-              }
-          },
-          {
-              $addFields: {
-                  cleanLocation: {
-                      $trim: {
-                          input: {
-                              $arrayElemAt: [
-                                  { $split: [{ $trim: { input: "$birthplace" } }, ","] },
-                                  0
-                              ]
-                          }
-                      }
-                  }
-              }
-          },
-          {
-              $match: {
-                  cleanLocation: {
-                      $nin: ["AP", "MH", "TN", "KA", "MP", "UP", "TS", "KL", "GJ", "RJ", "India", "Bharat"],
-                      $regex: /^.{3,}$/
-                  }
-              }
-          },
-          {
-              $group: {
-                  _id: { $toLower: "$cleanLocation" },
-                  pdfCount: { $sum: { $size: "$pdfGenerated" } },
-                  originalName: { $first: "$cleanLocation" }
-              }
-          },
-          {
-              $project: {
-                  _id: 0,
-                  region: "$originalName",
-                  pdfCount: 1
-              }
-          },
-          { $sort: { pdfCount: -1 } }
-      ]);
+    const date1 = new Date(startDate);
+    const date2 = new Date(endDate);
+    
+    // Set time to beginning and end of days
+    date1.setHours(0, 0, 0, 0);
+    date2.setHours(23, 59, 59, 999);
 
-      const totalPDFs = allRegions.reduce((sum, item) => sum + item.pdfCount, 0);
-      const threshold = Math.max(totalPDFs * 0.05, 1); // 5% threshold or at least 1 PDF
-
-      // Split regions into main and others
-      const mainRegions = [];
-      const otherRegions = [];
-
-      allRegions.forEach(region => {
-          if (mainRegions.length < 4 && region.pdfCount >= threshold) {
-              mainRegions.push(region);
-          } else {
-              otherRegions.push({
-                  region: region.region,
-                  pdfCount: region.pdfCount,
-                  percentage: ((region.pdfCount / totalPDFs) * 100).toFixed(1)
-              });
+    const allRegions = await Customer.aggregate([
+      {
+        $match: {
+          createdDateTime: { $gte: date1, $lte: date2 },
+          pdfGenerated: { $exists: true, $ne: [] },
+          birthplace: { $exists: true, $ne: "" }
+        }
+      },
+      {
+        $addFields: {
+          cleanLocation: {
+            $trim: {
+              input: {
+                $arrayElemAt: [
+                  { $split: [{ $trim: { input: "$birthplace" } }, ","] },
+                  0
+                ]
+              }
+            }
           }
-      });
+        }
+      },
+      {
+        $match: {
+          cleanLocation: {
+            $nin: ["AP", "MH", "TN", "KA", "MP", "UP", "TS", "KL", "GJ", "RJ", "India", "Bharat"],
+            $regex: /^.{3,}$/
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $toLower: "$cleanLocation" },
+          pdfCount: { $sum: { $size: "$pdfGenerated" } },
+          originalName: { $first: "$cleanLocation" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          region: "$originalName",
+          pdfCount: 1
+        }
+      },
+      {
+        $sort: { pdfCount: -1 }
+      }
+    ]);
 
-      const othersTotal = otherRegions.reduce((sum, item) => sum + item.pdfCount, 0);
+    const totalPDFs = allRegions.reduce((sum, item) => sum + item.pdfCount, 0);
 
-      res.json({
-          mainRegions,
-          otherRegions: otherRegions.sort((a, b) => b.pdfCount - a.pdfCount),
-          othersTotal,
-          totalPDFs
-      });
+    // Calculate percentages and split into main and other regions
+    const MAIN_REGIONS_COUNT = 4; // Based on the COLORS.main array length in the React component
+    const MINIMUM_PERCENTAGE_THRESHOLD = 5; // Regions below this percentage go to "Others"
+
+    const processedRegions = allRegions.map(region => ({
+      ...region,
+      percentage: ((region.pdfCount / totalPDFs) * 100).toFixed(1)
+    }));
+
+    // Split regions into main and others based on percentage threshold
+    const mainRegions = [];
+    const otherRegions = [];
+
+    processedRegions.forEach(region => {
+      if (mainRegions.length < MAIN_REGIONS_COUNT && parseFloat(region.percentage) >= MINIMUM_PERCENTAGE_THRESHOLD) {
+        mainRegions.push(region);
+      } else {
+        otherRegions.push(region);
+      }
+    });
+
+    // Calculate total PDFs in "Others" category
+    const othersTotal = otherRegions.reduce((sum, region) => sum + region.pdfCount, 0);
+
+    return res.status(200).json({
+      mainRegions,
+      otherRegions,
+      othersTotal,
+      totalPDFs
+    });
   } catch (error) {
-      console.error('Error in getRegionalDistribution:', error);
-      res.status(500).json({ message: 'Error fetching regional distribution data' });
+    console.error('Error in getRegionalDistribution:', error);
+    return res.status(500).json({
+      message: "An error occurred while fetching regional distribution data.",
+      error: error.message
+    });
   }
 };
-function getDateFilter(timeRange) {
-  const now = new Date();
-  const filters = {
-      'this': {
-          $gte: new Date(now.getFullYear(), now.getMonth(), 1),
-          $lt: new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      },
-      'last': {
-          $gte: new Date(now.getFullYear(), now.getMonth() - 1, 1),
-          $lt: new Date(now.getFullYear(), now.getMonth(), 0)
-      },
-      'quarter': {
-          $gte: new Date(now.getFullYear(), now.getMonth() - 3, 1),
-          $lt: new Date()
-      },
-      'year': {
-          $gte: new Date(now.getFullYear(), 0, 1),
-          $lt: new Date(now.getFullYear() + 1, 0, 1)
-      }
-  };
-  return { createdDateTime: filters[timeRange] };
-}
