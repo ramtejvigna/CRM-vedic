@@ -177,7 +177,11 @@ export const addCustomerWithAssignment = async (req, res) => {
                 luckyGod: horoscopeData?.SignLord || 'Unknown',
                 luckyMetal: horoscopeData?.paya || 'Unknown',
             });
-            await newAstroRecord.save();
+            const astroDetails = await newAstroRecord.save();
+
+            newCustomer.astroDetails = astroDetails._id;
+
+            await newCustomer.save();
         } catch (astroError) {
             console.error("Error saving Astro data:", astroError.message);
             return res.status(500).json({ error: "Failed to save horoscope data" });

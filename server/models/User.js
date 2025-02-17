@@ -33,6 +33,7 @@ const customerSchema = new mongoose.Schema({
     createdDateTime: { type: Date, default: Date.now },
     assignedOn: { type: Date },
     completedOn: { type: Date },
+    astroDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'Astro'},
     note:{type: String},
     preferredStartingLetterType : {type : String,enum:['Alphabet Based','Nakshatra Based','Rashi Based']},
     deadline : {type : Date},

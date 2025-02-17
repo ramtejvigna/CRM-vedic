@@ -1,5 +1,6 @@
 import { PDF as Pdfs } from '../models/PDF.js'
 import Expenses from "../models/Expenses.js"
+import { pipeline } from 'stream';
 import { Customer, Employee } from '../models/User.js';
 import Expense from '../models/Expenses.js';
 
@@ -472,7 +473,11 @@ export const getAnalyticsData = async (req, res) => {
       case 'leadSource':
         groupField = '$leadSource';
         break;
-        
+
+      case 'zodiac':
+        groupField = '$astroDetails.zodiacSign'; // Fetching zodiac sign from Astro details
+        break;
+
       case 'babyGender':
         groupField = '$babyGender';
         break;
