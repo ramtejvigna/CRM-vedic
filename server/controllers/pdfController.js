@@ -89,7 +89,7 @@ export const getBabyNames = async (req, res) => {
 // }
 
 export const sendDetails = async (req, res) => {
-    const { names, customerId, additionalBabyNames, generatedBy, userId } = req.body;
+    const { names, customerId, additionalBabyNames, userId } = req.body;
 
     if (!names || names.length === 0) {
         return res.status(400).json({ error: 'No baby names selected' });
@@ -103,44 +103,38 @@ export const sendDetails = async (req, res) => {
             return res.status(404).json({ error: 'Baby names not found' });
         }
 
-        // Extract the IDs of the selected baby names (already _id, so this is unnecessary)
-        const selectedNamesIds = selectedNames.map(name => name._id);
+        const employee = await Employee.findById(userId);
 
-        // Save the baby names' IDs and other PDF metadata in the PDF collection
+        // Create a new PDF document
         const newPdf = new PDF({
-            babyNames: selectedNamesIds, // Store baby names' IDs
+            babyNames: selectedNames.map(name => name._id), // Store baby names' IDs
             additionalBabyNames: additionalBabyNames,
-            generatedBy: generatedBy,
-            EmployeeGenerated: userId
+            generatedBy: userId,
+            generatedByAdmin: !employee
         });
 
         const savedPdf = await newPdf.save();
 
-        const employee = await Employee.findById(userId);
-        if(!employee) {
+        // Update the Admin or Employee document
+        if (employee) {
+            await Employee.findByIdAndUpdate(
+                userId,
+                { $push: { pdfGenerated: savedPdf._id } },
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            );
+        } else {
             await Admin.findByIdAndUpdate(
                 userId,
-                {
-                    $push: { pdfGenerated: savedPdf._id } // Add the PDF document's ID to the customer record
-                },
+                { $push: { pdfGenerated: savedPdf._id } },
                 { new: true, upsert: true, setDefaultsOnInsert: true }
-            )
-        } else {
-            await employee.updateOne(
-                {
-                    $push: { pdfGenerated: savedPdf._id } // Add the PDF document's ID
-                },
-                { new: true, upsert: true, setDefaultsOnInsert: true }
-            )
+            );
         }
-        
-        // Store the PDF document ID in the customer's record
+
+        // Update the Customer document
         await Customer.findByIdAndUpdate(
             customerId,
-            {
-                $push: { pdfGenerated: savedPdf._id } // Add the PDF document's ID to the customer record
-            },
-            { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is updated/inserted and array created if missing
+            { $push: { pdfGenerated: savedPdf._id } },
+            { new: true, upsert: true, setDefaultsOnInsert: true }
         );
 
         // Send a response indicating success and the stored PDF metadata

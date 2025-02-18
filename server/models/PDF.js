@@ -25,11 +25,8 @@ const PdfSchema = new mongoose.Schema({
             meaning: { type: String, required: true }
         }
     ],
-    generatedBy:{type:String,required:true},
-    EmployeeGenerated: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employee'
-    },
+    generatedBy:{ type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+    generatedByAdmin: { type: Boolean, default: false },
     rating: { type: Number, min: 0, max: 5, default: 0 }, 
 });
 

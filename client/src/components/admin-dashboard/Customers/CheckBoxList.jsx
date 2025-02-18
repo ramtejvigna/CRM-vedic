@@ -182,8 +182,6 @@ const CheckBoxListPage = () => {
 
   const handleSubmit = () => {
     setModalOpen(false);
-
-
   };
 
   const settings = {
@@ -214,9 +212,6 @@ const CheckBoxListPage = () => {
       />
     ),
   };
-
-
-
 
   const navigate = useNavigate();
 
@@ -384,8 +379,7 @@ const CheckBoxListPage = () => {
         names: selectedItems.map((item) => item._id), // Use item._id instead of item.name
         customerId: customerData._id,
         additionalBabyNames: additionalBabyNames,
-        generatedBy: "Admin",
-        userId: Cookies.get('employeeId')
+        userId: Cookies.get("userId")
       });
       toast.success("PDF Generated Successfully");
       setSelectedItems([]);
