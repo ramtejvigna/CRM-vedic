@@ -283,44 +283,71 @@ const parseDateParams = (fromDate, toDate) => {
 export const pdfGeneratedByEmployee = async (req, res) => {
   try {
     const { fromDate, toDate } = req.query;
-    const dateQuery = parseDateParams(fromDate, toDate);
 
-    // First get all employees including admins
-    const allEmployees = await Employee.find({}).select('firstName lastName email role');
+    // If dates aren't provided, return all data
+    let dateQuery = {};
+    
+    if (fromDate && toDate) {
+      // Parse and validate dates
+      const startDate = new Date(fromDate);
+      const endDate = new Date(toDate);
 
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return res.status(400).json({ 
+          error: 'Invalid date format. Please use ISO date format' 
+        });
+      }
 
-    // Get PDF stats for the date range
+      if (startDate > endDate) {
+        return res.status(400).json({ 
+          error: 'fromDate must be before or equal to toDate' 
+        });
+      }
+
+      dateQuery = {
+        createdAt: {
+          $gte: startDate,
+          $lte: new Date(endDate.setHours(23, 59, 59, 999))
+        }
+      };
+    }
+
+    // Get all employees
+    const allEmployees = await Employee.find({})
+      .select('firstName lastName role')
+      .lean();
+
+    // Get PDF statistics for the date range
     const pdfStats = await Pdfs.aggregate([
-      // Match PDFs within the date range
       { $match: dateQuery },
-      // Group by EmployeeGenerated and count the PDFs
       {
         $group: {
-          _id: '$EmployeeGenerated',
-          count: { $sum: 1 },
-        },
+          _id: '$generatedBy',
+          count: { $sum: 1 }
+        }
       }
     ]);
 
-    // Combine employee data with PDF stats, ensuring all employees are included
+    // Combine employee data with PDF stats
     const combinedStats = allEmployees.map(employee => {
-      const pdfStat = pdfStats.find(stat =>
-        stat._id && stat._id.toString() === employee._id.toString()
-      );
+      const pdfStat = pdfStats.find(
+        stat => stat._id && stat._id.toString() === employee._id.toString()
+      ) || { count: 0 };
 
       return {
-        employeeId: employee._id,
         employeeName: `${employee.firstName} ${employee.lastName}`,
-        email: employee.email,
         role: employee.role,
-        count: pdfStat ? pdfStat.count : 0
+        count: pdfStat.count
       };
     });
 
     res.status(200).json(combinedStats);
   } catch (error) {
     console.error('Error fetching PDF statistics:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      message: error.message 
+    });
   }
 };
 
