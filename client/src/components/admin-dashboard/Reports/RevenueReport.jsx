@@ -200,32 +200,6 @@ function RevenueReport() {
                 <option value="weekly">Weekly</option>
               </select>
             </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <select
-                value={employeeFilter}
-                onChange={handleEmployeeChange}
-                className="border cursor-pointer text-black rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="overall">Overall</option>
-                <AnimatePresence>
-                  {employees.map((employee) => (
-                    <motion.option 
-                      key={employee._id} 
-                      value={employee._id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      {employee.firstName}
-                    </motion.option>
-                  ))}
-                </AnimatePresence>
-              </select>
-            </motion.div>
           </motion.div>
         )}
         title="Revenue Report"
