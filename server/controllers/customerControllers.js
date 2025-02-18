@@ -283,7 +283,14 @@ export const getCustomersBasedOnRequests = async (req, res) => {
     try {
         const employeeId = req.params.employeeId;
 
-        const employee = await Employee.findById(employeeId).populate('customers');
+        const employee = await Employee.findById(employeeId)
+                                        .populate({
+                                            path: 'customers',
+                                            populate: {
+                                            path: 'astroDetails',
+                                            model: 'Astro'
+                                            }
+                                        });
 
         if (!employee) {
             return res.status(404).json({ error: "Employee not found" });

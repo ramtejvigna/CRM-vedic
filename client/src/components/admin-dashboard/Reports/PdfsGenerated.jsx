@@ -2,27 +2,22 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { FileText, Calendar } from "lucide-react";
-import axios from "axios"
-import { HOST } from "../../../utils/constants.js"
+import axios from "axios";
+import { HOST } from "../../../utils/constants.js";
 
 const DailyPdfsGenerated = () => {
   const [chartData, setChartData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const COLORS = [
-    "#6A5ACD", // Slate Blue
-    "#4CAF50", // Vibrant Green
-    "#FF6B6B", // Soft Red
-    "#4ECDC4", // Teal
-    "#556270", // Dark Slate Gray
-    "#FFA500", // Orange
-    "#2E8B57", // Sea Green
+    "#6A5ACD", "#4CAF50", "#FF6B6B", "#4ECDC4", 
+    "#556270", "#FFA500", "#2E8B57",
   ];
 
   useEffect(() => {
-    // Set default date range to current month
     if (!startDate && !endDate) {
       const today = new Date();
       const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -39,23 +34,27 @@ const DailyPdfsGenerated = () => {
 
       try {
         setLoading(true);
+        setError(null);
         
-        // Update API endpoint to accept date range
-        const res = await axios.get(`${HOST}/api/reports/pdf-gen-range?startDate=${startDate}&endDate=${endDate}`, {
-          credentials: 'include'
+        const response = await axios.get(`${HOST}/api/reports/pdf-gen-range`, {
+          params: {
+            startDate,
+            endDate
+          },
+          withCredentials: true
         });
 
-        const data = res.data;
-
-        const processedData = data.map((item, index) => ({
+        const processedData = response.data.map((item, index) => ({
           name: item.name || "Unknown",
           pdfs: item.count || 0,
+          role: item.role || "Unknown",
           color: COLORS[index % COLORS.length],
         }));
 
         setChartData(processedData);
       } catch (error) {
         console.error("Error fetching PDF data:", error);
+        setError(error.response?.data?.message || "Failed to fetch PDF data");
       } finally {
         setLoading(false);
       }
@@ -63,6 +62,19 @@ const DailyPdfsGenerated = () => {
 
     fetchPdfData();
   }, [startDate, endDate]);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-slate-800 text-white p-3 rounded-lg shadow-lg">
+          <p className="font-semibold">{label}</p>
+          <p className="text-emerald-400">PDFs Generated: {payload[0].value}</p>
+          <p className="text-gray-300">Role: {payload[0].payload.role}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <motion.div
@@ -100,6 +112,12 @@ const DailyPdfsGenerated = () => {
         </div>
       </div>
 
+      {error && (
+        <div className="text-red-500 text-center mb-4">
+          {error}
+        </div>
+      )}
+
       {loading ? (
         <motion.div
           initial={{ opacity: 0 }}
@@ -112,26 +130,16 @@ const DailyPdfsGenerated = () => {
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-            <XAxis dataKey="name" interval={0} angle={-45} textAnchor="end" height={100} />
-            <YAxis />
-            <Tooltip
-              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-              contentStyle={{
-                background: '#1E293B',
-                color: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                border: 'none',
-              }}
-              itemStyle={{
-                color: '#4CAF50',
-                fontWeight: 'bold',
-              }}
-              labelStyle={{
-                color: '#E2E8F0',
-                fontWeight: '600',
-              }}
+            <XAxis 
+              dataKey="name" 
+              interval={0} 
+              angle={-45} 
+              textAnchor="end" 
+              height={100}
+              tick={{ fontSize: 12 }}
             />
+            <YAxis />
+            <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="pdfs" name="PDFs">
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
