@@ -1,8 +1,9 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Eye, Link as LinkIcon,X,Search,Filter, Trash} from "lucide-react"; // Import Lucide icons
+import { Eye, Link as LinkIcon, X, Search, Filter, Trash, Edit2 } from "lucide-react";
 import { motion } from 'framer-motion';
 import { api } from '../../../utils/constants';
+
 
 
 function PostForm() {
@@ -35,6 +36,25 @@ function PostForm() {
         author: '',
         uniqueId: '',
     });
+    const [editingPost, setEditingPost] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    const handleEdit = (post) => {
+        setEditingPost(post);
+        setShowEditModal(true);
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.put(`${api}/api/posts/${editingPost._id}`, editingPost);
+            setShowEditModal(false);
+            setEditingPost(null);
+            fetchPosts(); // Refresh the posts list
+        } catch (error) {
+            console.error('Error updating post:', error);
+        }
+    };
 
     // Toggle filter visibility
     const toggleFilters = () => {
@@ -42,18 +62,22 @@ function PostForm() {
     };
 
     // Handle rows per page change
-const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setPage(0); // Reset to first page when changing rows per page
-};
+    const handleChangeRowsPerPage = (e) => {
+        setRowsPerPage(parseInt(e.target.value, 10));
+        setPage(0); // Reset to first page when changing rows per page
+    };
 
-// Handle page change
-const handleChangePage = (newPage) => {
-    setPage(newPage);
-};
+    // Handle page change
+    const handleChangePage = (newPage) => {
+        setPage(newPage);
+    };
 
-    
-    
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setEditingPost({ ...editingPost, [name]: value });
+    };
+
 
     // Fetch posts from the backend
     const fetchPosts = async () => {
@@ -103,18 +127,18 @@ const handleChangePage = (newPage) => {
         // Global search logic
         const matchesGlobalSearch = Object.values(post)
             .some((value) => value && value.toString().toLowerCase().includes(searchQuery));
-    
+
         // Individual filters logic
         const matchesPlatform = !filters.platform || post.socialMediaPlatform.toLowerCase().includes(filters.platform.toLowerCase());
         const matchesDate = !filters.date || post.dateOfPost.slice(0, 10) === filters.date; // Comparing the date string format YYYY-MM-DD
         const matchesAuthor = !filters.author || post.employeeAuthor.toLowerCase().includes(filters.author.toLowerCase());
         const matchesUniqueId = !filters.uniqueId || post.uniqueId.toLowerCase().includes(filters.uniqueId.toLowerCase());
-    
+
         return matchesGlobalSearch && matchesPlatform && matchesDate && matchesAuthor && matchesUniqueId;
     });
-    
+
     // Pagination logic: slice the filtered posts array to show only the current page's data
-const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rowsPerPage) || [];
+    const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rowsPerPage) || [];
 
     const openModal = (caption) => {
         setModalCaption(caption);
@@ -126,173 +150,355 @@ const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rows
         setShowModal(false);
     };
 
+
+    const EditModal = () => (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div className="bg-white w-3/4 max-w-4xl p-6 rounded-lg shadow-lg relative max-h-90vh overflow-y-auto">
+                <button
+                    onClick={() => {
+                        setShowEditModal(false);
+                        setEditingPost(null);
+                    }}
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+                <h3 className="text-xl font-semibold mb-6">Edit Post</h3>
+                <form onSubmit={handleEditSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Unique Id</label>
+                            <input
+                                type="text"
+                                name="uniqueId"
+                                value={editingPost?.uniqueId || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Platform</label>
+                            <input
+                                type="text"
+                                name="socialMediaPlatform"
+                                value={editingPost?.socialMediaPlatform || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Headline</label>
+                            <input
+                                type="text"
+                                name="headline"
+                                value={editingPost?.headline || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Caption</label>
+                            <textarea
+                                name="caption"
+                                value={editingPost?.caption || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                rows="3"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Date</label>
+                            <input
+                                type="date"
+                                name="dateOfPost"
+                                value={editingPost?.dateOfPost?.split('T')[0] || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Time</label>
+                            <input
+                                type="time"
+                                name="time"
+                                value={editingPost?.time || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Author</label>
+                            <input
+                                type="text"
+                                name="employeeAuthor"
+                                value={editingPost?.employeeAuthor || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">12h Views</label>
+                            <input
+                                type="number"
+                                name="view12Hour"
+                                value={editingPost?.view12Hour || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">24h Views</label>
+                            <input
+                                type="number"
+                                name="view24Hour"
+                                value={editingPost?.view24Hour || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">48h Views</label>
+                            <input
+                                type="number"
+                                name="view48Hour"
+                                value={editingPost?.view48Hour || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Link</label>
+                            <input
+                                type="url"
+                                name="link"
+                                value={editingPost?.link || ''}
+                                onChange={handleEditChange}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end space-x-3 mt-6">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowEditModal(false);
+                                setEditingPost(null);
+                            }}
+                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                        >
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+
+    const ActionsCell = ({ post }) => (
+        <td className="px-6 py-4 whitespace-nowrap">
+            <div className="flex space-x-2">
+                <button
+                    onClick={() => handleEdit(post)}
+                    className="text-blue-500 hover:text-blue-700"
+                >
+                    <Edit2 className="inline-block w-5 h-5" />
+                </button>
+                <button
+                    onClick={() => handleDelete(post._id)}
+                    className="text-red-500 hover:text-red-700"
+                >
+                    <Trash className="inline-block w-5 h-5" />
+                </button>
+            </div>
+        </td>
+    );
+
+
     return (
         <div className="p-4 md:p-8 min-h-screen">
-    <h1 className="text-2xl font-semibold mb-4">Post Form</h1>
+            <h1 className="text-2xl font-semibold mb-4">Post Form</h1>
 
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 shadow rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label htmlFor="uniqueId" className="block text-sm font-medium text-gray-700">Unique Id</label>
-                <input type="text" id="uniqueId" name="uniqueId" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter unique ID0" value={formData.uniqueId}  onChange={handleChange}  required/>
+            <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 shadow rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="uniqueId" className="block text-sm font-medium text-gray-700">Unique Id</label>
+                        <input type="text" id="uniqueId" name="uniqueId" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter unique ID0" value={formData.uniqueId} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="socialMediaPlatform" className="block text-sm font-medium text-gray-700">Social Media Platform</label>
+                        <input type="text" id="socialMediaPlatform" name="socialMediaPlatform" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter social media platform" value={formData.socialMediaPlatform} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="headline" className="block text-sm font-medium text-gray-700">Headline</label>
+                        <input type="text" id="headline" name="headline" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter headline" value={formData.headline} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="caption" className="block text-sm font-medium text-gray-700">Caption</label>
+                        <textarea id="caption" name="caption" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter caption" rows="3" value={formData.caption} onChange={handleChange} required></textarea>
+                    </div>
+
+                    <div>
+                        <label htmlFor="dateOfPost" className="block text-sm font-medium text-gray-700">Date of Post</label>
+                        <input type="date" id="dateOfPost" name="dateOfPost" className="mt-1 block w-full p-2 border rounded-md" value={formData.dateOfPost} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="time" className="block text-sm font-medium text-gray-700">Time</label>
+                        <input type="time" id="time" name="time" className="mt-1 block w-full p-2 border rounded-md" value={formData.time} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="indexStatus" className="block text-sm font-medium text-gray-700">Index Status</label>
+                        <input type="text" id="indexStatus" name="indexStatus" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter index status" value={formData.indexStatus} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="employeeAuthor" className="block text-sm font-medium text-gray-700">Employee/Author</label>
+                        <input type="text" id="employeeAuthor" name="employeeAuthor" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter employee/author name" value={formData.employeeAuthor} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="view12Hour" className="block text-sm font-medium text-gray-700">12 Hour View</label>
+                        <input type="number" id="view12Hour" name="view12Hour" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter 12-hour views" value={formData.view12Hour} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="view24Hour" className="block text-sm font-medium text-gray-700">24 Hour View</label>
+                        <input type="number" id="view24Hour" name="view24Hour" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter 24-hour views" value={formData.view24Hour} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="view48Hour" className="block text-sm font-medium text-gray-700">48 Hour View</label>
+                        <input type="number" id="view48Hour" name="view48Hour" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter 48-hour views" value={formData.view48Hour} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                        <label htmlFor="link" className="block text-sm font-medium text-gray-700">Link</label>
+                        <input type="url" id="link" name="link" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter link" value={formData.link} onChange={handleChange} required />
+                    </div>
+                </div>
+
+                <div className="text-right">
+                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
+                </div>
+            </form>
+
+            {/* Posts Table */}
+            <h2 className="text-xl font-semibold mt-8 mb-4">Posts Table</h2>
+            <div className="flex items-center space-x-4"> {/* Flex container for search input and button */}
+                <div className="relative flex-1 min-w-0 w-30"> {/* Adjusted width here */}
+                    <input
+                        type="text"
+                        placeholder="Search Names"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
+                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+                    />
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={toggleFilters}
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-white transition duration-300 flex items-center justify-center"
+                >
+                    <Filter className="h-5 w-5 mr-2" />
+                    <span>Filters</span>
+                </motion.button>
             </div>
 
-            <div>
-                <label htmlFor="socialMediaPlatform" className="block text-sm font-medium text-gray-700">Social Media Platform</label>
-                <input type="text" id="socialMediaPlatform" name="socialMediaPlatform" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter social media platform" value={formData.socialMediaPlatform}  onChange={handleChange} required/>
-            </div>
 
-            <div>
-                <label htmlFor="headline" className="block text-sm font-medium text-gray-700">Headline</label>
-                <input type="text" id="headline" name="headline" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter headline" value={formData.headline}  onChange={handleChange} required/>
-            </div>
+            <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: showFilters ? 'auto' : 0, opacity: showFilters ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden bg-gray-100 rounded-lg shadow-lg mt-4 p-4"
+            >
+                {showFilters && (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label htmlFor="platform" className="block text-sm font-medium text-gray-700">
+                                Platform
+                            </label>
+                            <input
+                                type="text"
+                                id="platform"
+                                placeholder="Enter platform"
+                                value={filters.platform}
+                                onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                            />
 
-            <div>
-                <label htmlFor="caption" className="block text-sm font-medium text-gray-700">Caption</label>
-                <textarea id="caption" name="caption" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter caption" rows="3" value={formData.caption}  onChange={handleChange} required></textarea>
-            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                                Date
+                            </label>
+                            <input
+                                type="date"
+                                id="date"
+                                value={filters.date}
+                                onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                            />
 
-            <div>
-                <label htmlFor="dateOfPost" className="block text-sm font-medium text-gray-700">Date of Post</label>
-                <input type="date" id="dateOfPost" name="dateOfPost" className="mt-1 block w-full p-2 border rounded-md"  value={formData.dateOfPost}  onChange={handleChange} required/>
-            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="author" className="block text-sm font-medium text-gray-700">
+                                Author
+                            </label>
+                            <input
+                                type="text"
+                                id="author"
+                                placeholder="Search by author"
+                                value={filters.author}
+                                onChange={(e) => setFilters({ ...filters, author: e.target.value })}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                            />
 
-            <div>
-                <label htmlFor="time" className="block text-sm font-medium text-gray-700">Time</label>
-                <input type="time" id="time" name="time" className="mt-1 block w-full p-2 border rounded-md" value={formData.time} onChange={handleChange} required/>
-            </div>
-
-            <div>
-                <label htmlFor="indexStatus" className="block text-sm font-medium text-gray-700">Index Status</label>
-                <input type="text" id="indexStatus" name="indexStatus" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter index status" value={formData.indexStatus}  onChange={handleChange} required />
-            </div>
-
-            <div>
-                <label htmlFor="employeeAuthor" className="block text-sm font-medium text-gray-700">Employee/Author</label>
-                <input type="text" id="employeeAuthor" name="employeeAuthor" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter employee/author name" value={formData.employeeAuthor}  onChange={handleChange} required/>
-            </div>
-
-            <div>
-                <label htmlFor="view12Hour" className="block text-sm font-medium text-gray-700">12 Hour View</label>
-                <input type="number" id="view12Hour" name="view12Hour" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter 12-hour views"  value={formData.view12Hour}  onChange={handleChange} required/>
-            </div>
-
-            <div>
-                <label htmlFor="view24Hour" className="block text-sm font-medium text-gray-700">24 Hour View</label>
-                <input type="number" id="view24Hour" name="view24Hour" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter 24-hour views"  value={formData.view24Hour} onChange={handleChange} required/>
-            </div>
-
-            <div>
-                <label htmlFor="view48Hour" className="block text-sm font-medium text-gray-700">48 Hour View</label>
-                <input type="number" id="view48Hour" name="view48Hour" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter 48-hour views" value={formData.view48Hour} onChange={handleChange} required/>
-            </div>
-
-            <div>
-                <label htmlFor="link" className="block text-sm font-medium text-gray-700">Link</label>
-                <input type="url" id="link" name="link" className="mt-1 block w-full p-2 border rounded-md" placeholder="Enter link"   value={formData.link}  onChange={handleChange} required/>
-            </div>
-        </div>
-
-        <div className="text-right">
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
-        </div>
-    </form>
-
-         {/* Posts Table */}
-         <h2 className="text-xl font-semibold mt-8 mb-4">Posts Table</h2>
-         <div className="flex items-center space-x-4"> {/* Flex container for search input and button */}
-    <div className="relative flex-1 min-w-0 w-30"> {/* Adjusted width here */}
-        <input
-            type="text"
-            placeholder="Search Names"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
-        />
-        <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-    </div>
-
-    <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={toggleFilters}
-        className="px-4 py-2 rounded-lg bg-blue-600 text-white transition duration-300 flex items-center justify-center"
-    >
-        <Filter className="h-5 w-5 mr-2" />
-        <span>Filters</span>
-    </motion.button>
-</div>
+                        </div>
+                        <div>
+                            <label htmlFor="uniqueId" className="block text-sm font-medium text-gray-700">
+                                Unique ID
+                            </label>
+                            <input
+                                type="text"
+                                id="uniqueId"
+                                placeholder="Search by unique ID"
+                                value={filters.uniqueId}
+                                onChange={(e) => setFilters({ ...filters, uniqueId: e.target.value })}
+                                className="mt-1 block w-full p-2 border rounded-md"
+                            />
+                        </div>
+                    </div>
+                )}
+            </motion.div>
 
 
-        <motion.div
-    initial={{ height: 0, opacity: 0 }}
-    animate={{ height: showFilters ? 'auto' : 0, opacity: showFilters ? 1 : 0 }}
-    transition={{ duration: 0.3 }}
-    className="overflow-hidden bg-gray-100 rounded-lg shadow-lg mt-4 p-4"
->
-    {showFilters && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label htmlFor="platform" className="block text-sm font-medium text-gray-700">
-                    Platform
-                </label>
-                <input
-                    type="text"
-                    id="platform"
-                    placeholder="Enter platform"
-                    value={filters.platform}
-                    onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
-                    className="mt-1 block w-full p-2 border rounded-md"
-                />
+            {showEditModal && <EditModal />}
 
-            </div>
-            <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                    Date
-                </label>
-                <input
-                    type="date"
-                    id="date"
-                    value={filters.date}
-                    onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-                    className="mt-1 block w-full p-2 border rounded-md"
-                />
-
-            </div>
-            <div>
-                <label htmlFor="author" className="block text-sm font-medium text-gray-700">
-                    Author
-                </label>
-                <input
-                    type="text"
-                    id="author"
-                    placeholder="Search by author"
-                    value={filters.author}
-                    onChange={(e) => setFilters({ ...filters, author: e.target.value })}
-                    className="mt-1 block w-full p-2 border rounded-md"
-                />
-
-            </div>
-            <div>
-                <label htmlFor="uniqueId" className="block text-sm font-medium text-gray-700">
-                    Unique ID
-                </label>
-                <input
-                    type="text"
-                    id="uniqueId"
-                    placeholder="Search by unique ID"
-                    value={filters.uniqueId}
-                    onChange={(e) => setFilters({ ...filters, uniqueId: e.target.value })}
-                    className="mt-1 block w-full p-2 border rounded-md"
-                />
-            </div>
-        </div>
-    )}
-</motion.div>
-
-         
-
-         <div className="overflow-x-auto p-4">
+            <div className="overflow-x-auto p-4">
                 <div className="bg-white rounded-lg shadow-xl">
                     <table className="min-w-full divide-y min-h-full divide-gray-200">
                         <thead className="bg-gray-50">
@@ -331,8 +537,8 @@ const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rows
                                             onClick={() => openModal(post.caption)}
                                             className="text-blue-500 hover:underline"
                                         >
-                                        <Eye className="inline-block w-5 h-5" />
-                                         </button>
+                                            <Eye className="inline-block w-5 h-5" />
+                                        </button>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {post.dateOfPost
@@ -352,15 +558,10 @@ const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rows
                                             className="text-blue-500 hover:underline"
                                         >
                                             <LinkIcon className="inline-block w-5 h-5" />
-                                            </a>
+                                        </a>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <button
-                                            onClick={() => handleDelete(post._id)}  // Call handleDelete on click
-                                            className="text-red-500 hover:text-red-700"
-                                        >
-                                            <Trash className="inline-block w-5 h-5" />
-                                        </button>
+                                        <ActionsCell post={post} />
                                     </td>
                                 </tr>
                             ))}
@@ -374,36 +575,36 @@ const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rows
             </div>
 
             <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-lg px-4 py-3">
-            <div className="flex items-center">
-                <span className="mr-2 text-sm">Rows per page:</span>
-                <select
-                    value={rowsPerPage}
-                    onChange={handleChangeRowsPerPage}
-                    className="border border-gray-300 rounded-lg pl-2 pr-5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
-                >
-                    {[5, 10, 25].map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                    ))}
-                </select>
+                <div className="flex items-center">
+                    <span className="mr-2 text-sm">Rows per page:</span>
+                    <select
+                        value={rowsPerPage}
+                        onChange={handleChangeRowsPerPage}
+                        className="border border-gray-300 rounded-lg pl-2 pr-5 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+                    >
+                        {[5, 10, 25].map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <button
+                        onClick={() => handleChangePage(page - 1)}
+                        disabled={page === 0}
+                        className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 disabled:opacity-50 transition duration-300 text-sm"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-sm">{`Page ${page + 1} of ${Math.ceil(filteredPosts.length / rowsPerPage)}`}</span>
+                    <button
+                        onClick={() => handleChangePage(page + 1)}
+                        disabled={page >= Math.ceil(filteredPosts.length / rowsPerPage) - 1}
+                        className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 disabled:opacity-50 transition duration-300 text-sm"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
-            <div className="flex items-center space-x-2">
-                <button
-                    onClick={() => handleChangePage(page - 1)}
-                    disabled={page === 0}
-                    className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 disabled:opacity-50 transition duration-300 text-sm"
-                >
-                    Previous
-                </button>
-                <span className="text-sm">{`Page ${page + 1} of ${Math.ceil(filteredPosts.length / rowsPerPage)}`}</span>
-                <button
-                    onClick={() => handleChangePage(page + 1)}
-                    disabled={page >= Math.ceil(filteredPosts.length / rowsPerPage) - 1}
-                    className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 disabled:opacity-50 transition duration-300 text-sm"
-                >
-                    Next
-                </button>
-            </div>
-        </div>
 
             {/* Modal */}
             {showModal && (
@@ -420,7 +621,7 @@ const displayedPosts = filteredPosts.slice(page * rowsPerPage, (page + 1) * rows
                     </div>
                 </div>
             )}
-</div>
+        </div>
 
     );
 }
